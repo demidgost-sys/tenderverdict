@@ -5,7 +5,15 @@ All notable changes to TenderVerdict are documented here.
 The format follows the principles of Keep a Changelog. The project uses Python-compatible version
 identifiers and may change interfaces during the alpha period.
 
-## [0.1.0a1] - Unreleased
+## [Unreleased]
+
+### Changed
+
+- Reworked the public README into a developer-focused project overview and corrected the macOS
+  quick start to use `python3`.
+- Added GitHub issue and pull-request templates for reproducible, non-confidential feedback.
+
+## [0.1.0a1] - 2026-08-02
 
 ### Added
 

@@ -56,6 +56,7 @@ OFFICIAL_URL_HOSTS = {
     "git-lfs.github.com",
     "github.com",
     "www.apache.org",
+    "www.w3.org",
 }
 
 

@@ -1,0 +1,44 @@
+name: Research feedback
+description: Share a workflow observation or a synthetic reproducible example
+title: "[Feedback] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        TenderVerdict is a developer alpha. Feedback is most useful when it identifies a concrete metadata-review step, ambiguity, or safely synthetic example.
+
+  - type: dropdown
+    id: perspective
+    attributes:
+      label: Perspective
+      options:
+        - Procurement technology
+        - Supplier or bidder workflow
+        - Public-procurement research
+        - Software engineering
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observation
+      description: What did you test or observe? What was useful, unclear, or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Synthetic example
+      description: If possible, provide a minimal fictional profile or notice that illustrates the point.
+
+  - type: checkboxes
+    id: data_boundary
+    attributes:
+      label: Data boundary
+      options:
+        - label: I did not include confidential documents, credentials, personal data, or undisclosed vulnerability details.
+          required: true

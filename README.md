@@ -1,39 +1,97 @@
-# TenderVerdict
+<p align="center">
+  <img src="docs/assets/tenderverdict-banner.svg" alt="TenderVerdict turns supplied procurement notice metadata into an explainable local review queue with open_documents, watch, and reject states.">
+</p>
 
-TenderVerdict is an experimental open-source, local-first command-line tool and Python library
-for supplier-side pre-qualification of public-procurement notice metadata.
+<h1 align="center">TenderVerdict</h1>
 
-It compares a manually supplied company profile with structured notice metadata and produces one
-of three review states:
+<p align="center"><strong>Explainable procurement metadata triage, run locally.</strong></p>
 
-- `open_documents`: the metadata passes the deterministic pre-qualification checks;
-- `watch`: important metadata is missing or only a broader CPV-family match is available;
-- `reject`: a deterministic exclusion rule applies.
+<p align="center">
+  <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status for main"></a>
+  &nbsp;·&nbsp; <a href="https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.1.0-alpha.1">v0.1.0-alpha.1</a>
+  &nbsp;·&nbsp; Python 3.11+
+  &nbsp;·&nbsp; <a href="LICENSE">Apache-2.0</a>
+</p>
 
-Every result includes human-readable reasons, unresolved fields, and a next review step. The output
-is decision support for a person. It is not legal advice, an eligibility determination, a bid/no-bid
-recommendation, an award decision, or a substitute for reading the procurement documents.
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#example-output">Example output</a> ·
+  <a href="#verdicts">Verdicts</a> ·
+  <a href="LIMITATIONS.md">Limitations</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
-> **Alpha status:** `0.1.0a1` is an experimental release candidate. Interfaces and rules can change.
-> Use synthetic or non-confidential inputs while evaluating it.
+TenderVerdict is an experimental open-source CLI and Python library for supplier-side
+pre-qualification of public-procurement **notice metadata**. You supply a company profile and
+structured notices; TenderVerdict applies narrow, deterministic rules and produces a review queue
+with reasons, unresolved fields, and a human next step.
 
-## Synthetic offline demo
+It does not read full procurement documents or decide whether you should bid.
 
-The demo uses only files committed to this repository and performs no network requests.
+| Property | What it means |
+|---|---|
+| **Local-first** | `demo` and `qualify` read local files and make no network requests. |
+| **Deterministic** | The same inputs and `--as-of` date produce the same verdicts. |
+| **Traceable** | Every result preserves reasons, unknowns, and the supplied source URL. |
+| **Fail closed** | Invalid input or a failed fetch returns an error without publishing partial output. |
+| **Small footprint** | The installed package has no runtime dependencies. |
+
+> [!IMPORTANT]
+> `0.1.0a1` is a developer alpha. Interfaces and rules may change. Start with the bundled
+> synthetic example and avoid confidential inputs while evaluating it.
+
+## Quick start
+
+Requires Python 3.11 or newer. The commands below install the immutable developer alpha in an
+isolated virtual environment.
+
+### macOS or Linux
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate
-python -m pip install .
-tenderverdict demo
+git clone --branch v0.1.0-alpha.1 --depth 1 \
+  https://github.com/demidgost-sys/tenderverdict.git
+cd tenderverdict
+python3 -m venv .venv
+.venv/bin/python -m pip install .
+.venv/bin/tenderverdict demo
 ```
 
-The generated demo contains exactly one example of each state. Use
-`tenderverdict demo --format html --output demo/index.html` to reproduce the tracked HTML copy.
+### Windows PowerShell
 
-![Synthetic TenderVerdict qualification report](demo/screenshot.png)
+```powershell
+git clone --branch v0.1.0-alpha.1 --depth 1 `
+  https://github.com/demidgost-sys/tenderverdict.git
+cd tenderverdict
+py -m venv .venv
+.venv\Scripts\python -m pip install .
+.venv\Scripts\tenderverdict demo
+```
 
-The screenshot is generated from the fictional, fully offline example committed to this repository.
+Once installed, the demo is fully offline and returns exactly one example of each verdict.
+Installing from source may download the pinned build tool if it is not already cached.
+
+## Example output
+
+| Verdict | Why it appears | Human next step |
+|---|---|---|
+| `open_documents` | Exact CPV and geography match, sufficient lead time, competition notice, valid HTTPS source URL | Open and review the official documents. |
+| `watch` | Important metadata is missing or only a broader CPV-family match is available | Resolve the flagged uncertainty first. |
+| `reject` | A configured hard stop applies, such as a near deadline or explicit mismatch | Stop unless the metadata is corrected. |
+
+<details>
+<summary><strong>View the complete synthetic HTML report</strong></summary>
+
+<p align="center">
+  <img src="demo/screenshot.png" width="900" alt="Synthetic TenderVerdict report with one open_documents result, one watch result, and one reject result.">
+</p>
+
+The report is generated from fictional data committed to this repository. Reproduce it with:
+
+```bash
+tenderverdict demo --format html --output demo/index.html
+```
+
+</details>
 
 ## Qualify local notice metadata
 
@@ -46,10 +104,10 @@ tenderverdict qualify \
   --output report.md
 ```
 
-Use `--format json` for machine-readable output. Input validation failures return a non-zero exit
-code and do not replace an existing output file.
+Use `--format json` for machine-readable output. Validation errors return a non-zero exit code and
+do not replace an existing output file.
 
-The minimal profile schema is:
+Minimal company profile:
 
 ```json
 {
@@ -61,11 +119,26 @@ The minimal profile schema is:
 }
 ```
 
-See the synthetic fixtures for the notice fields expected by the tool.
+See [`examples/synthetic`](examples/synthetic) for the notice schema and a reproducible example.
+
+## Verdicts
+
+The qualification rules are deliberately narrow:
+
+- `reject` — a closed or near deadline, explicit CPV/country mismatch, or non-competition notice;
+- `watch` — missing important metadata, an invalid source URL, or only a CPV-family match;
+- `open_documents` — exact CPV and geography match, sufficient lead time, competition notice, and
+  a syntactically valid absolute HTTPS source URL.
+
+`open_documents` means only that the configured metadata checks passed. TenderVerdict does not
+provide legal advice, determine eligibility, compare bidders, predict outcomes, recommend bidding,
+or take an autonomous procurement action. Read [`LIMITATIONS.md`](LIMITATIONS.md) before applying
+the output to real work.
 
 ## Optional TED metadata fetch
 
-`fetch-ted` is an explicit read-only network operation. It is not used by the demo, tests, or CI.
+`fetch-ted` is an explicit, read-only network operation. The demo, local qualification, tests, and
+CI do not use it.
 
 ```bash
 tenderverdict fetch-ted \
@@ -74,52 +147,41 @@ tenderverdict fetch-ted \
   --output notices.json
 ```
 
-The adapter uses the fixed HTTPS TED Search API endpoint, applies bounded pagination and response
-limits, and replaces the output only after a complete successful fetch. Review the source data and
-the current TED terms before relying on it. See [DATA_SOURCES.md](DATA_SOURCES.md).
-
-## What the rules mean
-
-The rules are intentionally narrow and deterministic:
-
-- closed or too-near deadlines, explicit CPV/country mismatches, and non-competition notices are
-  `reject`;
-- missing required metadata, a missing or syntactically invalid absolute HTTPS source URL, or only
-  a CPV-family match is `watch`;
-- an exact CPV and geography match, enough lead time, a competition notice, and a syntactically
-  valid absolute HTTPS source URL are `open_documents`.
-
-There is no confidence score, prediction, bidder comparison, or autonomous procurement action.
-Read [LIMITATIONS.md](LIMITATIONS.md) before applying the output to real work.
+The adapter uses the fixed HTTPS TED Search API endpoint, bounded pagination and response limits,
+and atomic output replacement after a complete successful fetch. Review [`DATA_SOURCES.md`](DATA_SOURCES.md)
+and the current source terms before relying on fetched metadata.
 
 ## Development
 
 ```bash
-python -m unittest discover -s tests -v
-python tools/check_public_tree.py
-python tools/security_scan.py
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+python3 tools/check_public_tree.py
+python3 tools/security_scan.py
 ruff check .
 ruff format --check .
 ```
 
-The functional test suite is offline. TED behaviour is tested with mocked HTTP responses.
+The functional test suite is offline; TED behaviour is tested with mocked HTTP responses.
+Reproducible bug reports and research feedback are welcome through
+[`GitHub Issues`](https://github.com/demidgost-sys/tenderverdict/issues). There is no guaranteed
+support or response time during the alpha period.
 
-Issues and research feedback are welcome. During the first 30 days, opening an issue does not imply
-that a change will be merged or that an individual response will be available. See
-[CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md), and
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) before contributing.
 
 ## Deutsch
 
-TenderVerdict ist ein experimentelles, quelloffenes und lokal ausgeführtes Kommandozeilenwerkzeug
-zur Vorqualifizierung von Metadaten öffentlicher Ausschreibungen aus Sicht von Anbietern. Es
-erstellt nachvollziehbare Prüfhinweise für Menschen. Es bietet keine Rechtsberatung, trifft keine
-Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung der Ausschreibungsunterlagen.
+TenderVerdict ist ein experimentelles, quelloffenes und lokal ausgeführtes CLI zur
+Vorqualifizierung von Metadaten öffentlicher Ausschreibungen aus Sicht von Anbietern. Ein lokales
+Unternehmensprofil und strukturierte Notice-JSON-Daten werden nachvollziehbar als
+`open_documents`, `watch` oder `reject` eingeordnet. Das Werkzeug bietet keine Rechtsberatung,
+trifft keine Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung der
+Ausschreibungsunterlagen.
 
 ## License and attribution
 
-The code is licensed under the [Apache License 2.0](LICENSE). Procurement records, TED names,
-logos, interfaces, and source data are not relicensed by this repository. See [NOTICE](NOTICE) and
-[DATA_SOURCES.md](DATA_SOURCES.md).
+The code is licensed under the [`Apache License 2.0`](LICENSE). Procurement records, TED names,
+logos, interfaces, and source data are not relicensed by this repository. See [`NOTICE`](NOTICE)
+and [`DATA_SOURCES.md`](DATA_SOURCES.md).
 
-Maintained by Demid Valiullin in Graz, Austria.
+Maintained by [Demid Valiullin](https://github.com/demidgost-sys) in Graz, Austria.

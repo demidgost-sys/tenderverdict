@@ -1,0 +1,55 @@
+name: Reproducible bug
+description: Report incorrect behaviour with a minimal synthetic example
+title: "[Bug] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping test TenderVerdict. Do not include confidential documents, credentials, personal data, or undisclosed vulnerability details.
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Before submitting
+      options:
+        - label: I reproduced this with the current release or `main`.
+          required: true
+        - label: The report uses only synthetic, public, or fully de-identified material.
+          required: true
+        - label: This is not a security-sensitive report; those use private vulnerability reporting.
+          required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and minimal input
+      description: Show the exact command and the smallest synthetic profile or notice that reproduces the problem.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What result did you expect, and why?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the exit code and safely redacted output.
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: TenderVerdict version, Python version, and operating system.
+      placeholder: "v0.1.0-alpha.1 · Python 3.13 · macOS"
+    validations:
+      required: true

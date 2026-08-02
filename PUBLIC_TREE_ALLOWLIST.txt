@@ -1,3 +1,7 @@
+.github/ISSUE_TEMPLATE/bug_report.yml
+.github/ISSUE_TEMPLATE/config.yml
+.github/ISSUE_TEMPLATE/research_feedback.yml
+.github/PULL_REQUEST_TEMPLATE.md
 .github/dependabot.yml
 .github/workflows/ci.yml
 .gitignore
@@ -13,6 +17,7 @@ README.md
 SECURITY.md
 demo/index.html
 demo/screenshot.png
+docs/assets/tenderverdict-banner.svg
 examples/synthetic/expected-brief.md
 examples/synthetic/notices.json
 examples/synthetic/profile.json

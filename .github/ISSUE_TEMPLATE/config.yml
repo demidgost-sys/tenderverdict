@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a vulnerability privately
+    url: https://github.com/demidgost-sys/tenderverdict/security/advisories/new
+    about: Do not disclose security-sensitive details in a public issue.

@@ -41,6 +41,7 @@ packages = ["src/tenderverdict"]
 include = [
   "/.github",
   "/demo",
+  "/docs/assets",
   "/examples",
   "/src",
   "/tests",
