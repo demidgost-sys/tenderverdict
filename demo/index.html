@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>TenderVerdict report — Example Software GmbH</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; line-height: 1.5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #172033; background: #f5f7fa; }
+    main { width: min(70rem, calc(100% - 2rem)); margin: 0 auto; padding: 2.5rem 0; }
+    h1, h2, h3 { line-height: 1.2; overflow-wrap: anywhere; }
+    .lede { max-width: 70ch; color: #44516a; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+      gap: .75rem;
+      margin: 1.5rem 0;
+    }
+    .metric, article { border: 1px solid #d8dfeb; border-radius: .75rem; background: #fff; }
+    .metric { padding: 1rem; }
+    .metric strong { display: block; font-size: 1.5rem; }
+    article { margin: 1rem 0; padding: clamp(1rem, 3vw, 1.5rem); overflow-wrap: anywhere; }
+    dl { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: .35rem 1rem; }
+    dt { font-weight: 700; }
+    dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+    .verdict {
+      display: inline-block;
+      border-radius: 999px;
+      padding: .2rem .65rem;
+      font-weight: 700;
+      background: #e8edf5;
+    }
+    .open_documents { color: #075d45; background: #dff7ed; }
+    .watch { color: #765700; background: #fff2c7; }
+    .reject { color: #8a2030; background: #fde7ea; }
+    .next-step { border-left: .25rem solid #526df0; padding-left: .75rem; }
+    footer { margin-top: 2rem; color: #56627a; }
+    @media (max-width: 32rem) {
+      main { width: min(100% - 1rem, 70rem); padding: 1rem 0; }
+      dl { grid-template-columns: 1fr; }
+      dd + dt { margin-top: .45rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>TenderVerdict qualification report</h1>
+      <p class="lede">Metadata-only, deterministic decision support for Example Software GmbH.
+        As of 2026-08-02.</p>
+    </header>
+    <section class="summary" aria-label="Verdict summary">
+      <div class="metric"><strong>1</strong>
+        open_documents</div>
+      <div class="metric"><strong>1</strong>watch</div>
+      <div class="metric"><strong>1</strong>reject</div>
+    </section>
+    <section aria-label="Qualification results">
+      <article>
+        <h2>SYN-OPEN-001 — Application maintenance services</h2>
+        <p><span class="verdict open_documents">open_documents</span></p>
+        <dl>
+          <dt>Buyer</dt><dd>Example City Procurement Office</dd>
+          <dt>Deadline</dt><dd>2026-09-15</dd>
+          <dt>Source</dt><dd>https://procurement.example/notices/SYN-OPEN-001</dd>
+        </dl>
+        <h3>Reasons</h3>
+        <ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 44 days, meeting the 14-day minimum.</li><li>Exact CPV match: 72260000.</li><li>Country match: AUT.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul>
+        <h3>Unknowns</h3>
+        <ul><li>None from the supplied metadata.</li></ul>
+        <p class="next-step"><strong>Human next step:</strong> Open and review the official procurement documents; a human decides whether to proceed.</p>
+      </article>
+      <article>
+        <h2>SYN-WATCH-001 — Software support services</h2>
+        <p><span class="verdict watch">watch</span></p>
+        <dl>
+          <dt>Buyer</dt><dd>Example Regional Authority</dd>
+          <dt>Deadline</dt><dd>2026-09-20</dd>
+          <dt>Source</dt><dd>https://procurement.example/notices/SYN-WATCH-001</dd>
+        </dl>
+        <h3>Reasons</h3>
+        <ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 49 days, meeting the 14-day minimum.</li><li>Four-digit CPV class match only: profile 72260000, notice 72261000.</li><li>Country match: DEU.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul>
+        <h3>Unknowns</h3>
+        <ul><li>Confirm the exact procurement scope in the documents.</li></ul>
+        <p class="next-step"><strong>Human next step:</strong> Verify the flagged metadata before opening the procurement documents.</p>
+      </article>
+      <article>
+        <h2>SYN-REJECT-001 — Software implementation services</h2>
+        <p><span class="verdict reject">reject</span></p>
+        <dl>
+          <dt>Buyer</dt><dd>Example Federal Agency</dd>
+          <dt>Deadline</dt><dd>2026-08-05</dd>
+          <dt>Source</dt><dd>https://procurement.example/notices/SYN-REJECT-001</dd>
+        </dl>
+        <h3>Reasons</h3>
+        <ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 3 days, below the 14-day minimum.</li><li>Exact CPV match: 72260000.</li><li>Country match: AUT.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul>
+        <h3>Unknowns</h3>
+        <ul><li>None from the supplied metadata.</li></ul>
+        <p class="next-step"><strong>Human next step:</strong> Stop review unless the notice metadata is corrected.</p>
+      </article>
+    </section>
+    <footer>Metadata-only decision support. No legal advice and no autonomous
+      participation decision.</footer>
+  </main>
+</body>
+</html>
