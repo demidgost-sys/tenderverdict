@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title description">
+  <title id="title">TenderVerdict</title>
+  <desc id="description">A local-first, deterministic procurement metadata triage banner showing the open_documents, watch, and reject review states.</desc>
+
+  <rect width="1280" height="640" fill="#F7F5EF"/>
+  <path d="M0 0h16v640H0z" fill="#15233C"/>
+
+  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g transform="translate(72 72)">
+      <rect width="64" height="64" rx="16" fill="#15233C"/>
+      <path d="M18 18h28M18 32h18M18 46h28" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="46" cy="32" r="5" fill="#E8A526"/>
+    </g>
+
+    <text x="156" y="116" fill="#15233C" font-size="34" font-weight="720" letter-spacing="-0.7">TenderVerdict</text>
+    <text x="72" y="190" fill="#536178" font-size="16" font-weight="700" letter-spacing="2.4">LOCAL-FIRST  /  OPEN SOURCE</text>
+
+    <text x="72" y="262" fill="#15233C" font-size="44" font-weight="760" letter-spacing="-1.3">Procurement metadata,</text>
+    <text x="72" y="318" fill="#15233C" font-size="44" font-weight="760" letter-spacing="-1.3">triaged by fixed rules.</text>
+
+    <text x="72" y="382" fill="#536178" font-size="22">Traceable reasons and unresolved fields.</text>
+    <text x="72" y="414" fill="#536178" font-size="22">A human decides what happens next.</text>
+
+    <g transform="translate(72 492)">
+      <rect width="468" height="80" rx="16" fill="#FFFFFF" stroke="#D6DAE1" stroke-width="2"/>
+      <text x="24" y="31" fill="#536178" font-size="14" font-weight="700" letter-spacing="1.4">SUPPLIED METADATA</text>
+      <path d="M25 52h96" stroke="#15233C" stroke-width="4" stroke-linecap="round"/>
+      <path d="M146 52h96" stroke="#E8A526" stroke-width="4" stroke-linecap="round"/>
+      <path d="M267 52h96" stroke="#0B6E4F" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="427" cy="52" r="8" fill="#FFFFFF" stroke="#15233C" stroke-width="4"/>
+    </g>
+
+    <g transform="translate(604 56)">
+      <rect width="612" height="528" rx="28" fill="#FFFFFF" stroke="#D6DAE1" stroke-width="2"/>
+      <text x="40" y="58" fill="#15233C" font-size="17" font-weight="750" letter-spacing="1.8">DETERMINISTIC TRIAGE</text>
+      <text x="40" y="91" fill="#6A7588" font-size="16">No score. No prediction. No autonomous action.</text>
+
+      <g transform="translate(40 124)">
+        <rect width="532" height="76" rx="14" fill="#F4F6F8"/>
+        <g transform="translate(20 18)" fill="none" stroke="#536178" stroke-width="3" stroke-linejoin="round">
+          <path d="M2 1h25l9 9v29H2z"/>
+          <path d="M27 1v10h9M9 20h20M9 29h15"/>
+        </g>
+        <text x="78" y="33" fill="#15233C" font-size="18" font-weight="700">Notice metadata + company profile</text>
+        <text x="78" y="57" fill="#6A7588" font-size="15">Explicit local inputs</text>
+      </g>
+
+      <path d="M306 206v25" stroke="#AEB6C2" stroke-width="3" stroke-linecap="round"/>
+      <path d="M298 224l8 8 8-8" fill="none" stroke="#AEB6C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(40 236)">
+        <rect width="532" height="76" rx="14" fill="#15233C"/>
+        <g transform="translate(20 18)" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="20" cy="20" r="18"/>
+          <path d="M12 20l6 6 11-13"/>
+        </g>
+        <text x="78" y="33" fill="#FFFFFF" font-size="18" font-weight="700">Narrow, fixed qualification rules</text>
+        <text x="78" y="57" fill="#C9D0DA" font-size="15">Same input, same traceable result</text>
+      </g>
+
+      <path d="M306 318v25" stroke="#AEB6C2" stroke-width="3" stroke-linecap="round"/>
+      <path d="M298 336l8 8 8-8" fill="none" stroke="#AEB6C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(40 348)">
+        <rect width="532" height="44" rx="12" fill="#DDF3E9"/>
+        <circle cx="25" cy="22" r="12" fill="#0B6E4F"/>
+        <path d="M19 22l4 4 8-9" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="50" y="28" fill="#07583F" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" font-weight="700">open_documents</text>
+        <text x="500" y="28" fill="#07583F" font-size="15" font-weight="700" text-anchor="end">review</text>
+      </g>
+
+      <g transform="translate(40 404)">
+        <rect width="532" height="44" rx="12" fill="#FFF1C7"/>
+        <path d="M25 9l13 23H12z" fill="#9A5B00"/>
+        <path d="M25 16v7M25 27v1" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="50" y="28" fill="#754500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" font-weight="700">watch</text>
+        <text x="500" y="28" fill="#754500" font-size="15" font-weight="700" text-anchor="end">verify</text>
+      </g>
+
+      <g transform="translate(40 460)">
+        <rect width="532" height="44" rx="12" fill="#FBE2E2"/>
+        <circle cx="25" cy="22" r="12" fill="#A43131"/>
+        <path d="M20 17l10 10M30 17L20 27" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="50" y="28" fill="#812424" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" font-weight="700">reject</text>
+        <text x="500" y="28" fill="#812424" font-size="15" font-weight="700" text-anchor="end">stop</text>
+      </g>
+    </g>
+  </g>
+</svg>
