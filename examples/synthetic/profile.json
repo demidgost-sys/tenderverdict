@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "name": "Example Software GmbH",
+  "cpv_codes": [
+    "72260000"
+  ],
+  "countries": [
+    "AUT",
+    "DEU"
+  ],
+  "minimum_days_to_deadline": 14
+}

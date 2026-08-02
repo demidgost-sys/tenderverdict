@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tenderverdict"
+version = "0.1.0a1"
+description = "Local-first pre-qualification of public-procurement notice metadata"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [
+  { name = "Demid Valiullin" },
+]
+keywords = ["procurement", "tenders", "TED", "decision-support"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Office/Business",
+]
+dependencies = []
+
+[project.scripts]
+tenderverdict = "tenderverdict.cli:main"
+
+[project.urls]
+Repository = "https://github.com/demidgost-sys/tenderverdict"
+Issues = "https://github.com/demidgost-sys/tenderverdict/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tenderverdict"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/.github",
+  "/demo",
+  "/examples",
+  "/src",
+  "/tests",
+  "/tools",
+  "/CHANGELOG.md",
+  "/CODE_OF_CONDUCT.md",
+  "/CONTRIBUTING.md",
+  "/DATA_SOURCES.md",
+  "/LICENSE",
+  "/LIMITATIONS.md",
+  "/NOTICE",
+  "/PUBLIC_TREE_ALLOWLIST.txt",
+  "/README.md",
+  "/SECURITY.md",
+  "/pyproject.toml",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["build", "dist"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["B017"]
