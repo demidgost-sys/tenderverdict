@@ -122,8 +122,17 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          & .\dist\TenderVerdict\TenderVerdict.exe --smoke-test
-          if ($LASTEXITCODE -ne 0) { throw "Frozen desktop smoke test failed" }
+          $executable = (Resolve-Path ".\dist\TenderVerdict\TenderVerdict.exe").Path
+          $process = Start-Process -FilePath $executable `
+            -ArgumentList "--smoke-test" -PassThru
+          if (-not $process.WaitForExit(30000)) {
+            $process.Kill($true)
+            throw "Frozen desktop smoke test timed out after 30 seconds"
+          }
+          Write-Host "Frozen desktop smoke exit code: $($process.ExitCode)"
+          if ($process.ExitCode -ne 0) {
+            throw "Frozen desktop smoke test failed"
+          }
 
       - name: Verify Windows trust boundary
         if: runner.os == 'Windows'
