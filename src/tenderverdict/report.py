@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import date
 from html import escape as escape_html
 from unicodedata import category
@@ -10,8 +11,39 @@ from unicodedata import category
 from .models import Profile, QualificationResult, Verdict
 
 
+@dataclass(frozen=True, slots=True)
+class ReportProvenance:
+    """Stable generator and input evidence attached to every product report."""
+
+    generator_version: str
+    source_kind: str
+    profile_sha256: str
+    notices_sha256: str
+    ted_query: str | None = None
+    retrieved_at: str | None = None
+    lot_policy: str | None = None
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "generator": {"name": "TenderVerdict", "version": self.generator_version},
+            "source_kind": self.source_kind,
+            "profile_sha256": self.profile_sha256,
+            "notices_sha256": self.notices_sha256,
+        }
+        if self.ted_query is not None:
+            payload["ted_query"] = self.ted_query
+        if self.retrieved_at is not None:
+            payload["retrieved_at"] = self.retrieved_at
+        if self.lot_policy is not None:
+            payload["lot_policy"] = self.lot_policy
+        return payload
+
+
 def report_as_dict(
-    profile: Profile, results: Sequence[QualificationResult], as_of: date
+    profile: Profile,
+    results: Sequence[QualificationResult],
+    as_of: date,
+    provenance: ReportProvenance,
 ) -> dict[str, object]:
     """Return the canonical report structure shared by all renderers."""
 
@@ -19,7 +51,8 @@ def report_as_dict(
         raise TypeError("as_of must be a datetime.date")
     counts = _counts(results)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "provenance": provenance.to_dict(),
         "profile": profile.to_dict(),
         "as_of": as_of.isoformat(),
         "summary": {
@@ -32,7 +65,12 @@ def report_as_dict(
     }
 
 
-def render_markdown(profile: Profile, results: Sequence[QualificationResult], as_of: date) -> str:
+def render_markdown(
+    profile: Profile,
+    results: Sequence[QualificationResult],
+    as_of: date,
+    provenance: ReportProvenance,
+) -> str:
     """Render a stable Markdown report with untrusted values escaped."""
 
     counts = _counts(results)
@@ -44,12 +82,30 @@ def render_markdown(profile: Profile, results: Sequence[QualificationResult], as
         f"- **As of:** {as_of.isoformat()}",
         f"- **Notices:** {len(results)}",
         "",
-        "## Summary",
+        "## Provenance",
         "",
-        f"- **open_documents:** {counts[Verdict.OPEN_DOCUMENTS]}",
-        f"- **watch:** {counts[Verdict.WATCH]}",
-        f"- **reject:** {counts[Verdict.REJECT]}",
+        f"- **Generator:** TenderVerdict {provenance.generator_version}",
+        f"- **Source kind:** {_escape_markdown(provenance.source_kind)}",
+        f"- **Profile SHA-256:** `{provenance.profile_sha256}`",
+        f"- **Notices SHA-256:** `{provenance.notices_sha256}`",
     ]
+
+    if provenance.ted_query is not None:
+        lines.append(f"- **TED query:** {_escape_markdown(provenance.ted_query)}")
+    if provenance.retrieved_at is not None:
+        lines.append(f"- **Retrieved at:** `{provenance.retrieved_at}`")
+    if provenance.lot_policy is not None:
+        lines.append(f"- **Lot policy:** `{provenance.lot_policy}`")
+    lines.extend(
+        [
+            "",
+            "## Summary",
+            "",
+            f"- **open_documents:** {counts[Verdict.OPEN_DOCUMENTS]}",
+            f"- **watch:** {counts[Verdict.WATCH]}",
+            f"- **reject:** {counts[Verdict.REJECT]}",
+        ]
+    )
 
     for result in results:
         notice = result.notice
@@ -63,6 +119,8 @@ def render_markdown(profile: Profile, results: Sequence[QualificationResult], as
                 f"- **Buyer:** {_escape_markdown(notice.buyer or '(missing)')}",
                 "- **Deadline:** "
                 f"{notice.deadline.isoformat() if notice.deadline else '(missing)'}",
+                "- **Published:** "
+                + (notice.publication_date.isoformat() if notice.publication_date else "(missing)"),
                 f"- **Source:** {_escape_markdown(notice.source_url or '(missing)')}",
                 "",
                 "### Reasons",
@@ -95,13 +153,19 @@ def render_markdown(profile: Profile, results: Sequence[QualificationResult], as
     return "\n".join(lines)
 
 
-def render_html(profile: Profile, results: Sequence[QualificationResult], as_of: date) -> str:
+def render_html(
+    profile: Profile,
+    results: Sequence[QualificationResult],
+    as_of: date,
+    provenance: ReportProvenance,
+) -> str:
     """Render a self-contained static HTML report without scripts or remote assets."""
 
     counts = _counts(results)
 
     sections = "".join(_render_result_html(result) for result in results)
     company = _escape_html_text(profile.name)
+    provenance_html = _render_provenance_html(provenance)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -141,6 +205,9 @@ def render_html(profile: Profile, results: Sequence[QualificationResult], as_of:
     .reject {{ color: #8a2030; background: #fde7ea; }}
     .next-step {{ border-left: .25rem solid #526df0; padding-left: .75rem; }}
     footer {{ margin-top: 2rem; color: #56627a; }}
+    details.provenance {{ margin: 1rem 0 1.5rem; }}
+    details.provenance summary {{ cursor: pointer; font-weight: 700; }}
+    code {{ overflow-wrap: anywhere; }}
     @media (max-width: 32rem) {{
       main {{ width: min(100% - 1rem, 70rem); padding: 1rem 0; }}
       dl {{ grid-template-columns: 1fr; }}
@@ -155,6 +222,7 @@ def render_html(profile: Profile, results: Sequence[QualificationResult], as_of:
       <p class="lede">Metadata-only, deterministic decision support for {company}.
         As of {as_of.isoformat()}.</p>
     </header>
+{provenance_html}
     <section class="summary" aria-label="Verdict summary">
       <div class="metric"><strong>{counts[Verdict.OPEN_DOCUMENTS]}</strong>
         open_documents</div>
@@ -178,6 +246,9 @@ def _render_result_html(result: QualificationResult) -> str:
     buyer = _escape_html_text(notice.buyer or "(missing)")
     source = _escape_html_text(notice.source_url or "(missing)")
     deadline = notice.deadline.isoformat() if notice.deadline else "(missing)"
+    publication_date = (
+        notice.publication_date.isoformat() if notice.publication_date else "(missing)"
+    )
     reasons = "".join(f"<li>{_escape_html_text(item)}</li>" for item in result.reasons)
     if result.unknowns:
         unknowns = "".join(f"<li>{_escape_html_text(item)}</li>" for item in result.unknowns)
@@ -191,6 +262,7 @@ def _render_result_html(result: QualificationResult) -> str:
         <dl>
           <dt>Buyer</dt><dd>{buyer}</dd>
           <dt>Deadline</dt><dd>{deadline}</dd>
+          <dt>Published</dt><dd>{publication_date}</dd>
           <dt>Source</dt><dd>{source}</dd>
         </dl>
         <h3>Reasons</h3>
@@ -200,6 +272,31 @@ def _render_result_html(result: QualificationResult) -> str:
         <p class="next-step"><strong>Human next step:</strong> {next_step}</p>
       </article>
 """
+
+
+def _render_provenance_html(provenance: ReportProvenance) -> str:
+    rows = [
+        ("Generator", f"TenderVerdict {provenance.generator_version}"),
+        ("Source kind", provenance.source_kind),
+        ("Profile SHA-256", provenance.profile_sha256),
+        ("Notices SHA-256", provenance.notices_sha256),
+    ]
+    if provenance.ted_query is not None:
+        rows.append(("TED query", provenance.ted_query))
+    if provenance.retrieved_at is not None:
+        rows.append(("Retrieved at", provenance.retrieved_at))
+    if provenance.lot_policy is not None:
+        rows.append(("Lot policy", provenance.lot_policy))
+    rendered = "".join(
+        f"<dt>{_escape_html_text(label)}</dt><dd><code>{_escape_html_text(value)}</code></dd>"
+        for label, value in rows
+    )
+    return (
+        '    <details class="provenance">\n'
+        "      <summary>Report provenance</summary>\n"
+        f"      <dl>{rendered}</dl>\n"
+        "    </details>"
+    )
 
 
 def _counts(results: Sequence[QualificationResult]) -> dict[Verdict, int]:

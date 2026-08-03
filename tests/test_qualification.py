@@ -80,6 +80,17 @@ class QualificationTests(unittest.TestCase):
                 self.assertEqual(result.verdict, Verdict.WATCH)
                 self.assertTrue(result.unknowns)
 
+    def test_source_metadata_warning_forces_human_review(self) -> None:
+        warning = "Lot association could not be verified."
+        result = qualify_notice(
+            PROFILE,
+            replace(OPEN_NOTICE, metadata_warnings=(warning,)),
+            AS_OF,
+        )
+
+        self.assertEqual(result.verdict, Verdict.WATCH)
+        self.assertIn(warning, result.unknowns)
+
     def test_every_hard_stop_rejects(self) -> None:
         variants = {
             "not_competition": replace(OPEN_NOTICE, notice_type="award notice"),

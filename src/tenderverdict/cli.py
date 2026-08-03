@@ -12,7 +12,7 @@ from .models import (
     parse_iso_date,
 )
 from .output import write_text_atomically
-from .ted import TedApiError, fetch_notices
+from .ted import TedApiError, build_ted_snapshot, fetch_notices
 from .workflow import demo_run, dump_json, qualify_files, render_run
 
 
@@ -99,7 +99,7 @@ def _run_qualify(args: argparse.Namespace) -> int:
 
 def _run_fetch_ted(args: argparse.Namespace) -> int:
     notices = fetch_notices(args.query, max_notices=args.max_notices)
-    _emit(dump_json(notices), args.output)
+    _emit(dump_json(build_ted_snapshot(args.query, notices)), args.output)
     return 0
 
 

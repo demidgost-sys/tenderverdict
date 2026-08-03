@@ -43,8 +43,14 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn('"tenderverdict.ted"', spec)
         self.assertIn("console=False", spec)
         self.assertIn("upx=False", spec)
+        self.assertIn("icon=str(ICON_PATH)", spec)
         self.assertIn("ROOT = Path(SPECPATH).parent\n", spec)
+        self.assertIn('MACOS_BUNDLE_VERSION = PROJECT_VERSION.split("a", 1)[0]', spec)
+        self.assertIn('"CFBundleShortVersionString": MACOS_BUNDLE_VERSION', spec)
+        self.assertIn('"CFBundleVersion": MACOS_BUNDLE_VERSION', spec)
         self.assertNotIn("Path(SPECPATH).parent.parent", spec)
+        self.assertTrue((ROOT / "packaging" / "tenderverdict-icon.icns").is_file())
+        self.assertTrue((ROOT / "packaging" / "tenderverdict-icon.ico").is_file())
         manifest = (ROOT / "tools" / "write_build_manifest.py").read_text(encoding="utf-8")
         self.assertIn('"macos-arm64": ("Darwin", {"arm64", "aarch64"}, "adhoc")', manifest)
         self.assertIn("GITHUB_SHA must be a full lowercase 40-character commit SHA", manifest)
@@ -69,6 +75,13 @@ class ProjectMetadataTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_ci_scans_generated_sdist_metadata_without_deleting_it(self) -> None:
+        workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+
+        self.assertIn('tools/check_public_tree.py --root "${sdist_root}" --sdist', workflow)
+        self.assertIn('tools/security_scan.py --root "${sdist_root}" --sdist', workflow)
+        self.assertNotIn('rm "${sdist_root}/PKG-INFO"', workflow)
 
 
 if __name__ == "__main__":

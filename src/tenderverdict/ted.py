@@ -10,14 +10,20 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Callable, Mapping
-from datetime import date
+from datetime import UTC, date, datetime
 from http.client import HTTPException
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
-TED_SEARCH_URL = "https://api.ted.europa.eu/v3/notices/search"
+from ._version import __version__
+from .models import (
+    TED_SEARCH_URL,
+    TED_SNAPSHOT_LOT_POLICY,
+    notice_collection_from_json_bytes,
+)
+
 DEFAULT_TIMEOUT_SECONDS = 20.0
 DEFAULT_MAX_RESPONSE_BYTES = 2_000_000
 MAX_RESPONSE_BYTES = 10_000_000
@@ -30,6 +36,7 @@ MAX_QUERY_CHARACTERS = 10_000
 # TED includes its language-specific notice links alongside selected fields.
 TED_FIELDS = (
     "publication-number",
+    "publication-date",
     "form-type",
     "notice-title",
     "buyer-name",
@@ -40,6 +47,7 @@ TED_FIELDS = (
     "place-of-performance-country-proc",
     "place-of-performance-country-lot",
     "deadline-receipt-tender-date-lot",
+    "identifier-lot",
 )
 
 
@@ -171,27 +179,84 @@ def normalize_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
     if publication_number is None:
         raise TedApiError("TED notice is missing publication-number")
 
-    return {
-        "publication_number": publication_number,
-        "notice_type": _nonempty_text(notice.get("form-type")),
-        "title": _preferred_text(notice.get("notice-title")),
-        "buyer": _preferred_text(notice.get("buyer-name")),
-        "cpv_codes": _unique_strings(
+    lot_identifiers = _unique_strings(notice.get("identifier-lot"))
+    if len(lot_identifiers) == 1:
+        cpv_codes = _unique_strings(
             notice.get("main-classification-proc"),
             notice.get("main-classification-lot"),
             notice.get("additional-classification-proc"),
             notice.get("additional-classification-lot"),
-        ),
-        "countries": [
+        )
+        countries = [
             value.upper()
             for value in _unique_strings(
                 notice.get("place-of-performance-country-proc"),
                 notice.get("place-of-performance-country-lot"),
             )
-        ],
-        "deadline": _earliest_iso_date(notice.get("deadline-receipt-tender-date-lot")),
+        ]
+        deadline = _earliest_iso_date(notice.get("deadline-receipt-tender-date-lot"))
+        metadata_warnings: list[str] = []
+    elif len(lot_identifiers) > 1:
+        cpv_codes = []
+        countries = []
+        deadline = None
+        metadata_warnings = [
+            "TED returned multiple lots. Lot-level CPV, country, and deadline values were "
+            "withheld because the notice-level Search API does not preserve their associations."
+        ]
+    else:
+        cpv_codes = []
+        countries = []
+        deadline = None
+        metadata_warnings = [
+            "TED did not return a lot identifier. Lot-level CPV, country, and deadline values "
+            "were withheld because their scope cannot be verified."
+        ]
+
+    return {
+        "publication_number": publication_number,
+        "notice_type": _nonempty_text(notice.get("form-type")),
+        "title": _preferred_text(notice.get("notice-title")),
+        "buyer": _preferred_text(notice.get("buyer-name")),
+        "cpv_codes": cpv_codes,
+        "countries": countries,
+        "deadline": deadline,
+        "publication_date": _earliest_iso_date(notice.get("publication-date")),
         "source_url": _source_url(notice.get("links")),
+        "metadata_warnings": metadata_warnings,
     }
+
+
+def build_ted_snapshot(
+    query: str,
+    notices: list[dict[str, Any]],
+    *,
+    retrieved_at: str | None = None,
+) -> dict[str, object]:
+    """Wrap a complete fetch in a validated, traceable snapshot document."""
+
+    if not isinstance(query, str) or not query.strip():
+        raise ValueError("query must be a non-empty TED expert query")
+    clean_query = query.strip()
+    if len(clean_query) > MAX_QUERY_CHARACTERS:
+        raise ValueError(f"query must not exceed {MAX_QUERY_CHARACTERS} characters")
+    if retrieved_at is None:
+        retrieved_at = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    snapshot: dict[str, object] = {
+        "schema_version": 1,
+        "source": {
+            "kind": "ted_search_api",
+            "endpoint": TED_SEARCH_URL,
+            "query": clean_query,
+            "retrieved_at": retrieved_at,
+            "lot_policy": TED_SNAPSHOT_LOT_POLICY,
+        },
+        "notices": notices,
+    }
+    # Reuse the public input validator before a snapshot can reach an output file.
+    encoded = json.dumps(snapshot, ensure_ascii=True, separators=(",", ":")).encode("ascii")
+    notice_collection_from_json_bytes(encoded, "TED snapshot")
+    return snapshot
 
 
 def _validate_options(
@@ -241,7 +306,9 @@ def _search_page(
         "page": page,
         "limit": limit,
         "scope": "ALL",
-        "checkQuerySyntax": True,
+        # The live v3 endpoint currently returns a null count for valid queries when
+        # this flag is true. Response validation below still fails closed.
+        "checkQuerySyntax": False,
         "paginationMode": "PAGE_NUMBER",
         "onlyLatestVersions": True,
     }
@@ -251,7 +318,7 @@ def _search_page(
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "User-Agent": "TenderVerdict/0.1 (open-source read-only TED client)",
+            "User-Agent": f"TenderVerdict/{__version__} (open-source read-only TED client)",
         },
         method="POST",
     )

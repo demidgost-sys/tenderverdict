@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
   push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -162,10 +163,8 @@ jobs:
           sdist_root="$(find "${RUNNER_TEMP}/sdist-check" -mindepth 1 -maxdepth 1 \
             -type d -name 'tenderverdict-*' -print -quit)"
           test -n "${sdist_root}"
-          test -s "${sdist_root}/PKG-INFO"
-          rm "${sdist_root}/PKG-INFO"
-          python tools/check_public_tree.py --root "${sdist_root}"
-          python tools/security_scan.py --root "${sdist_root}"
+          python tools/check_public_tree.py --root "${sdist_root}" --sdist
+          python tools/security_scan.py --root "${sdist_root}" --sdist
 
       - name: Create isolated smoke-test environment
         run: python -m venv "${RUNNER_TEMP}/tenderverdict-smoke"

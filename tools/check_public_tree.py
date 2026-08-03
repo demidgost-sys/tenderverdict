@@ -7,14 +7,30 @@ import argparse
 import os
 import subprocess
 import sys
+import zlib
 from pathlib import Path, PurePosixPath
 
 MAX_FILE_BYTES = 1024 * 1024
 MAX_SCREENSHOT_BYTES = 500 * 1024
 SCREENSHOT_PATH = "demo/screenshot.png"
+ICNS_PATH = "packaging/tenderverdict-icon.icns"
+ICO_PATH = "packaging/tenderverdict-icon.ico"
+BINARY_ASSET_PATHS = frozenset({SCREENSHOT_PATH, ICNS_PATH, ICO_PATH})
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 FORBIDDEN_PNG_CHUNKS = {b"eXIf", b"tEXt", b"iTXt", b"zTXt"}
+ALLOWED_PNG_CHUNKS = {b"IHDR", b"IDAT", b"IEND"}
+ICNS_PNG_DIMENSIONS = {
+    b"ic07": 128,
+    b"ic08": 256,
+    b"ic09": 512,
+    b"ic10": 1024,
+    b"ic11": 32,
+    b"ic12": 64,
+    b"ic13": 256,
+    b"ic14": 512,
+}
 ALLOWLIST_NAME = "PUBLIC_TREE_ALLOWLIST.txt"
+SDIST_METADATA_PATH = "PKG-INFO"
 GLOB_CHARACTERS = frozenset("*?[]{}!")
 IGNORED_DIRECTORY_NAMES = frozenset(
     {
@@ -122,39 +138,164 @@ def _looks_binary(path: Path) -> bool:
     return b"\0" in sample
 
 
-def _validate_screenshot(path: Path) -> None:
-    payload = path.read_bytes()
-    if len(payload) > MAX_SCREENSHOT_BYTES:
-        raise TreeError(f"screenshot exceeds 500 KiB: {len(payload)} bytes")
+def _validate_png_payload(payload: bytes, label: str) -> tuple[int, int]:
     if not payload.startswith(PNG_SIGNATURE):
-        raise TreeError("demo/screenshot.png does not have a valid PNG signature")
+        raise TreeError(f"{label} does not have a valid PNG signature")
 
     offset = len(PNG_SIGNATURE)
     chunks: list[bytes] = []
+    dimensions: tuple[int, int] | None = None
     while offset < len(payload):
         if offset + 12 > len(payload):
-            raise TreeError("demo/screenshot.png has a truncated PNG chunk")
+            raise TreeError(f"{label} has a truncated PNG chunk")
         length = int.from_bytes(payload[offset : offset + 4], "big")
         chunk_type = payload[offset + 4 : offset + 8]
         end = offset + 12 + length
         if end > len(payload):
-            raise TreeError("demo/screenshot.png has an invalid PNG chunk length")
+            raise TreeError(f"{label} has an invalid PNG chunk length")
+        chunk_data = payload[offset + 8 : offset + 8 + length]
+        expected_crc = int.from_bytes(payload[offset + 8 + length : end], "big")
+        actual_crc = zlib.crc32(chunk_type + chunk_data) & 0xFFFFFFFF
+        if actual_crc != expected_crc:
+            raise TreeError(f"{label} has an invalid PNG chunk checksum")
+        if chunk_type == b"IHDR":
+            if chunks or length != 13:
+                raise TreeError(f"{label} has an invalid PNG IHDR chunk")
+            dimensions = (
+                int.from_bytes(chunk_data[:4], "big"),
+                int.from_bytes(chunk_data[4:8], "big"),
+            )
         chunks.append(chunk_type)
         offset = end
         if chunk_type == b"IEND":
             break
 
     if not chunks or chunks[0] != b"IHDR" or chunks[-1] != b"IEND" or offset != len(payload):
-        raise TreeError("demo/screenshot.png has an invalid PNG chunk structure")
+        raise TreeError(f"{label} has an invalid PNG chunk structure")
     forbidden = sorted(set(chunks) & FORBIDDEN_PNG_CHUNKS)
     if forbidden:
         labels = ", ".join(chunk.decode("ascii") for chunk in forbidden)
-        raise TreeError(f"demo/screenshot.png contains metadata chunks: {labels}")
+        raise TreeError(f"{label} contains metadata chunks: {labels}")
+    unsupported = sorted(set(chunks) - ALLOWED_PNG_CHUNKS)
+    if unsupported:
+        labels = ", ".join(
+            chunk.decode("ascii", errors="backslashreplace") for chunk in unsupported
+        )
+        raise TreeError(f"{label} contains unsupported PNG chunks: {labels}")
+    if chunks.count(b"IHDR") != 1 or chunks.count(b"IEND") != 1 or b"IDAT" not in chunks:
+        raise TreeError(f"{label} has an invalid PNG image-data structure")
+    if dimensions is None or dimensions[0] <= 0 or dimensions[1] <= 0:
+        raise TreeError(f"{label} has invalid PNG dimensions")
+    return dimensions
 
 
-def validate_tree(root: Path) -> list[str]:
+def _validate_screenshot(path: Path) -> None:
+    payload = path.read_bytes()
+    if len(payload) > MAX_SCREENSHOT_BYTES:
+        raise TreeError(f"screenshot exceeds 500 KiB: {len(payload)} bytes")
+    _validate_png_payload(payload, SCREENSHOT_PATH)
+
+
+def _validate_icns(path: Path) -> None:
+    payload = path.read_bytes()
+    if len(payload) < 16 or payload[:4] != b"icns":
+        raise TreeError(f"{ICNS_PATH} does not have a valid ICNS header")
+    if int.from_bytes(payload[4:8], "big") != len(payload):
+        raise TreeError(f"{ICNS_PATH} has an invalid declared length")
+    offset = 8
+    chunks = 0
+    icon_types: set[bytes] = set()
+    table_of_contents: list[tuple[bytes, int]] | None = None
+    image_entries: list[tuple[bytes, int]] = []
+    while offset < len(payload):
+        if offset + 8 > len(payload):
+            raise TreeError(f"{ICNS_PATH} has a truncated chunk")
+        chunk_type = payload[offset : offset + 4]
+        chunk_length = int.from_bytes(payload[offset + 4 : offset + 8], "big")
+        if chunk_length < 8 or offset + chunk_length > len(payload):
+            raise TreeError(f"{ICNS_PATH} has an invalid chunk length")
+        if chunk_type == b"TOC ":
+            if table_of_contents is not None or (chunk_length - 8) % 8:
+                raise TreeError(f"{ICNS_PATH} has an invalid table-of-contents chunk")
+            table_of_contents = []
+            toc_offset = offset + 8
+            while toc_offset < offset + chunk_length:
+                table_of_contents.append(
+                    (
+                        payload[toc_offset : toc_offset + 4],
+                        int.from_bytes(payload[toc_offset + 4 : toc_offset + 8], "big"),
+                    )
+                )
+                toc_offset += 8
+        elif chunk_type in ICNS_PNG_DIMENSIONS:
+            if chunk_type in icon_types:
+                raise TreeError(f"{ICNS_PATH} contains a duplicate {chunk_type!r} chunk")
+            icon_types.add(chunk_type)
+            image_payload = payload[offset + 8 : offset + chunk_length]
+            dimensions = _validate_png_payload(
+                image_payload,
+                f"{ICNS_PATH}:{chunk_type.decode('ascii')}",
+            )
+            expected = ICNS_PNG_DIMENSIONS[chunk_type]
+            if dimensions != (expected, expected):
+                raise TreeError(
+                    f"{ICNS_PATH}:{chunk_type.decode('ascii')} has unexpected dimensions"
+                )
+            image_entries.append((chunk_type, chunk_length))
+        else:
+            raise TreeError(f"{ICNS_PATH} contains unsupported chunk type {chunk_type!r}")
+        offset += chunk_length
+        chunks += 1
+    if (
+        offset != len(payload)
+        or chunks == 0
+        or icon_types != set(ICNS_PNG_DIMENSIONS)
+        or table_of_contents != image_entries
+    ):
+        raise TreeError(f"{ICNS_PATH} has an invalid chunk structure")
+
+
+def _validate_ico(path: Path) -> None:
+    payload = path.read_bytes()
+    if len(payload) < 22 or payload[:4] != b"\x00\x00\x01\x00":
+        raise TreeError(f"{ICO_PATH} does not have a valid ICO header")
+    image_count = int.from_bytes(payload[4:6], "little")
+    if not 1 <= image_count <= 20 or len(payload) < 6 + 16 * image_count:
+        raise TreeError(f"{ICO_PATH} has an invalid image directory")
+    resources: list[tuple[int, int]] = []
+    for index in range(image_count):
+        entry = 6 + index * 16
+        size = int.from_bytes(payload[entry + 8 : entry + 12], "little")
+        offset = int.from_bytes(payload[entry + 12 : entry + 16], "little")
+        if size < len(PNG_SIGNATURE) or offset < 6 + 16 * image_count:
+            raise TreeError(f"{ICO_PATH} has an invalid image entry")
+        end = offset + size
+        if end > len(payload) or payload[offset : offset + len(PNG_SIGNATURE)] != PNG_SIGNATURE:
+            raise TreeError(f"{ICO_PATH} must contain bounded PNG image data")
+        dimensions = _validate_png_payload(payload[offset:end], f"{ICO_PATH}:image-{index}")
+        expected_width = payload[entry] or 256
+        expected_height = payload[entry + 1] or 256
+        if dimensions != (expected_width, expected_height):
+            raise TreeError(f"{ICO_PATH}:image-{index} dimensions do not match its directory entry")
+        resources.append((offset, end))
+    expected_offset = 6 + 16 * image_count
+    for offset, end in sorted(resources):
+        if offset != expected_offset:
+            raise TreeError(f"{ICO_PATH} contains overlapping or unreferenced data")
+        expected_offset = end
+    if expected_offset != len(payload):
+        raise TreeError(f"{ICO_PATH} contains trailing or unreferenced data")
+
+
+def validate_tree(root: Path, *, sdist: bool = False) -> list[str]:
     root = root.resolve()
     expected_list = read_allowlist(root)
+    if sdist:
+        if _is_git_worktree(root):
+            raise TreeError("sdist mode requires an extracted source distribution")
+        if SDIST_METADATA_PATH in expected_list:
+            raise TreeError(f"{SDIST_METADATA_PATH} must remain generated distribution metadata")
+        expected_list = [*expected_list, SDIST_METADATA_PATH]
     expected = set(expected_list)
 
     if _is_git_worktree(root):
@@ -185,6 +326,10 @@ def validate_tree(root: Path) -> list[str]:
             raise TreeError(f"file exceeds 1 MiB: {relative} ({size} bytes)")
         if relative == SCREENSHOT_PATH:
             _validate_screenshot(path)
+        elif relative == ICNS_PATH:
+            _validate_icns(path)
+        elif relative == ICO_PATH:
+            _validate_ico(path)
         elif _looks_binary(path):
             raise TreeError(f"binary files are forbidden: {relative}")
         else:
@@ -201,9 +346,14 @@ def validate_tree(root: Path) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--sdist",
+        action="store_true",
+        help="require and validate the single generated PKG-INFO file in an extracted sdist",
+    )
     arguments = parser.parse_args(argv)
     try:
-        files = validate_tree(arguments.root)
+        files = validate_tree(arguments.root, sdist=arguments.sdist)
     except (OSError, TreeError, subprocess.CalledProcessError, UnicodeDecodeError) as error:
         print(f"PUBLIC_TREE_FAIL: {error}", file=sys.stderr)
         return 1

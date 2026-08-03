@@ -33,7 +33,7 @@ It does not read full procurement documents or decide whether you should bid.
 |---|---|
 | **Local-first** | `demo` and `qualify` read local files and make no network requests. |
 | **Deterministic** | The same inputs and `--as-of` date produce the same verdicts. |
-| **Traceable** | Every result preserves reasons, unknowns, and the supplied source URL. |
+| **Traceable** | Reports preserve reasons, unknowns, source metadata, generator version, and input SHA-256 digests. |
 | **Fail closed** | Invalid input or a failed fetch returns an error without publishing partial output. |
 | **Small footprint** | The installed package has no runtime dependencies. |
 
@@ -146,13 +146,20 @@ Minimal company profile:
 The CSV header is:
 
 ```text
-publication_number,notice_type,title,buyer,cpv_codes,countries,deadline,source_url
+publication_number,notice_type,title,buyer,cpv_codes,countries,deadline,publication_date,source_url
 ```
 
-`publication_number` is required on every row. Empty evidence fields are preserved as unknowns.
+`publication_number` is required and must be unique, case-insensitively. `publication_date` is
+optional; the other empty evidence fields are preserved as unknowns.
 Use `|` inside `cpv_codes` or `countries` when a row has multiple values, for example
 `72260000|72261000` or `AUT|DEU`. Comma-, semicolon-, and tab-separated files are accepted; the
 bundled example uses commas. CSV is treated as data, never as executable spreadsheet content.
+
+A notices file may contain at most 1,000 records and 10 MiB. Text fields and value lists also have
+explicit bounds. A valid header-only CSV and an empty JSON array both produce a zero-notice report;
+validation or network failure remains an error and never means "zero matches". JSON, Markdown, and
+HTML reports include provenance; the JSON report format on the unreleased branch is schema version
+2.
 
 See [`examples/synthetic`](examples/synthetic) for matching CSV and JSON fixtures and a
 reproducible report.
@@ -171,6 +178,9 @@ provide legal advice, determine eligibility, compare bidders, predict outcomes, 
 or take an autonomous procurement action. Read [`LIMITATIONS.md`](LIMITATIONS.md) before applying
 the output to real work.
 
+Because the model stores dates rather than local deadline times, a deadline equal to `--as-of` is
+treated conservatively as closed.
+
 ## Optional TED metadata fetch
 
 `fetch-ted` is an explicit, read-only network operation. The demo, local qualification, tests, and
@@ -178,14 +188,19 @@ CI do not use it.
 
 ```bash
 tenderverdict fetch-ted \
-  --query "classification-cpv = 72260000" \
+  --query "classification-cpv = 72260000 SORT BY publication-date DESC" \
   --max-notices 10 \
   --output notices.json
 ```
 
 The adapter uses the fixed HTTPS TED Search API endpoint, bounded pagination and response limits,
-and atomic output replacement after a complete successful fetch. Review [`DATA_SOURCES.md`](DATA_SOURCES.md)
-and the current source terms before relying on fetched metadata.
+and atomic output replacement after a complete successful fetch. Its JSON snapshot records the
+query, UTC retrieval time, endpoint, and lot policy, and can be passed directly to `qualify`.
+
+TED Search API rows are notice-level. TenderVerdict uses lot-specific fields only when exactly one
+lot identifier is present. For zero or multiple lot identifiers it withholds CPV, country, and
+deadline values and forces human review instead of flattening unrelated lot evidence. Review
+[`DATA_SOURCES.md`](DATA_SOURCES.md) and the current source terms before relying on fetched metadata.
 
 ## Development
 

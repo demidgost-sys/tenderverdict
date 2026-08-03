@@ -37,6 +37,9 @@
     .reject { color: #8a2030; background: #fde7ea; }
     .next-step { border-left: .25rem solid #526df0; padding-left: .75rem; }
     footer { margin-top: 2rem; color: #56627a; }
+    details.provenance { margin: 1rem 0 1.5rem; }
+    details.provenance summary { cursor: pointer; font-weight: 700; }
+    code { overflow-wrap: anywhere; }
     @media (max-width: 32rem) {
       main { width: min(100% - 1rem, 70rem); padding: 1rem 0; }
       dl { grid-template-columns: 1fr; }
@@ -51,6 +54,10 @@
       <p class="lede">Metadata-only, deterministic decision support for Example Software GmbH.
         As of 2026-08-02.</p>
     </header>
+    <details class="provenance">
+      <summary>Report provenance</summary>
+      <dl><dt>Generator</dt><dd><code>TenderVerdict 0.2.0a1</code></dd><dt>Source kind</dt><dd><code>synthetic_demo</code></dd><dt>Profile SHA-256</dt><dd><code>0a50cb80e9d2f9f61f6d7f9e5f24e5abaaf185ea985507c11cf922d0a2403d6a</code></dd><dt>Notices SHA-256</dt><dd><code>2bc23dc112526168591bc7922b477b2cb1dd73b00d1fc941db89cbd209f59a5d</code></dd></dl>
+    </details>
     <section class="summary" aria-label="Verdict summary">
       <div class="metric"><strong>1</strong>
         open_documents</div>
@@ -64,6 +71,7 @@
         <dl>
           <dt>Buyer</dt><dd>Example City Procurement Office</dd>
           <dt>Deadline</dt><dd>2026-09-15</dd>
+          <dt>Published</dt><dd>2026-08-01</dd>
           <dt>Source</dt><dd>https://procurement.example/notices/SYN-OPEN-001</dd>
         </dl>
         <h3>Reasons</h3>
@@ -78,6 +86,7 @@
         <dl>
           <dt>Buyer</dt><dd>Example Regional Authority</dd>
           <dt>Deadline</dt><dd>2026-09-20</dd>
+          <dt>Published</dt><dd>2026-07-30</dd>
           <dt>Source</dt><dd>https://procurement.example/notices/SYN-WATCH-001</dd>
         </dl>
         <h3>Reasons</h3>
@@ -92,6 +101,7 @@
         <dl>
           <dt>Buyer</dt><dd>Example Federal Agency</dd>
           <dt>Deadline</dt><dd>2026-08-05</dd>
+          <dt>Published</dt><dd>2026-07-15</dd>
           <dt>Source</dt><dd>https://procurement.example/notices/SYN-REJECT-001</dd>
         </dl>
         <h3>Reasons</h3>

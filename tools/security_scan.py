@@ -10,10 +10,12 @@ import json
 import re
 import sys
 import tomllib
+from email import policy
+from email.parser import Parser
 from pathlib import Path
 from urllib.parse import urlparse
 
-from check_public_tree import TreeError, validate_tree
+from check_public_tree import BINARY_ASSET_PATHS, SDIST_METADATA_PATH, TreeError, validate_tree
 
 EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@([A-Z0-9.-]+\.[A-Z]{2,})\b", re.IGNORECASE)
 URL_PATTERN = re.compile(r"https?://(?:\\[.-]|[^\s<>`\"')\\])+")
@@ -57,6 +59,7 @@ OFFICIAL_URL_HOSTS = {
     "docs.ted.europa.eu",
     "git-lfs.github.com",
     "github.com",
+    "op.europa.eu",
     "www.apache.org",
     "www.w3.org",
 }
@@ -238,13 +241,35 @@ def _scan_metadata(root: Path, errors: list[str]) -> None:
     if not (root / "NOTICE").is_file():
         errors.append("NOTICE: required attribution boundary is missing")
 
+    sdist_metadata = root / SDIST_METADATA_PATH
+    if sdist_metadata.is_file():
+        message = Parser(policy=policy.default).parsestr(sdist_metadata.read_text(encoding="utf-8"))
+        expected_headers = {
+            "Metadata-Version": "2.4",
+            "Name": project.get("name"),
+            "Version": project.get("version"),
+            "Summary": project.get("description"),
+            "Author": project.get("authors", [{}])[0].get("name"),
+            "License-Expression": project.get("license"),
+            "Requires-Python": project.get("requires-python"),
+            "Description-Content-Type": "text/markdown",
+        }
+        for header, expected in expected_headers.items():
+            values = message.get_all(header, [])
+            if values != [expected]:
+                errors.append(
+                    f"{SDIST_METADATA_PATH}: {header} must occur once and match pyproject.toml"
+                )
+        if message.get_all("Requires-Dist"):
+            errors.append(f"{SDIST_METADATA_PATH}: runtime dependencies must remain empty")
 
-def scan(root: Path) -> list[str]:
+
+def scan(root: Path, *, sdist: bool = False) -> list[str]:
     root = root.resolve()
-    files = validate_tree(root)
+    files = validate_tree(root, sdist=sdist)
     errors: list[str] = []
     for relative in files:
-        if relative == "demo/screenshot.png":
+        if relative in BINARY_ASSET_PATHS:
             continue
         text = (root / relative).read_text(encoding="utf-8")
         _scan_text(relative, text, errors)
@@ -256,9 +281,14 @@ def scan(root: Path) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--sdist",
+        action="store_true",
+        help="require and scan the generated PKG-INFO file in an extracted sdist",
+    )
     arguments = parser.parse_args(argv)
     try:
-        errors = scan(arguments.root)
+        errors = scan(arguments.root, sdist=arguments.sdist)
     except (OSError, TreeError, UnicodeDecodeError, tomllib.TOMLDecodeError) as scan_error:
         print(f"SECURITY_SCAN_FAIL: {scan_error}", file=sys.stderr)
         return 1

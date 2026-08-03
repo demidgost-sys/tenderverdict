@@ -6,6 +6,7 @@ from datetime import date
 from pathlib import Path
 
 from tenderverdict.models import (
+    MAX_NOTICE_COUNT,
     SchemaValidationError,
     load_notices,
     load_profile,
@@ -146,11 +147,27 @@ class CsvNoticeTests(unittest.TestCase):
         with self.assertRaisesRegex(SchemaValidationError, r"duplicate CSV columns"):
             notices_from_csv_bytes((duplicate + self.ROW).encode())
 
-    def test_csv_requires_data_and_explicit_file_type(self) -> None:
-        with self.assertRaisesRegex(SchemaValidationError, "at least one notice row"):
-            notices_from_csv_bytes(self.HEADER.encode())
+    def test_csv_and_json_share_the_zero_notice_policy(self) -> None:
+        self.assertEqual(notices_from_csv_bytes(self.HEADER.encode()), ())
+        self.assertEqual(notices_from_data([]), ())
         with self.assertRaisesRegex(SchemaValidationError, r"ending in \.csv or \.json"):
             notices_from_file_bytes((self.HEADER + self.ROW).encode(), "notices.txt")
+
+    def test_duplicate_publication_numbers_are_rejected_case_insensitively(self) -> None:
+        duplicate = self.ROW + self.ROW.replace("SYN-CSV-001", "syn-csv-001")
+        with self.assertRaisesRegex(SchemaValidationError, "duplicate publication_number"):
+            notices_from_csv_bytes((self.HEADER + duplicate).encode())
+
+    def test_notice_count_and_field_lengths_are_bounded(self) -> None:
+        with self.assertRaisesRegex(SchemaValidationError, f"at most {MAX_NOTICE_COUNT}"):
+            notices_from_data(
+                [
+                    {"publication_number": f"SYN-{index:04d}"}
+                    for index in range(MAX_NOTICE_COUNT + 1)
+                ]
+            )
+        with self.assertRaisesRegex(SchemaValidationError, "at most 2000 characters"):
+            notice_from_dict({"publication_number": "SYN-LONG", "title": "x" * 2_001})
 
     def test_csv_renderer_round_trips_through_file_loader(self) -> None:
         notices = notices_from_csv_bytes((self.HEADER + self.ROW).encode())

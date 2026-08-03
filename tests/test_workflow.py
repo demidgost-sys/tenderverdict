@@ -37,7 +37,12 @@ class WorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             json.loads(render_run(run, "json")),
-            report_as_dict(profile, expected_results, as_of=date(2026, 8, 2)),
+            report_as_dict(
+                profile,
+                expected_results,
+                as_of=date(2026, 8, 2),
+                provenance=run.provenance,
+            ),
         )
 
     def test_file_workflow_matches_direct_renderers(self) -> None:
@@ -49,11 +54,21 @@ class WorkflowTests(unittest.TestCase):
 
         self.assertEqual(
             render_run(run, "markdown"),
-            render_markdown(run.profile, run.results, as_of=run.as_of),
+            render_markdown(
+                run.profile,
+                run.results,
+                as_of=run.as_of,
+                provenance=run.provenance,
+            ),
         )
         self.assertEqual(
             render_run(run, "html"),
-            render_html(run.profile, run.results, as_of=run.as_of),
+            render_html(
+                run.profile,
+                run.results,
+                as_of=run.as_of,
+                provenance=run.provenance,
+            ),
         )
         self.assertEqual(
             run.summary,
@@ -65,7 +80,12 @@ class WorkflowTests(unittest.TestCase):
             EXAMPLES / "notices.csv",
             as_of=date(2026, 8, 2),
         )
-        self.assertEqual(csv_run, run)
+        self.assertEqual(csv_run.profile, run.profile)
+        self.assertEqual(csv_run.results, run.results)
+        self.assertEqual(csv_run.as_of, run.as_of)
+        self.assertEqual(run.provenance.source_kind, "local_json")
+        self.assertEqual(csv_run.provenance.source_kind, "local_csv")
+        self.assertNotEqual(csv_run.provenance.notices_sha256, run.provenance.notices_sha256)
 
     def test_write_run_is_atomic_and_rejects_unknown_format(self) -> None:
         run = demo_run()

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">TenderVerdict application icon</title>
+  <desc id="description">A navy rounded square with three white evidence lines and one amber review marker.</desc>
+  <defs>
+    <linearGradient id="background" x1="128" y1="96" x2="896" y2="928" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#263E68"/>
+      <stop offset="0.55" stop-color="#152A4B"/>
+      <stop offset="1" stop-color="#0C182C"/>
+    </linearGradient>
+  </defs>
+  <rect x="52" y="52" width="920" height="920" rx="224" fill="url(#background)"/>
+  <rect x="67" y="67" width="890" height="890" rx="209" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="10"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="72" stroke-linecap="round">
+    <path d="M276 326h472"/>
+    <path d="M276 512h278"/>
+    <path d="M276 698h472"/>
+  </g>
+  <circle cx="748" cy="512" r="78" fill="#E8A526"/>
+  <circle cx="748" cy="512" r="55" fill="none" stroke="#FFF7E5" stroke-opacity="0.42" stroke-width="8"/>
+</svg>

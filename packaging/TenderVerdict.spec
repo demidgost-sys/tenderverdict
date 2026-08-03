@@ -1,10 +1,18 @@
 # PyInstaller specification for native, one-directory desktop previews.
 
 import sys
+import tomllib
 from pathlib import Path
 
 
 ROOT = Path(SPECPATH).parent
+PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+    "version"
+]
+MACOS_BUNDLE_VERSION = PROJECT_VERSION.split("a", 1)[0]
+ICON_PATH = ROOT / "packaging" / (
+    "tenderverdict-icon.ico" if sys.platform == "win32" else "tenderverdict-icon.icns"
+)
 
 analysis = Analysis(
     [str(ROOT / "tools" / "desktop_launcher.py")],
@@ -42,6 +50,7 @@ executable = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=str(ICON_PATH),
 )
 
 collected = COLLECT(
@@ -58,6 +67,11 @@ if sys.platform == "darwin":
     application = BUNDLE(
         collected,
         name="TenderVerdict.app",
-        icon=None,
+        icon=str(ICON_PATH),
         bundle_identifier="io.github.demidgostsys.tenderverdict",
+        info_plist={
+            "CFBundleShortVersionString": MACOS_BUNDLE_VERSION,
+            "CFBundleVersion": MACOS_BUNDLE_VERSION,
+            "NSHumanReadableCopyright": "Copyright 2026 Demid Valiullin",
+        },
     )

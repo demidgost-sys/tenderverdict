@@ -21,6 +21,11 @@ can. The editable example contains only fictional `SYN-` rows and uses `|` betwe
 country values. You can also load and save the small supplier profile as JSON. Changing any input
 invalidates the visible result and disables export until the review is run again.
 
+The desktop accepts at most 1,000 notices in a 10 MiB file. Duplicate publication numbers and
+overlong fields fail validation. Header-only CSV and empty JSON are treated consistently as a valid
+zero-notice review. Exported reports include the TenderVerdict version and SHA-256 digests of the
+profile and notice inputs; a saved TED snapshot also preserves its query and retrieval time.
+
 The preview uses a two-pane review workspace: setup stays on the left, while verdict totals, the
 notice queue, and a structured explanation stay visible on the right. The visual system follows the
 operating system's light or dark appearance and uses one primary action for each review cycle.
@@ -38,6 +43,7 @@ by the preview. The same actions are discoverable in the native File and Review 
 - Saving the CSV example is explicit and atomic; it never overwrites a file after a failed write.
 - Failed validation or export does not intentionally replace an existing output with a partial
   file.
+- A changed notice file cannot export the result created from its previous bytes.
 
 The preview still consumes untrusted metadata. Keep confidential material outside this alpha and
 read [LIMITATIONS.md](LIMITATIONS.md) before evaluating real workflows.

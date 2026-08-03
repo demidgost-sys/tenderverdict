@@ -100,12 +100,18 @@ jobs:
         shell: bash
         run: |
           executable="dist/TenderVerdict.app/Contents/MacOS/TenderVerdict"
+          plist="dist/TenderVerdict.app/Contents/Info.plist"
           file "$executable"
           if [[ "${{ matrix.target }}" == "macos-arm64" ]]; then
             file "$executable" | grep -q "arm64"
           else
             file "$executable" | grep -q "x86_64"
           fi
+          expected_version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"].split("a", 1)[0])')"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")" = "$expected_version"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$plist")" = "$expected_version"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$plist")" = "tenderverdict-icon.icns"
+          test -s "dist/TenderVerdict.app/Contents/Resources/tenderverdict-icon.icns"
           codesign --verify --deep --strict --verbose=4 dist/TenderVerdict.app
           for signed_path in dist/TenderVerdict.app "$executable"; do
             signature="$(codesign -dv --verbose=4 "$signed_path" 2>&1)"
@@ -194,3 +200,18 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
+
+  gate:
+    name: Desktop gate
+    if: always()
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require source validation and every native build
+        env:
+          VALIDATE_RESULT: ${{ needs.validate.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+        run: |
+          test "${VALIDATE_RESULT}" = "success"
+          test "${BUILD_RESULT}" = "success"

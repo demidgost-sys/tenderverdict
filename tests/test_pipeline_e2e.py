@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import json
 import unittest
-from datetime import date
 from pathlib import Path
 
 from tenderverdict.demo_data import demo_notices, demo_profile
-from tenderverdict.models import load_notices, load_profile, render_notices_csv
-from tenderverdict.qualification import qualify_notices
-from tenderverdict.report import render_html, render_markdown, report_as_dict
+from tenderverdict.models import load_notices, render_notices_csv
+from tenderverdict.workflow import demo_run, render_run
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "examples" / "synthetic"
@@ -32,21 +30,18 @@ class OfflinePipelineTests(unittest.TestCase):
         )
 
     def test_demo_snapshots_are_reproducible(self) -> None:
-        profile = load_profile(EXAMPLES / "profile.json")
-        notices = load_notices(EXAMPLES / "notices.json")
-        as_of = date(2026, 8, 2)
-        results = qualify_notices(profile, notices, as_of=as_of)
+        run = demo_run()
 
-        payload = report_as_dict(profile, results, as_of=as_of)
+        payload = json.loads(render_run(run, "json"))
         self.assertEqual(
             [result["verdict"] for result in payload["results"]],
             ["open_documents", "watch", "reject"],
         )
         self.assertEqual(
-            render_markdown(profile, results, as_of=as_of),
+            render_run(run, "markdown"),
             (EXAMPLES / "expected-brief.md").read_text(encoding="utf-8"),
         )
-        html = render_html(profile, results, as_of=as_of)
+        html = render_run(run, "html")
         self.assertEqual(html, (ROOT / "demo" / "index.html").read_text(encoding="utf-8"))
         lowered = html.lower()
         for forbidden in ("<script", "<form", "<iframe", " src=", " href=", "@import"):

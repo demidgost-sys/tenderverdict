@@ -14,11 +14,13 @@ from typing import Any
 
 from .demo_data import demo_notices
 from .models import (
+    MAX_NOTICES_FILE_BYTES,
+    MAX_PROFILE_FILE_BYTES,
     Profile,
     QualificationResult,
     SchemaValidationError,
+    notice_collection_from_file_bytes,
     notices_from_data,
-    notices_from_file_bytes,
     parse_iso_date,
     profile_from_dict,
     profile_from_json_bytes,
@@ -34,8 +36,6 @@ from .workflow import (
     write_run,
 )
 
-MAX_PROFILE_FILE_BYTES = 256 * 1024
-MAX_NOTICES_FILE_BYTES = 10 * 1024 * 1024
 DEMO_NOTICE_LABEL = "Bundled synthetic notices (offline)"
 _TOKEN_SEPARATOR = re.compile(r"[,;\s]+")
 _VERDICT_LABELS = {
@@ -230,6 +230,8 @@ def format_result_details(result: QualificationResult) -> str:
         f"Title: {safe(notice.title)}",
         f"Buyer: {safe(notice.buyer)}",
         f"Deadline: {notice.deadline.isoformat() if notice.deadline else '(missing)'}",
+        "Published: "
+        f"{notice.publication_date.isoformat() if notice.publication_date else '(missing)'}",
         f"Supplied source URL: {safe(notice.source_url)}",
         "",
         "Reasons",
@@ -1095,7 +1097,7 @@ class TenderVerdictApp:
                 label="notices",
                 maximum_bytes=MAX_NOTICES_FILE_BYTES,
             )
-            notices = notices_from_file_bytes(snapshot.payload, snapshot.path)
+            notices = notice_collection_from_file_bytes(snapshot.payload, snapshot.path).notices
         except (SchemaValidationError, OSError, ValueError) as exc:
             self._show_error("Unable to use notice data", exc, self.choose_notices_button)
             return
@@ -1226,10 +1228,16 @@ class TenderVerdictApp:
                     maximum_bytes=MAX_NOTICES_FILE_BYTES,
                 )
                 notices_sha256 = snapshot.sha256
+                collection = notice_collection_from_file_bytes(snapshot.payload, snapshot.path)
                 run = qualify_inputs(
                     profile,
-                    notices_from_file_bytes(snapshot.payload, snapshot.path),
+                    collection.notices,
                     as_of=as_of,
+                    source_kind=collection.source_kind,
+                    notices_sha256=snapshot.sha256,
+                    ted_query=collection.ted_query,
+                    retrieved_at=collection.retrieved_at,
+                    lot_policy=collection.lot_policy,
                 )
         except (SchemaValidationError, OSError, ValueError) as exc:
             self._show_error("Review not created", exc, self.choose_notices_button)
@@ -1395,10 +1403,14 @@ class TenderVerdictApp:
             return normalize_display_text(value) if value else fallback
 
         deadline = notice.deadline.isoformat() if notice.deadline else "(missing)"
+        publication_date = (
+            notice.publication_date.isoformat() if notice.publication_date else "(missing)"
+        )
         metadata = (
             f"Notice ID  {safe(notice.publication_number)}\n"
             f"Buyer  {safe(notice.buyer)}\n"
             f"Deadline  {deadline}\n"
+            f"Published  {publication_date}\n"
             f"Supplied source  {safe(notice.source_url)}\n"
         )
         reasons = "".join(f"• {normalize_display_text(reason)}\n" for reason in result.reasons)

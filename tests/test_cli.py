@@ -318,7 +318,16 @@ class CliTests(unittest.TestCase):
             raw_output = output.read_text(encoding="utf-8")
             self.assertTrue(raw_output.isascii())
             self.assertIn(r"\u202e", raw_output)
-            self.assertEqual(json.loads(output.read_text(encoding="utf-8")), [notice])
+            snapshot = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(snapshot["schema_version"], 1)
+            self.assertEqual(snapshot["source"]["kind"], "ted_search_api")
+            self.assertEqual(snapshot["source"]["query"], "form-type = competition")
+            self.assertEqual(snapshot["source"]["lot_policy"], "single_lot_only")
+            self.assertRegex(
+                snapshot["source"]["retrieved_at"],
+                r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+            )
+            self.assertEqual(snapshot["notices"], [notice])
 
 
 if __name__ == "__main__":
