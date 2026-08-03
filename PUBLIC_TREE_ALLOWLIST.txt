@@ -16,6 +16,7 @@ LIMITATIONS.md
 NOTICE
 PUBLIC_TREE_ALLOWLIST.txt
 README.md
+ROADMAP.md
 SECURITY.md
 demo/index.html
 demo/screenshot.png

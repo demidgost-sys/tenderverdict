@@ -18,14 +18,16 @@
   <a href="#desktop-preview">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
   <a href="#verdicts">Verdicts</a> ·
+  <a href="ROADMAP.md">Roadmap</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
-TenderVerdict is an experimental open-source CLI and Python library for supplier-side
-pre-qualification of public-procurement **notice metadata**. You supply a company profile and
-structured notices; TenderVerdict applies narrow, deterministic rules and produces a review queue
-with reasons, unresolved fields, and a human next step.
+TenderVerdict is experimental open-source software for supplier-side pre-qualification of
+public-procurement **notice metadata**. The published alpha is a CLI and Python library; `main` also
+contains an unreleased desktop preview. You supply a company profile and structured notices;
+TenderVerdict applies narrow, deterministic rules and produces a review queue with reasons,
+unresolved fields, and a human next step.
 
 It does not read full procurement documents or decide whether you should bid.
 
@@ -41,6 +43,18 @@ It does not read full procurement documents or decide whether you should bid.
 > `v0.1.0-alpha.1` is the immutable CLI developer alpha. The `main` branch also contains an
 > unreleased `0.2.0a1` desktop preview. Interfaces and rules may change. Start with the bundled
 > synthetic example and avoid confidential inputs while evaluating either version.
+
+## Release status
+
+| Surface | Current state | Installation path |
+|---|---|---|
+| CLI and library | Published as `v0.1.0-alpha.1` | Versioned source tag below |
+| Desktop UI | Unreleased `0.2.0a1` source preview on `main` | Python 3.11+ with Tk |
+| Native desktop archives | Unsigned, short-lived CI artifacts | Maintainer evaluation only |
+
+There is no supported one-click desktop installer, hosted service, account system, telemetry, or
+automatic update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates required before a
+desktop developer release.
 
 ## Quick start
 
@@ -90,9 +104,10 @@ python3 -m venv .venv
 .venv/bin/tenderverdict desktop
 ```
 
-This source preview requires Python 3.11+ with Tk. Packaged macOS and Windows builds are CI-only,
-unsigned developer artifacts until they pass platform testing; they are not a public release. See
-[`DESKTOP.md`](DESKTOP.md) for the exact trust, privacy, build, and accessibility boundaries.
+This source preview requires Python 3.11+ with Tk. Packaged macOS and Windows builds are CI-tested,
+unsigned, short-lived developer artifacts; they are not a public release or a supported install
+path. See [`DESKTOP.md`](DESKTOP.md) for the exact trust, privacy, build, and accessibility
+boundaries.
 
 ## Example output
 
@@ -158,8 +173,7 @@ bundled example uses commas. CSV is treated as data, never as executable spreads
 A notices file may contain at most 1,000 records and 10 MiB. Text fields and value lists also have
 explicit bounds. A valid header-only CSV and an empty JSON array both produce a zero-notice report;
 validation or network failure remains an error and never means "zero matches". JSON, Markdown, and
-HTML reports include provenance; the JSON report format on the unreleased branch is schema version
-2.
+HTML reports include provenance; the JSON report format in `0.2.0a1` is schema version 2.
 
 See [`examples/synthetic`](examples/synthetic) for matching CSV and JSON fixtures and a
 reproducible report.
@@ -218,8 +232,8 @@ Reproducible bug reports and research feedback are welcome through
 [`GitHub Issues`](https://github.com/demidgost-sys/tenderverdict/issues). There is no guaranteed
 support or response time during the alpha period.
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md), and
-[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) before contributing.
+Read [`ROADMAP.md`](ROADMAP.md), [`CONTRIBUTING.md`](CONTRIBUTING.md),
+[`SECURITY.md`](SECURITY.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) before contributing.
 
 ## Deutsch
 
@@ -228,7 +242,8 @@ Vorqualifizierung von Metadaten öffentlicher Ausschreibungen aus Sicht von Anbi
 Unternehmensprofil und strukturierte Notice-Daten aus CSV oder JSON werden nachvollziehbar als
 `open_documents`, `watch` oder `reject` eingeordnet. Das Werkzeug bietet keine Rechtsberatung,
 trifft keine Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung der
-Ausschreibungsunterlagen.
+Ausschreibungsunterlagen. Die veröffentlichte Alpha-Version ist ein CLI; `main` enthält zusätzlich
+eine noch unveröffentlichte Desktop-Vorschau ohne unterstützten Ein-Klick-Installer.
 
 ## License and attribution
 

@@ -60,6 +60,7 @@ include = [
   "/NOTICE",
   "/PUBLIC_TREE_ALLOWLIST.txt",
   "/README.md",
+  "/ROADMAP.md",
   "/SECURITY.md",
   "/pyproject.toml",
   "/requirements-desktop-build.txt",

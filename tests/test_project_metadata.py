@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 import tomllib
@@ -82,6 +83,25 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn('tools/check_public_tree.py --root "${sdist_root}" --sdist', workflow)
         self.assertIn('tools/security_scan.py --root "${sdist_root}" --sdist', workflow)
         self.assertNotIn('rm "${sdist_root}/PKG-INFO"', workflow)
+
+    def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
+        allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
+        local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
+
+        for relative in allowlist:
+            if not relative.endswith(".md"):
+                continue
+            document = ROOT / relative
+            for raw_target in local_link.findall(document.read_text(encoding="utf-8")):
+                target = raw_target.strip().strip("<>")
+                if target.startswith(("#", "https://", "http://", "mailto:")):
+                    continue
+                path_text = target.split("#", 1)[0]
+                resolved = document.parent / path_text
+                self.assertTrue(
+                    resolved.exists(),
+                    f"{relative} contains a broken local link: {raw_target}",
+                )
 
 
 if __name__ == "__main__":

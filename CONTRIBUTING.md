@@ -1,8 +1,9 @@
 # Contributing
 
-Issues, reproducible bug reports, and research feedback are welcome. TenderVerdict is in an early
-30-day evaluation period: opening an issue or proposing a patch does not imply that it will be
-accepted, merged, reviewed by a particular date, or answered individually.
+Issues, reproducible bug reports, and research feedback are welcome. The current evaluation order
+and evidence gates are recorded in [ROADMAP.md](ROADMAP.md). Opening an issue or proposing a patch
+does not imply that it will be accepted, merged, reviewed by a particular date, or answered
+individually.
 
 ## Before opening an issue
 
@@ -28,12 +29,14 @@ boundaries:
 Run the local checks before proposing a patch:
 
 ```bash
-python -m unittest discover -s tests -v
+python -m pip install build==1.5.0 hatchling==1.27.0 mypy==2.3.0 ruff==0.16.1
+PYTHONPATH=src python -m unittest discover -s tests -v
 python tools/check_public_tree.py
 python tools/security_scan.py
 ruff check .
 ruff format --check .
 mypy
+python -m build --no-isolation
 ```
 
 Do not add files without also updating `PUBLIC_TREE_ALLOWLIST.txt`. Do not weaken a fail-closed check

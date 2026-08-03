@@ -6,6 +6,17 @@ local interface over the same deterministic qualification workflow used by the C
 The preview is intended for evaluation. It is not a signed consumer release or a replacement for
 procurement, eligibility, or legal review.
 
+## Release status
+
+The source UI is part of the unreleased `0.2.0a1` code on `main`. Native macOS and Windows archives
+are built and smoke-tested by GitHub Actions, retained briefly, and intended for maintainer
+evaluation. They are not attached to a GitHub Release and are not a supported end-user install
+path.
+
+The exact gates for a possible `v0.2.0-alpha.1` are listed in [ROADMAP.md](ROADMAP.md). Do not advise
+evaluators to disable Gatekeeper, SmartScreen, antivirus, or another operating-system security
+control to run an unsigned artifact.
+
 ## What the desktop preview does
 
 1. Enter a supplier name, CPV codes, countries, and a minimum lead time.
@@ -82,6 +93,29 @@ python3 tools/build_desktop.py
 
 GitHub Actions builds separate developer artifacts for macOS arm64, macOS Intel, and Windows x64.
 They are short-lived CI artifacts, not GitHub Releases.
+
+Each archive is accompanied by a SHA-256 checksum and `BUILD_INFO.txt`. Verify both before a manual
+test and record the commit, target, operating system, and completed workflow. An automated smoke
+test is evidence that the application starts and its synthetic flow is intact; it is not a
+substitute for a person completing the packaged workflow.
+
+On macOS or Linux, verify a downloaded archive before extracting it:
+
+```bash
+shasum -a 256 -c TenderVerdict-macos-arm64.sha256
+unzip -l TenderVerdict-macos-arm64.zip
+```
+
+On Windows PowerShell, compare the expected and calculated values explicitly:
+
+```powershell
+$expected = (Get-Content .\TenderVerdict-windows-x64.sha256).Split()[0].ToLowerInvariant()
+$actual = (Get-FileHash .\TenderVerdict-windows-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($actual -ne $expected) { throw "TenderVerdict archive checksum mismatch" }
+```
+
+After extraction, inspect `BUILD_INFO.txt` and confirm that its commit and target match the workflow
+run you intended to test.
 
 The direct build tool and Python version are pinned, and every archive gets a checksum and build
 manifest. Transitive build wheels and hosted-runner images are not hash-locked in this preview, so

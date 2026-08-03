@@ -20,6 +20,8 @@ identifiers and may change interfaces during the alpha period.
   retrieval time, plus notice publication dates.
 - Added bounded record and field counts, case-insensitive publication-number uniqueness, and a
   consistent zero-notice policy for CSV and JSON.
+- Added a version-based roadmap with explicit desktop-release, manual-platform, security, and
+  evaluation gates.
 
 ### Changed
 
@@ -37,6 +39,8 @@ identifiers and may change interfaces during the alpha period.
   macOS bundle metadata. Binary release checks now verify icon structure, PNG checksums, dimensions,
   and the absence of embedded metadata chunks. Generated sdist metadata is explicitly bounded and
   scanned instead of being deleted before validation.
+- Clarified the published CLI, unreleased source preview, short-lived native artifacts, and lack of
+  a supported one-click desktop installation path across public documentation.
 
 ## [0.1.0a1] - 2026-08-02
 

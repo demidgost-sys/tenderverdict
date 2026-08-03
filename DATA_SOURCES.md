@@ -14,6 +14,7 @@ endpoint:
 
 - API endpoint: `https://api.ted.europa.eu/v3/notices/search`
 - official documentation: `https://docs.ted.europa.eu/api/latest/search.html`
+- official field reference: `https://docs.ted.europa.eu/ODS/latest/reuse/field-list.html`
 
 The adapter is read-only, bounded, and deliberately separate from the offline qualification path.
 API availability, schemas, fields, rate limits, records, and provider terms can change independently
@@ -31,6 +32,8 @@ normalization.
 Every successful fetch writes one wrapper containing the exact query, fixed endpoint, UTC retrieval
 time, `single_lot_only` policy, and the complete normalized notice array. A failed response never
 publishes that wrapper; a successful query with zero rows publishes a valid empty snapshot.
+`retrieved_at` records when TenderVerdict completed the request. It does not prove that the provider
+record was complete, unchanged, or current at that time.
 
 Before using fetched data, review the provider's current documentation, legal notice, attribution
 requirements, and any restrictions relevant to your jurisdiction and intended use. Retain the

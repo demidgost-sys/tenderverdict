@@ -16,5 +16,8 @@ Describe the narrow problem and the change that addresses it.
 - [ ] `python3 tools/security_scan.py`
 - [ ] `ruff check .`
 - [ ] `ruff format --check .`
+- [ ] `mypy`
+- [ ] `python -m build --no-isolation`
 
-List any additional manual or visual checks below.
+If desktop packaging changed, list the affected native targets and the completed manual or visual
+checks below.
