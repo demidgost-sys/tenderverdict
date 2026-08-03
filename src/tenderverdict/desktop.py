@@ -568,6 +568,22 @@ class TenderVerdictApp:
             bordercolor=[("focus", palette.focus)],
         )
         self.style.configure(
+            "Quiet.TMenubutton",
+            background=palette.surface,
+            foreground=palette.muted,
+            bordercolor=palette.border,
+            lightcolor=palette.border,
+            darkcolor=palette.border,
+            font=self.small_font,
+            padding=(10, 5),
+        )
+        self.style.map(
+            "Quiet.TMenubutton",
+            background=[("pressed", palette.surface_alt), ("active", palette.surface_alt)],
+            foreground=[("active", palette.text)],
+            bordercolor=[("focus", palette.focus)],
+        )
+        self.style.configure(
             "Review.Treeview",
             background=palette.surface,
             fieldbackground=palette.surface,
@@ -667,23 +683,17 @@ class TenderVerdictApp:
             frame,
             text="Supplier criteria",
             style="CardTitle.TLabel",
-        ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(3, 0))
-        profile_actions = self.ttk.Frame(frame, style="Surface.TFrame")
-        profile_actions.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(12, 12))
-        profile_actions.columnconfigure(0, weight=1)
-        profile_actions.columnconfigure(1, weight=1)
-        self.ttk.Button(
-            profile_actions,
-            text="Load JSON…",
-            command=self._load_profile,
-            style="Quiet.TButton",
-        ).grid(row=0, column=0, sticky="ew", padx=(0, 5))
-        self.ttk.Button(
-            profile_actions,
-            text="Save JSON…",
-            command=self._save_profile,
-            style="Quiet.TButton",
-        ).grid(row=0, column=1, sticky="ew", padx=(5, 0))
+        ).grid(row=1, column=0, sticky="w", pady=(3, 0))
+        profile_menu = self.tk.Menu(frame)
+        profile_menu.add_command(label="Load Profile…", command=self._load_profile)
+        profile_menu.add_command(label="Save Profile…", command=self._save_profile)
+        self.profile_menu_button = self.ttk.Menubutton(
+            frame,
+            text="Profile…",
+            menu=profile_menu,
+            style="Quiet.TMenubutton",
+        )
+        self.profile_menu_button.grid(row=1, column=1, sticky="e", padx=(10, 0))
 
         self.ttk.Label(frame, text="Supplier name", style="FieldLabel.TLabel").grid(
             row=4, column=0, columnspan=2, sticky="w"
@@ -788,14 +798,14 @@ class TenderVerdictApp:
             command=self._run_review,
             style="Primary.TButton",
         )
-        self.run_button.grid(row=16, column=0, columnspan=2, sticky="ew", pady=(12, 0))
+        self.run_button.grid(row=16, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         self.status_label = self.ttk.Label(
             frame,
             textvariable=self.status_var,
             style="Status.TLabel",
             wraplength=330,
         )
-        self.status_label.grid(row=17, column=0, columnspan=2, sticky="w", pady=(8, 0))
+        self.status_label.grid(row=17, column=0, columnspan=2, sticky="w", pady=(4, 0))
 
     def _set_status(self, message: str, tone: str = "neutral") -> None:
         styles = {
