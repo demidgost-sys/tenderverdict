@@ -18,9 +18,13 @@ procurement, eligibility, or legal review.
 You can also load and save the small supplier profile as JSON. Changing any input invalidates the
 visible result and disables export until the review is run again.
 
+The preview uses a two-pane review workspace: setup stays on the left, while verdict totals, the
+notice queue, and a structured explanation stay visible on the right. The visual system follows the
+operating system's light or dark appearance and uses one primary action for each review cycle.
+
 Keyboard shortcuts use Command on macOS and Control on Windows: `D` runs the demo, `R` runs the
 current review, `O` chooses notices, and `S` exports. Latin and Russian keyboard layouts are handled
-by the preview.
+by the preview. The same actions are discoverable in the native File and Review menus.
 
 ## Privacy and network boundary
 
@@ -79,9 +83,9 @@ the artifacts are source-pinned and traceable, not claimed to be byte-for-byte r
   an ad-hoc signature during assembly, which is not the same trust level.
 - The Windows preview is not code-signed and may trigger reputation-based warnings.
 - Do not redistribute a CI artifact as a trusted installer.
-- The interface uses native Tk controls, visible status text, keyboard traversal, and common
-  open/save shortcuts. Packaged keyboard behaviour still requires hands-on verification on each
-  target platform.
+- The interface uses styled Tk controls with system fonts, visible status text, keyboard traversal,
+  clear focus treatment, and common open/save shortcuts. Packaged keyboard behaviour still
+  requires hands-on verification on each target platform.
 - Screen-reader support is not confirmed. In one source-runtime check on macOS, the Tk controls
   were not exposed reliably in the accessibility tree. Do not rely on this preview for a
   screen-reader workflow until packaged builds pass VoiceOver and NVDA testing.

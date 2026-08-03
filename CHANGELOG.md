@@ -18,6 +18,9 @@ identifiers and may change interfaces during the alpha period.
 ### Changed
 
 - Moved the shared offline qualification and atomic output path behind a UI-neutral workflow.
+- Reworked the desktop preview into a focused two-pane workspace with clearer action hierarchy,
+  semantic status feedback, readable verdict metrics, and structured notice explanations.
+- Added restrained light and dark palettes with tested text and status contrast.
 - Reworked the public README into a developer-focused project overview and corrected the macOS
   quick start to use `python3`.
 - Added GitHub issue and pull-request templates for reproducible, non-confidential feedback.

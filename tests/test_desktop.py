@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from inspect import getsource
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from tenderverdict.desktop import (
     MAX_NOTICES_FILE_BYTES,
     TenderVerdictApp,
+    desktop_palette,
     export_format_for_path,
     format_result_details,
     profile_from_fields,
@@ -147,10 +147,21 @@ class DesktopInputTests(unittest.TestCase):
 
 
 class DesktopPresentationTests(unittest.TestCase):
-    def test_details_widget_uses_platform_dynamic_colours(self) -> None:
-        source = getsource(TenderVerdictApp._build_results)
-        self.assertNotIn("background=", source)
-        self.assertNotIn("foreground=", source)
+    def test_semantic_palettes_keep_readable_contrast(self) -> None:
+        for is_dark in (False, True):
+            with self.subTest(is_dark=is_dark):
+                palette = desktop_palette(is_dark)
+                pairs = (
+                    (palette.text, palette.surface),
+                    (palette.muted, palette.surface),
+                    (palette.subtle, palette.surface),
+                    (palette.accent_text, palette.accent),
+                    (palette.success, palette.surface_alt),
+                    (palette.warning, palette.surface_alt),
+                    (palette.danger, palette.surface_alt),
+                )
+                for foreground, background in pairs:
+                    self.assertGreaterEqual(_contrast_ratio(foreground, background), 4.5)
 
     def test_result_details_make_controls_visible(self) -> None:
         result = demo_run().results[0]
@@ -183,6 +194,22 @@ class DesktopPresentationTests(unittest.TestCase):
         with patch("socket.socket.connect", side_effect=AssertionError("network forbidden")):
             run = demo_run()
         self.assertEqual(run.summary["total"], 3)
+
+
+def _relative_luminance(colour: str) -> float:
+    channels = [int(colour[index : index + 2], 16) / 255 for index in (1, 3, 5)]
+    linear = [
+        channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4
+        for channel in channels
+    ]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+
+def _contrast_ratio(first: str, second: str) -> float:
+    brightest, darkest = sorted(
+        (_relative_luminance(first), _relative_luminance(second)), reverse=True
+    )
+    return (brightest + 0.05) / (darkest + 0.05)
 
 
 if __name__ == "__main__":
