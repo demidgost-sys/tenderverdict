@@ -56,10 +56,14 @@ APPROVED_IDENTITY = "Demid Valiullin"
 APPROVED_SYNTHETIC_ORGANISATION = "Example Software GmbH"
 OFFICIAL_URL_HOSTS = {
     "api.ted.europa.eu",
+    "data.europa.eu",
     "docs.ted.europa.eu",
     "git-lfs.github.com",
     "github.com",
     "op.europa.eu",
+    "publications.europa.eu",
+    "purl.org",
+    "ted.europa.eu",
     "www.apache.org",
     "www.w3.org",
 }

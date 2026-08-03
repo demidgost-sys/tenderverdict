@@ -63,7 +63,7 @@ class ReportTests(unittest.TestCase):
         )
         verdicts = [item["verdict"] for item in report["results"]]  # type: ignore[index]
         self.assertEqual(verdicts, ["open_documents", "watch", "reject"])
-        self.assertEqual(report["schema_version"], 2)
+        self.assertEqual(report["schema_version"], 3)
         self.assertEqual(report["provenance"]["profile_sha256"], "a" * 64)  # type: ignore[index]
 
     def test_markdown_is_deterministic_and_complete(self) -> None:

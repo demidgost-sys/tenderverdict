@@ -25,6 +25,7 @@ examples/synthetic/expected-brief.md
 examples/synthetic/notices.csv
 examples/synthetic/notices.json
 examples/synthetic/profile.json
+packaging/START_HERE.txt
 packaging/THIRD_PARTY_NOTICES.md
 packaging/TenderVerdict.spec
 packaging/tenderverdict-icon.icns
@@ -32,10 +33,14 @@ packaging/tenderverdict-icon.ico
 packaging/tenderverdict-icon.svg
 pyproject.toml
 requirements-desktop-build.txt
+requirements-package-build.txt
 src/tenderverdict/__init__.py
 src/tenderverdict/__main__.py
 src/tenderverdict/_version.py
 src/tenderverdict/cli.py
+src/tenderverdict/data/VOCABULARY_SOURCES.json
+src/tenderverdict/data/country_codes.txt
+src/tenderverdict/data/cpv_codes.txt
 src/tenderverdict/demo_data.py
 src/tenderverdict/desktop.py
 src/tenderverdict/models.py
@@ -44,6 +49,7 @@ src/tenderverdict/py.typed
 src/tenderverdict/qualification.py
 src/tenderverdict/report.py
 src/tenderverdict/ted.py
+src/tenderverdict/vocabularies.py
 src/tenderverdict/workflow.py
 tests/test_cli.py
 tests/test_desktop.py
@@ -59,4 +65,5 @@ tools/build_desktop.py
 tools/check_public_tree.py
 tools/desktop_launcher.py
 tools/security_scan.py
+tools/update_vocabularies.py
 tools/write_build_manifest.py

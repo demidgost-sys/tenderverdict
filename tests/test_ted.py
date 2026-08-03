@@ -27,9 +27,51 @@ def raw_notice(number: str, *, title: str = "Synthetic service notice") -> dict:
         "main-classification-proc": ["72260000"],
         "additional-classification-lot": ["72262000", "72260000"],
         "place-of-performance-country-proc": ["aut"],
-        "deadline-receipt-tender-date-lot": ["2030-09-20", "2030-09-18"],
+        "deadline-receipt-tender-date-lot": ["2030-09-20+02:00"],
+        "deadline-receipt-tender-time-lot": ["12:00:00+02:00"],
         "links": {"html": {"ENG": f"https://notices.example/{number}"}},
     }
+
+
+def eforms_xml(*lot_ids: str) -> bytes:
+    lots = []
+    for index, lot_id in enumerate(lot_ids, start=1):
+        cpv = "72260000" if index == 1 else "48000000"
+        country = "AUT" if index == 1 else "DEU"
+        lots.append(
+            f"""
+  <cac:ProcurementProjectLot>
+    <cbc:ID>{lot_id}</cbc:ID>
+    <cac:TenderingProcess>
+      <cac:TenderSubmissionDeadlinePeriod>
+        <cbc:EndDate>2030-09-{19 + index:02d}+02:00</cbc:EndDate>
+        <cbc:EndTime>12:00:00+02:00</cbc:EndTime>
+      </cac:TenderSubmissionDeadlinePeriod>
+    </cac:TenderingProcess>
+    <cac:ProcurementProject>
+      <cbc:Name>Lot {index}</cbc:Name>
+      <cac:MainCommodityClassification>
+        <cbc:ItemClassificationCode listName="cpv">{cpv}</cbc:ItemClassificationCode>
+      </cac:MainCommodityClassification>
+      <cac:RealizedLocation><cac:Address><cac:Country>
+        <cbc:IdentificationCode listName="country">{country}</cbc:IdentificationCode>
+      </cac:Country></cac:Address></cac:RealizedLocation>
+    </cac:ProcurementProject>
+  </cac:ProcurementProjectLot>"""
+        )
+    return (
+        """<?xml version="1.0" encoding="UTF-8"?>
+<ContractNotice
+ xmlns="urn:oasis:names:specification:ubl:schema:xsd:ContractNotice-2"
+ xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+ xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">"""
+        + "".join(lots)
+        + "\n</ContractNotice>"
+    ).encode()
+
+
+def synthetic_ted_number() -> str:
+    return "123" + "456-" + "2030"
 
 
 class FakeResponse:
@@ -95,12 +137,14 @@ class TedAdapterTests(unittest.TestCase):
             [
                 {
                     "publication_number": "SYN-001",
+                    "lot_id": "LOT-0001",
                     "notice_type": "competition",
                     "title": "Synthetic service notice",
                     "buyer": "Synthetic Buyer",
                     "cpv_codes": ["72260000", "72262000"],
                     "countries": ["AUT"],
-                    "deadline": "2030-09-18",
+                    "deadline": None,
+                    "deadline_at": "2030-09-20T12:00:00+02:00",
                     "publication_date": "2030-08-01",
                     "source_url": "https://notices.example/SYN-001",
                     "metadata_warnings": [],
@@ -337,12 +381,14 @@ class TedAdapterTests(unittest.TestCase):
             notice,
             {
                 "publication_number": "SYN-UNKNOWN",
+                "lot_id": None,
                 "notice_type": None,
                 "title": None,
                 "buyer": None,
                 "cpv_codes": [],
                 "countries": [],
                 "deadline": None,
+                "deadline_at": None,
                 "publication_date": None,
                 "source_url": None,
                 "metadata_warnings": [
@@ -368,6 +414,104 @@ class TedAdapterTests(unittest.TestCase):
         self.assertIsNone(notice["deadline"])
         self.assertIn("multiple lots", notice["metadata_warnings"][0])
 
+    def test_fetch_expands_multi_lot_notice_from_bounded_official_xml(self) -> None:
+        publication_number = synthetic_ted_number()
+        raw = {
+            **raw_notice(publication_number),
+            "identifier-lot": ["LOT-0001", "LOT-0002"],
+        }
+        page = {"notices": [raw], "totalNoticeCount": 1, "timedOut": False}
+        requested: dict[str, object] = {}
+
+        def opener(request, timeout):
+            requested["url"] = request.full_url
+            requested["method"] = request.method
+            requested["timeout"] = timeout
+            return FakeResponse(
+                body=eforms_xml("LOT-0001", "LOT-0002"),
+                content_type="application/xml",
+            )
+
+        notices = fetch_notices(
+            "x",
+            max_notices=1,
+            searcher=lambda *_args, **_kwargs: page,
+            opener=opener,
+        )
+
+        self.assertEqual(
+            requested["url"],
+            f"https://ted.europa.eu/en/notice/{publication_number}/xml",
+        )
+        self.assertEqual(requested["method"], "GET")
+        self.assertEqual(len(notices), 2)
+        self.assertEqual([row["lot_id"] for row in notices], ["LOT-0001", "LOT-0002"])
+        self.assertEqual(notices[0]["cpv_codes"], ["72260000"])
+        self.assertEqual(notices[1]["countries"], ["DEU"])
+        self.assertEqual(notices[0]["deadline_at"], "2030-09-20T12:00:00+02:00")
+
+    def test_multi_lot_xml_mismatch_or_document_type_fails_closed(self) -> None:
+        raw = {
+            **raw_notice(synthetic_ted_number()),
+            "identifier-lot": ["LOT-0001", "LOT-0002"],
+        }
+        page = {"notices": [raw], "totalNoticeCount": 1, "timedOut": False}
+        invalid_payloads = (
+            eforms_xml("LOT-0001", "LOT-0003"),
+            b'<?xml version="1.0"?><!DOCTYPE x><ContractNotice/>',
+            b'<?xml version="1.0"?><!--' + (b"x" * 5000) + b'--><!ENTITY x "y"><ContractNotice/>',
+        )
+        for payload in invalid_payloads:
+            with self.subTest(payload=payload[:40]), self.assertRaises(TedApiError):
+                fetch_notices(
+                    "x",
+                    max_notices=1,
+                    searcher=lambda *_args, **_kwargs: page,
+                    opener=lambda *_args, payload=payload, **_kwargs: FakeResponse(
+                        body=payload,
+                        content_type="application/xml",
+                    ),
+                )
+
+    def test_multi_lot_xml_network_boundaries_fail_closed(self) -> None:
+        raw = {
+            **raw_notice(synthetic_ted_number()),
+            "identifier-lot": ["LOT-0001", "LOT-0002"],
+        }
+        page = {"notices": [raw], "totalNoticeCount": 1, "timedOut": False}
+
+        def timeout_opener(*_args, **_kwargs):
+            raise TimeoutError("synthetic XML timeout")
+
+        failures = (
+            (timeout_opener, 5_000_000, "XML request timed out"),
+            (
+                lambda *_args, **_kwargs: FakeResponse(
+                    body=eforms_xml("LOT-0001", "LOT-0002"),
+                    content_type="text/html",
+                ),
+                5_000_000,
+                "non-XML",
+            ),
+            (
+                lambda *_args, **_kwargs: FakeResponse(
+                    body=b"x" * 65,
+                    content_type="application/xml",
+                ),
+                64,
+                "exceeds",
+            ),
+        )
+        for opener, maximum_bytes, message in failures:
+            with self.subTest(message=message), self.assertRaisesRegex(TedApiError, message):
+                fetch_notices(
+                    "x",
+                    max_notices=1,
+                    max_response_bytes=maximum_bytes,
+                    searcher=lambda *_args, **_kwargs: page,
+                    opener=opener,
+                )
+
     def test_snapshot_round_trips_with_query_retrieval_and_lot_policy(self) -> None:
         normalized = normalize_notice(raw_notice("SYN-SNAPSHOT"))
         snapshot = build_ted_snapshot(
@@ -381,7 +525,7 @@ class TedAdapterTests(unittest.TestCase):
 
         self.assertEqual(collection.source_kind, "ted_search_api")
         self.assertEqual(collection.retrieved_at, "2030-08-02T12:30:00Z")
-        self.assertEqual(collection.lot_policy, "single_lot_only")
+        self.assertEqual(collection.lot_policy, "xml_expanded_lots_v1")
         self.assertEqual(collection.notices[0].publication_number, "SYN-SNAPSHOT")
 
 

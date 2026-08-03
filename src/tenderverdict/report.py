@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from html import escape as escape_html
 from unicodedata import category
 
@@ -42,16 +42,16 @@ class ReportProvenance:
 def report_as_dict(
     profile: Profile,
     results: Sequence[QualificationResult],
-    as_of: date,
+    as_of: date | datetime,
     provenance: ReportProvenance,
 ) -> dict[str, object]:
     """Return the canonical report structure shared by all renderers."""
 
-    if type(as_of) is not date:
-        raise TypeError("as_of must be a datetime.date")
+    if type(as_of) is not date and not (type(as_of) is datetime and as_of.utcoffset() is not None):
+        raise TypeError("as_of must be a date or a timezone-aware datetime")
     counts = _counts(results)
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "provenance": provenance.to_dict(),
         "profile": profile.to_dict(),
         "as_of": as_of.isoformat(),
@@ -68,7 +68,7 @@ def report_as_dict(
 def render_markdown(
     profile: Profile,
     results: Sequence[QualificationResult],
-    as_of: date,
+    as_of: date | datetime,
     provenance: ReportProvenance,
 ) -> str:
     """Render a stable Markdown report with untrusted values escaped."""
@@ -109,16 +109,16 @@ def render_markdown(
 
     for result in results:
         notice = result.notice
+        identity = _notice_identity(notice.publication_number, notice.lot_id)
         lines.extend(
             [
                 "",
-                f"## {_escape_markdown(notice.publication_number)} — "
+                f"## {_escape_markdown(identity)} — "
                 f"{_escape_markdown(notice.title or '(title missing)')}",
                 "",
                 f"- **Verdict:** `{result.verdict.value}`",
                 f"- **Buyer:** {_escape_markdown(notice.buyer or '(missing)')}",
-                "- **Deadline:** "
-                f"{notice.deadline.isoformat() if notice.deadline else '(missing)'}",
+                f"- **Deadline:** {_deadline_text(notice.deadline, notice.deadline_at)}",
                 "- **Published:** "
                 + (notice.publication_date.isoformat() if notice.publication_date else "(missing)"),
                 f"- **Source:** {_escape_markdown(notice.source_url or '(missing)')}",
@@ -156,7 +156,7 @@ def render_markdown(
 def render_html(
     profile: Profile,
     results: Sequence[QualificationResult],
-    as_of: date,
+    as_of: date | datetime,
     provenance: ReportProvenance,
 ) -> str:
     """Render a self-contained static HTML report without scripts or remote assets."""
@@ -242,10 +242,12 @@ def render_html(
 def _render_result_html(result: QualificationResult) -> str:
     notice = result.notice
     title = _escape_html_text(notice.title or "(title missing)")
-    publication_number = _escape_html_text(notice.publication_number)
+    publication_number = _escape_html_text(
+        _notice_identity(notice.publication_number, notice.lot_id)
+    )
     buyer = _escape_html_text(notice.buyer or "(missing)")
     source = _escape_html_text(notice.source_url or "(missing)")
-    deadline = notice.deadline.isoformat() if notice.deadline else "(missing)"
+    deadline = _deadline_text(notice.deadline, notice.deadline_at)
     publication_date = (
         notice.publication_date.isoformat() if notice.publication_date else "(missing)"
     )
@@ -304,6 +306,18 @@ def _counts(results: Sequence[QualificationResult]) -> dict[Verdict, int]:
     for result in results:
         counts[result.verdict] += 1
     return counts
+
+
+def _deadline_text(deadline: date | None, deadline_at: datetime | None) -> str:
+    if deadline_at is not None:
+        return deadline_at.isoformat()
+    if deadline is not None:
+        return deadline.isoformat()
+    return "(missing)"
+
+
+def _notice_identity(publication_number: str, lot_id: str | None) -> str:
+    return f"{publication_number} / {lot_id}" if lot_id else publication_number
 
 
 def _escape_markdown(value: str) -> str:

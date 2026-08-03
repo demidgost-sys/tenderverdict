@@ -29,7 +29,10 @@ boundaries:
 Run the local checks before proposing a patch:
 
 ```bash
-python -m pip install build==1.5.0 hatchling==1.27.0 mypy==2.3.0 ruff==0.16.1
+python -m pip install --require-hashes --only-binary=:all: --no-deps \
+  -r requirements-package-build.txt
+python -m pip install mypy==2.3.0 ruff==0.16.1
+python -m pip check
 PYTHONPATH=src python -m unittest discover -s tests -v
 python tools/check_public_tree.py
 python tools/security_scan.py
@@ -38,6 +41,12 @@ ruff format --check .
 mypy
 python -m build --no-isolation
 ```
+
+`requirements-package-build.txt` is the reviewed, hash-locked package-build environment. Desktop
+bundles use the separate `requirements-desktop-build.txt` lock. The vocabulary snapshots under
+`src/tenderverdict/data/` are intentional release inputs: do not run
+`tools/update_vocabularies.py` as a routine development step. A vocabulary refresh is a networked
+maintainer operation and must include review of the source metadata, row counts, hashes, and diff.
 
 Do not add files without also updating `PUBLIC_TREE_ALLOWLIST.txt`. Do not weaken a fail-closed check
 merely to make a new fixture pass; make the fixture safely synthetic or document the required narrow

@@ -6,7 +6,7 @@ import hashlib
 import json
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import cast
 
@@ -35,7 +35,7 @@ class QualificationRun:
     """One complete, deterministic qualification run."""
 
     profile: Profile
-    as_of: date
+    as_of: date | datetime
     results: tuple[QualificationResult, ...]
     provenance: ReportProvenance
 
@@ -54,7 +54,7 @@ def qualify_inputs(
     profile: Profile,
     notices: Sequence[Notice],
     *,
-    as_of: date,
+    as_of: date | datetime,
     source_kind: str = "in_memory",
     profile_sha256: str | None = None,
     notices_sha256: str | None = None,
@@ -88,7 +88,7 @@ def qualify_files(
     profile_path: str | Path,
     notices_path: str | Path,
     *,
-    as_of: date,
+    as_of: date | datetime,
 ) -> QualificationRun:
     """Load a JSON profile plus validated local CSV or JSON notices."""
 

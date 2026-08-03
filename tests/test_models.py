@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from tenderverdict.models import (
@@ -15,6 +15,8 @@ from tenderverdict.models import (
     notices_from_data,
     notices_from_file_bytes,
     parse_iso_date,
+    parse_review_point,
+    parse_rfc3339_datetime,
     profile_from_dict,
     render_notices_csv,
 )
@@ -45,6 +47,8 @@ class ProfileValidationTests(unittest.TestCase):
             {**VALID_PROFILE, "minimum_days_to_deadline": -1},
             {**VALID_PROFILE, "cpv_codes": []},
             {**VALID_PROFILE, "countries": ["AT"]},
+            {**VALID_PROFILE, "countries": ["ZZZ"]},
+            {**VALID_PROFILE, "cpv_codes": ["99999999"]},
             {**VALID_PROFILE, "unexpected": "field"},
         )
 
@@ -63,6 +67,8 @@ class NoticeValidationTests(unittest.TestCase):
         self.assertEqual(notice.cpv_codes, ())
         self.assertEqual(notice.countries, ())
         self.assertIsNone(notice.deadline)
+        self.assertIsNone(notice.deadline_at)
+        self.assertIsNone(notice.lot_id)
         self.assertIsNone(notice.source_url)
 
     def test_notice_normalizes_and_serializes(self) -> None:
@@ -75,6 +81,7 @@ class NoticeValidationTests(unittest.TestCase):
                 "cpv_codes": ["72260000", "72260000"],
                 "countries": ["aut", "AUT"],
                 "deadline": "2026-09-15",
+                "lot_id": "lot-0001",
                 "source_url": " https://procurement.example/notices/SYN-001 ",
             }
         )
@@ -83,6 +90,7 @@ class NoticeValidationTests(unittest.TestCase):
         self.assertEqual(notice.cpv_codes, ("72260000",))
         self.assertEqual(notice.countries, ("AUT",))
         self.assertEqual(notice.deadline, date(2026, 9, 15))
+        self.assertEqual(notice.lot_id, "LOT-0001")
         self.assertEqual(notice.to_dict()["deadline"], "2026-09-15")
 
     def test_notice_rejects_invalid_shape(self) -> None:
@@ -94,6 +102,12 @@ class NoticeValidationTests(unittest.TestCase):
             {"publication_number": "SYN-001", "cpv_codes": ["7226"]},
             {"publication_number": "SYN-001", "countries": [3]},
             {"publication_number": "SYN-001", "deadline": "2026-02-30"},
+            {"publication_number": "SYN-001", "lot_id": "LOT-1"},
+            {
+                "publication_number": "SYN-001",
+                "deadline": "2026-09-15",
+                "deadline_at": "2026-09-15T12:00:00+02:00",
+            },
             {"publication_number": "SYN-001", "extra": True},
         )
 
@@ -129,6 +143,38 @@ class CsvNoticeTests(unittest.TestCase):
                 notices = notices_from_csv_bytes(payload)
                 self.assertEqual(notices[0].publication_number, "SYN-CSV-001")
 
+    def test_csv_accepts_optional_lot_and_exact_deadline_columns(self) -> None:
+        header = (
+            self.HEADER.rstrip()
+            .replace(
+                "publication_number,",
+                "publication_number,lot_id,",
+            )
+            .replace(
+                ",source_url",
+                ",deadline_at,source_url",
+            )
+            + "\n"
+        )
+        row = (
+            self.ROW.rstrip()
+            .replace(
+                "SYN-CSV-001,",
+                "SYN-CSV-001,LOT-0001,",
+            )
+            .replace(
+                "2026-09-15,",
+                ",2026-09-15T12:00:00+02:00,",
+            )
+            + "\n"
+        )
+
+        notice = notices_from_csv_bytes((header + row).encode())[0]
+
+        self.assertEqual(notice.lot_id, "LOT-0001")
+        self.assertIsNone(notice.deadline)
+        self.assertEqual(notice.deadline_at.isoformat(), "2026-09-15T12:00:00+02:00")
+
     def test_csv_errors_name_the_row_and_fix(self) -> None:
         bad_date = self.ROW.replace("2026-09-15", "2026-99-15")
         with self.assertRaisesRegex(SchemaValidationError, r"CSV row 2: deadline"):
@@ -158,6 +204,18 @@ class CsvNoticeTests(unittest.TestCase):
         with self.assertRaisesRegex(SchemaValidationError, "duplicate publication_number"):
             notices_from_csv_bytes((self.HEADER + duplicate).encode())
 
+    def test_distinct_lots_can_share_a_publication_number(self) -> None:
+        rows = [
+            {"publication_number": "SYN-LOT", "lot_id": "LOT-0001"},
+            {"publication_number": "syn-lot", "lot_id": "LOT-0002"},
+        ]
+        notices = notices_from_data(rows)
+        self.assertEqual([notice.lot_id for notice in notices], ["LOT-0001", "LOT-0002"])
+        with self.assertRaisesRegex(SchemaValidationError, "duplicate publication_number"):
+            notices_from_data([rows[0], rows[0]])
+        with self.assertRaisesRegex(SchemaValidationError, "mixes notice-level and lot-level"):
+            notices_from_data([rows[0], {"publication_number": "SYN-LOT"}])
+
     def test_notice_count_and_field_lengths_are_bounded(self) -> None:
         with self.assertRaisesRegex(SchemaValidationError, f"at most {MAX_NOTICE_COUNT}"):
             notices_from_data(
@@ -183,6 +241,19 @@ class JsonAndDateTests(unittest.TestCase):
         for value in ("20260802", "2026-8-2", "2026-02-30"):
             with self.subTest(value=value), self.assertRaises(SchemaValidationError):
                 parse_iso_date(value)
+
+    def test_rfc3339_review_points_are_timezone_aware(self) -> None:
+        expected = datetime(2026, 8, 2, 12, 30, tzinfo=UTC)
+        self.assertEqual(parse_rfc3339_datetime("2026-08-02T12:30:00Z"), expected)
+        self.assertEqual(parse_review_point("2026-08-02"), date(2026, 8, 2))
+        self.assertEqual(parse_review_point("2026-08-02T12:30:00Z"), expected)
+        for value in (
+            "2026-08-02T12:30:00",
+            "2026-08-02 12:30:00Z",
+            "2026-08-02T25:30:00+02:00",
+        ):
+            with self.subTest(value=value), self.assertRaises(SchemaValidationError):
+                parse_rfc3339_datetime(value)
 
     def test_duplicate_json_key_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

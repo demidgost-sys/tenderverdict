@@ -22,6 +22,15 @@ identifiers and may change interfaces during the alpha period.
   consistent zero-notice policy for CSV and JSON.
 - Added a version-based roadmap with explicit desktop-release, manual-platform, security, and
   evaluation gates.
+- Added source-traceable offline validation against bundled EU CPV and current country authority
+  snapshots, plus a bounded maintainer refresh tool with atomic per-file replacement.
+- Added optional lot identifiers and timezone-aware RFC 3339 deadlines while preserving v0.1 CSV
+  and JSON input compatibility.
+- Added verified multi-lot expansion through bounded official eForms XML with fail-closed
+  Search/XML identifier matching.
+- Added desktop verdict filters, sortable result headings, and explicit plain-text copy.
+- Added hash-locked package and desktop build dependencies plus a first-run guide with synthetic
+  data inside every native developer archive.
 
 ### Changed
 
@@ -33,8 +42,8 @@ identifiers and may change interfaces during the alpha period.
 - Reworked the public README into a developer-focused project overview and corrected the macOS
   quick start to use `python3`.
 - Added GitHub issue and pull-request templates for reproducible, non-confidential feedback.
-- Changed TED snapshots to a traceable wrapper and withheld unsafe lot-level evidence whenever the
-  Search API does not return exactly one lot identifier.
+- Changed TED snapshots to `xml_expanded_lots_v1`: single-lot Search fields remain direct,
+  multi-lot results require verified eForms XML, and zero-lot ambiguity remains withheld.
 - Added one aggregate desktop CI gate, a dedicated application icon, and the project version in
   macOS bundle metadata. Binary release checks now verify icon structure, PNG checksums, dimensions,
   and the absence of embedded metadata chunks. Generated sdist metadata is explicitly bounded and

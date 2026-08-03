@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import re
 import subprocess
@@ -30,21 +32,19 @@ class ProjectMetadataTests(unittest.TestCase):
         )
 
     def test_desktop_build_tool_is_exact_and_network_adapter_is_excluded(self) -> None:
-        requirements = [
-            line.strip()
-            for line in (ROOT / "requirements-desktop-build.txt")
-            .read_text(encoding="utf-8")
-            .splitlines()
-            if line.strip() and not line.lstrip().startswith("#")
-        ]
+        requirements = (ROOT / "requirements-desktop-build.txt").read_text(encoding="utf-8")
         spec = (ROOT / "packaging" / "TenderVerdict.spec").read_text(encoding="utf-8")
 
-        self.assertEqual(requirements, ["pyinstaller==6.21.0"])
+        self.assertIn("pyinstaller==6.21.0", requirements)
+        self.assertIn("hatchling==1.27.0", requirements)
+        self.assertIn("--hash=sha256:", requirements)
+        self.assertNotIn(">=", requirements)
         self.assertIn('"tenderverdict.cli"', spec)
         self.assertIn('"tenderverdict.ted"', spec)
         self.assertIn("console=False", spec)
         self.assertIn("upx=False", spec)
         self.assertIn("icon=str(ICON_PATH)", spec)
+        self.assertIn('"tenderverdict/data"', spec)
         self.assertIn("ROOT = Path(SPECPATH).parent\n", spec)
         self.assertIn('MACOS_BUNDLE_VERSION = PROJECT_VERSION.split("a", 1)[0]', spec)
         self.assertIn('"CFBundleShortVersionString": MACOS_BUNDLE_VERSION', spec)
@@ -55,6 +55,17 @@ class ProjectMetadataTests(unittest.TestCase):
         manifest = (ROOT / "tools" / "write_build_manifest.py").read_text(encoding="utf-8")
         self.assertIn('"macos-arm64": ("Darwin", {"arm64", "aarch64"}, "adhoc")', manifest)
         self.assertIn("GITHUB_SHA must be a full lowercase 40-character commit SHA", manifest)
+        self.assertIn("desktop_build_lock_sha256=", manifest)
+        self.assertIn("build_tools=", manifest)
+
+    def test_bundled_vocabularies_match_source_metadata(self) -> None:
+        data = ROOT / "src" / "tenderverdict" / "data"
+        metadata = json.loads((data / "VOCABULARY_SOURCES.json").read_text(encoding="utf-8"))
+        self.assertEqual(metadata["retrieved_on"], "2026-08-04")
+        for key, filename in (("cpv", "cpv_codes.txt"), ("countries", "country_codes.txt")):
+            payload = (data / filename).read_bytes()
+            self.assertEqual(metadata[key]["records"], len(payload.splitlines()))
+            self.assertEqual(metadata[key]["sha256"], hashlib.sha256(payload).hexdigest())
 
     def test_desktop_module_import_is_headless_and_does_not_load_ted(self) -> None:
         environment = os.environ.copy()

@@ -64,6 +64,7 @@ include = [
   "/SECURITY.md",
   "/pyproject.toml",
   "/requirements-desktop-build.txt",
+  "/requirements-package-build.txt",
 ]
 
 [tool.ruff]

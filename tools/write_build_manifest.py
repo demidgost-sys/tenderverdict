@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import os
 import platform
 import re
@@ -23,6 +24,17 @@ TARGETS = {
     "macos-x64": ("Darwin", {"x86_64", "amd64"}, "adhoc"),
     "windows-x64": ("Windows", {"amd64", "x86_64"}, "not-signed"),
 }
+BUILD_PACKAGES = (
+    "altgraph",
+    "hatchling",
+    "packaging",
+    "pathspec",
+    "pluggy",
+    "pyinstaller",
+    "pyinstaller-hooks-contrib",
+    "setuptools",
+    "trove-classifiers",
+)
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -75,6 +87,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     requirements = ROOT / "requirements-desktop-build.txt"
+    platform_packages = (
+        ("macholib",) if platform.system() == "Darwin" else ("pefile", "pywin32-ctypes")
+    )
+    build_tools = ",".join(
+        f"{package}=={importlib.metadata.version(package)}"
+        for package in (*BUILD_PACKAGES, *platform_packages)
+    )
     lines = [
         "TenderVerdict desktop developer artifact",
         f"target={args.target}",
@@ -87,7 +106,8 @@ def main(argv: list[str] | None = None) -> int:
         f"tcl={tk.TclVersion}",
         f"tk={tk.TkVersion}",
         f"pyinstaller={PyInstaller.__version__}",
-        f"build_requirements_sha256={_sha256(requirements)}",
+        f"desktop_build_lock_sha256={_sha256(requirements)}",
+        f"build_tools={build_tools}",
         f"runner_image={provenance['image_os']}",
         f"runner_image_version={provenance['image_version']}",
         f"signature_state={args.signature_state}",

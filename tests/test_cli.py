@@ -322,7 +322,7 @@ class CliTests(unittest.TestCase):
             self.assertEqual(snapshot["schema_version"], 1)
             self.assertEqual(snapshot["source"]["kind"], "ted_search_api")
             self.assertEqual(snapshot["source"]["query"], "form-type = competition")
-            self.assertEqual(snapshot["source"]["lot_policy"], "single_lot_only")
+            self.assertEqual(snapshot["source"]["lot_policy"], "xml_expanded_lots_v1")
             self.assertRegex(
                 snapshot["source"]["retrieved_at"],
                 r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
