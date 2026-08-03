@@ -765,7 +765,7 @@ class TenderVerdictApp:
         )
         self.ttk.Label(
             frame,
-            text="Choose normalized CSV or JSON, save an editable example, or run the demo.",
+            text="Choose CSV or JSON, or run the demo. CSV example: File menu.",
             style="CardDescription.TLabel",
             wraplength=330,
         ).grid(row=12, column=0, columnspan=2, sticky="w", pady=(4, 8))
@@ -795,13 +795,6 @@ class TenderVerdictApp:
             command=self._run_demo,
             style="Secondary.TButton",
         ).grid(row=0, column=1, sticky="ew", padx=(5, 0))
-        self.save_csv_example_button = self.ttk.Button(
-            notice_actions,
-            text="Save editable CSV example…",
-            command=self._save_csv_example,
-            style="Secondary.TButton",
-        )
-        self.save_csv_example_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(8, 0))
 
         frame.rowconfigure(15, weight=1)
         self.run_button = self.ttk.Button(
@@ -1013,6 +1006,7 @@ class TenderVerdictApp:
             command=self._choose_notices,
         )
         file_menu.add_command(label="Save CSV Example…", command=self._save_csv_example)
+        self.save_csv_example_menu_index = file_menu.index("end")
         file_menu.add_separator()
         file_menu.add_command(label="Load Profile…", command=self._load_profile)
         file_menu.add_command(label="Save Profile…", command=self._save_profile)
@@ -1461,6 +1455,11 @@ def _desktop_smoke_test(
             raise RuntimeError("desktop menu is not configured")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "disabled":
             raise RuntimeError("desktop export menu must start disabled")
+        if (
+            str(app.file_menu.entrycget(app.save_csv_example_menu_index, "label"))
+            != "Save CSV Example…"
+        ):
+            raise RuntimeError("desktop CSV example action is not configured")
         modifier = "Command" if app._windowing_system == "aqua" else "Control"
         if not root.bind_all(f"<{modifier}-KeyPress>"):
             raise RuntimeError("desktop keyboard shortcuts are not registered")
@@ -1483,7 +1482,6 @@ def _desktop_smoke_test(
             return bottom
 
         for name, widget in (
-            ("CSV example action", app.save_csv_example_button),
             ("primary review action", app.run_button),
             ("review status", app.status_label),
             ("result queue", app.results_tree),
