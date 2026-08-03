@@ -827,22 +827,16 @@ class TenderVerdictApp:
             style="Field.TEntry",
         )
         self.as_of_entry.grid(row=10, column=1, sticky="ew", padx=(6, 0), pady=(5, 0))
-        self.ttk.Label(
-            frame,
-            text="Date or RFC 3339 with UTC offset",
-            style="Helper.TLabel",
-            wraplength=330,
-        ).grid(row=11, column=0, columnspan=2, sticky="w", pady=(5, 0))
 
         self.ttk.Label(frame, text="NOTICE DATA", style="CardEyebrow.TLabel").grid(
-            row=12, column=0, columnspan=2, sticky="w", pady=(16, 0)
+            row=11, column=0, columnspan=2, sticky="w", pady=(16, 0)
         )
         self.ttk.Label(
             frame,
             text="Use CSV, JSON, or the offline demo.",
             style="CardDescription.TLabel",
             wraplength=330,
-        ).grid(row=13, column=0, columnspan=2, sticky="w", pady=(4, 8))
+        ).grid(row=12, column=0, columnspan=2, sticky="w", pady=(4, 8))
         self.notices_entry = self.ttk.Entry(
             frame,
             textvariable=self.notices_display_var,
@@ -850,10 +844,10 @@ class TenderVerdictApp:
             takefocus=False,
             style="Field.TEntry",
         )
-        self.notices_entry.grid(row=14, column=0, columnspan=2, sticky="ew")
+        self.notices_entry.grid(row=13, column=0, columnspan=2, sticky="ew")
 
         notice_actions = self.ttk.Frame(frame, style="Surface.TFrame")
-        notice_actions.grid(row=15, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        notice_actions.grid(row=14, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         notice_actions.columnconfigure(0, weight=1)
         notice_actions.columnconfigure(1, weight=1)
         self.choose_notices_button = self.ttk.Button(
@@ -870,14 +864,14 @@ class TenderVerdictApp:
             style="Secondary.TButton",
         ).grid(row=0, column=1, sticky="ew", padx=(5, 0))
 
-        frame.rowconfigure(16, weight=1)
+        frame.rowconfigure(15, weight=1)
         self.run_button = self.ttk.Button(
             frame,
             text="Run review",
             command=self._run_review,
             style="Primary.TButton",
         )
-        self.run_button.grid(row=17, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        self.run_button.grid(row=16, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         self.status_label = self.ttk.Label(
             frame,
             textvariable=self.status_var,
@@ -885,7 +879,7 @@ class TenderVerdictApp:
             wraplength=330,
             takefocus=True,
         )
-        self.status_label.grid(row=18, column=0, columnspan=2, sticky="w", pady=(4, 0))
+        self.status_label.grid(row=17, column=0, columnspan=2, sticky="w", pady=(4, 0))
 
     def _set_status(self, message: str, tone: str = "neutral") -> None:
         styles = {
