@@ -15,6 +15,7 @@ from tenderverdict.desktop import (
     profile_from_fields,
     read_local_snapshot,
     shortcut_action,
+    visible_result_indices,
 )
 from tenderverdict.models import SchemaValidationError
 from tenderverdict.workflow import demo_run
@@ -43,6 +44,7 @@ class DesktopInputTests(unittest.TestCase):
             (("Example", "72260000", "", "14"), "Add at least one 3-letter country code"),
             (("Example", "72260000", "AUT", "14.5"), "whole number"),
             (("Example", "7226", "AUT", "14"), "8-digit CPV code"),
+            (("Example", "99999999", "AUT", "14"), "official CPV vocabulary"),
         )
         for arguments, message in cases:
             with self.subTest(arguments=arguments):
@@ -267,6 +269,44 @@ class DesktopPresentationTests(unittest.TestCase):
         with patch("socket.socket.connect", side_effect=AssertionError("network forbidden")):
             run = demo_run()
         self.assertEqual(run.summary["total"], 3)
+
+    def test_result_queue_filters_and_sorts_without_changing_the_run(self) -> None:
+        run = demo_run()
+
+        self.assertEqual(
+            visible_result_indices(run.results, "Watch", "input", False),
+            [1],
+        )
+        self.assertEqual(
+            visible_result_indices(run.results, "All verdicts", "verdict", False),
+            [0, 1, 2],
+        )
+        by_notice = visible_result_indices(
+            run.results,
+            "All verdicts",
+            "notice",
+            True,
+        )
+        self.assertEqual(by_notice, [1, 2, 0])
+
+    def test_copy_selected_result_is_explicit_plain_text(self) -> None:
+        app = object.__new__(TenderVerdictApp)
+        app._current_run = demo_run()
+        app.results_tree = Mock(selection=Mock(return_value=("0",)))
+        app.root = Mock()
+        app._set_status = Mock()
+
+        handled = app._copy_selected_result()
+
+        self.assertEqual(handled, "break")
+        app.root.clipboard_clear.assert_called_once_with()
+        copied = app.root.clipboard_append.call_args.args[0]
+        self.assertIn("Verdict: Open documents", copied)
+        self.assertNotIn("<script", copied.casefold())
+        app._set_status.assert_called_once_with(
+            "Copied the selected result as plain text. No data was uploaded.",
+            "success",
+        )
 
 
 def _relative_luminance(colour: str) -> float:

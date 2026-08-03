@@ -8,3 +8,8 @@ endorsed by, or sponsored by the European Union or the Tenders Electronic Daily
 Names, logos, interfaces, and records supplied by external data providers remain
 subject to their respective rights and terms. The Apache License 2.0 for this
 repository does not grant rights to external procurement data or trademarks.
+
+The source distribution includes bounded CPV and country-code snapshots retrieved
+from the Publications Office of the European Union. Their exact provenance and
+digests are recorded in src/tenderverdict/data/VOCABULARY_SOURCES.json. Those data
+are not relicensed under Apache-2.0 by this notice.

@@ -72,10 +72,9 @@ jobs:
           python-version: "3.14.6"
 
       - name: Install pinned build tools
-        run: >-
-          python -m pip install
-          hatchling==1.27.0
-          -r requirements-desktop-build.txt
+        run: |
+          python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-desktop-build.txt
+          python -m pip check
 
       - name: Install TenderVerdict without runtime dependencies
         run: python -m pip install --no-build-isolation --no-deps .
@@ -158,11 +157,25 @@ jobs:
           mkdir -p "$stage"
           ditto "dist/TenderVerdict.app" "$stage/TenderVerdict.app"
           cp LICENSE NOTICE packaging/THIRD_PARTY_NOTICES.md "$stage/"
+          cp packaging/START_HERE.txt "$stage/"
+          mkdir -p "$stage/Example data"
+          cp examples/synthetic/profile.json examples/synthetic/notices.csv \
+            "$stage/Example data/"
           PYTHONPATH=src python tools/write_build_manifest.py \
             --ci --signature-state adhoc \
             --target "${{ matrix.target }}" --output "$stage/BUILD_INFO.txt"
-          ditto -c -k --sequesterRsrc --keepParent "$stage" \
+          ditto -c -k --norsrc --keepParent "$stage" \
             "TenderVerdict-${{ matrix.target }}.zip"
+          archive_prefix="TenderVerdict-${{ matrix.target }}/"
+          if unzip -Z1 "TenderVerdict-${{ matrix.target }}.zip" \
+            | grep -Evq "^${archive_prefix}"; then
+            echo "Desktop archive must contain one target-named top-level folder" >&2
+            exit 1
+          fi
+          unzip -Z1 "TenderVerdict-${{ matrix.target }}.zip" \
+            | grep -Fxq "${archive_prefix}START_HERE.txt"
+          unzip -Z1 "TenderVerdict-${{ matrix.target }}.zip" \
+            | grep -Fxq "${archive_prefix}BUILD_INFO.txt"
           shasum -a 256 "TenderVerdict-${{ matrix.target }}.zip" \
             > "TenderVerdict-${{ matrix.target }}.sha256"
 
@@ -173,13 +186,40 @@ jobs:
           $stage = "artifact\TenderVerdict-${{ matrix.target }}"
           New-Item -ItemType Directory -Force $stage | Out-Null
           Copy-Item -Recurse .\dist\TenderVerdict "$stage\TenderVerdict"
-          Copy-Item LICENSE, NOTICE, packaging\THIRD_PARTY_NOTICES.md $stage
+          Copy-Item LICENSE, NOTICE, packaging\THIRD_PARTY_NOTICES.md, packaging\START_HERE.txt $stage
+          New-Item -ItemType Directory -Force "$stage\Example data" | Out-Null
+          Copy-Item examples\synthetic\profile.json, examples\synthetic\notices.csv `
+            "$stage\Example data"
           $env:PYTHONPATH = "src"
           python tools\write_build_manifest.py `
             --ci --signature-state not-signed `
             --target "${{ matrix.target }}" --output "$stage\BUILD_INFO.txt"
-          Compress-Archive -Path "$stage\*" `
+          # Match the macOS artifacts: extraction creates one clearly named
+          # top-level folder instead of scattering files into the destination.
+          Compress-Archive -Path $stage `
             -DestinationPath "TenderVerdict-${{ matrix.target }}.zip"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive = [System.IO.Compression.ZipFile]::OpenRead(
+            "TenderVerdict-${{ matrix.target }}.zip"
+          )
+          try {
+            $prefix = "TenderVerdict-${{ matrix.target }}/"
+            $entryNames = @(
+              $archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') }
+            )
+            if ($entryNames.Count -eq 0 -or @($entryNames | Where-Object {
+              -not $_.StartsWith($prefix)
+            }).Count -ne 0) {
+              throw "Desktop archive must contain one target-named top-level folder"
+            }
+            if ($entryNames -notcontains "${prefix}START_HERE.txt" -or
+                $entryNames -notcontains "${prefix}BUILD_INFO.txt") {
+              throw "Desktop archive is missing its first-run handoff"
+            }
+          }
+          finally {
+            $archive.Dispose()
+          }
           $hash = (Get-FileHash "TenderVerdict-${{ matrix.target }}.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
           $checksumPath = Join-Path $PWD "TenderVerdict-${{ matrix.target }}.sha256"
           $checksumLine = "$hash *TenderVerdict-${{ matrix.target }}.zip`n"

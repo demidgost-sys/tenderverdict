@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "retrieved_on": "2026-08-04",
+  "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+  "cpv": {
+    "source": "Common Procurement Vocabulary",
+    "query": "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\nSELECT DISTINCT ?notation WHERE {\n  ?concept a skos:Concept ; skos:notation ?notation .\n  FILTER(STRSTARTS(STR(?concept), \"http://data.europa.eu/cpv/cpv/\"))\n}\nORDER BY ?notation",
+    "records": 9454,
+    "sha256": "57826b7484e559cc46dc2d5e6232573797ee6b6ca17dffff10b0e7c591ecbee6"
+  },
+  "countries": {
+    "source": "Countries and territories authority table (CURRENT concepts)",
+    "query": "PREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>\nSELECT DISTINCT ?identifier WHERE {\n  ?concept dc:identifier ?identifier ;\n    euvoc:status <http://publications.europa.eu/resource/authority/concept-status/CURRENT> .\n  FILTER(STRSTARTS(\n    STR(?concept),\n    \"http://publications.europa.eu/resource/authority/country/\"\n  ))\n  FILTER(REGEX(STR(?identifier), \"^[A-Z]{3}$\"))\n}\nORDER BY ?identifier",
+    "records": 303,
+    "sha256": "bac6097a5c4f2693a038d3124e3e5a8ab3af852f001d7059c81f79487bfa2b6c"
+  }
+}

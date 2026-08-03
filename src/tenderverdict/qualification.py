@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from urllib.parse import urlsplit
 
 from .models import Notice, Profile, QualificationResult, Verdict
@@ -25,20 +25,24 @@ _NEXT_STEPS = {
 
 
 def qualify_notices(
-    profile: Profile, notices: tuple[Notice, ...] | list[Notice], as_of: date
+    profile: Profile,
+    notices: tuple[Notice, ...] | list[Notice],
+    as_of: date | datetime,
 ) -> tuple[QualificationResult, ...]:
     """Qualify notices in their input order without network access or scoring."""
 
-    if type(as_of) is not date:
-        raise TypeError("as_of must be a datetime.date")
+    _validate_review_point(as_of)
     return tuple(qualify_notice(profile, notice, as_of) for notice in notices)
 
 
-def qualify_notice(profile: Profile, notice: Notice, as_of: date) -> QualificationResult:
+def qualify_notice(
+    profile: Profile,
+    notice: Notice,
+    as_of: date | datetime,
+) -> QualificationResult:
     """Return one traceable verdict from supplied metadata only."""
 
-    if type(as_of) is not date:
-        raise TypeError("as_of must be a datetime.date")
+    _validate_review_point(as_of)
 
     reasons: list[str] = []
     unknowns: list[str] = []
@@ -77,14 +81,28 @@ def qualify_notice(profile: Profile, notice: Notice, as_of: date) -> Qualificati
         reasons.append("Buyer metadata is supplied.")
 
     # Deadline
-    if notice.deadline is None:
+    if notice.deadline is None and notice.deadline_at is None:
         reasons.append("Submission deadline is missing.")
         unknowns.append("Confirm the submission deadline before reviewing documents.")
         needs_review = True
+    elif notice.deadline_at is not None:
+        deadline_reasons, deadline_unknowns, deadline_reject, deadline_review = (
+            _evaluate_exact_deadline(
+                notice.deadline_at,
+                as_of,
+                profile.minimum_days_to_deadline,
+            )
+        )
+        reasons.extend(deadline_reasons)
+        unknowns.extend(deadline_unknowns)
+        hard_reject = hard_reject or deadline_reject
+        needs_review = needs_review or deadline_review
     else:
-        days_remaining = (notice.deadline - as_of).days
+        assert notice.deadline is not None
+        review_date = as_of.date() if type(as_of) is datetime else as_of
+        days_remaining = (notice.deadline - review_date).days
         if days_remaining <= 0:
-            reasons.append(f"Submission deadline is closed as of {as_of.isoformat()}.")
+            reasons.append(f"Submission deadline is closed as of {review_date.isoformat()}.")
             hard_reject = True
         elif days_remaining < profile.minimum_days_to_deadline:
             reasons.append(
@@ -160,6 +178,71 @@ def qualify_notice(profile: Profile, notice: Notice, as_of: date) -> Qualificati
         unknowns=tuple(unknowns),
         human_next_step=_NEXT_STEPS[verdict],
     )
+
+
+def _validate_review_point(as_of: date | datetime) -> None:
+    if type(as_of) is date:
+        return
+    if type(as_of) is datetime and as_of.utcoffset() is not None:
+        return
+    raise TypeError("as_of must be a date or a timezone-aware datetime")
+
+
+def _evaluate_exact_deadline(
+    deadline_at: datetime,
+    as_of: date | datetime,
+    minimum_days: int,
+) -> tuple[list[str], list[str], bool, bool]:
+    reasons: list[str] = []
+    unknowns: list[str] = []
+    if deadline_at.utcoffset() is None:
+        reasons.append("Submission deadline timestamp has no UTC offset.")
+        unknowns.append("Replace deadline_at with a timezone-aware RFC 3339 timestamp.")
+        return reasons, unknowns, False, True
+
+    if type(as_of) is datetime:
+        remaining = deadline_at.astimezone(UTC) - as_of.astimezone(UTC)
+        if remaining <= timedelta(0):
+            reasons.append(f"Submission deadline is closed as of {as_of.isoformat()}.")
+            return reasons, unknowns, True, False
+        if remaining < timedelta(days=minimum_days):
+            hours = remaining.total_seconds() / 3600
+            reasons.append(
+                "Submission deadline leaves "
+                f"{hours:.1f} hours, below the {minimum_days}-day minimum."
+            )
+            return reasons, unknowns, True, False
+        reasons.append(
+            "Submission deadline timestamp meets the "
+            f"{minimum_days}-day minimum at {deadline_at.isoformat()}."
+        )
+        return reasons, unknowns, False, False
+
+    calendar_days = (deadline_at.date() - as_of).days
+    if calendar_days < 0:
+        reasons.append(f"Submission deadline is closed as of {as_of.isoformat()}.")
+        return reasons, unknowns, True, False
+    if calendar_days == 0:
+        reasons.append("Submission deadline is on the date-only review boundary.")
+        unknowns.append("Use an RFC 3339 --as-of instant to determine whether it is still open.")
+        return reasons, unknowns, False, True
+    if calendar_days < minimum_days:
+        reasons.append(
+            "Submission deadline leaves fewer than "
+            f"{minimum_days} full days from the date-only review point."
+        )
+        return reasons, unknowns, True, False
+    if calendar_days == minimum_days:
+        reasons.append("Submission deadline is on the exact lead-time boundary.")
+        unknowns.append(
+            "Use an RFC 3339 --as-of instant to verify the configured minimum lead time."
+        )
+        return reasons, unknowns, False, True
+    reasons.append(
+        "Submission deadline timestamp is beyond the "
+        f"{minimum_days}-day minimum from the supplied review date."
+    )
+    return reasons, unknowns, False, False
 
 
 def is_verifiable_source_url(value: str) -> bool:

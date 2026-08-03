@@ -22,6 +22,15 @@ analysis = Analysis(
         (str(ROOT / "LICENSE"), "licenses"),
         (str(ROOT / "NOTICE"), "licenses"),
         (str(ROOT / "packaging" / "THIRD_PARTY_NOTICES.md"), "licenses"),
+        (str(ROOT / "src" / "tenderverdict" / "data" / "cpv_codes.txt"), "tenderverdict/data"),
+        (
+            str(ROOT / "src" / "tenderverdict" / "data" / "country_codes.txt"),
+            "tenderverdict/data",
+        ),
+        (
+            str(ROOT / "src" / "tenderverdict" / "data" / "VOCABULARY_SOURCES.json"),
+            "tenderverdict/data",
+        ),
     ],
     hiddenimports=[],
     hookspath=[],

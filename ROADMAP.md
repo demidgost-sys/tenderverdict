@@ -17,6 +17,11 @@ The current product contract remains narrow: local, deterministic pre-qualificat
 public-procurement notice metadata. It does not read full tender documents, provide legal advice,
 or decide whether to participate.
 
+The source candidate now includes offline official-code validation, timezone-aware deadline
+support, verified eForms XML expansion for multi-lot TED results, result filtering/sorting/copy,
+hash-locked Python build dependencies, and a first-run handoff inside native archives. These are source
+capabilities, not evidence that a desktop release or a platform usability gate has passed.
+
 ## Next milestone: `v0.2.0-alpha.1`
 
 The next milestone is an honest desktop developer alpha, not a consumer installer. It may be tagged
@@ -36,6 +41,10 @@ only after every gate below has evidence attached to the candidate commit:
 There is currently no supported one-click installation path. Users should not be told to disable
 operating-system security controls to run an unsigned preview.
 
+Code can satisfy gates 1-3, 5-7, and prepare gate 8. Gate 4 requires hands-on use of the exact
+packaged commit on both operating-system families. Signing/notarization requires external platform
+accounts and certificates and is deliberately not simulated by CI.
+
 ## Evaluation after the desktop alpha
 
 Feedback remains opt-in through public GitHub issues using synthetic, public, or fully de-identified
@@ -54,15 +63,16 @@ valid outcome.
 
 ## Candidate follow-on work
 
-Priorities are ordered by risk reduction and user value:
+Priorities are ordered by evidence value rather than feature count:
 
-1. Lot-aware TED normalization that preserves CPV, geography, and deadline associations instead of
-   flattening multi-lot rows.
-2. Packaged Windows and macOS usability testing, including clear first-run guidance.
-3. Result sorting, verdict filters, and a safe copy action for review workflows.
-4. VoiceOver and NVDA verification, followed by documented remediation or an explicit unsupported
-   boundary.
-5. A distribution and signing decision based on demonstrated usage, not assumed demand.
+1. Run the exact candidate archive through demo, CSV import, filtering, copy, and HTML export on a
+   real Windows x64 machine; repeat the accessibility portion with NVDA.
+2. Repeat the packaged flow on macOS with VoiceOver and record which controls are exposed.
+3. Obtain three independent opt-in runs and two concrete procurement-workflow observations using
+   synthetic, public, or fully de-identified data.
+4. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
+5. Consider an updater or desktop TED action only after a signed distribution and privacy design
+   exist; until then the desktop remains local-only and updates remain manual.
 
 Automatic bidding, bidder scoring, legal conclusions, confidential-document ingestion, accounts,
 hosted execution, payments, and analytics are outside the current roadmap.

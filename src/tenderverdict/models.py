@@ -13,9 +13,15 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from .vocabularies import is_known_country, is_known_cpv
+
 _CPV_RE = re.compile(r"^[0-9]{8}$")
 _COUNTRY_RE = re.compile(r"^[A-Z]{3}$")
 _DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_RFC3339_RE = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+)
+_LOT_ID_RE = re.compile(r"^(?:LOT|PAR|GLO)-[A-Z0-9]{4,20}$")
 _CSV_LIST_SEPARATOR_RE = re.compile(r"[,;|\s]+")
 _CSV_DELIMITERS = (",", ";", "\t")
 _RFC3339_UTC_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
@@ -26,6 +32,7 @@ MAX_NOTICES_FILE_BYTES = 10 * 1024 * 1024
 MAX_NOTICE_COUNT = 1_000
 MAX_PROFILE_NAME_CHARACTERS = 200
 MAX_PUBLICATION_NUMBER_CHARACTERS = 200
+MAX_LOT_ID_CHARACTERS = 24
 MAX_NOTICE_TYPE_CHARACTERS = 100
 MAX_TITLE_CHARACTERS = 2_000
 MAX_BUYER_CHARACTERS = 500
@@ -37,21 +44,30 @@ MAX_COUNTRIES_PER_RECORD = 100
 MAX_MINIMUM_DAYS_TO_DEADLINE = 3_650
 MAX_TED_QUERY_CHARACTERS = 10_000
 TED_SEARCH_URL = "https://api.ted.europa.eu/v3/notices/search"
-TED_SNAPSHOT_LOT_POLICY = "single_lot_only"
+TED_SNAPSHOT_LOT_POLICY = "xml_expanded_lots_v1"
+LEGACY_TED_SNAPSHOT_LOT_POLICY = "single_lot_only"
+SUPPORTED_TED_SNAPSHOT_LOT_POLICIES = {
+    LEGACY_TED_SNAPSHOT_LOT_POLICY,
+    TED_SNAPSHOT_LOT_POLICY,
+}
 
 CSV_NOTICE_COLUMNS = (
     "publication_number",
+    "lot_id",
     "notice_type",
     "title",
     "buyer",
     "cpv_codes",
     "countries",
     "deadline",
+    "deadline_at",
     "publication_date",
     "source_url",
 )
 _REQUIRED_CSV_NOTICE_COLUMNS = tuple(
-    column for column in CSV_NOTICE_COLUMNS if column != "publication_date"
+    column
+    for column in CSV_NOTICE_COLUMNS
+    if column not in {"lot_id", "deadline_at", "publication_date"}
 )
 
 
@@ -95,6 +111,8 @@ class Notice:
     countries: tuple[str, ...]
     deadline: date | None
     source_url: str | None
+    lot_id: str | None = None
+    deadline_at: datetime | None = None
     publication_date: date | None = None
     metadata_warnings: tuple[str, ...] = ()
 
@@ -109,6 +127,10 @@ class Notice:
             "deadline": self.deadline.isoformat() if self.deadline else None,
             "source_url": self.source_url,
         }
+        if self.lot_id is not None:
+            payload["lot_id"] = self.lot_id
+        if self.deadline_at is not None:
+            payload["deadline_at"] = self.deadline_at.isoformat()
         if self.publication_date is not None:
             payload["publication_date"] = self.publication_date.isoformat()
         if self.metadata_warnings:
@@ -138,9 +160,13 @@ class QualificationResult:
     def to_dict(self) -> dict[str, object]:
         return {
             "publication_number": self.notice.publication_number,
+            "lot_id": self.notice.lot_id,
             "title": self.notice.title,
             "buyer": self.notice.buyer,
             "deadline": self.notice.deadline.isoformat() if self.notice.deadline else None,
+            "deadline_at": (
+                self.notice.deadline_at.isoformat() if self.notice.deadline_at else None
+            ),
             "publication_date": self.notice.publication_date.isoformat()
             if self.notice.publication_date
             else None,
@@ -163,6 +189,33 @@ def parse_iso_date(value: str, field_name: str = "date") -> date:
         return date.fromisoformat(value)
     except ValueError as exc:
         raise SchemaValidationError(f"{field_name} is not a valid calendar date") from exc
+
+
+def parse_rfc3339_datetime(value: str, field_name: str = "datetime") -> datetime:
+    """Parse an explicit, timezone-aware RFC 3339 timestamp without fractions."""
+
+    if not isinstance(value, str):
+        raise SchemaValidationError(f"{field_name} must be an RFC 3339 timestamp")
+    if not _RFC3339_RE.fullmatch(value):
+        raise SchemaValidationError(
+            f"{field_name} must use YYYY-MM-DDTHH:MM:SSZ or an explicit UTC offset"
+        )
+    normalized = value.removesuffix("Z") + ("+00:00" if value.endswith("Z") else "")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise SchemaValidationError(f"{field_name} is not a valid RFC 3339 timestamp") from exc
+    if parsed.utcoffset() is None:
+        raise SchemaValidationError(f"{field_name} must include a UTC offset")
+    return parsed
+
+
+def parse_review_point(value: str, field_name: str = "review point") -> date | datetime:
+    """Parse a documented calendar date or an exact RFC 3339 review instant."""
+
+    if isinstance(value, str) and _DATE_RE.fullmatch(value):
+        return parse_iso_date(value, field_name)
+    return parse_rfc3339_datetime(value, field_name)
 
 
 def profile_from_dict(data: Mapping[str, Any]) -> Profile:
@@ -230,12 +283,14 @@ def notice_from_dict(data: Mapping[str, Any], index: int | None = None) -> Notic
     obj = _require_mapping(data, label)
     allowed = {
         "publication_number",
+        "lot_id",
         "notice_type",
         "title",
         "buyer",
         "cpv_codes",
         "countries",
         "deadline",
+        "deadline_at",
         "publication_date",
         "source_url",
         "metadata_warnings",
@@ -248,6 +303,17 @@ def notice_from_dict(data: Mapping[str, Any], index: int | None = None) -> Notic
         label,
         maximum_characters=MAX_PUBLICATION_NUMBER_CHARACTERS,
     )
+    lot_id = _optional_string(
+        obj.get("lot_id"),
+        f"{label}.lot_id",
+        maximum_characters=MAX_LOT_ID_CHARACTERS,
+    )
+    if lot_id is not None:
+        lot_id = lot_id.upper()
+        if not _LOT_ID_RE.fullmatch(lot_id):
+            raise SchemaValidationError(
+                f"{label}.lot_id must use an official LOT-, PAR-, or GLO- identifier"
+            )
     notice_type = _optional_string(
         obj.get("notice_type"),
         f"{label}.notice_type",
@@ -271,6 +337,14 @@ def notice_from_dict(data: Mapping[str, Any], index: int | None = None) -> Notic
 
     raw_deadline = obj.get("deadline")
     deadline = None if raw_deadline is None else parse_iso_date(raw_deadline, f"{label}.deadline")
+    raw_deadline_at = obj.get("deadline_at")
+    deadline_at = (
+        None
+        if raw_deadline_at is None
+        else parse_rfc3339_datetime(raw_deadline_at, f"{label}.deadline_at")
+    )
+    if deadline is not None and deadline_at is not None:
+        raise SchemaValidationError(f"{label} must not contain both deadline and deadline_at")
     raw_publication_date = obj.get("publication_date")
     publication_date = (
         None
@@ -299,6 +373,8 @@ def notice_from_dict(data: Mapping[str, Any], index: int | None = None) -> Notic
         deadline=deadline,
         publication_date=publication_date,
         source_url=source_url,
+        lot_id=lot_id,
+        deadline_at=deadline_at,
         metadata_warnings=metadata_warnings,
     )
 
@@ -427,9 +503,9 @@ def notice_collection_from_json_bytes(
         "notice snapshot.source",
         maximum_characters=40,
     )
-    if lot_policy != TED_SNAPSHOT_LOT_POLICY:
+    if lot_policy not in SUPPORTED_TED_SNAPSHOT_LOT_POLICIES:
         raise SchemaValidationError(
-            f"notice snapshot.source.lot_policy must be {TED_SNAPSHOT_LOT_POLICY}"
+            "notice snapshot.source.lot_policy is not a supported TenderVerdict policy"
         )
     notices = notices_from_data(_required(obj, "notices", "notice snapshot"))
     return NoticeCollection(
@@ -474,12 +550,14 @@ def notices_from_csv_bytes(
             values = {name: value.strip() for name, value in zip(header, row, strict=True)}
             data: dict[str, object] = {
                 "publication_number": values["publication_number"],
+                "lot_id": values.get("lot_id") or None,
                 "notice_type": values["notice_type"] or None,
                 "title": values["title"] or None,
                 "buyer": values["buyer"] or None,
                 "cpv_codes": _split_csv_list(values["cpv_codes"]),
                 "countries": _split_csv_list(values["countries"]),
                 "deadline": values["deadline"] or None,
+                "deadline_at": values.get("deadline_at") or None,
                 "publication_date": values.get("publication_date") or None,
                 "source_url": values["source_url"] or None,
             }
@@ -535,12 +613,14 @@ def render_notices_csv(notices: tuple[Notice, ...]) -> str:
         writer.writerow(
             (
                 notice.publication_number,
+                notice.lot_id or "",
                 notice.notice_type or "",
                 notice.title or "",
                 notice.buyer or "",
                 "|".join(notice.cpv_codes),
                 "|".join(notice.countries),
                 notice.deadline.isoformat() if notice.deadline else "",
+                notice.deadline_at.isoformat() if notice.deadline_at else "",
                 notice.publication_date.isoformat() if notice.publication_date else "",
                 notice.source_url or "",
             )
@@ -657,7 +737,7 @@ def _optional_string(value: object, label: str, maximum_characters: int) -> str 
 
 
 def _code_list(value: object, label: str, allow_empty: bool = True) -> tuple[str, ...]:
-    return _validated_string_list(
+    normalized = _validated_string_list(
         value,
         label,
         _CPV_RE,
@@ -665,6 +745,12 @@ def _code_list(value: object, label: str, allow_empty: bool = True) -> tuple[str
         allow_empty,
         MAX_CODES_PER_RECORD,
     )
+    for index, code in enumerate(normalized):
+        if not is_known_cpv(code):
+            raise SchemaValidationError(
+                f"{label}[{index}] is not in the bundled official CPV vocabulary"
+            )
+    return normalized
 
 
 def _country_list(value: object, label: str, allow_empty: bool = True) -> tuple[str, ...]:
@@ -681,6 +767,10 @@ def _country_list(value: object, label: str, allow_empty: bool = True) -> tuple[
         country = item.strip().upper()
         if not _COUNTRY_RE.fullmatch(country):
             raise SchemaValidationError(f"{label}[{index}] must be a 3-letter country code")
+        if not is_known_country(country):
+            raise SchemaValidationError(
+                f"{label}[{index}] is not in the bundled current country authority table"
+            )
         if country not in normalized:
             normalized.append(country)
     if not allow_empty and not normalized:
@@ -740,18 +830,34 @@ def _bounded_string_list(
 
 
 def _reject_duplicate_notices(notices: tuple[Notice, ...]) -> None:
-    seen: dict[str, tuple[int, str]] = {}
+    seen: dict[tuple[str, str], tuple[int, str]] = {}
+    scopes: dict[str, tuple[bool, int]] = {}
     for index, notice in enumerate(notices):
-        identity = notice.publication_number.casefold()
+        publication_identity = notice.publication_number.casefold()
+        has_lot = notice.lot_id is not None
+        previous_scope = scopes.get(publication_identity)
+        if previous_scope is not None and previous_scope[0] != has_lot:
+            raise SchemaValidationError(
+                "publication_number mixes notice-level and lot-level rows: "
+                f"{notice.publication_number!r} at notices[{index}]"
+            )
+        scopes[publication_identity] = (has_lot, index)
+        identity = (publication_identity, (notice.lot_id or "").casefold())
         previous = seen.get(identity)
         if previous is not None:
             first_index, first_value = previous
+            lot_suffix = f" and lot_id {notice.lot_id!r}" if notice.lot_id else ""
             raise SchemaValidationError(
                 "duplicate publication_number "
-                f"{notice.publication_number!r} at notices[{index}]; "
+                f"{notice.publication_number!r}{lot_suffix} at notices[{index}]; "
                 f"first seen as {first_value!r} at notices[{first_index}]"
             )
-        seen[identity] = (index, notice.publication_number)
+        display_identity = (
+            f"{notice.publication_number}/{notice.lot_id}"
+            if notice.lot_id
+            else notice.publication_number
+        )
+        seen[identity] = (index, display_identity)
 
 
 def _validate_retrieved_at(value: str) -> None:

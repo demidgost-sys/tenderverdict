@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .models import (
     SchemaValidationError,
-    parse_iso_date,
+    parse_review_point,
 )
 from .output import write_text_atomically
 from .ted import TedApiError, build_ted_snapshot, fetch_notices
@@ -39,8 +39,8 @@ def build_parser() -> argparse.ArgumentParser:
     qualify_parser.add_argument(
         "--as-of",
         required=True,
-        metavar="YYYY-MM-DD",
-        help="explicit review date; system time is never used",
+        metavar="DATE_OR_RFC3339",
+        help="explicit review date or timezone-aware instant; system time is never used",
     )
     _add_format_arguments(qualify_parser)
     qualify_parser.set_defaults(handler=_run_qualify)
@@ -91,7 +91,7 @@ def _run_demo(args: argparse.Namespace) -> int:
 
 
 def _run_qualify(args: argparse.Namespace) -> int:
-    as_of = parse_iso_date(args.as_of, "--as-of")
+    as_of = parse_review_point(args.as_of, "--as-of")
     run = qualify_files(args.profile, args.notices, as_of=as_of)
     _emit(render_run(run, args.format), args.output)
     return 0

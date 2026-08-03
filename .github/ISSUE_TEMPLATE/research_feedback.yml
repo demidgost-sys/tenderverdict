@@ -21,6 +21,45 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface tested
+      options:
+        - Packaged desktop preview
+        - Desktop source preview
+        - Command-line interface
+        - Documentation or synthetic demo only
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system and version; add the Python version for source or CLI testing.
+      placeholder: Windows 11 24H2, packaged desktop preview
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: completed_steps
+    attributes:
+      label: Steps completed
+      description: Select only steps you personally completed.
+      options:
+        - label: Opened the synthetic example
+        - label: Ran a qualification review
+        - label: Filtered or inspected the result details
+        - label: Exported a Markdown or JSON report
+
+  - type: input
+    id: completion_time
+    attributes:
+      label: Approximate completion time
+      description: Optional. How many minutes did the tested workflow take?
+      placeholder: About 4 minutes
+
   - type: textarea
     id: observation
     attributes:
@@ -28,6 +67,18 @@ body:
       description: What did you test or observe? What was useful, unclear, or missing?
     validations:
       required: true
+
+  - type: textarea
+    id: next_use
+    attributes:
+      label: Plausible next use
+      description: Would you use it again for a similar metadata review? Why or why not? This is research, not a purchase or support request.
+
+  - type: textarea
+    id: blocker
+    attributes:
+      label: Main blocker
+      description: What single change would make the next test substantially more useful?
 
   - type: textarea
     id: example

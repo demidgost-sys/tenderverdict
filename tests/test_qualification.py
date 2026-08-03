@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 from dataclasses import replace
-from datetime import date
+from datetime import UTC, date, datetime
 
 from tenderverdict.models import Notice, Profile, Verdict
 from tenderverdict.qualification import (
@@ -133,6 +133,30 @@ class QualificationTests(unittest.TestCase):
             result.reasons,
         )
 
+    def test_exact_deadline_uses_timezone_aware_review_instant(self) -> None:
+        notice = replace(
+            OPEN_NOTICE,
+            deadline=None,
+            deadline_at=datetime(2026, 8, 16, 12, tzinfo=UTC),
+        )
+
+        exact = qualify_notice(
+            PROFILE,
+            notice,
+            datetime(2026, 8, 2, 12, tzinfo=UTC),
+        )
+        ambiguous = qualify_notice(PROFILE, notice, AS_OF)
+        too_close = qualify_notice(
+            PROFILE,
+            notice,
+            datetime(2026, 8, 2, 12, 0, 1, tzinfo=UTC),
+        )
+
+        self.assertEqual(exact.verdict, Verdict.OPEN_DOCUMENTS)
+        self.assertEqual(ambiguous.verdict, Verdict.WATCH)
+        self.assertIn("RFC 3339 --as-of instant", ambiguous.unknowns[0])
+        self.assertEqual(too_close.verdict, Verdict.REJECT)
+
     def test_input_order_is_preserved(self) -> None:
         notices = (
             replace(OPEN_NOTICE, publication_number="SYN-003"),
@@ -153,9 +177,11 @@ class QualificationTests(unittest.TestCase):
         self.assertNotIn("confidence", output)
         self.assertNotIn("score", output)
 
-    def test_as_of_requires_date(self) -> None:
+    def test_as_of_requires_date_or_aware_datetime(self) -> None:
         with self.assertRaises(TypeError):
             qualify_notice(PROFILE, OPEN_NOTICE, "2026-08-02")  # type: ignore[arg-type]
+        with self.assertRaises(TypeError):
+            qualify_notice(PROFILE, OPEN_NOTICE, datetime(2026, 8, 2, 12))
 
 
 class SourceUrlTests(unittest.TestCase):

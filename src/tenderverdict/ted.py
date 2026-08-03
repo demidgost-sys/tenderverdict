@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 import math
+import re
+import xml.etree.ElementTree as ElementTree
 from collections.abc import Callable, Mapping
 from datetime import UTC, date, datetime
 from http.client import HTTPException
@@ -25,9 +27,10 @@ from .models import (
 )
 
 DEFAULT_TIMEOUT_SECONDS = 20.0
-DEFAULT_MAX_RESPONSE_BYTES = 2_000_000
+DEFAULT_MAX_RESPONSE_BYTES = 5_000_000
 MAX_RESPONSE_BYTES = 10_000_000
 MAX_NOTICES = 1_000
+MAX_XML_DOCUMENTS = 100
 MAX_PAGE_SIZE = 250
 MAX_STALLED_PAGES = 3
 MAX_QUERY_CHARACTERS = 10_000
@@ -47,8 +50,18 @@ TED_FIELDS = (
     "place-of-performance-country-proc",
     "place-of-performance-country-lot",
     "deadline-receipt-tender-date-lot",
+    "deadline-receipt-tender-time-lot",
     "identifier-lot",
 )
+
+_PUBLICATION_NUMBER_RE = re.compile(r"^[0-9]{6}-[0-9]{4}$")
+_LOT_IDENTIFIER_RE = re.compile(r"^LOT-[A-Z0-9]{4,20}$")
+_EFORMS_DATE_RE = re.compile(r"^([0-9]{4}-[0-9]{2}-[0-9]{2})(Z|[+-][0-9]{2}:[0-9]{2})?$")
+_EFORMS_TIME_RE = re.compile(r"^([0-9]{2}:[0-9]{2}:[0-9]{2})(Z|[+-][0-9]{2}:[0-9]{2})?$")
+_UBL_NAMESPACES = {
+    "cac": "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
+    "cbc": "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
+}
 
 
 class TedApiError(RuntimeError):
@@ -87,7 +100,9 @@ def fetch_notices(
     )
 
     output: list[dict[str, Any]] = []
-    seen: set[str] = set()
+    seen_publications: set[str] = set()
+    source_notice_count = 0
+    xml_document_count = 0
     page = 1
     stalled_pages = 0
     expected_total: int | None = None
@@ -95,7 +110,7 @@ def fetch_notices(
     # Pagination is bounded even if the remote dataset changes between pages.
     page_budget = math.ceil(max_notices / page_size) + MAX_STALLED_PAGES
 
-    while len(output) < max_notices and page <= page_budget:
+    while source_notice_count < max_notices and page <= page_budget:
         if searcher is None:
             result = _search_page(
                 clean_query,
@@ -123,40 +138,62 @@ def fetch_notices(
                 "TED totalNoticeCount changed during pagination; results may be incomplete"
             )
 
-        count_before_page = len(output)
+        count_before_page = source_notice_count
         for raw_notice in raw_notices:
-            normalized = normalize_notice(raw_notice)
-            identity = normalized["publication_number"]
-            if identity not in seen:
-                seen.add(identity)
-                output.append(normalized)
-            if len(output) >= max_notices:
+            publication_number = _nonempty_text(raw_notice.get("publication-number"))
+            if publication_number is None:
+                raise TedApiError("TED notice is missing publication-number")
+            if publication_number in seen_publications:
+                continue
+            lot_identifiers = _unique_strings(raw_notice.get("identifier-lot"))
+            if len(lot_identifiers) > 1:
+                xml_document_count += 1
+                if xml_document_count > MAX_XML_DOCUMENTS:
+                    raise TedApiError(
+                        f"TED fetch requires more than {MAX_XML_DOCUMENTS} bounded XML documents"
+                    )
+                normalized_rows = _expand_multi_lot_notice(
+                    raw_notice,
+                    timeout=timeout,
+                    max_response_bytes=max_response_bytes,
+                    opener=opener,
+                )
+            else:
+                normalized_rows = [normalize_notice(raw_notice)]
+            if len(output) + len(normalized_rows) > MAX_NOTICES:
+                raise TedApiError(
+                    f"lot expansion exceeds the {MAX_NOTICES}-record snapshot safety limit"
+                )
+            seen_publications.add(publication_number)
+            output.extend(normalized_rows)
+            source_notice_count += 1
+            if source_notice_count >= max_notices:
                 break
 
-        if len(output) == count_before_page:
+        if source_notice_count == count_before_page:
             stalled_pages += 1
         else:
             stalled_pages = 0
 
         assert expected_target is not None
-        if len(output) >= expected_target:
+        if source_notice_count >= expected_target:
             return output
         if stalled_pages >= MAX_STALLED_PAGES:
             raise _incomplete_results_error(
                 reason="pagination repeated rows without progress",
-                collected=len(output),
+                collected=source_notice_count,
                 expected=expected_target,
             )
         if len(raw_notices) < page_size:
             raise _incomplete_results_error(
                 reason="TED returned a premature short page",
-                collected=len(output),
+                collected=source_notice_count,
                 expected=expected_target,
             )
         if page * page_size >= total_count:
             raise _incomplete_results_error(
                 reason="reported page range ended before all unique rows were collected",
-                collected=len(output),
+                collected=source_notice_count,
                 expected=expected_target,
             )
         page += 1
@@ -164,7 +201,7 @@ def fetch_notices(
     assert expected_target is not None
     raise _incomplete_results_error(
         reason="bounded pagination budget was exhausted",
-        collected=len(output),
+        collected=source_notice_count,
         expected=expected_target,
     )
 
@@ -181,6 +218,7 @@ def normalize_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
 
     lot_identifiers = _unique_strings(notice.get("identifier-lot"))
     if len(lot_identifiers) == 1:
+        lot_id = lot_identifiers[0].upper()
         cpv_codes = _unique_strings(
             notice.get("main-classification-proc"),
             notice.get("main-classification-lot"),
@@ -194,20 +232,26 @@ def normalize_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
                 notice.get("place-of-performance-country-lot"),
             )
         ]
-        deadline = _earliest_iso_date(notice.get("deadline-receipt-tender-date-lot"))
         metadata_warnings: list[str] = []
+        deadline, deadline_at, deadline_warning = _single_lot_deadline(notice)
+        if deadline_warning is not None:
+            metadata_warnings.append(deadline_warning)
     elif len(lot_identifiers) > 1:
+        lot_id = None
         cpv_codes = []
         countries = []
         deadline = None
+        deadline_at = None
         metadata_warnings = [
             "TED returned multiple lots. Lot-level CPV, country, and deadline values were "
             "withheld because the notice-level Search API does not preserve their associations."
         ]
     else:
+        lot_id = None
         cpv_codes = []
         countries = []
         deadline = None
+        deadline_at = None
         metadata_warnings = [
             "TED did not return a lot identifier. Lot-level CPV, country, and deadline values "
             "were withheld because their scope cannot be verified."
@@ -215,16 +259,256 @@ def normalize_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
 
     return {
         "publication_number": publication_number,
+        "lot_id": lot_id,
         "notice_type": _nonempty_text(notice.get("form-type")),
         "title": _preferred_text(notice.get("notice-title")),
         "buyer": _preferred_text(notice.get("buyer-name")),
         "cpv_codes": cpv_codes,
         "countries": countries,
         "deadline": deadline,
+        "deadline_at": deadline_at,
         "publication_date": _earliest_iso_date(notice.get("publication-date")),
         "source_url": _source_url(notice.get("links")),
         "metadata_warnings": metadata_warnings,
     }
+
+
+def _single_lot_deadline(notice: Mapping[str, Any]) -> tuple[str | None, str | None, str | None]:
+    date_values = _unique_strings(notice.get("deadline-receipt-tender-date-lot"))
+    time_values = _unique_strings(notice.get("deadline-receipt-tender-time-lot"))
+    if not date_values:
+        return None, None, None
+    if len(date_values) != 1 or len(time_values) > 1:
+        return (
+            None,
+            None,
+            "TED returned ambiguous deadline values for one lot; deadline evidence was withheld.",
+        )
+    if not time_values:
+        deadline = _strict_eforms_date(date_values[0])
+        if deadline is None:
+            return None, None, "TED returned an invalid lot deadline; it was withheld."
+        return deadline, None, None
+    deadline_at = _combine_eforms_datetime(date_values[0], time_values[0])
+    if deadline_at is None:
+        return (
+            None,
+            None,
+            "TED returned an invalid or timezone-ambiguous lot deadline; it was withheld.",
+        )
+    return None, deadline_at, None
+
+
+def _expand_multi_lot_notice(
+    notice: Mapping[str, Any],
+    *,
+    timeout: float,
+    max_response_bytes: int,
+    opener: Callable[..., Any],
+) -> list[dict[str, Any]]:
+    publication_number = _nonempty_text(notice.get("publication-number"))
+    if publication_number is None or not _PUBLICATION_NUMBER_RE.fullmatch(publication_number):
+        raise TedApiError("multi-lot TED notice has an unsupported publication-number")
+    expected_lots = tuple(value.upper() for value in _unique_strings(notice.get("identifier-lot")))
+    if any(not _LOT_IDENTIFIER_RE.fullmatch(value) for value in expected_lots):
+        raise TedApiError("multi-lot TED notice has an invalid lot identifier")
+
+    xml_url = f"https://ted.europa.eu/en/notice/{publication_number}/xml"
+    payload = _fetch_xml(
+        xml_url,
+        timeout=timeout,
+        max_response_bytes=max_response_bytes,
+        opener=opener,
+    )
+    return _parse_eforms_lots(notice, payload, expected_lots)
+
+
+def _fetch_xml(
+    url: str,
+    *,
+    timeout: float,
+    max_response_bytes: int,
+    opener: Callable[..., Any],
+) -> bytes:
+    request = Request(
+        url,
+        headers={
+            "Accept": "application/xml, text/xml",
+            "User-Agent": f"TenderVerdict/{__version__} (open-source read-only TED client)",
+        },
+        method="GET",
+    )
+    try:
+        with opener(request, timeout=timeout) as response:
+            content_type = _content_type(response)
+            if not _is_xml_content_type(content_type):
+                raise TedApiError(
+                    "TED returned a non-XML Content-Type for a multi-lot notice"
+                    + (f": {content_type}" if content_type else "")
+                )
+            payload = response.read(max_response_bytes + 1)
+    except HTTPError as exc:
+        raise TedApiError(f"TED XML returned HTTP {exc.code}") from exc
+    except TimeoutError as exc:
+        raise TedApiError("TED XML request timed out") from exc
+    except URLError as exc:
+        reason = "request timed out" if _is_timeout_reason(exc.reason) else "request failed"
+        raise TedApiError(f"TED XML {reason}") from exc
+    except (HTTPException, OSError) as exc:
+        raise TedApiError("TED XML request failed") from exc
+    if not isinstance(payload, bytes):
+        raise TedApiError("TED XML response body is not bytes")
+    if len(payload) > max_response_bytes:
+        raise TedApiError(f"TED XML response exceeds the {max_response_bytes}-byte safety limit")
+    return payload
+
+
+def _parse_eforms_lots(
+    notice: Mapping[str, Any],
+    payload: bytes,
+    expected_lots: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    # The response is already bounded, so scan all bytes before handing them to
+    # ElementTree. A long XML declaration or comment must not be able to push a
+    # prohibited declaration beyond a prefix-only check.
+    upper_payload = payload.upper()
+    if b"<!DOCTYPE" in upper_payload or b"<!ENTITY" in upper_payload:
+        raise TedApiError("TED XML contains a prohibited document type or entity declaration")
+    try:
+        root = ElementTree.fromstring(payload)
+    except ElementTree.ParseError as exc:
+        raise TedApiError("TED returned invalid eForms XML") from exc
+
+    lot_elements = root.findall(".//cac:ProcurementProjectLot", _UBL_NAMESPACES)
+    parsed_lots: list[tuple[str, Any]] = []
+    seen_lots: set[str] = set()
+    for lot in lot_elements:
+        lot_id = _xml_text(lot.find("cbc:ID", _UBL_NAMESPACES))
+        if lot_id is None:
+            raise TedApiError("TED eForms XML contains a lot without an identifier")
+        lot_id = lot_id.upper()
+        if not _LOT_IDENTIFIER_RE.fullmatch(lot_id) or lot_id in seen_lots:
+            raise TedApiError("TED eForms XML contains an invalid or duplicate lot identifier")
+        seen_lots.add(lot_id)
+        parsed_lots.append((lot_id, lot))
+    if len(parsed_lots) != len(expected_lots) or seen_lots != set(expected_lots):
+        raise TedApiError(
+            "TED Search and eForms XML lot identifiers differ; no snapshot was created"
+        )
+
+    notice_title = _preferred_text(notice.get("notice-title"))
+    buyer = _preferred_text(notice.get("buyer-name"))
+    source_url = _source_url(notice.get("links"))
+    publication_date = _earliest_iso_date(notice.get("publication-date"))
+    rows: list[dict[str, Any]] = []
+    for lot_id, lot in parsed_lots:
+        project = lot.find("cac:ProcurementProject", _UBL_NAMESPACES)
+        process = lot.find("cac:TenderingProcess", _UBL_NAMESPACES)
+        lot_title = None
+        cpv_codes: list[str] = []
+        countries: list[str] = []
+        if project is not None:
+            lot_title = _xml_text(project.find("cbc:Name", _UBL_NAMESPACES))
+            cpv_codes = _unique_xml_values(
+                project.findall(".//cbc:ItemClassificationCode", _UBL_NAMESPACES),
+                list_name="cpv",
+            )
+            countries = [
+                value.upper()
+                for value in _unique_xml_values(
+                    project.findall(".//cac:Country/cbc:IdentificationCode", _UBL_NAMESPACES),
+                    list_name="country",
+                )
+            ]
+        deadline_at = None
+        metadata_warnings: list[str] = []
+        if process is not None:
+            period = process.find("cac:TenderSubmissionDeadlinePeriod", _UBL_NAMESPACES)
+            if period is not None:
+                deadline_at = _combine_eforms_datetime(
+                    _xml_text(period.find("cbc:EndDate", _UBL_NAMESPACES)),
+                    _xml_text(period.find("cbc:EndTime", _UBL_NAMESPACES)),
+                )
+                if deadline_at is None:
+                    metadata_warnings.append(
+                        "TED eForms XML did not provide a valid timezone-aware submission deadline."
+                    )
+        title = _lot_title(notice_title, lot_title)
+        rows.append(
+            {
+                "publication_number": _nonempty_text(notice.get("publication-number")),
+                "lot_id": lot_id,
+                "notice_type": _nonempty_text(notice.get("form-type")),
+                "title": title,
+                "buyer": buyer,
+                "cpv_codes": cpv_codes,
+                "countries": countries,
+                "deadline": None,
+                "deadline_at": deadline_at,
+                "publication_date": publication_date,
+                "source_url": source_url,
+                "metadata_warnings": metadata_warnings,
+            }
+        )
+    return rows
+
+
+def _unique_xml_values(elements: list[Any], *, list_name: str) -> list[str]:
+    output: list[str] = []
+    for element in elements:
+        if str(element.attrib.get("listName", "")).casefold() != list_name:
+            continue
+        value = _xml_text(element)
+        if value is not None and value not in output:
+            output.append(value)
+    return output
+
+
+def _xml_text(element: Any) -> str | None:
+    if element is None or not isinstance(element.text, str):
+        return None
+    text = element.text.strip()
+    return text or None
+
+
+def _lot_title(notice_title: str | None, lot_title: str | None) -> str | None:
+    if notice_title and lot_title and notice_title != lot_title:
+        return f"{notice_title} — {lot_title}"
+    return lot_title or notice_title
+
+
+def _strict_eforms_date(value: str) -> str | None:
+    match = _EFORMS_DATE_RE.fullmatch(value)
+    if match is None:
+        return None
+    try:
+        return date.fromisoformat(match.group(1)).isoformat()
+    except ValueError:
+        return None
+
+
+def _combine_eforms_datetime(date_value: str | None, time_value: str | None) -> str | None:
+    if date_value is None or time_value is None:
+        return None
+    date_match = _EFORMS_DATE_RE.fullmatch(date_value)
+    time_match = _EFORMS_TIME_RE.fullmatch(time_value)
+    if date_match is None or time_match is None:
+        return None
+    date_offset = date_match.group(2)
+    time_offset = time_match.group(2)
+    if date_offset and time_offset and date_offset != time_offset:
+        return None
+    offset = time_offset or date_offset
+    if offset is None:
+        return None
+    candidate = f"{date_match.group(1)}T{time_match.group(1)}{offset}"
+    try:
+        parsed = datetime.fromisoformat(candidate.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.utcoffset() is None:
+        return None
+    return parsed.isoformat()
 
 
 def build_ted_snapshot(
@@ -405,6 +689,11 @@ def _content_type(response: Any) -> str:
 def _is_json_content_type(content_type: str) -> bool:
     media_type = content_type.split(";", 1)[0].strip().lower()
     return media_type == "application/json" or media_type.endswith("+json")
+
+
+def _is_xml_content_type(content_type: str) -> bool:
+    media_type = content_type.split(";", 1)[0].strip().lower()
+    return media_type in {"application/xml", "text/xml"} or media_type.endswith("+xml")
 
 
 def _is_timeout_reason(reason: Any) -> bool:

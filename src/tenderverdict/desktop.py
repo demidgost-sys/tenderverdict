@@ -8,7 +8,9 @@ import os
 import re
 import stat
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +23,7 @@ from .models import (
     SchemaValidationError,
     notice_collection_from_file_bytes,
     notices_from_data,
-    parse_iso_date,
+    parse_review_point,
     profile_from_dict,
     profile_from_json_bytes,
     render_notices_csv,
@@ -43,6 +45,13 @@ _VERDICT_LABELS = {
     "watch": "Watch",
     "reject": "Reject",
 }
+_VERDICT_FILTERS = ("All verdicts", "Open documents", "Watch", "Reject")
+_FILTER_TO_VERDICT = {
+    "Open documents": "open_documents",
+    "Watch": "watch",
+    "Reject": "reject",
+}
+_VERDICT_SORT_ORDER = {"open_documents": 0, "watch": 1, "reject": 2}
 _MACOS_SHORTCUT_KEYCODES = {1: "export", 2: "demo", 15: "review", 31: "open"}
 _WINDOWS_SHORTCUT_KEYCODES = {68: "demo", 79: "open", 82: "review", 83: "export"}
 _KEYSYM_SHORTCUTS = {
@@ -226,10 +235,10 @@ def format_result_details(result: QualificationResult) -> str:
 
     lines = [
         f"Verdict: {_VERDICT_LABELS[result.verdict.value]}",
-        f"Notice: {safe(notice.publication_number)}",
+        f"Notice: {safe(notice_identity(notice.publication_number, notice.lot_id))}",
         f"Title: {safe(notice.title)}",
         f"Buyer: {safe(notice.buyer)}",
-        f"Deadline: {notice.deadline.isoformat() if notice.deadline else '(missing)'}",
+        f"Deadline: {deadline_display(notice.deadline, notice.deadline_at)}",
         "Published: "
         f"{notice.publication_date.isoformat() if notice.publication_date else '(missing)'}",
         f"Supplied source URL: {safe(notice.source_url)}",
@@ -283,6 +292,59 @@ def notice_count_label(count: int) -> str:
     return f"{count} notice" if count == 1 else f"{count} notices"
 
 
+def notice_identity(publication_number: str, lot_id: str | None) -> str:
+    return f"{publication_number} / {lot_id}" if lot_id else publication_number
+
+
+def deadline_display(deadline: date | None, deadline_at: datetime | None) -> str:
+    if deadline_at is not None:
+        return deadline_at.isoformat()
+    if deadline is not None:
+        return deadline.isoformat()
+    return "(missing)"
+
+
+def visible_result_indices(
+    results: Sequence[QualificationResult],
+    verdict_filter: str,
+    sort_column: str,
+    descending: bool,
+) -> list[int]:
+    """Return stable result indices for the desktop queue view."""
+
+    wanted_verdict = _FILTER_TO_VERDICT.get(verdict_filter)
+    indices = [
+        index
+        for index, result in enumerate(results)
+        if wanted_verdict is None or result.verdict.value == wanted_verdict
+    ]
+    if sort_column == "input":
+        return indices
+
+    if sort_column == "verdict":
+        return sorted(
+            indices,
+            key=lambda index: _VERDICT_SORT_ORDER[results[index].verdict.value],
+            reverse=descending,
+        )
+    if sort_column == "notice":
+        return sorted(
+            indices,
+            key=lambda index: notice_identity(
+                results[index].notice.publication_number,
+                results[index].notice.lot_id,
+            ).casefold(),
+            reverse=descending,
+        )
+    if sort_column == "title":
+        return sorted(
+            indices,
+            key=lambda index: (results[index].notice.title or "").casefold(),
+            reverse=descending,
+        )
+    raise ValueError(f"unsupported desktop sort column: {sort_column}")
+
+
 def _load_tkinter() -> tuple[Any, Any, Any, Any, Any]:
     try:
         import tkinter as tk
@@ -318,6 +380,8 @@ class TenderVerdictApp:
         self._current_notices_sha256: str | None = None
         self._using_demo_notices = False
         self._suspend_stale = False
+        self._sort_column = "input"
+        self._sort_descending = False
 
         root.title("TenderVerdict")
         root.geometry("1120x780")
@@ -339,6 +403,8 @@ class TenderVerdictApp:
         self.open_var = tk.StringVar(value="—")
         self.watch_var = tk.StringVar(value="—")
         self.reject_var = tk.StringVar(value="—")
+        self.verdict_filter_var = tk.StringVar(value=_VERDICT_FILTERS[0])
+        self.filter_summary_var = tk.StringVar(value="No reviewed notices")
 
         root.columnconfigure(0, weight=1)
         root.rowconfigure(1, weight=1)
@@ -744,7 +810,7 @@ class TenderVerdictApp:
         ).grid(row=9, column=0, sticky="w", padx=(0, 6))
         self.ttk.Label(
             frame,
-            text="Review date",
+            text="Review point",
             style="FieldLabel.TLabel",
         ).grid(row=9, column=1, sticky="w", padx=(6, 0))
         self.minimum_days_entry = self.ttk.Spinbox(
@@ -811,6 +877,7 @@ class TenderVerdictApp:
             textvariable=self.status_var,
             style="Status.TLabel",
             wraplength=330,
+            takefocus=True,
         )
         self.status_label.grid(row=17, column=0, columnspan=2, sticky="w", pady=(4, 0))
 
@@ -880,9 +947,35 @@ class TenderVerdictApp:
                 row=1, column=0, sticky="w", pady=(2, 0)
             )
 
-        self.ttk.Label(outer, text="Notices", style="FieldLabel.TLabel").grid(
-            row=2, column=0, sticky="w", pady=(0, 7)
+        queue_toolbar = self.ttk.Frame(outer, style="Surface.TFrame")
+        queue_toolbar.grid(row=2, column=0, sticky="ew", pady=(0, 7))
+        queue_toolbar.columnconfigure(1, weight=1)
+        self.ttk.Label(queue_toolbar, text="Notices", style="FieldLabel.TLabel").grid(
+            row=0, column=0, sticky="w", padx=(0, 10)
         )
+        self.verdict_filter = self.ttk.Combobox(
+            queue_toolbar,
+            textvariable=self.verdict_filter_var,
+            values=_VERDICT_FILTERS,
+            state="readonly",
+            width=16,
+            takefocus=True,
+        )
+        self.verdict_filter.grid(row=0, column=1, sticky="w")
+        self.verdict_filter.bind("<<ComboboxSelected>>", self._refresh_results)
+        self.ttk.Label(
+            queue_toolbar,
+            textvariable=self.filter_summary_var,
+            style="Helper.TLabel",
+        ).grid(row=0, column=2, sticky="e", padx=(10, 8))
+        self.copy_button = self.ttk.Button(
+            queue_toolbar,
+            text="Copy selected",
+            command=self._copy_selected_result,
+            state="disabled",
+            style="Quiet.TButton",
+        )
+        self.copy_button.grid(row=0, column=3, sticky="e")
         list_frame = self.ttk.Frame(outer, style="Surface.TFrame")
         list_frame.grid(row=3, column=0, sticky="nsew")
         list_frame.columnconfigure(0, weight=1)
@@ -894,10 +987,23 @@ class TenderVerdictApp:
             selectmode="browse",
             style="Review.Treeview",
             height=7,
+            takefocus=True,
         )
-        self.results_tree.heading("verdict", text="Verdict")
-        self.results_tree.heading("notice", text="Notice ID")
-        self.results_tree.heading("title", text="Notice title")
+        self.results_tree.heading(
+            "verdict",
+            text="Verdict",
+            command=lambda: self._sort_results("verdict"),
+        )
+        self.results_tree.heading(
+            "notice",
+            text="Notice / lot",
+            command=lambda: self._sort_results("notice"),
+        )
+        self.results_tree.heading(
+            "title",
+            text="Notice title",
+            command=lambda: self._sort_results("title"),
+        )
         self.results_tree.column("verdict", width=118, minwidth=100, stretch=False)
         self.results_tree.column("notice", width=135, minwidth=110, stretch=False)
         self.results_tree.column("title", width=340, minwidth=160, stretch=True)
@@ -996,6 +1102,7 @@ class TenderVerdictApp:
         self._windowing_system = str(self.root.tk.call("tk", "windowingsystem"))
         modifier = "Command" if self._windowing_system == "aqua" else "Control"
         self.root.bind_all(f"<{modifier}-KeyPress>", self._handle_shortcut)
+        self.root.bind_all(f"<{modifier}-Shift-KeyPress-c>", self._copy_selected_result)
 
     def _build_menu(self) -> None:
         accelerator = "⌘" if self._windowing_system == "aqua" else "Ctrl+"
@@ -1022,6 +1129,17 @@ class TenderVerdictApp:
         self.file_menu = file_menu
         self.export_menu_index = file_menu.index("end")
         menu.add_cascade(label="File", menu=file_menu)
+
+        edit_menu = self.tk.Menu(menu)
+        edit_menu.add_command(
+            label="Copy Selected Result",
+            accelerator=f"{accelerator}Shift+C",
+            command=self._copy_selected_result,
+            state="disabled",
+        )
+        self.edit_menu = edit_menu
+        self.copy_menu_index = edit_menu.index("end")
+        menu.add_cascade(label="Edit", menu=edit_menu)
 
         review_menu = self.tk.Menu(menu)
         review_menu.add_command(
@@ -1209,7 +1327,7 @@ class TenderVerdictApp:
             self._show_error("Review not created", exc, focus_widget)
             return
         try:
-            as_of = parse_iso_date(self.as_of_var.get().strip(), "Review date")
+            as_of = parse_review_point(self.as_of_var.get().strip(), "Review point")
         except (SchemaValidationError, ValueError) as exc:
             self._show_error("Review not created", exc, self.as_of_entry)
             return
@@ -1252,21 +1370,6 @@ class TenderVerdictApp:
         self._current_run = run
         self._current_signature = self._input_signature()
         self._current_notices_sha256 = notices_sha256
-        for item in self.results_tree.get_children():
-            self.results_tree.delete(item)
-        for index, result in enumerate(run.results):
-            notice = result.notice
-            self.results_tree.insert(
-                "",
-                "end",
-                iid=str(index),
-                values=(
-                    _VERDICT_LABELS[result.verdict.value],
-                    normalize_display_text(notice.publication_number),
-                    normalize_display_text(notice.title or "(title missing)"),
-                ),
-                tags=(result.verdict.value,),
-            )
         summary = run.summary
         self.total_var.set(str(summary["total"]))
         self.open_var.set(str(summary["open_documents"]))
@@ -1274,18 +1377,91 @@ class TenderVerdictApp:
         self.reject_var.set(str(summary["reject"]))
         self.export_button.configure(state="normal")
         self.file_menu.entryconfigure(self.export_menu_index, state="normal")
-        if run.results:
-            first = self.results_tree.get_children()[0]
-            self.results_tree.selection_set(first)
-            self.results_tree.focus(first)
-            self.results_tree.see(first)
-            self._show_selected_result()
-            self.results_tree.focus_set()
+        self._sort_column = "input"
+        self._sort_descending = False
+        self.verdict_filter_var.set(_VERDICT_FILTERS[0])
+        self._refresh_results()
+
+    def _sort_results(self, column: str) -> None:
+        if self._current_run is None:
+            return
+        if self._sort_column == column:
+            self._sort_descending = not self._sort_descending
         else:
-            self._set_empty_details(
-                "No notices to review",
-                "Choose another notices file and run the review again.",
+            self._sort_column = column
+            self._sort_descending = False
+        self._refresh_results()
+
+    def _refresh_results(self, _event: object | None = None) -> None:
+        selected_index: int | None = None
+        selection = self.results_tree.selection()
+        if selection:
+            selected_index = int(selection[0])
+        for item in self.results_tree.get_children():
+            self.results_tree.delete(item)
+        if self._current_run is None:
+            self.filter_summary_var.set("No reviewed notices")
+            self._set_copy_state(False)
+            return
+
+        indices = visible_result_indices(
+            self._current_run.results,
+            self.verdict_filter_var.get(),
+            self._sort_column,
+            self._sort_descending,
+        )
+        for index in indices:
+            result = self._current_run.results[index]
+            notice = result.notice
+            self.results_tree.insert(
+                "",
+                "end",
+                iid=str(index),
+                values=(
+                    _VERDICT_LABELS[result.verdict.value],
+                    normalize_display_text(
+                        notice_identity(notice.publication_number, notice.lot_id)
+                    ),
+                    normalize_display_text(notice.title or "(title missing)"),
+                ),
+                tags=(result.verdict.value,),
             )
+        self.filter_summary_var.set(f"Showing {len(indices)} of {len(self._current_run.results)}")
+        if not indices:
+            self._set_copy_state(False)
+            self._set_empty_details(
+                "No notices match this filter",
+                "Choose another verdict filter to continue reviewing results.",
+            )
+            return
+        target = selected_index if selected_index in indices else indices[0]
+        iid = str(target)
+        self.results_tree.selection_set(iid)
+        self.results_tree.focus(iid)
+        self.results_tree.see(iid)
+        self._show_selected_result()
+        self.results_tree.focus_set()
+
+    def _set_copy_state(self, enabled: bool) -> None:
+        state = "normal" if enabled else "disabled"
+        self.copy_button.configure(state=state)
+        self.edit_menu.entryconfigure(self.copy_menu_index, state=state)
+
+    def _copy_selected_result(self, _event: object | None = None) -> str | None:
+        if self._current_run is None:
+            return None
+        selection = self.results_tree.selection()
+        if not selection:
+            return None
+        result = self._current_run.results[int(selection[0])]
+        self.root.clipboard_clear()
+        self.root.clipboard_append(format_result_details(result))
+        self.root.update_idletasks()
+        self._set_status(
+            "Copied the selected result as plain text. No data was uploaded.",
+            "success",
+        )
+        return "break"
 
     def _show_selected_result(self, _event: object | None = None) -> None:
         if self._current_run is None:
@@ -1295,6 +1471,7 @@ class TenderVerdictApp:
             return
         index = int(selection[0])
         self._set_result_details(self._current_run.results[index])
+        self._set_copy_state(True)
 
     def _export_report(self) -> None:
         if self._current_run is None or self._input_signature() != self._current_signature:
@@ -1305,7 +1482,12 @@ class TenderVerdictApp:
             return
         if not self._notices_are_current():
             return
-        initialfile = f"tenderverdict-report-{self._current_run.as_of.isoformat()}.html"
+        review_date = (
+            self._current_run.as_of.date()
+            if type(self._current_run.as_of) is datetime
+            else self._current_run.as_of
+        )
+        initialfile = f"tenderverdict-report-{review_date.isoformat()}.html"
         selected = self.filedialog.asksaveasfilename(
             title="Export review report",
             defaultextension=".html",
@@ -1372,8 +1554,11 @@ class TenderVerdictApp:
         self.open_var.set("—")
         self.watch_var.set("—")
         self.reject_var.set("—")
+        self.filter_summary_var.set("No reviewed notices")
+        self.verdict_filter_var.set(_VERDICT_FILTERS[0])
         self.export_button.configure(state="disabled")
         self.file_menu.entryconfigure(self.export_menu_index, state="disabled")
+        self._set_copy_state(False)
         self._set_empty_details(
             "Results need a refresh",
             "Run the current inputs to create a new review.",
@@ -1402,12 +1587,12 @@ class TenderVerdictApp:
         def safe(value: str | None, fallback: str = "(missing)") -> str:
             return normalize_display_text(value) if value else fallback
 
-        deadline = notice.deadline.isoformat() if notice.deadline else "(missing)"
+        deadline = deadline_display(notice.deadline, notice.deadline_at)
         publication_date = (
             notice.publication_date.isoformat() if notice.publication_date else "(missing)"
         )
         metadata = (
-            f"Notice ID  {safe(notice.publication_number)}\n"
+            f"Notice / lot  {safe(notice_identity(notice.publication_number, notice.lot_id))}\n"
             f"Buyer  {safe(notice.buyer)}\n"
             f"Deadline  {deadline}\n"
             f"Published  {publication_date}\n"
@@ -1467,6 +1652,8 @@ def _desktop_smoke_test(
             raise RuntimeError("desktop menu is not configured")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "disabled":
             raise RuntimeError("desktop export menu must start disabled")
+        if str(app.edit_menu.entrycget(app.copy_menu_index, "state")) != "disabled":
+            raise RuntimeError("desktop copy menu must start disabled")
         if (
             str(app.file_menu.entrycget(app.save_csv_example_menu_index, "label"))
             != "Save CSV Example…"
@@ -1484,6 +1671,13 @@ def _desktop_smoke_test(
             raise RuntimeError("desktop demo shortcut did not run")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "normal":
             raise RuntimeError("desktop export menu was not enabled after a review")
+        if str(app.edit_menu.entrycget(app.copy_menu_index, "state")) != "normal":
+            raise RuntimeError("desktop copy menu was not enabled after a review")
+        app.verdict_filter_var.set("Watch")
+        app._refresh_results()
+        root.update()
+        if len(app.results_tree.get_children()) != 1:
+            raise RuntimeError("desktop verdict filter did not preserve exactly one watch result")
 
         def bottom_in_root(widget: Any) -> int:
             bottom = int(widget.winfo_height())
@@ -1493,6 +1687,14 @@ def _desktop_smoke_test(
                 current = current.master
             return bottom
 
+        def right_in_root(widget: Any) -> int:
+            right = int(widget.winfo_width())
+            current = widget
+            while current is not root:
+                right += int(current.winfo_x())
+                current = current.master
+            return right
+
         for name, widget in (
             ("primary review action", app.run_button),
             ("review status", app.status_label),
@@ -1501,12 +1703,18 @@ def _desktop_smoke_test(
         ):
             has_layout = widget.winfo_width() > 1 and widget.winfo_height() > 1
             widget_bottom = bottom_in_root(widget)
-            if not has_layout or widget_bottom > root.winfo_height():
+            widget_right = right_in_root(widget)
+            if (
+                not has_layout
+                or widget_bottom > root.winfo_height()
+                or widget_right > root.winfo_width()
+            ):
                 widget_size = f"{widget.winfo_width()}x{widget.winfo_height()}"
                 root_size = f"{root.winfo_width()}x{root.winfo_height()}"
                 raise RuntimeError(
                     f"{name} is not laid out within the minimum window size "
-                    f"(widget={widget_size}, bottom={widget_bottom}, root={root_size})"
+                    f"(widget={widget_size}, right={widget_right}, bottom={widget_bottom}, "
+                    f"root={root_size})"
                 )
     finally:
         root.destroy()

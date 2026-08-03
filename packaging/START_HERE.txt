@@ -1,0 +1,48 @@
+TenderVerdict desktop developer preview
+=======================================
+
+What it does
+------------
+TenderVerdict reviews a supplier profile against normalized tender notice
+metadata. It produces explainable open_documents, watch, or reject results.
+A human still opens the official documents and decides what to do.
+
+First safe run
+--------------
+1. Read BUILD_INFO.txt and verify the archive checksum before extracting it.
+2. Open TenderVerdict only if your operating system accepts the unsigned
+   developer preview normally. Do not disable Gatekeeper, SmartScreen,
+   antivirus, or another security control.
+3. Choose "Run demo". It is synthetic, offline, and makes no network request.
+4. To try a file, choose Example data/notices.csv and use the bundled supplier
+   profile values, or load Example data/profile.json from the Profile menu.
+5. Review the reasons and unknowns. Use the verdict filter, sortable column
+   headings, and "Copy selected" when useful.
+6. Export HTML, Markdown, or JSON only after the current inputs have completed
+   a review.
+
+Privacy and network boundary
+----------------------------
+The desktop preview reads local CSV or JSON and does not intentionally access
+TED or another network service. The separate fetch-ted CLI command is the only
+network adapter. TenderVerdict has no account, telemetry, analytics, updater,
+email capture, or upload feature.
+
+Input limits
+------------
+- Profile: JSON, at most 256 KiB.
+- Notices: normalized CSV or JSON, at most 10 MiB and 1,000 rows.
+- CPV and country codes are validated against the source-traceable EU snapshots
+  bundled with this build.
+- A deadline may be a calendar date or an RFC 3339 timestamp with UTC offset.
+
+Trust boundary
+--------------
+This preview is not code-signed, notarized, or distributed through an app
+store. It is not an installer and does not update itself. If the operating
+system blocks it, use the source/CLI workflow or wait for a signed build.
+
+Feedback
+--------
+Use the repository issue forms. Never attach confidential tender documents,
+credentials, personal data, or customer information.
