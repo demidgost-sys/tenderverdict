@@ -42,6 +42,7 @@ packages = ["src/tenderverdict"]
 
 [tool.hatch.build.targets.sdist]
 include = [
+  "/.gitattributes",
   "/.github",
   "/demo",
   "/docs/assets",
