@@ -175,8 +175,11 @@ jobs:
           Compress-Archive -Path "$stage\*" `
             -DestinationPath "TenderVerdict-${{ matrix.target }}.zip"
           $hash = (Get-FileHash "TenderVerdict-${{ matrix.target }}.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash *TenderVerdict-${{ matrix.target }}.zip" | `
-            Out-File -Encoding ascii "TenderVerdict-${{ matrix.target }}.sha256"
+          $checksumPath = Join-Path $PWD "TenderVerdict-${{ matrix.target }}.sha256"
+          $checksumLine = "$hash *TenderVerdict-${{ matrix.target }}.zip`n"
+          [System.IO.File]::WriteAllText(
+            $checksumPath, $checksumLine, [System.Text.Encoding]::ASCII
+          )
 
       - name: Upload short-lived developer artifact
         if: >-
