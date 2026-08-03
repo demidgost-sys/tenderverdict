@@ -1,0 +1,2 @@
+# Build-time only. The installed TenderVerdict package keeps zero runtime dependencies.
+pyinstaller==6.21.0

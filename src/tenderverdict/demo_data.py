@@ -27,6 +27,7 @@ def demo_notices() -> list[dict[str, Any]]:
             "cpv_codes": ["72260000"],
             "countries": ["AUT"],
             "deadline": "2026-09-15",
+            "publication_date": "2026-08-01",
             "source_url": "https://procurement.example/notices/SYN-OPEN-001",
         },
         {
@@ -37,6 +38,7 @@ def demo_notices() -> list[dict[str, Any]]:
             "cpv_codes": ["72261000"],
             "countries": ["DEU"],
             "deadline": "2026-09-20",
+            "publication_date": "2026-07-30",
             "source_url": "https://procurement.example/notices/SYN-WATCH-001",
         },
         {
@@ -47,6 +49,7 @@ def demo_notices() -> list[dict[str, Any]]:
             "cpv_codes": ["72260000"],
             "countries": ["AUT"],
             "deadline": "2026-08-05",
+            "publication_date": "2026-07-15",
             "source_url": "https://procurement.example/notices/SYN-REJECT-001",
         },
     ]

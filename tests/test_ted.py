@@ -6,7 +6,14 @@ import unittest
 from http.client import IncompleteRead
 from urllib.error import URLError
 
-from tenderverdict.ted import TED_SEARCH_URL, TedApiError, fetch_notices, normalize_notice
+from tenderverdict.models import notice_collection_from_json_bytes
+from tenderverdict.ted import (
+    TED_SEARCH_URL,
+    TedApiError,
+    build_ted_snapshot,
+    fetch_notices,
+    normalize_notice,
+)
 
 
 def raw_notice(number: str, *, title: str = "Synthetic service notice") -> dict:
@@ -15,6 +22,8 @@ def raw_notice(number: str, *, title: str = "Synthetic service notice") -> dict:
         "form-type": "competition",
         "notice-title": {"eng": [title]},
         "buyer-name": {"eng": ["Synthetic Buyer"]},
+        "publication-date": "2030-08-01+02:00",
+        "identifier-lot": ["LOT-0001"],
         "main-classification-proc": ["72260000"],
         "additional-classification-lot": ["72262000", "72260000"],
         "place-of-performance-country-proc": ["aut"],
@@ -78,7 +87,9 @@ class TedAdapterTests(unittest.TestCase):
         self.assertEqual(captured["body"]["page"], 1)
         self.assertEqual(captured["body"]["paginationMode"], "PAGE_NUMBER")
         self.assertTrue(captured["body"]["onlyLatestVersions"])
-        self.assertTrue(captured["body"]["checkQuerySyntax"])
+        self.assertFalse(captured["body"]["checkQuerySyntax"])
+        self.assertIn("identifier-lot", captured["body"]["fields"])
+        self.assertIn("publication-date", captured["body"]["fields"])
         self.assertEqual(
             notices,
             [
@@ -90,7 +101,9 @@ class TedAdapterTests(unittest.TestCase):
                     "cpv_codes": ["72260000", "72262000"],
                     "countries": ["AUT"],
                     "deadline": "2030-09-18",
+                    "publication_date": "2030-08-01",
                     "source_url": "https://notices.example/SYN-001",
+                    "metadata_warnings": [],
                 }
             ],
         )
@@ -155,6 +168,18 @@ class TedAdapterTests(unittest.TestCase):
                 page_size=5,
                 searcher=lambda *_args, **_kwargs: page,
             )
+
+    def test_successful_zero_match_query_is_an_explicit_empty_result(self) -> None:
+        page = {"notices": [], "totalNoticeCount": 0, "timedOut": False}
+
+        notices = fetch_notices(
+            "x",
+            max_notices=5,
+            page_size=5,
+            searcher=lambda *_args, **_kwargs: page,
+        )
+
+        self.assertEqual(notices, [])
 
     def test_short_page_before_reported_total_fails_closed(self) -> None:
         page = {
@@ -318,9 +343,46 @@ class TedAdapterTests(unittest.TestCase):
                 "cpv_codes": [],
                 "countries": [],
                 "deadline": None,
+                "publication_date": None,
                 "source_url": None,
+                "metadata_warnings": [
+                    "TED did not return a lot identifier. Lot-level CPV, country, and deadline "
+                    "values were withheld because their scope cannot be verified."
+                ],
             },
         )
+
+    def test_multi_lot_values_are_withheld_instead_of_flattened(self) -> None:
+        notice = normalize_notice(
+            {
+                **raw_notice("SYN-MULTI"),
+                "identifier-lot": ["LOT-0001", "LOT-0002"],
+                "main-classification-lot": ["72260000", "48000000"],
+                "place-of-performance-country-lot": ["AUT", "FRA"],
+                "deadline-receipt-tender-date-lot": ["2030-09-01", "2030-10-01"],
+            }
+        )
+
+        self.assertEqual(notice["cpv_codes"], [])
+        self.assertEqual(notice["countries"], [])
+        self.assertIsNone(notice["deadline"])
+        self.assertIn("multiple lots", notice["metadata_warnings"][0])
+
+    def test_snapshot_round_trips_with_query_retrieval_and_lot_policy(self) -> None:
+        normalized = normalize_notice(raw_notice("SYN-SNAPSHOT"))
+        snapshot = build_ted_snapshot(
+            "form-type = competition SORT BY publication-date DESC",
+            [normalized],
+            retrieved_at="2030-08-02T12:30:00Z",
+        )
+        encoded = json.dumps(snapshot).encode("utf-8")
+
+        collection = notice_collection_from_json_bytes(encoded, "snapshot.json")
+
+        self.assertEqual(collection.source_kind, "ted_search_api")
+        self.assertEqual(collection.retrieved_at, "2030-08-02T12:30:00Z")
+        self.assertEqual(collection.lot_policy, "single_lot_only")
+        self.assertEqual(collection.notices[0].publication_number, "SYN-SNAPSHOT")
 
 
 if __name__ == "__main__":

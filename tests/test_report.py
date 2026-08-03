@@ -6,7 +6,7 @@ from datetime import date
 
 from tenderverdict.models import Notice, Profile, Verdict
 from tenderverdict.qualification import qualify_notices
-from tenderverdict.report import render_html, render_markdown, report_as_dict
+from tenderverdict.report import ReportProvenance, render_html, render_markdown, report_as_dict
 
 AS_OF = date(2026, 8, 2)
 PROFILE = Profile(1, "Example Software GmbH", ("72260000",), ("AUT",), 14)
@@ -42,6 +42,12 @@ NOTICES = (
         "https://procurement.example/notices/SYN-REJECT-001",
     ),
 )
+PROVENANCE = ReportProvenance(
+    generator_version="0.2.0a1",
+    source_kind="synthetic_test",
+    profile_sha256="a" * 64,
+    notices_sha256="b" * 64,
+)
 
 
 class ReportTests(unittest.TestCase):
@@ -49,7 +55,7 @@ class ReportTests(unittest.TestCase):
         self.results = qualify_notices(PROFILE, NOTICES, AS_OF)
 
     def test_structured_report_has_three_outcomes(self) -> None:
-        report = report_as_dict(PROFILE, self.results, AS_OF)
+        report = report_as_dict(PROFILE, self.results, AS_OF, PROVENANCE)
 
         self.assertEqual(
             report["summary"],
@@ -57,10 +63,12 @@ class ReportTests(unittest.TestCase):
         )
         verdicts = [item["verdict"] for item in report["results"]]  # type: ignore[index]
         self.assertEqual(verdicts, ["open_documents", "watch", "reject"])
+        self.assertEqual(report["schema_version"], 2)
+        self.assertEqual(report["provenance"]["profile_sha256"], "a" * 64)  # type: ignore[index]
 
     def test_markdown_is_deterministic_and_complete(self) -> None:
-        first = render_markdown(PROFILE, self.results, AS_OF)
-        second = render_markdown(PROFILE, self.results, AS_OF)
+        first = render_markdown(PROFILE, self.results, AS_OF, PROVENANCE)
+        second = render_markdown(PROFILE, self.results, AS_OF, PROVENANCE)
 
         self.assertEqual(first, second)
         self.assertTrue(first.endswith("\n"))
@@ -68,10 +76,11 @@ class ReportTests(unittest.TestCase):
         self.assertIn("**open_documents:** 1", first)
         self.assertIn("**watch:** 1", first)
         self.assertIn("**reject:** 1", first)
+        self.assertIn("## Provenance", first)
         self.assertNotIn("confidence", first.casefold())
 
     def test_html_is_static_semantic_and_mobile_safe(self) -> None:
-        output = render_html(PROFILE, self.results, AS_OF)
+        output = render_html(PROFILE, self.results, AS_OF, PROVENANCE)
 
         self.assertEqual(output.count("<h1>"), 1)
         self.assertEqual(output.count("<main>"), 1)
@@ -82,6 +91,7 @@ class ReportTests(unittest.TestCase):
         self.assertNotIn("<form", output.casefold())
         self.assertNotIn("<input", output.casefold())
         self.assertNotIn("src=", output.casefold())
+        self.assertIn("Report provenance", output)
 
     def test_user_content_is_escaped_in_both_formats(self) -> None:
         malicious_notice = replace(
@@ -95,8 +105,9 @@ class ReportTests(unittest.TestCase):
         malicious_profile = replace(PROFILE, name="<svg onload=alert(1)>")
         result = qualify_notices(malicious_profile, (malicious_notice,), AS_OF)
 
-        markdown = render_markdown(malicious_profile, result, AS_OF)
-        html = render_html(malicious_profile, result, AS_OF)
+        malicious_provenance = replace(PROVENANCE, source_kind="<img src=x>")
+        markdown = render_markdown(malicious_profile, result, AS_OF, malicious_provenance)
+        html = render_html(malicious_profile, result, AS_OF, malicious_provenance)
 
         self.assertNotIn("<script>", markdown.casefold())
         self.assertNotIn("<svg", markdown.casefold())
@@ -117,8 +128,8 @@ class ReportTests(unittest.TestCase):
         controlled_profile = replace(PROFILE, name="Example\u2066 Organization")
         result = qualify_notices(controlled_profile, (controlled_notice,), AS_OF)
 
-        markdown = render_markdown(controlled_profile, result, AS_OF)
-        html = render_html(controlled_profile, result, AS_OF)
+        markdown = render_markdown(controlled_profile, result, AS_OF, PROVENANCE)
+        html = render_html(controlled_profile, result, AS_OF, PROVENANCE)
 
         for output in (markdown, html):
             self.assertNotIn("\x00", output)
@@ -145,8 +156,8 @@ class ReportTests(unittest.TestCase):
         )
         result = qualify_notices(PROFILE, (missing,), AS_OF)
 
-        markdown = render_markdown(PROFILE, result, AS_OF)
-        html = render_html(PROFILE, result, AS_OF)
+        markdown = render_markdown(PROFILE, result, AS_OF, PROVENANCE)
+        html = render_html(PROFILE, result, AS_OF, PROVENANCE)
 
         self.assertIn(r"\(title missing\)", markdown)
         self.assertIn("(missing)", html)

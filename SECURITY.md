@@ -2,8 +2,9 @@
 
 ## Supported version
 
-Security fixes are considered for the current `0.1.x` alpha line only. This is an experimental
-project and no response or remediation deadline is guaranteed.
+Security fixes are considered on a best-effort basis for the latest published `0.x` alpha and the
+current `main` branch. Older commits and short-lived CI artifacts are not supported. This is an
+experimental project and no response or remediation deadline is guaranteed.
 
 ## Reporting a vulnerability
 
@@ -25,10 +26,11 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
 
 - `demo` and `qualify` operate on local files and require no network access.
 - `fetch-ted` is the only command that intentionally contacts an external service.
+- The desktop preview does not call `fetch-ted`; it accepts local normalized notice metadata.
 - The tool does not require credentials and should not be given secrets.
 - Output can contain content copied from input metadata. Treat generated files as untrusted data.
 - A verdict is not a security, legal, eligibility, or procurement decision.
 
-The repository CI performs offline tests, public-tree validation, and a conservative content scan.
-These checks reduce accidental exposure; they are not a warranty that the software is free of
-vulnerabilities.
+The repository CI performs offline tests, public-tree and distribution validation, a conservative
+content scan, CodeQL analysis, and native-build smoke tests. Required checks reduce accidental
+exposure; they are not a warranty that the software is free of vulnerabilities.

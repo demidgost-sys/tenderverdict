@@ -1,5 +1,6 @@
 """Public package surface for TenderVerdict."""
 
+from ._version import __version__
 from .models import (
     Notice,
     Profile,
@@ -8,8 +9,6 @@ from .models import (
     Verdict,
 )
 from .qualification import qualify_notices
-
-__version__ = "0.1.0a1"
 
 __all__ = [
     "Notice",

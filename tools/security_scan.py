@@ -4,14 +4,18 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import re
 import sys
 import tomllib
+from email import policy
+from email.parser import Parser
 from pathlib import Path
 from urllib.parse import urlparse
 
-from check_public_tree import TreeError, validate_tree
+from check_public_tree import BINARY_ASSET_PATHS, SDIST_METADATA_PATH, TreeError, validate_tree
 
 EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@([A-Z0-9.-]+\.[A-Z]{2,})\b", re.IGNORECASE)
 URL_PATTERN = re.compile(r"https?://(?:\\[.-]|[^\s<>`\"')\\])+")
@@ -55,6 +59,7 @@ OFFICIAL_URL_HOSTS = {
     "docs.ted.europa.eu",
     "git-lfs.github.com",
     "github.com",
+    "op.europa.eu",
     "www.apache.org",
     "www.w3.org",
 }
@@ -102,6 +107,29 @@ def _scan_json_synthetic_fields(relative: str, text: str, errors: list[str]) -> 
     walk(payload)
 
 
+def _scan_csv_synthetic_fields(relative: str, text: str, errors: list[str]) -> None:
+    if not relative.endswith(".csv"):
+        return
+    try:
+        reader = csv.DictReader(io.StringIO(text, newline=""), strict=True)
+        for row_number, row in enumerate(reader, start=2):
+            publication_number = row.get("publication_number")
+            if not publication_number or not publication_number.startswith("SYN-"):
+                errors.append(
+                    f"{relative}:{row_number}: committed publication_number must begin with SYN-"
+                )
+            source_url = row.get("source_url")
+            if source_url:
+                hostname = (urlparse(source_url).hostname or "").lower()
+                if not hostname.endswith(".example"):
+                    errors.append(
+                        f"{relative}:{row_number}: committed source_url must use a "
+                        "reserved .example host"
+                    )
+    except (csv.Error, UnicodeError) as error:
+        errors.append(f"{relative}: invalid CSV fixture ({error})")
+
+
 def _scan_text(relative: str, text: str, errors: list[str]) -> None:
     for pattern in SECRET_PATTERNS:
         if pattern.search(text):
@@ -146,6 +174,7 @@ def _scan_text(relative: str, text: str, errors: list[str]) -> None:
         errors.append(f"{relative}: maintainer identity differs from approved public form")
 
     _scan_json_synthetic_fields(relative, text, errors)
+    _scan_csv_synthetic_fields(relative, text, errors)
 
 
 def _scan_workflows(root: Path, files: list[str], errors: list[str]) -> None:
@@ -197,7 +226,7 @@ def _scan_metadata(root: Path, errors: list[str]) -> None:
     pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
     project = pyproject.get("project", {})
     if project.get("dependencies") != []:
-        errors.append("pyproject.toml: runtime dependencies must remain empty for 0.1.0a1")
+        errors.append("pyproject.toml: runtime dependencies must remain empty")
     if project.get("requires-python") != ">=3.11":
         errors.append("pyproject.toml: requires-python must be >=3.11")
     if project.get("license") != "Apache-2.0":
@@ -212,13 +241,35 @@ def _scan_metadata(root: Path, errors: list[str]) -> None:
     if not (root / "NOTICE").is_file():
         errors.append("NOTICE: required attribution boundary is missing")
 
+    sdist_metadata = root / SDIST_METADATA_PATH
+    if sdist_metadata.is_file():
+        message = Parser(policy=policy.default).parsestr(sdist_metadata.read_text(encoding="utf-8"))
+        expected_headers = {
+            "Metadata-Version": "2.4",
+            "Name": project.get("name"),
+            "Version": project.get("version"),
+            "Summary": project.get("description"),
+            "Author": project.get("authors", [{}])[0].get("name"),
+            "License-Expression": project.get("license"),
+            "Requires-Python": project.get("requires-python"),
+            "Description-Content-Type": "text/markdown",
+        }
+        for header, expected in expected_headers.items():
+            values = message.get_all(header, [])
+            if values != [expected]:
+                errors.append(
+                    f"{SDIST_METADATA_PATH}: {header} must occur once and match pyproject.toml"
+                )
+        if message.get_all("Requires-Dist"):
+            errors.append(f"{SDIST_METADATA_PATH}: runtime dependencies must remain empty")
 
-def scan(root: Path) -> list[str]:
+
+def scan(root: Path, *, sdist: bool = False) -> list[str]:
     root = root.resolve()
-    files = validate_tree(root)
+    files = validate_tree(root, sdist=sdist)
     errors: list[str] = []
     for relative in files:
-        if relative == "demo/screenshot.png":
+        if relative in BINARY_ASSET_PATHS:
             continue
         text = (root / relative).read_text(encoding="utf-8")
         _scan_text(relative, text, errors)
@@ -230,15 +281,20 @@ def scan(root: Path) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--sdist",
+        action="store_true",
+        help="require and scan the generated PKG-INFO file in an extracted sdist",
+    )
     arguments = parser.parse_args(argv)
     try:
-        errors = scan(arguments.root)
-    except (OSError, TreeError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
-        print(f"SECURITY_SCAN_FAIL: {error}", file=sys.stderr)
+        errors = scan(arguments.root, sdist=arguments.sdist)
+    except (OSError, TreeError, UnicodeDecodeError, tomllib.TOMLDecodeError) as scan_error:
+        print(f"SECURITY_SCAN_FAIL: {scan_error}", file=sys.stderr)
         return 1
     if errors:
-        for error in sorted(set(errors)):
-            print(f"SECURITY_SCAN_FAIL: {error}", file=sys.stderr)
+        for scan_error in sorted(set(errors)):
+            print(f"SECURITY_SCAN_FAIL: {scan_error}", file=sys.stderr)
         return 1
     print("SECURITY_SCAN_OK: no forbidden release markers detected")
     return 0

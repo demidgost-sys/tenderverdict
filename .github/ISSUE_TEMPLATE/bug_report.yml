@@ -50,6 +50,6 @@ body:
     attributes:
       label: Environment
       description: TenderVerdict version, Python version, and operating system.
-      placeholder: "v0.1.0-alpha.1 · Python 3.13 · macOS"
+      placeholder: "v0.1.0-alpha.1 or 0.2.0a1@commit · Python 3.13 · macOS"
     validations:
       required: true

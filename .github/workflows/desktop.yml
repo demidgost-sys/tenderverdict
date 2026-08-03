@@ -1,0 +1,217 @@
+name: Desktop preview
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  validate:
+    name: Validate desktop source
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up exact Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.6"
+
+      - name: Install pinned validation tools
+        run: python -m pip install mypy==2.3.0 ruff==0.16.1
+
+      - name: Validate public and security boundaries
+        run: |
+          python tools/check_public_tree.py
+          python tools/security_scan.py
+
+      - name: Lint, format-check, and type-check
+        run: |
+          ruff check .
+          ruff format --check .
+          mypy
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: validate
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: macos-arm64
+            runner: macos-15
+          - target: macos-x64
+            runner: macos-15-intel
+          - target: windows-x64
+            runner: windows-2022
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up exact Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.6"
+
+      - name: Install pinned build tools
+        run: >-
+          python -m pip install
+          hatchling==1.27.0
+          -r requirements-desktop-build.txt
+
+      - name: Install TenderVerdict without runtime dependencies
+        run: python -m pip install --no-build-isolation --no-deps .
+
+      - name: Run offline test suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+
+      - name: Smoke-test installed desktop source
+        run: python -m tenderverdict.desktop --smoke-test
+
+      - name: Build native one-directory preview
+        run: python tools/build_desktop.py
+
+      - name: Smoke-test frozen macOS application
+        if: runner.os == 'macOS'
+        run: dist/TenderVerdict.app/Contents/MacOS/TenderVerdict --smoke-test
+
+      - name: Verify macOS architecture and trust boundary
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          executable="dist/TenderVerdict.app/Contents/MacOS/TenderVerdict"
+          plist="dist/TenderVerdict.app/Contents/Info.plist"
+          file "$executable"
+          if [[ "${{ matrix.target }}" == "macos-arm64" ]]; then
+            file "$executable" | grep -q "arm64"
+          else
+            file "$executable" | grep -q "x86_64"
+          fi
+          expected_version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"].split("a", 1)[0])')"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")" = "$expected_version"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$plist")" = "$expected_version"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$plist")" = "tenderverdict-icon.icns"
+          test -s "dist/TenderVerdict.app/Contents/Resources/tenderverdict-icon.icns"
+          codesign --verify --deep --strict --verbose=4 dist/TenderVerdict.app
+          for signed_path in dist/TenderVerdict.app "$executable"; do
+            signature="$(codesign -dv --verbose=4 "$signed_path" 2>&1)"
+            printf '%s\n' "$signature"
+            printf '%s\n' "$signature" | grep -q 'Signature=adhoc'
+            printf '%s\n' "$signature" | grep -q 'TeamIdentifier=not set'
+            if printf '%s\n' "$signature" | grep -Eq 'Authority=Developer ID|TeamIdentifier=[A-Z0-9]{10}'; then
+              echo "Unexpected Developer ID signature in preview artifact" >&2
+              exit 1
+            fi
+          done
+
+      - name: Smoke-test frozen Windows application
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $executable = (Resolve-Path ".\dist\TenderVerdict\TenderVerdict.exe").Path
+          $process = Start-Process -FilePath $executable `
+            -ArgumentList "--smoke-test" -PassThru
+          if (-not $process.WaitForExit(30000)) {
+            $process.Kill($true)
+            throw "Frozen desktop smoke test timed out after 30 seconds"
+          }
+          Write-Host "Frozen desktop smoke exit code: $($process.ExitCode)"
+          if ($process.ExitCode -ne 0) {
+            throw "Frozen desktop smoke test failed"
+          }
+
+      - name: Verify Windows trust boundary
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $signature = Get-AuthenticodeSignature .\dist\TenderVerdict\TenderVerdict.exe
+          $signature | Format-List
+          if ($signature.Status -ne "NotSigned") {
+            throw "Expected an unsigned Windows developer preview"
+          }
+
+      - name: Stage macOS artifact
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          stage="artifact/TenderVerdict-${{ matrix.target }}"
+          mkdir -p "$stage"
+          ditto "dist/TenderVerdict.app" "$stage/TenderVerdict.app"
+          cp LICENSE NOTICE packaging/THIRD_PARTY_NOTICES.md "$stage/"
+          PYTHONPATH=src python tools/write_build_manifest.py \
+            --ci --signature-state adhoc \
+            --target "${{ matrix.target }}" --output "$stage/BUILD_INFO.txt"
+          ditto -c -k --sequesterRsrc --keepParent "$stage" \
+            "TenderVerdict-${{ matrix.target }}.zip"
+          shasum -a 256 "TenderVerdict-${{ matrix.target }}.zip" \
+            > "TenderVerdict-${{ matrix.target }}.sha256"
+
+      - name: Stage Windows artifact
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $stage = "artifact\TenderVerdict-${{ matrix.target }}"
+          New-Item -ItemType Directory -Force $stage | Out-Null
+          Copy-Item -Recurse .\dist\TenderVerdict "$stage\TenderVerdict"
+          Copy-Item LICENSE, NOTICE, packaging\THIRD_PARTY_NOTICES.md $stage
+          $env:PYTHONPATH = "src"
+          python tools\write_build_manifest.py `
+            --ci --signature-state not-signed `
+            --target "${{ matrix.target }}" --output "$stage\BUILD_INFO.txt"
+          Compress-Archive -Path "$stage\*" `
+            -DestinationPath "TenderVerdict-${{ matrix.target }}.zip"
+          $hash = (Get-FileHash "TenderVerdict-${{ matrix.target }}.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
+          $checksumPath = Join-Path $PWD "TenderVerdict-${{ matrix.target }}.sha256"
+          $checksumLine = "$hash *TenderVerdict-${{ matrix.target }}.zip`n"
+          [System.IO.File]::WriteAllText(
+            $checksumPath, $checksumLine, [System.Text.Encoding]::ASCII
+          )
+
+      - name: Upload short-lived developer artifact
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: TenderVerdict-${{ matrix.target }}-${{ github.sha }}
+          path: |
+            TenderVerdict-${{ matrix.target }}.zip
+            TenderVerdict-${{ matrix.target }}.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  gate:
+    name: Desktop gate
+    if: always()
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require source validation and every native build
+        env:
+          VALIDATE_RESULT: ${{ needs.validate.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+        run: |
+          test "${VALIDATE_RESULT}" = "success"
+          test "${BUILD_RESULT}" = "success"

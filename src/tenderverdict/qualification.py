@@ -45,6 +45,11 @@ def qualify_notice(profile: Profile, notice: Notice, as_of: date) -> Qualificati
     hard_reject = False
     needs_review = False
 
+    for warning in notice.metadata_warnings:
+        reasons.append(f"Source metadata warning: {warning}")
+        unknowns.append(warning)
+        needs_review = True
+
     # Notice type
     if notice.notice_type is None:
         reasons.append("Notice type is missing.")

@@ -11,8 +11,18 @@ from unittest.mock import patch
 from tenderverdict.cli import main
 from tenderverdict.ted import TedApiError
 
+ROOT = Path(__file__).resolve().parents[1]
+EXAMPLES = ROOT / "examples" / "synthetic"
+
 
 class CliTests(unittest.TestCase):
+    def test_desktop_command_delegates_without_changing_cli_contract(self) -> None:
+        with patch("tenderverdict.desktop.main", return_value=0) as desktop_main:
+            exit_code = main(["desktop"])
+
+        self.assertEqual(exit_code, 0)
+        desktop_main.assert_called_once_with([])
+
     def test_demo_defaults_to_markdown_stdout(self) -> None:
         stdout = io.StringIO()
         with (
@@ -214,6 +224,41 @@ class CliTests(unittest.TestCase):
             self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
             self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
 
+    def test_invalid_csv_does_not_replace_existing_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            notices = root / "notices.csv"
+            output = root / "report.md"
+            notices.write_text(
+                "publication_number,notice_type,title,buyer,cpv_codes,countries,"
+                "deadline,source_url\n"
+                "SYN-BAD-CSV,competition,Synthetic,Example Buyer,72260000,AUT,"
+                "2026-99-01,https://procurement.example/notices/SYN-BAD-CSV\n",
+                encoding="utf-8",
+            )
+            output.write_text("keep-me\n", encoding="utf-8")
+            stderr = io.StringIO()
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main(
+                    [
+                        "qualify",
+                        "--profile",
+                        str(EXAMPLES / "profile.json"),
+                        "--notices",
+                        str(notices),
+                        "--as-of",
+                        "2026-08-02",
+                        "--output",
+                        str(output),
+                    ]
+                )
+
+            self.assertEqual(exit_code, 2)
+            self.assertIn("CSV row 2: deadline", stderr.getvalue())
+            self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
+            self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
+
     def test_failed_fetch_does_not_replace_existing_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "notices.json"
@@ -273,7 +318,16 @@ class CliTests(unittest.TestCase):
             raw_output = output.read_text(encoding="utf-8")
             self.assertTrue(raw_output.isascii())
             self.assertIn(r"\u202e", raw_output)
-            self.assertEqual(json.loads(output.read_text(encoding="utf-8")), [notice])
+            snapshot = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(snapshot["schema_version"], 1)
+            self.assertEqual(snapshot["source"]["kind"], "ted_search_api")
+            self.assertEqual(snapshot["source"]["query"], "form-type = competition")
+            self.assertEqual(snapshot["source"]["lot_policy"], "single_lot_only")
+            self.assertRegex(
+                snapshot["source"]["retrieved_at"],
+                r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+            )
+            self.assertEqual(snapshot["notices"], [notice])
 
 
 if __name__ == "__main__":

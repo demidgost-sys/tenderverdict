@@ -17,8 +17,15 @@ a conclusion about whether an organisation can or should participate in a procur
 ## Input and source risk
 
 Metadata can be missing, stale, mistranslated, inconsistent, or changed after collection. CPV codes
-and country fields are coarse indicators. A source URL establishes traceability, not correctness.
+and country fields are coarse indicators. The current schema validates their shape, not membership
+in a complete authoritative CPV or country vocabulary. A source URL establishes traceability, not
+correctness.
 Deadlines can be amended or subject to procedural rules not represented in the input.
+
+The model stores calendar dates, not local deadline times. A deadline on the `as_of` date is treated
+as closed. TED Search API output is notice-level; zero- and multi-lot records intentionally lose
+lot-specific CPV, country, and deadline values and become a human-review case rather than risking a
+false association.
 
 Always inspect the current official notice, amendments, procurement documents, and applicable rules
 before acting. When a field is unclear, preserve the uncertainty instead of inferring a favourable
@@ -31,6 +38,8 @@ answer.
 - Treat input text and generated reports as untrusted content when embedding them elsewhere.
 - Network collection can fail or return an incomplete provider response; a failed fetch must not be
   treated as an empty market.
+- A successful zero-row snapshot is distinct from a failure and produces an explicit zero-notice
+  report.
 
 The software is provided under the warranty disclaimer in the Apache License 2.0. Nothing in this
 repository is legal advice or a professional procurement opinion.
