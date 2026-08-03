@@ -1392,7 +1392,7 @@ def _desktop_smoke_test(
     try:
         app = TenderVerdictApp(root, tk, ttk, filedialog, messagebox, tkfont)
         root.geometry("860x680")
-        root.update_idletasks()
+        root.update()
         if not str(root.cget("menu")):
             raise RuntimeError("desktop menu is not configured")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "disabled":
@@ -1404,7 +1404,7 @@ def _desktop_smoke_test(
         event = argparse.Namespace(keycode=keycode, keysym="d")
         if app._handle_shortcut(event) != "break":
             raise RuntimeError("desktop demo shortcut was not handled")
-        root.update_idletasks()
+        root.update()
         if app._current_run is None:
             raise RuntimeError("desktop demo shortcut did not run")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "normal":
@@ -1425,8 +1425,14 @@ def _desktop_smoke_test(
             ("selected notice detail", app.details_text),
         ):
             has_layout = widget.winfo_width() > 1 and widget.winfo_height() > 1
-            if not has_layout or bottom_in_root(widget) > root.winfo_height():
-                raise RuntimeError(f"{name} is not laid out within the minimum window size")
+            widget_bottom = bottom_in_root(widget)
+            if not has_layout or widget_bottom > root.winfo_height():
+                widget_size = f"{widget.winfo_width()}x{widget.winfo_height()}"
+                root_size = f"{root.winfo_width()}x{root.winfo_height()}"
+                raise RuntimeError(
+                    f"{name} is not laid out within the minimum window size "
+                    f"(widget={widget_size}, bottom={widget_bottom}, root={root_size})"
+                )
     finally:
         root.destroy()
     summary = demo_run().summary
