@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 from collections.abc import Mapping
@@ -14,7 +16,20 @@ from typing import Any
 _CPV_RE = re.compile(r"^[0-9]{8}$")
 _COUNTRY_RE = re.compile(r"^[A-Z]{3}$")
 _DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_CSV_LIST_SEPARATOR_RE = re.compile(r"[,;|\s]+")
+_CSV_DELIMITERS = (",", ";", "\t")
 _MISSING = object()
+
+CSV_NOTICE_COLUMNS = (
+    "publication_number",
+    "notice_type",
+    "title",
+    "buyer",
+    "cpv_codes",
+    "countries",
+    "deadline",
+    "source_url",
+)
 
 
 class SchemaValidationError(ValueError):
@@ -212,7 +227,12 @@ def load_profile(path: str | Path) -> Profile:
 
 
 def load_notices(path: str | Path) -> tuple[Notice, ...]:
-    return notices_from_data(_load_json(path))
+    source = Path(path)
+    try:
+        payload = source.read_bytes()
+    except OSError as exc:
+        raise SchemaValidationError(f"Unable to read notices from {source}.") from exc
+    return notices_from_file_bytes(payload, source)
 
 
 def profile_from_json_bytes(payload: bytes, source: str | Path = "profile") -> Profile:
@@ -231,6 +251,139 @@ def notices_from_json_bytes(
     """Decode and validate one UTF-8 notices snapshot."""
 
     return notices_from_data(_decode_json_bytes(payload, source))
+
+
+def notices_from_csv_bytes(
+    payload: bytes,
+    source: str | Path = "notices.csv",
+) -> tuple[Notice, ...]:
+    """Decode a normalized UTF-8 CSV file and validate every notice row."""
+
+    try:
+        text = payload.decode("utf-8-sig")
+    except UnicodeError as exc:
+        raise SchemaValidationError(f"Save {source} as UTF-8 CSV and try again.") from exc
+    if "\0" in text:
+        raise SchemaValidationError(f"Remove the null byte from {source} and try again.")
+    if not text.strip():
+        raise SchemaValidationError("Add the CSV header and at least one notice row.")
+
+    delimiter = _detect_csv_delimiter(text)
+    try:
+        reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter, strict=True)
+        raw_header = next(reader)
+        header = _validate_csv_header(raw_header)
+        notices: list[Notice] = []
+        for row in reader:
+            line_number = reader.line_num
+            if not row or all(not value.strip() for value in row):
+                continue
+            if len(row) != len(header):
+                raise SchemaValidationError(
+                    f"CSV row {line_number} has {len(row)} columns; use exactly {len(header)}."
+                )
+            values = {name: value.strip() for name, value in zip(header, row, strict=True)}
+            data: dict[str, object] = {
+                "publication_number": values["publication_number"],
+                "notice_type": values["notice_type"] or None,
+                "title": values["title"] or None,
+                "buyer": values["buyer"] or None,
+                "cpv_codes": _split_csv_list(values["cpv_codes"]),
+                "countries": _split_csv_list(values["countries"]),
+                "deadline": values["deadline"] or None,
+                "source_url": values["source_url"] or None,
+            }
+            try:
+                notices.append(notice_from_dict(data))
+            except SchemaValidationError as exc:
+                message = str(exc).removeprefix("notice.")
+                raise SchemaValidationError(f"CSV row {line_number}: {message}") from exc
+    except StopIteration as exc:
+        raise SchemaValidationError("Add the CSV header and at least one notice row.") from exc
+    except csv.Error as exc:
+        raise SchemaValidationError(f"Fix the malformed CSV near line {reader.line_num}.") from exc
+
+    if not notices:
+        raise SchemaValidationError("Add at least one notice row below the CSV header.")
+    return tuple(notices)
+
+
+def notices_from_file_bytes(
+    payload: bytes,
+    source: str | Path,
+) -> tuple[Notice, ...]:
+    """Decode notices according to an explicit local ``.csv`` or ``.json`` suffix."""
+
+    suffix = Path(source).suffix.casefold()
+    if suffix == ".csv":
+        return notices_from_csv_bytes(payload, source)
+    if suffix == ".json":
+        return notices_from_json_bytes(payload, source)
+    raise SchemaValidationError("Choose a notices file ending in .csv or .json.")
+
+
+def render_notices_csv(notices: tuple[Notice, ...]) -> str:
+    """Render normalized notices as an editable, spreadsheet-friendly CSV example."""
+
+    buffer = io.StringIO(newline="")
+    writer = csv.writer(buffer, lineterminator="\n")
+    writer.writerow(CSV_NOTICE_COLUMNS)
+    for notice in notices:
+        writer.writerow(
+            (
+                notice.publication_number,
+                notice.notice_type or "",
+                notice.title or "",
+                notice.buyer or "",
+                "|".join(notice.cpv_codes),
+                "|".join(notice.countries),
+                notice.deadline.isoformat() if notice.deadline else "",
+                notice.source_url or "",
+            )
+        )
+    return buffer.getvalue()
+
+
+def _detect_csv_delimiter(text: str) -> str:
+    candidates: list[tuple[int, int, int, str]] = []
+    expected = set(CSV_NOTICE_COLUMNS)
+    for preference, delimiter in enumerate(_CSV_DELIMITERS):
+        try:
+            first_row = next(
+                csv.reader(io.StringIO(text, newline=""), delimiter=delimiter, strict=True)
+            )
+        except (StopIteration, csv.Error):
+            continue
+        normalized = [value.strip().casefold() for value in first_row]
+        recognized = len(expected.intersection(normalized))
+        exact_shape = int(len(normalized) == len(CSV_NOTICE_COLUMNS))
+        candidates.append((recognized, exact_shape, -preference, delimiter))
+    if not candidates:
+        raise SchemaValidationError("Add a valid comma-, semicolon-, or tab-separated CSV header.")
+    return max(candidates)[-1]
+
+
+def _validate_csv_header(raw_header: list[str]) -> tuple[str, ...]:
+    header = tuple(value.strip().casefold() for value in raw_header)
+    duplicates = sorted({name for name in header if name and header.count(name) > 1})
+    if duplicates:
+        raise SchemaValidationError("Remove duplicate CSV columns: " + ", ".join(duplicates) + ".")
+    expected = set(CSV_NOTICE_COLUMNS)
+    actual = set(header)
+    missing = sorted(expected - actual)
+    unsupported = sorted(name or "(blank)" for name in actual - expected)
+    details: list[str] = []
+    if missing:
+        details.append("add columns: " + ", ".join(missing))
+    if unsupported:
+        details.append("remove unsupported columns: " + ", ".join(unsupported))
+    if details:
+        raise SchemaValidationError("Fix the CSV header: " + "; ".join(details) + ".")
+    return header
+
+
+def _split_csv_list(value: str) -> list[str]:
+    return [token for token in _CSV_LIST_SEPARATOR_RE.split(value) if token]
 
 
 def _load_json(path: str | Path) -> object:

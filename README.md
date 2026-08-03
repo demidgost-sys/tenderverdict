@@ -75,8 +75,9 @@ Installing from source may download the pinned build tool if it is not already c
 ## Desktop preview
 
 The unreleased desktop preview on `main` removes the need to edit the supplier profile by hand. It
-provides labelled fields for the supplier criteria, a file chooser for normalized notices, an
-explicit review-date field, a result browser, and atomic HTML, Markdown, or JSON export.
+provides labelled fields for the supplier criteria, immediate validation for normalized CSV or
+JSON notice data, an editable CSV example, an explicit review-date field, a result browser, and
+atomic HTML, Markdown, or JSON export.
 
 It uses the same deterministic workflow as the CLI. It does not upload data, fetch TED metadata,
 open source URLs automatically, or make a participation decision.
@@ -121,14 +122,14 @@ tenderverdict demo --format html --output demo/index.html
 ```bash
 tenderverdict qualify \
   --profile examples/synthetic/profile.json \
-  --notices examples/synthetic/notices.json \
+  --notices examples/synthetic/notices.csv \
   --as-of 2026-08-02 \
   --format markdown \
   --output report.md
 ```
 
-Use `--format json` for machine-readable output. Validation errors return a non-zero exit code and
-do not replace an existing output file.
+Use `--format json` for machine-readable output. Notice data can be normalized `.csv` or `.json`.
+Validation errors return a non-zero exit code and do not replace an existing output file.
 
 Minimal company profile:
 
@@ -142,7 +143,19 @@ Minimal company profile:
 }
 ```
 
-See [`examples/synthetic`](examples/synthetic) for the notice schema and a reproducible example.
+The CSV header is:
+
+```text
+publication_number,notice_type,title,buyer,cpv_codes,countries,deadline,source_url
+```
+
+`publication_number` is required on every row. Empty evidence fields are preserved as unknowns.
+Use `|` inside `cpv_codes` or `countries` when a row has multiple values, for example
+`72260000|72261000` or `AUT|DEU`. Comma-, semicolon-, and tab-separated files are accepted; the
+bundled example uses commas. CSV is treated as data, never as executable spreadsheet content.
+
+See [`examples/synthetic`](examples/synthetic) for matching CSV and JSON fixtures and a
+reproducible report.
 
 ## Verdicts
 
@@ -197,7 +210,7 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md), and
 
 TenderVerdict ist ein experimentelles, quelloffenes und lokal ausgeführtes CLI zur
 Vorqualifizierung von Metadaten öffentlicher Ausschreibungen aus Sicht von Anbietern. Ein lokales
-Unternehmensprofil und strukturierte Notice-JSON-Daten werden nachvollziehbar als
+Unternehmensprofil und strukturierte Notice-Daten aus CSV oder JSON werden nachvollziehbar als
 `open_documents`, `watch` oder `reject` eingeordnet. Das Werkzeug bietet keine Rechtsberatung,
 trifft keine Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung der
 Ausschreibungsunterlagen.

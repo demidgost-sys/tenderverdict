@@ -18,10 +18,11 @@ from .models import (
     QualificationResult,
     SchemaValidationError,
     notices_from_data,
-    notices_from_json_bytes,
+    notices_from_file_bytes,
     parse_iso_date,
     profile_from_dict,
     profile_from_json_bytes,
+    render_notices_csv,
 )
 from .output import write_text_atomically
 from .report import normalize_display_text
@@ -61,7 +62,7 @@ class DesktopUnavailableError(RuntimeError):
 
 
 @dataclass(frozen=True, slots=True)
-class LocalJsonSnapshot:
+class LocalFileSnapshot:
     """One bounded local-file snapshot and its export provenance."""
 
     path: Path
@@ -175,16 +176,16 @@ def profile_from_fields(
     )
 
 
-def read_local_json_snapshot(
+def read_local_snapshot(
     raw_path: str,
     *,
     label: str,
     maximum_bytes: int,
-) -> LocalJsonSnapshot:
+) -> LocalFileSnapshot:
     """Read one regular local file once, within the desktop input budget."""
 
     if not raw_path.strip():
-        raise SchemaValidationError(f"Choose a {label} JSON file.")
+        raise SchemaValidationError(f"Choose a {label} file.")
     path = Path(raw_path).expanduser()
     try:
         with path.open("rb") as handle:
@@ -208,7 +209,7 @@ def read_local_json_snapshot(
         else:
             limit = f"{maximum_bytes // 1024} KiB"
         raise SchemaValidationError(f"Choose a {label} file no larger than {limit}.")
-    return LocalJsonSnapshot(
+    return LocalFileSnapshot(
         path=path,
         payload=payload,
         sha256=hashlib.sha256(payload).hexdigest(),
@@ -274,6 +275,10 @@ def shortcut_action(windowing_system: str, keycode: int, keysym: str) -> str | N
 
 def _split_tokens(value: str) -> list[str]:
     return [token for token in _TOKEN_SEPARATOR.split(value.strip()) if token]
+
+
+def notice_count_label(count: int) -> str:
+    return f"{count} notice" if count == 1 else f"{count} notices"
 
 
 def _load_tkinter() -> tuple[Any, Any, Any, Any, Any]:
@@ -760,7 +765,7 @@ class TenderVerdictApp:
         )
         self.ttk.Label(
             frame,
-            text="Use normalized JSON or the offline demo.",
+            text="Choose normalized CSV or JSON, save an editable example, or run the demo.",
             style="CardDescription.TLabel",
             wraplength=330,
         ).grid(row=12, column=0, columnspan=2, sticky="w", pady=(4, 8))
@@ -779,7 +784,7 @@ class TenderVerdictApp:
         notice_actions.columnconfigure(1, weight=1)
         self.choose_notices_button = self.ttk.Button(
             notice_actions,
-            text="Choose JSON…",
+            text="Choose file…",
             command=self._choose_notices,
             style="Secondary.TButton",
         )
@@ -790,6 +795,13 @@ class TenderVerdictApp:
             command=self._run_demo,
             style="Secondary.TButton",
         ).grid(row=0, column=1, sticky="ew", padx=(5, 0))
+        self.save_csv_example_button = self.ttk.Button(
+            notice_actions,
+            text="Save editable CSV example…",
+            command=self._save_csv_example,
+            style="Secondary.TButton",
+        )
+        self.save_csv_example_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(8, 0))
 
         frame.rowconfigure(15, weight=1)
         self.run_button = self.ttk.Button(
@@ -981,7 +993,8 @@ class TenderVerdictApp:
         detail_scroll.grid(row=1, column=1, sticky="ns")
         self._set_empty_details(
             "Ready for a local review",
-            "Run the synthetic demo or add your own notice JSON. Results will appear here.",
+            "Run the synthetic demo or add a normalized CSV or JSON file. "
+            "Results will appear here.",
         )
 
     def _bind_shortcuts(self) -> None:
@@ -995,10 +1008,11 @@ class TenderVerdictApp:
 
         file_menu = self.tk.Menu(menu)
         file_menu.add_command(
-            label="Choose Notices…",
+            label="Choose Notice Data…",
             accelerator=f"{accelerator}O",
             command=self._choose_notices,
         )
+        file_menu.add_command(label="Save CSV Example…", command=self._save_csv_example)
         file_menu.add_separator()
         file_menu.add_command(label="Load Profile…", command=self._load_profile)
         file_menu.add_command(label="Save Profile…", command=self._save_profile)
@@ -1071,15 +1085,35 @@ class TenderVerdictApp:
 
     def _choose_notices(self) -> None:
         selected = self.filedialog.askopenfilename(
-            title="Choose normalized notices JSON",
-            filetypes=(("JSON files", "*.json"), ("All files", "*")),
+            title="Choose normalized notice data",
+            filetypes=(
+                ("Notice data", "*.csv *.json"),
+                ("CSV files", "*.csv"),
+                ("JSON files", "*.json"),
+                ("All files", "*"),
+            ),
         )
-        if selected:
-            self._using_demo_notices = False
-            self.notices_path_var.set(selected)
-            self.notices_display_var.set(selected)
-            self._set_status("Notices selected. Confirm the review date, then run the review.")
-            self.as_of_entry.focus_set()
+        if not selected:
+            return
+        try:
+            snapshot = read_local_snapshot(
+                selected,
+                label="notices",
+                maximum_bytes=MAX_NOTICES_FILE_BYTES,
+            )
+            notices = notices_from_file_bytes(snapshot.payload, snapshot.path)
+        except (SchemaValidationError, OSError, ValueError) as exc:
+            self._show_error("Unable to use notice data", exc, self.choose_notices_button)
+            return
+        self._using_demo_notices = False
+        self.notices_path_var.set(selected)
+        self.notices_display_var.set(selected)
+        self._set_status(
+            f"{notice_count_label(len(notices))} ready · confirm the review date, "
+            "then run the review.",
+            "success",
+        )
+        self.as_of_entry.focus_set()
 
     def _load_profile(self) -> None:
         selected = self.filedialog.askopenfilename(
@@ -1089,7 +1123,7 @@ class TenderVerdictApp:
         if not selected:
             return
         try:
-            snapshot = read_local_json_snapshot(
+            snapshot = read_local_snapshot(
                 selected,
                 label="profile",
                 maximum_bytes=MAX_PROFILE_FILE_BYTES,
@@ -1126,6 +1160,26 @@ class TenderVerdictApp:
             self._show_error("Unable to save profile", exc, self.name_entry)
             return
         self._set_status(f"Saved profile as {Path(selected).name}.", "success")
+
+    def _save_csv_example(self) -> None:
+        selected = self.filedialog.asksaveasfilename(
+            title="Save editable CSV example",
+            defaultextension=".csv",
+            initialfile="tenderverdict-notices-example.csv",
+            filetypes=(("CSV files", "*.csv"),),
+        )
+        if not selected:
+            return
+        notices = notices_from_data(demo_notices())
+        try:
+            write_text_atomically(selected, render_notices_csv(notices))
+        except OSError as exc:
+            self._show_error("Unable to save CSV example", exc, self.choose_notices_button)
+            return
+        self._set_status(
+            f"Saved {Path(selected).name}. Replace the synthetic rows, then choose that file.",
+            "success",
+        )
 
     def _run_demo(self) -> None:
         run = demo_run()
@@ -1172,7 +1226,7 @@ class TenderVerdictApp:
                     as_of=as_of,
                 )
             else:
-                snapshot = read_local_json_snapshot(
+                snapshot = read_local_snapshot(
                     self.notices_path_var.get(),
                     label="notices",
                     maximum_bytes=MAX_NOTICES_FILE_BYTES,
@@ -1180,7 +1234,7 @@ class TenderVerdictApp:
                 notices_sha256 = snapshot.sha256
                 run = qualify_inputs(
                     profile,
-                    notices_from_json_bytes(snapshot.payload, snapshot.path),
+                    notices_from_file_bytes(snapshot.payload, snapshot.path),
                     as_of=as_of,
                 )
         except (SchemaValidationError, OSError, ValueError) as exc:
@@ -1188,7 +1242,7 @@ class TenderVerdictApp:
             return
         self._display_run(run, notices_sha256=notices_sha256)
         self._set_status(
-            f"Review complete · {len(run.results)} notices · no uploads.",
+            f"Review complete · {notice_count_label(len(run.results))} · no uploads.",
             "success",
         )
 
@@ -1276,7 +1330,7 @@ class TenderVerdictApp:
         if self._current_notices_sha256 is None:
             return True
         try:
-            snapshot = read_local_json_snapshot(
+            snapshot = read_local_snapshot(
                 self.notices_path_var.get(),
                 label="notices",
                 maximum_bytes=MAX_NOTICES_FILE_BYTES,
@@ -1429,6 +1483,7 @@ def _desktop_smoke_test(
             return bottom
 
         for name, widget in (
+            ("CSV example action", app.save_csv_example_button),
             ("primary review action", app.run_button),
             ("review status", app.status_label),
             ("result queue", app.results_tree),

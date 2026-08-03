@@ -6,7 +6,7 @@ from datetime import date
 from pathlib import Path
 
 from tenderverdict.demo_data import demo_notices, demo_profile
-from tenderverdict.models import load_notices, load_profile
+from tenderverdict.models import load_notices, load_profile, render_notices_csv
 from tenderverdict.qualification import qualify_notices
 from tenderverdict.report import render_html, render_markdown, report_as_dict
 
@@ -23,6 +23,12 @@ class OfflinePipelineTests(unittest.TestCase):
         self.assertEqual(
             demo_notices(),
             json.loads((EXAMPLES / "notices.json").read_text(encoding="utf-8")),
+        )
+        csv_notices = load_notices(EXAMPLES / "notices.csv")
+        self.assertEqual([notice.to_dict() for notice in csv_notices], demo_notices())
+        self.assertEqual(
+            render_notices_csv(csv_notices),
+            (EXAMPLES / "notices.csv").read_text(encoding="utf-8"),
         )
 
     def test_demo_snapshots_are_reproducible(self) -> None:

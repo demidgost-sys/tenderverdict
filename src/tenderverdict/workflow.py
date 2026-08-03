@@ -57,7 +57,7 @@ def qualify_files(
     *,
     as_of: date,
 ) -> QualificationRun:
-    """Load validated local JSON files and run the canonical offline rules."""
+    """Load a JSON profile plus validated local CSV or JSON notices."""
 
     return qualify_inputs(
         load_profile(profile_path),

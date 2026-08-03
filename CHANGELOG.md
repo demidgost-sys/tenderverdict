@@ -14,6 +14,8 @@ identifiers and may change interfaces during the alpha period.
 - Added short-lived macOS arm64, macOS Intel, and Windows x64 developer-artifact builds.
 - Added bounded input snapshots and provenance checks so changed notices cannot export a stale
   report.
+- Added normalized UTF-8 CSV notice import with row-level validation, common spreadsheet delimiter
+  support, and an editable synthetic CSV example in the desktop preview.
 
 ### Changed
 
@@ -21,6 +23,7 @@ identifiers and may change interfaces during the alpha period.
 - Reworked the desktop preview into a focused two-pane workspace with clearer action hierarchy,
   semantic status feedback, readable verdict metrics, and structured notice explanations.
 - Added restrained light and dark palettes with tested text and status contrast.
+- Extended the shared offline workflow and CLI to accept explicit `.csv` or `.json` notice files.
 - Reworked the public README into a developer-focused project overview and corrected the macOS
   quick start to use `python3`.
 - Added GitHub issue and pull-request templates for reproducible, non-confidential feedback.

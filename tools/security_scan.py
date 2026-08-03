@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import re
 import sys
@@ -102,6 +104,29 @@ def _scan_json_synthetic_fields(relative: str, text: str, errors: list[str]) -> 
     walk(payload)
 
 
+def _scan_csv_synthetic_fields(relative: str, text: str, errors: list[str]) -> None:
+    if not relative.endswith(".csv"):
+        return
+    try:
+        reader = csv.DictReader(io.StringIO(text, newline=""), strict=True)
+        for row_number, row in enumerate(reader, start=2):
+            publication_number = row.get("publication_number")
+            if not publication_number or not publication_number.startswith("SYN-"):
+                errors.append(
+                    f"{relative}:{row_number}: committed publication_number must begin with SYN-"
+                )
+            source_url = row.get("source_url")
+            if source_url:
+                hostname = (urlparse(source_url).hostname or "").lower()
+                if not hostname.endswith(".example"):
+                    errors.append(
+                        f"{relative}:{row_number}: committed source_url must use a "
+                        "reserved .example host"
+                    )
+    except (csv.Error, UnicodeError) as error:
+        errors.append(f"{relative}: invalid CSV fixture ({error})")
+
+
 def _scan_text(relative: str, text: str, errors: list[str]) -> None:
     for pattern in SECRET_PATTERNS:
         if pattern.search(text):
@@ -146,6 +171,7 @@ def _scan_text(relative: str, text: str, errors: list[str]) -> None:
         errors.append(f"{relative}: maintainer identity differs from approved public form")
 
     _scan_json_synthetic_fields(relative, text, errors)
+    _scan_csv_synthetic_fields(relative, text, errors)
 
 
 def _scan_workflows(root: Path, files: list[str], errors: list[str]) -> None:

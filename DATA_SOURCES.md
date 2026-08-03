@@ -2,9 +2,10 @@
 
 ## Synthetic repository data
 
-All committed profile and notice fixtures are fictional. Synthetic notice identifiers begin with
-`SYN-`, and synthetic source links use reserved domains ending in `.example`. They are not
-procurement records and must not be presented as such.
+All committed profile and notice fixtures are fictional. The matching CSV and JSON examples contain
+the same normalized records. Synthetic notice identifiers begin with `SYN-`, and synthetic source
+links use reserved domains ending in `.example`. They are not procurement records and must not be
+presented as such.
 
 ## Optional TED Search API
 

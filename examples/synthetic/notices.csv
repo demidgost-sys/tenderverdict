@@ -1,0 +1,4 @@
+publication_number,notice_type,title,buyer,cpv_codes,countries,deadline,source_url
+SYN-OPEN-001,competition,Application maintenance services,Example City Procurement Office,72260000,AUT,2026-09-15,https://procurement.example/notices/SYN-OPEN-001
+SYN-WATCH-001,competition,Software support services,Example Regional Authority,72261000,DEU,2026-09-20,https://procurement.example/notices/SYN-WATCH-001
+SYN-REJECT-001,competition,Software implementation services,Example Federal Agency,72260000,AUT,2026-08-05,https://procurement.example/notices/SYN-REJECT-001

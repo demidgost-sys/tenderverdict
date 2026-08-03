@@ -193,7 +193,7 @@ jobs:
         run: >-
           "${RUNNER_TEMP}/tenderverdict-smoke/bin/tenderverdict" qualify
           --profile examples/synthetic/profile.json
-          --notices examples/synthetic/notices.json
+          --notices examples/synthetic/notices.csv
           --as-of 2026-08-02 --format json
           --output "${RUNNER_TEMP}/report.json"
 

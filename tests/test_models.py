@@ -7,11 +7,15 @@ from pathlib import Path
 
 from tenderverdict.models import (
     SchemaValidationError,
+    load_notices,
     load_profile,
     notice_from_dict,
+    notices_from_csv_bytes,
     notices_from_data,
+    notices_from_file_bytes,
     parse_iso_date,
     profile_from_dict,
+    render_notices_csv,
 )
 
 VALID_PROFILE = {
@@ -99,6 +103,61 @@ class NoticeValidationTests(unittest.TestCase):
     def test_notice_array_must_be_an_array(self) -> None:
         with self.assertRaisesRegex(SchemaValidationError, "JSON array"):
             notices_from_data({"publication_number": "SYN-001"})
+
+
+class CsvNoticeTests(unittest.TestCase):
+    HEADER = "publication_number,notice_type,title,buyer,cpv_codes,countries,deadline,source_url\n"
+    ROW = (
+        "SYN-CSV-001,competition,Synthetic service,Example Buyer,"
+        "72260000|72261000,AUT|DEU,2026-09-15,"
+        "https://procurement.example/notices/SYN-CSV-001\n"
+    )
+
+    def test_csv_accepts_utf8_bom_and_normalizes_lists(self) -> None:
+        notices = notices_from_csv_bytes(("\ufeff" + self.HEADER + self.ROW).encode())
+
+        self.assertEqual(len(notices), 1)
+        self.assertEqual(notices[0].publication_number, "SYN-CSV-001")
+        self.assertEqual(notices[0].cpv_codes, ("72260000", "72261000"))
+        self.assertEqual(notices[0].countries, ("AUT", "DEU"))
+
+    def test_csv_accepts_common_spreadsheet_delimiters(self) -> None:
+        for delimiter in (";", "\t"):
+            with self.subTest(delimiter=repr(delimiter)):
+                payload = (self.HEADER + self.ROW).replace(",", delimiter).encode()
+                notices = notices_from_csv_bytes(payload)
+                self.assertEqual(notices[0].publication_number, "SYN-CSV-001")
+
+    def test_csv_errors_name_the_row_and_fix(self) -> None:
+        bad_date = self.ROW.replace("2026-09-15", "2026-99-15")
+        with self.assertRaisesRegex(SchemaValidationError, r"CSV row 2: deadline"):
+            notices_from_csv_bytes((self.HEADER + bad_date).encode())
+
+        short_row = "SYN-CSV-001,competition\n"
+        with self.assertRaisesRegex(SchemaValidationError, r"row 2 has 2 columns; use exactly 8"):
+            notices_from_csv_bytes((self.HEADER + short_row).encode())
+
+    def test_csv_header_is_strict_and_actionable(self) -> None:
+        missing = self.HEADER.replace("deadline,", "")
+        with self.assertRaisesRegex(SchemaValidationError, r"add columns: deadline"):
+            notices_from_csv_bytes((missing + self.ROW).encode())
+
+        duplicate = self.HEADER.replace("source_url", "publication_number")
+        with self.assertRaisesRegex(SchemaValidationError, r"duplicate CSV columns"):
+            notices_from_csv_bytes((duplicate + self.ROW).encode())
+
+    def test_csv_requires_data_and_explicit_file_type(self) -> None:
+        with self.assertRaisesRegex(SchemaValidationError, "at least one notice row"):
+            notices_from_csv_bytes(self.HEADER.encode())
+        with self.assertRaisesRegex(SchemaValidationError, r"ending in \.csv or \.json"):
+            notices_from_file_bytes((self.HEADER + self.ROW).encode(), "notices.txt")
+
+    def test_csv_renderer_round_trips_through_file_loader(self) -> None:
+        notices = notices_from_csv_bytes((self.HEADER + self.ROW).encode())
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "notices.csv"
+            path.write_text(render_notices_csv(notices), encoding="utf-8")
+            self.assertEqual(load_notices(path), notices)
 
 
 class JsonAndDateTests(unittest.TestCase):

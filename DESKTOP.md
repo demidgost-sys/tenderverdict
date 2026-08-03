@@ -9,14 +9,17 @@ procurement, eligibility, or legal review.
 ## What the desktop preview does
 
 1. Enter a supplier name, CPV codes, countries, and a minimum lead time.
-2. Choose a local normalized notices JSON file, or use the bundled synthetic demo.
+2. Choose a local normalized notices CSV or JSON file, save an editable CSV example, or use the
+   bundled synthetic demo.
 3. Enter an explicit review date.
 4. Review the `open_documents`, `watch`, and `reject` results with their reasons, unknowns, and
    human next step.
 5. Export a complete HTML, Markdown, or JSON report to a location you choose.
 
-You can also load and save the small supplier profile as JSON. Changing any input invalidates the
-visible result and disables export until the review is run again.
+The file chooser validates notice data before accepting it and reports the failing CSV row when it
+can. The editable example contains only fictional `SYN-` rows and uses `|` between multiple CPV or
+country values. You can also load and save the small supplier profile as JSON. Changing any input
+invalidates the visible result and disables export until the review is run again.
 
 The preview uses a two-pane review workspace: setup stays on the left, while verdict totals, the
 notice queue, and a structured explanation stay visible on the right. The visual system follows the
@@ -32,6 +35,7 @@ by the preview. The same actions are discoverable in the native File and Review 
 - The desktop preview does not call the TED adapter or make another intentional network request.
 - Nothing is uploaded automatically.
 - Reports and profiles are written only after you choose a destination.
+- Saving the CSV example is explicit and atomic; it never overwrites a file after a failed write.
 - Failed validation or export does not intentionally replace an existing output with a partial
   file.
 
@@ -89,5 +93,5 @@ the artifacts are source-pinned and traceable, not claimed to be byte-for-byte r
 - Screen-reader support is not confirmed. In one source-runtime check on macOS, the Tk controls
   were not exposed reliably in the accessibility tree. Do not rely on this preview for a
   screen-reader workflow until packaged builds pass VoiceOver and NVDA testing.
-- This preview does not include automatic updates, an installer, drag and drop, full-document
-  parsing, or TED fetching.
+- This preview does not include automatic updates, an installer, drag and drop, arbitrary TED CSV
+  mapping, full-document parsing, or TED fetching.

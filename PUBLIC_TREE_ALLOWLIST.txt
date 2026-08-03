@@ -21,6 +21,7 @@ demo/index.html
 demo/screenshot.png
 docs/assets/tenderverdict-banner.svg
 examples/synthetic/expected-brief.md
+examples/synthetic/notices.csv
 examples/synthetic/notices.json
 examples/synthetic/profile.json
 packaging/THIRD_PARTY_NOTICES.md

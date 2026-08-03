@@ -11,6 +11,9 @@ from unittest.mock import patch
 from tenderverdict.cli import main
 from tenderverdict.ted import TedApiError
 
+ROOT = Path(__file__).resolve().parents[1]
+EXAMPLES = ROOT / "examples" / "synthetic"
+
 
 class CliTests(unittest.TestCase):
     def test_desktop_command_delegates_without_changing_cli_contract(self) -> None:
@@ -218,6 +221,41 @@ class CliTests(unittest.TestCase):
 
             self.assertEqual(exit_code, 2)
             self.assertIn("deadline", stderr.getvalue())
+            self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
+            self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
+
+    def test_invalid_csv_does_not_replace_existing_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            notices = root / "notices.csv"
+            output = root / "report.md"
+            notices.write_text(
+                "publication_number,notice_type,title,buyer,cpv_codes,countries,"
+                "deadline,source_url\n"
+                "SYN-BAD-CSV,competition,Synthetic,Example Buyer,72260000,AUT,"
+                "2026-99-01,https://procurement.example/notices/SYN-BAD-CSV\n",
+                encoding="utf-8",
+            )
+            output.write_text("keep-me\n", encoding="utf-8")
+            stderr = io.StringIO()
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main(
+                    [
+                        "qualify",
+                        "--profile",
+                        str(EXAMPLES / "profile.json"),
+                        "--notices",
+                        str(notices),
+                        "--as-of",
+                        "2026-08-02",
+                        "--output",
+                        str(output),
+                    ]
+                )
+
+            self.assertEqual(exit_code, 2)
+            self.assertIn("CSV row 2: deadline", stderr.getvalue())
             self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
             self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
 

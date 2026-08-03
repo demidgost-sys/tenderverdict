@@ -60,6 +60,13 @@ class WorkflowTests(unittest.TestCase):
             {"total": 3, "open_documents": 1, "watch": 1, "reject": 1},
         )
 
+        csv_run = qualify_files(
+            EXAMPLES / "profile.json",
+            EXAMPLES / "notices.csv",
+            as_of=date(2026, 8, 2),
+        )
+        self.assertEqual(csv_run, run)
+
     def test_write_run_is_atomic_and_rejects_unknown_format(self) -> None:
         run = demo_run()
         with tempfile.TemporaryDirectory() as directory:

@@ -32,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     demo_parser.set_defaults(handler=_run_demo)
 
     qualify_parser = subparsers.add_parser(
-        "qualify", help="qualify normalized notice metadata from local JSON files"
+        "qualify", help="qualify normalized notice metadata from local CSV or JSON files"
     )
     qualify_parser.add_argument("--profile", required=True, type=Path)
     qualify_parser.add_argument("--notices", required=True, type=Path)
