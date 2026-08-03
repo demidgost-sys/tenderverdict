@@ -197,7 +197,7 @@ def _scan_metadata(root: Path, errors: list[str]) -> None:
     pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
     project = pyproject.get("project", {})
     if project.get("dependencies") != []:
-        errors.append("pyproject.toml: runtime dependencies must remain empty for 0.1.0a1")
+        errors.append("pyproject.toml: runtime dependencies must remain empty")
     if project.get("requires-python") != ">=3.11":
         errors.append("pyproject.toml: requires-python must be >=3.11")
     if project.get("license") != "Apache-2.0":
@@ -233,12 +233,12 @@ def main(argv: list[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
     try:
         errors = scan(arguments.root)
-    except (OSError, TreeError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
-        print(f"SECURITY_SCAN_FAIL: {error}", file=sys.stderr)
+    except (OSError, TreeError, UnicodeDecodeError, tomllib.TOMLDecodeError) as scan_error:
+        print(f"SECURITY_SCAN_FAIL: {scan_error}", file=sys.stderr)
         return 1
     if errors:
-        for error in sorted(set(errors)):
-            print(f"SECURITY_SCAN_FAIL: {error}", file=sys.stderr)
+        for scan_error in sorted(set(errors)):
+            print(f"SECURITY_SCAN_FAIL: {scan_error}", file=sys.stderr)
         return 1
     print("SECURITY_SCAN_OK: no forbidden release markers detected")
     return 0

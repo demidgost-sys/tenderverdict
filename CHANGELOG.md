@@ -7,8 +7,17 @@ identifiers and may change interfaces during the alpha period.
 
 ## [Unreleased]
 
+### Added
+
+- Added an unreleased local desktop preview for editing supplier profiles, reviewing normalized
+  notices, inspecting explainable results, and exporting reports.
+- Added short-lived macOS arm64, macOS Intel, and Windows x64 developer-artifact builds.
+- Added bounded input snapshots and provenance checks so changed notices cannot export a stale
+  report.
+
 ### Changed
 
+- Moved the shared offline qualification and atomic output path behind a UI-neutral workflow.
 - Reworked the public README into a developer-focused project overview and corrected the macOS
   quick start to use `python3`.
 - Added GitHub issue and pull-request templates for reproducible, non-confidential feedback.

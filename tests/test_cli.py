@@ -13,6 +13,13 @@ from tenderverdict.ted import TedApiError
 
 
 class CliTests(unittest.TestCase):
+    def test_desktop_command_delegates_without_changing_cli_contract(self) -> None:
+        with patch("tenderverdict.desktop.main", return_value=0) as desktop_main:
+            exit_code = main(["desktop"])
+
+        self.assertEqual(exit_code, 0)
+        desktop_main.assert_called_once_with([])
+
     def test_demo_defaults_to_markdown_stdout(self) -> None:
         stdout = io.StringIO()
         with (

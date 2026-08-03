@@ -33,6 +33,7 @@ python tools/check_public_tree.py
 python tools/security_scan.py
 ruff check .
 ruff format --check .
+mypy
 ```
 
 Do not add files without also updating `PUBLIC_TREE_ALLOWLIST.txt`. Do not weaken a fail-closed check

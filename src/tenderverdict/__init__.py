@@ -9,7 +9,7 @@ from .models import (
 )
 from .qualification import qualify_notices
 
-__version__ = "0.1.0a1"
+__version__ = "0.2.0a1"
 
 __all__ = [
     "Notice",

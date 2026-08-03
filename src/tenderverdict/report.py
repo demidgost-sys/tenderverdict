@@ -210,7 +210,7 @@ def _counts(results: Sequence[QualificationResult]) -> dict[Verdict, int]:
 
 
 def _escape_markdown(value: str) -> str:
-    normalized = _normalize_untrusted_text(value)
+    normalized = normalize_display_text(value)
     normalized = escape_html(normalized, quote=False)
     normalized = normalized.replace("\\", "\\\\")
     for character in "`*_{}[]()#+-.!|>":
@@ -219,11 +219,11 @@ def _escape_markdown(value: str) -> str:
 
 
 def _escape_html_text(value: str) -> str:
-    return escape_html(_normalize_untrusted_text(value), quote=True)
+    return escape_html(normalize_display_text(value), quote=True)
 
 
-def _normalize_untrusted_text(value: str) -> str:
-    """Flatten structure and make terminal and bidi controls visible."""
+def normalize_display_text(value: str) -> str:
+    """Flatten structure and make terminal and bidi controls visible in any UI."""
 
     normalized: list[str] = []
     for character in value:

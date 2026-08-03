@@ -205,23 +205,52 @@ def notices_from_data(data: object) -> tuple[Notice, ...]:
 
 
 def load_profile(path: str | Path) -> Profile:
-    return profile_from_dict(_load_json(path))
+    payload = _load_json(path)
+    if not isinstance(payload, Mapping):
+        raise SchemaValidationError("profile must be a JSON object")
+    return profile_from_dict(payload)
 
 
 def load_notices(path: str | Path) -> tuple[Notice, ...]:
     return notices_from_data(_load_json(path))
 
 
+def profile_from_json_bytes(payload: bytes, source: str | Path = "profile") -> Profile:
+    """Decode and validate one UTF-8 profile snapshot."""
+
+    data = _decode_json_bytes(payload, source)
+    if not isinstance(data, Mapping):
+        raise SchemaValidationError("profile must be a JSON object")
+    return profile_from_dict(data)
+
+
+def notices_from_json_bytes(
+    payload: bytes,
+    source: str | Path = "notices",
+) -> tuple[Notice, ...]:
+    """Decode and validate one UTF-8 notices snapshot."""
+
+    return notices_from_data(_decode_json_bytes(payload, source))
+
+
 def _load_json(path: str | Path) -> object:
     source = Path(path)
     try:
-        with source.open("r", encoding="utf-8") as handle:
-            return json.load(
-                handle,
-                object_pairs_hook=_object_without_duplicate_keys,
-                parse_constant=_reject_nonfinite_number,
-            )
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        payload = source.read_bytes()
+    except OSError as exc:
+        raise SchemaValidationError(f"cannot read valid UTF-8 JSON from {source}") from exc
+    return _decode_json_bytes(payload, source)
+
+
+def _decode_json_bytes(payload: bytes, source: str | Path) -> object:
+    try:
+        text = payload.decode("utf-8")
+        return json.loads(
+            text,
+            object_pairs_hook=_object_without_duplicate_keys,
+            parse_constant=_reject_nonfinite_number,
+        )
+    except (UnicodeError, json.JSONDecodeError) as exc:
         raise SchemaValidationError(f"cannot read valid UTF-8 JSON from {source}") from exc
 
 

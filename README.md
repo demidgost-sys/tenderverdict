@@ -15,6 +15,7 @@
 
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
+  <a href="#desktop-preview">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
   <a href="#verdicts">Verdicts</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
@@ -37,8 +38,9 @@ It does not read full procurement documents or decide whether you should bid.
 | **Small footprint** | The installed package has no runtime dependencies. |
 
 > [!IMPORTANT]
-> `0.1.0a1` is a developer alpha. Interfaces and rules may change. Start with the bundled
-> synthetic example and avoid confidential inputs while evaluating it.
+> `v0.1.0-alpha.1` is the immutable CLI developer alpha. The `main` branch also contains an
+> unreleased `0.2.0a1` desktop preview. Interfaces and rules may change. Start with the bundled
+> synthetic example and avoid confidential inputs while evaluating either version.
 
 ## Quick start
 
@@ -69,6 +71,27 @@ py -m venv .venv
 
 Once installed, the demo is fully offline and returns exactly one example of each verdict.
 Installing from source may download the pinned build tool if it is not already cached.
+
+## Desktop preview
+
+The unreleased desktop preview on `main` removes the need to edit the supplier profile by hand. It
+provides labelled fields for the supplier criteria, a file chooser for normalized notices, an
+explicit review-date field, a result browser, and atomic HTML, Markdown, or JSON export.
+
+It uses the same deterministic workflow as the CLI. It does not upload data, fetch TED metadata,
+open source URLs automatically, or make a participation decision.
+
+```bash
+git clone https://github.com/demidgost-sys/tenderverdict.git
+cd tenderverdict
+python3 -m venv .venv
+.venv/bin/python -m pip install .
+.venv/bin/tenderverdict desktop
+```
+
+This source preview requires Python 3.11+ with Tk. Packaged macOS and Windows builds are CI-only,
+unsigned developer artifacts until they pass platform testing; they are not a public release. See
+[`DESKTOP.md`](DESKTOP.md) for the exact trust, privacy, build, and accessibility boundaries.
 
 ## Example output
 
@@ -159,6 +182,7 @@ python3 tools/check_public_tree.py
 python3 tools/security_scan.py
 ruff check .
 ruff format --check .
+mypy
 ```
 
 The functional test suite is offline; TED behaviour is tested with mocked HTTP responses.
