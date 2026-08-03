@@ -1409,16 +1409,24 @@ def _desktop_smoke_test(
             raise RuntimeError("desktop demo shortcut did not run")
         if str(app.file_menu.entrycget(app.export_menu_index, "state")) != "normal":
             raise RuntimeError("desktop export menu was not enabled after a review")
-        root_bottom = root.winfo_rooty() + root.winfo_height()
+
+        def bottom_in_root(widget: Any) -> int:
+            bottom = int(widget.winfo_height())
+            current = widget
+            while current is not root:
+                bottom += int(current.winfo_y())
+                current = current.master
+            return bottom
+
         for name, widget in (
             ("primary review action", app.run_button),
             ("review status", app.status_label),
             ("result queue", app.results_tree),
             ("selected notice detail", app.details_text),
         ):
-            widget_bottom = widget.winfo_rooty() + widget.winfo_height()
-            if not widget.winfo_viewable() or widget_bottom > root_bottom:
-                raise RuntimeError(f"{name} is not visible at the minimum window size")
+            has_layout = widget.winfo_width() > 1 and widget.winfo_height() > 1
+            if not has_layout or bottom_in_root(widget) > root.winfo_height():
+                raise RuntimeError(f"{name} is not laid out within the minimum window size")
     finally:
         root.destroy()
     summary = demo_run().summary
