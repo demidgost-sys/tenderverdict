@@ -824,12 +824,15 @@ def _desktop_smoke_test(
     root = tk.Tk()
     try:
         app = TenderVerdictApp(root, tk, ttk, filedialog, messagebox, tkfont)
-        root.update()
-        app.name_entry.focus_force()
-        root.update()
-        modifier = "Command" if root.tk.call("tk", "windowingsystem") == "aqua" else "Control"
-        app.name_entry.event_generate(f"<{modifier}-KeyPress-d>")
-        root.update()
+        root.update_idletasks()
+        modifier = "Command" if app._windowing_system == "aqua" else "Control"
+        if not root.bind_all(f"<{modifier}-KeyPress>"):
+            raise RuntimeError("desktop keyboard shortcuts are not registered")
+        keycode = 2 if app._windowing_system == "aqua" else 68
+        event = argparse.Namespace(keycode=keycode, keysym="d")
+        if app._handle_shortcut(event) != "break":
+            raise RuntimeError("desktop demo shortcut was not handled")
+        root.update_idletasks()
         if app._current_run is None:
             raise RuntimeError("desktop demo shortcut did not run")
     finally:

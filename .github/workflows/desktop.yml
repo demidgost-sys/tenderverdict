@@ -85,6 +85,9 @@ jobs:
           PYTHONPATH: src
         run: python -m unittest discover -s tests -v
 
+      - name: Smoke-test installed desktop source
+        run: python -m tenderverdict.desktop --smoke-test
+
       - name: Build native one-directory preview
         run: python tools/build_desktop.py
 
