@@ -829,7 +829,7 @@ class TenderVerdictApp:
         self.as_of_entry.grid(row=10, column=1, sticky="ew", padx=(6, 0), pady=(5, 0))
         self.ttk.Label(
             frame,
-            text="Date or RFC 3339 timestamp with UTC offset",
+            text="Date or RFC 3339 with UTC offset",
             style="Helper.TLabel",
             wraplength=330,
         ).grid(row=11, column=0, columnspan=2, sticky="w", pady=(5, 0))
