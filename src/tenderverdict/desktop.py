@@ -765,7 +765,7 @@ class TenderVerdictApp:
         )
         self.ttk.Label(
             frame,
-            text="Choose CSV or JSON, or run the demo. CSV example: File menu.",
+            text="Use CSV, JSON, or the offline demo.",
             style="CardDescription.TLabel",
             wraplength=330,
         ).grid(row=12, column=0, columnspan=2, sticky="w", pady=(4, 8))
