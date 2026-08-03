@@ -16,6 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProjectMetadataTests(unittest.TestCase):
+    def test_repository_text_checkout_is_cross_platform_deterministic(self) -> None:
+        attributes = (ROOT / ".gitattributes").read_text(encoding="ascii").splitlines()
+        self.assertIn("* text=auto eol=lf", attributes)
+        for pattern in ("*.icns binary", "*.ico binary", "*.png binary"):
+            self.assertIn(pattern, attributes)
+
     def test_versions_entry_points_and_dependency_boundary_match(self) -> None:
         metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         project = metadata["project"]

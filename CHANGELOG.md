@@ -48,6 +48,8 @@ identifiers and may change interfaces during the alpha period.
   macOS bundle metadata. Binary release checks now verify icon structure, PNG checksums, dimensions,
   and the absence of embedded metadata chunks. Generated sdist metadata is explicitly bounded and
   scanned instead of being deleted before validation.
+- Fixed text checkout to use LF on every platform so vocabulary and provenance digests remain
+  identical on Windows, macOS, and Linux.
 - Clarified the published CLI, unreleased source preview, short-lived native artifacts, and lack of
   a supported one-click desktop installation path across public documentation.
 
