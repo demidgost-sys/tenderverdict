@@ -26,7 +26,7 @@ body:
     attributes:
       label: Interface tested
       options:
-        - Packaged desktop preview
+        - Packaged desktop alpha
         - Desktop source preview
         - Command-line interface
         - Documentation or synthetic demo only
@@ -51,7 +51,15 @@ body:
         - label: Opened the synthetic example
         - label: Ran a qualification review
         - label: Filtered or inspected the result details
-        - label: Exported a Markdown or JSON report
+        - label: Exported an HTML, Markdown, or JSON report
+
+  - type: checkboxes
+    id: trust_boundary
+    attributes:
+      label: Operating-system trust boundary
+      description: Do not weaken system security settings for this test.
+      options:
+        - label: The archive opened without disabling Gatekeeper, SmartScreen, antivirus, or another security control
 
   - type: input
     id: completion_time

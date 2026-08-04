@@ -38,11 +38,13 @@ Input limits
 
 Trust boundary
 --------------
-This preview is not code-signed, notarized, or distributed through an app
-store. It is not an installer and does not update itself. If the operating
-system blocks it, use the source/CLI workflow or wait for a signed build.
+The macOS preview is not Developer ID-signed or notarized. The Windows preview
+is not Authenticode-signed. Neither archive is an installer or updates itself.
+If the operating system blocks it, use the source/CLI workflow or stop the
+test. Do not weaken an operating-system security control.
 
 Feedback
 --------
-Use the repository issue forms. Never attach confidential tender documents,
-credentials, personal data, or customer information.
+Use the repository issue forms or the opt-in release feedback issue. Never
+attach confidential tender documents, credentials, personal data, or customer
+information.

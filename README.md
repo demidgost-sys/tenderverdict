@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status for main"></a>
-  &nbsp;·&nbsp; <a href="https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.1.0-alpha.1">v0.1.0-alpha.1</a>
+  &nbsp;·&nbsp; <a href="https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.2.0-alpha.1">v0.2.0-alpha.1</a>
   &nbsp;·&nbsp; Python 3.11+
   &nbsp;·&nbsp; <a href="LICENSE">Apache-2.0</a>
 </p>
@@ -24,8 +24,8 @@
 </p>
 
 TenderVerdict is experimental open-source software for supplier-side pre-qualification of
-public-procurement **notice metadata**. The published alpha is a CLI and Python library; `main` also
-contains an unreleased desktop preview. You supply a company profile and structured notices;
+public-procurement **notice metadata**. The published developer alpha contains a CLI, Python
+library, and an unsigned local desktop preview. You supply a company profile and structured notices;
 TenderVerdict applies narrow, deterministic rules and produces a review queue with reasons,
 unresolved fields, and a human next step.
 
@@ -40,21 +40,21 @@ It does not read full procurement documents or decide whether you should bid.
 | **Small footprint** | The installed package has no runtime dependencies. |
 
 > [!IMPORTANT]
-> `v0.1.0-alpha.1` is the immutable CLI developer alpha. The `main` branch also contains an
-> unreleased `0.2.0a1` desktop preview. Interfaces and rules may change. Start with the bundled
-> synthetic example and avoid confidential inputs while evaluating either version.
+> `v0.2.0-alpha.1` is an unsigned developer alpha, not a consumer installer. Interfaces and rules
+> may change. Start with the bundled synthetic example, avoid confidential inputs, and do not
+> disable operating-system security controls to run an archive.
 
 ## Release status
 
 | Surface | Current state | Installation path |
 |---|---|---|
-| CLI and library | Published as `v0.1.0-alpha.1` | Versioned source tag below |
-| Desktop UI | Unreleased `0.2.0a1` source preview on `main` | Python 3.11+ with Tk |
-| Native desktop archives | Unsigned, short-lived CI artifacts | Maintainer evaluation only |
+| CLI and library | Published as `v0.2.0-alpha.1` | Versioned source tag below |
+| Desktop UI | Published developer alpha | Source with Tk or unsigned native archive |
+| macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
+| Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
 
-There is no supported one-click desktop installer, hosted service, account system, telemetry, or
-automatic update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates required before a
-desktop developer release.
+There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
+update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
 
 ## Quick start
 
@@ -64,7 +64,7 @@ isolated virtual environment.
 ### macOS or Linux
 
 ```bash
-git clone --branch v0.1.0-alpha.1 --depth 1 \
+git clone --branch v0.2.0-alpha.1 --depth 1 \
   https://github.com/demidgost-sys/tenderverdict.git
 cd tenderverdict
 python3 -m venv .venv
@@ -75,7 +75,7 @@ python3 -m venv .venv
 ### Windows PowerShell
 
 ```powershell
-git clone --branch v0.1.0-alpha.1 --depth 1 `
+git clone --branch v0.2.0-alpha.1 --depth 1 `
   https://github.com/demidgost-sys/tenderverdict.git
 cd tenderverdict
 py -m venv .venv
@@ -86,15 +86,17 @@ py -m venv .venv
 Once installed, the demo is fully offline and returns exactly one example of each verdict.
 Installing from source may download the pinned build tool if it is not already cached.
 
-## Desktop preview
+## Desktop developer alpha
 
-The unreleased desktop preview on `main` removes the need to edit the supplier profile by hand. It
+The desktop preview removes the need to edit the supplier profile by hand. It
 provides labelled fields for the supplier criteria, immediate validation for normalized CSV or
 JSON notice data, an editable CSV example, an explicit review point, verdict filters, sortable
 results, plain-text copy, and atomic HTML, Markdown, or JSON export.
 
 It uses the same deterministic workflow as the CLI. It does not upload data, fetch TED metadata,
 open source URLs automatically, or make a participation decision.
+
+Run it from source:
 
 ```bash
 git clone https://github.com/demidgost-sys/tenderverdict.git
@@ -104,10 +106,14 @@ python3 -m venv .venv
 .venv/bin/tenderverdict desktop
 ```
 
-This source preview requires Python 3.11+ with Tk. Packaged macOS and Windows builds are CI-tested,
-unsigned, short-lived developer artifacts; they are not a public release or a supported install
-path. See [`DESKTOP.md`](DESKTOP.md) for the exact trust, privacy, build, and accessibility
-boundaries.
+Or download the archive and matching `.sha256` file for `macos-arm64`, `macos-x64`, or
+`windows-x64` from the
+[`v0.2.0-alpha.1` prerelease](https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.2.0-alpha.1).
+Read `START_HERE.txt` and verify the checksum before extracting. These archives are unsigned:
+macOS lacks Developer ID signing and notarization, and Windows lacks Authenticode signing. If the
+operating system does not accept an archive normally, use the source workflow or stop the test;
+do not weaken Gatekeeper, SmartScreen, antivirus, or another security control. See
+[`DESKTOP.md`](DESKTOP.md) for the complete trust, privacy, build, and accessibility boundaries.
 
 ## Example output
 

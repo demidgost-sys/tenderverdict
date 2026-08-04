@@ -1,6 +1,6 @@
 # Desktop preview
 
-TenderVerdict `0.2.0a1` adds an unreleased desktop preview for macOS and Windows. It is a native,
+TenderVerdict `0.2.0a1` adds a desktop developer alpha for macOS and Windows. It is a native,
 local interface over the same deterministic qualification workflow used by the CLI.
 
 The preview is intended for evaluation. It is not a signed consumer release or a replacement for
@@ -8,12 +8,12 @@ procurement, eligibility, or legal review.
 
 ## Release status
 
-The source UI is part of the unreleased `0.2.0a1` code on `main`. Native macOS and Windows archives
-are built and smoke-tested by GitHub Actions, retained briefly, and intended for maintainer
-evaluation. They are not attached to a GitHub Release and are not a supported end-user install
-path.
+The source UI and unsigned native archives are published in the `v0.2.0-alpha.1` prerelease. Each
+archive has a matching checksum and an embedded `BUILD_INFO.txt`. The macOS arm64 packaged flow has
+completed hands-on evaluation. macOS Intel and Windows x64 pass native automated builds and frozen
+smoke tests; the Windows archive has not yet completed a hands-on run.
 
-The exact gates for a possible `v0.2.0-alpha.1` are listed in [ROADMAP.md](ROADMAP.md). Do not advise
+The exact release and follow-on evidence gates are listed in [ROADMAP.md](ROADMAP.md). Do not advise
 evaluators to disable Gatekeeper, SmartScreen, antivirus, or another operating-system security
 control to run an unsigned artifact.
 
@@ -97,7 +97,8 @@ python3 tools/build_desktop.py
 ```
 
 GitHub Actions builds separate developer artifacts for macOS arm64, macOS Intel, and Windows x64.
-They are short-lived CI artifacts, not GitHub Releases.
+The artifacts attached to `v0.2.0-alpha.1` are copied from the successful workflow for the tagged
+commit; ordinary branch and pull-request artifacts remain short-lived.
 
 Each archive is accompanied by a SHA-256 checksum and `BUILD_INFO.txt`, plus `START_HERE.txt` and
 synthetic example data inside the archive. Verify the checksum and manifest before a manual test,
@@ -134,7 +135,7 @@ artifacts remain source-pinned and traceable rather than claimed to be byte-for-
 - The macOS previews do not have Developer ID signing or Apple notarization. PyInstaller may apply
   an ad-hoc signature during assembly, which is not the same trust level.
 - The Windows preview is not code-signed and may trigger reputation-based warnings.
-- Do not redistribute a CI artifact as a trusted installer.
+- Do not represent a prerelease or CI artifact as a trusted installer.
 - The interface uses labelled native controls, visible and focusable status text, keyboard
   traversal, clear focus treatment, filters, sortable headings, and explicit copy/open/save
   actions. Packaged keyboard behaviour still requires hands-on verification on each target.
