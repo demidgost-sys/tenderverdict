@@ -45,6 +45,8 @@ test. Do not weaken an operating-system security control.
 
 Feedback
 --------
-Use the repository issue forms or the opt-in release feedback issue. Never
-attach confidential tender documents, credentials, personal data, or customer
-information.
+Use the opt-in release feedback issue:
+https://github.com/demidgost-sys/tenderverdict/issues/9
+
+Never attach confidential tender documents, credentials, personal data, or
+customer information.

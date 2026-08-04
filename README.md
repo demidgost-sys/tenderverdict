@@ -115,6 +115,10 @@ operating system does not accept an archive normally, use the source workflow or
 do not weaken Gatekeeper, SmartScreen, antivirus, or another security control. See
 [`DESKTOP.md`](DESKTOP.md) for the complete trust, privacy, build, and accessibility boundaries.
 
+Completed an independent packaged run? Share the target, commit, completed steps, and first blocker
+in the opt-in [desktop feedback issue](https://github.com/demidgost-sys/tenderverdict/issues/9).
+Use only synthetic, public, or fully de-identified material.
+
 ## Example output
 
 | Verdict | Why it appears | Human next step |
