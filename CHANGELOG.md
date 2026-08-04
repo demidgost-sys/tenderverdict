@@ -36,6 +36,8 @@ identifiers and may change interfaces during the alpha period.
 - Added complete native result-contract validation for totals, identities, ordered shared notices,
   and byte-stable portfolio consumption, plus a competition scorecard grounded in official rules
   and recent winner patterns.
+- Added a canonical project-status ledger that separates local implementation progress, final
+  submission readiness, verified evidence, previous-plan completion, and open owner gates.
 
 ### Changed
 

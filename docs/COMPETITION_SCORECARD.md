@@ -1,12 +1,17 @@
 # Shipaton 2026 competition scorecard
 
-- Rechecked: 2026-08-04
+- Rechecked: 2026-08-05
 - Scope: Next Gen Award, macOS submission path
 - Decision rule: verified evidence is separated from inference and open owner gates
 
 This scorecard converts the public judging criteria and recurring winner patterns into product
 decisions. It does not predict a result, claim private judge preferences, or replace the controlling
 [evidence record](SHIPATON_EVIDENCE.md).
+
+The measurable progress ledger is maintained separately in
+[PROJECT_STATUS.md](PROJECT_STATUS.md): 19 of 22 local implementation milestones are complete and
+7 of 12 final-submission gates are ready. This scorecard explains quality and strategic fit; the
+ledger prevents those judgments from being confused with verified completion.
 
 ## Public judges and judging contract
 
@@ -67,15 +72,15 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 
 ### Next product work before calling the app release-ready
 
-| Priority | Improvement | Why it matters | Acceptance evidence |
-|---|---|---|---|
-| P1 | Native profile builder and editor | Removes the largest onboarding obstacle: hand-authoring workspace JSON | Create, rename, reorder, validate, and save 1–5 local profiles without leaving the app |
-| P1 | Local workspace continuity | Makes repeated supplier review feel like a product, not a one-off demo | Explicitly saved recent workspace; no silent upload or hidden telemetry; clear reset action |
-| P1 | Real-user workflow pass | Tests whether verdict wording and comparison actually reduce review work | Three opt-in sessions and two documented workflow changes using public, synthetic, or de-identified data |
-| P1 | Complete accessibility pass | Converts native semantics into verified usability | VoiceOver async announcements, Increase Contrast, Reduce Transparency, and large-text checks |
-| P2 | Notice search and buyer/deadline filters | Helps only after realistic files exceed the three-row demo | Tested with a bounded 100+ notice fixture; keyboard and screen-reader usable |
-| P2 | Profile-focused drill-down | Lets a user move from comparison to evidence without losing context | Selecting a matrix cell opens the matching notice reasoning for that profile |
-| P2 | Saved local export presets | Reduces repeated export friction without creating accounts | User-controlled destination and format choice; atomic writes and recovery tests remain intact |
+| Priority | Improvement | Current state | Why it matters | Acceptance evidence |
+|---|---|---|---|---|
+| P1 | Complete accessibility pass | `PARTIAL` | Converts native semantics into verified usability | VoiceOver async announcements, Increase Contrast, Reduce Transparency, and large-text checks |
+| P1 | Real-user workflow pass | `OPEN` | Tests whether verdict wording and comparison actually reduce review work | Three opt-in sessions and two documented workflow changes using public, synthetic, or de-identified data |
+| P1 | Native profile builder and editor | `EVIDENCE_GATED` | Removes hand-authored JSON only if users confirm it is the main obstacle | Create, rename, reorder, validate, and save 1–5 local profiles without leaving the app |
+| P1 | Local workspace continuity | `OPEN` | Makes repeated supplier review feel like a product, not a one-off demo | Explicitly saved recent workspace; no silent upload or hidden telemetry; clear reset action |
+| P2 | Notice search and buyer/deadline filters | `FIXTURE_GATED` | Helps only after realistic files exceed the three-row demo | Tested with a bounded 100+ notice fixture; keyboard and screen-reader usable |
+| P2 | Profile-focused drill-down | `PARTIAL` | Lets a user move from comparison to evidence without losing context | Selecting a matrix cell opens the matching notice reasoning for that profile |
+| P2 | Saved local export presets | `OPEN` | Reduces repeated export friction without creating accounts | User-controlled destination and format choice; atomic writes and recovery tests remain intact |
 
 Do not add cross-profile ranking, bid automation, confidential-document ingestion, hosted accounts,
 analytics, or production billing merely to look larger. None fixes the current proof gap, and each
@@ -86,7 +91,7 @@ would widen the trust and delivery surface.
 The project is not ready for an external release or final Devpost submission until all of these are
 true:
 
-- the complete Python, Swift, package, public-tree, and security checks pass on one clean commit;
+- the complete Python, Swift, package, public-tree, and security checks pass on the final candidate;
 - the final self-contained app passes launch, local-file run, result review, source link, export,
   failure retention, and entitlement recovery checks;
 - the student and academic-email requirement is confirmed in the entrant account;
@@ -99,6 +104,9 @@ The unauthenticated Devpost project page currently stops at registration, so thi
 not pretend that private form fields have been verified. Publicly documented description, source,
 video, icon, screenshot, platform, and eligibility requirements are already tracked in the
 [runbook](HACKATHON_RUNBOOK.md).
+
+The same gate set already passed on clean pushed implementation baseline `33dbe87`; it must be
+repeated on any later final candidate rather than treated as permanently inherited evidence.
 
 ## Owner inputs — later, not required for this implementation pass
 

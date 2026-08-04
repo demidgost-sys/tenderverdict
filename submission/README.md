@@ -2,6 +2,8 @@
 
 This directory contains public, synthetic-only entry materials. It must never contain a RevenueCat
 key, account screenshot, private identifier, confidential notice, or unsupported transaction claim.
+Overall implementation and submission progress is recorded in
+[`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md).
 
 | Asset | Status | Contract |
 |---|---|---|

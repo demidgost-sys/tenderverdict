@@ -4,6 +4,11 @@ This roadmap records the intended evaluation sequence for TenderVerdict. It is n
 dates, support, compatibility, or continued development. A milestone advances only after its
 documented evidence gates pass.
 
+The current measured snapshot and the reconciliation with earlier plans live in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). As of 2026-08-05, 19 of 22 local Shipaton
+implementation milestones are complete and 7 of 12 final-submission gates are ready. The counts
+are a progress ledger, not a probability of winning or a public-release claim.
+
 ## Current state
 
 | Surface | State | Intended user |
@@ -101,16 +106,19 @@ sufficient for the store-exempt Next Gen path, so that interpretation remains a 
 
 The remaining order is:
 
-1. finish the review-queue/comparison QA pass and run every repository gate on one clean commit;
-2. verify asynchronous RevenueCat announcements plus Increase Contrast, Reduce Transparency, and
+1. verify asynchronous RevenueCat announcements plus Increase Contrast, Reduce Transparency, and
    large-text behavior without embedding a usable key;
-3. run three opt-in workflow sessions and convert observed friction into bounded product changes;
-4. implement a native local profile builder if those sessions confirm JSON authoring is the main
+2. run three opt-in workflow sessions and convert observed friction into bounded product changes;
+3. implement a native local profile builder if those sessions confirm JSON authoring is the main
    onboarding obstacle;
-5. verify the organizer answer and the entrant's student/email eligibility;
-6. inspect the exact private Devpost fields after the owner joins and signs in;
-7. only after owner approval, prepare the public demo and complete the final evidence and
+4. verify the organizer answer and the entrant's student/email eligibility;
+5. inspect the exact private Devpost fields after the owner joins and signs in;
+6. only after owner approval, prepare the public demo and complete the final evidence and
    logged-out-link audit.
+
+The previous first step is complete: the review queue, comparison matrix, safe-link behavior,
+native contract checks, hands-on UX pass, and full repository gate set passed on clean pushed
+implementation commit `33dbe87f928575dd168b64e6a10022cf79d1d000`.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.

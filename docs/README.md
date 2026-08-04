@@ -8,6 +8,7 @@ and Shipaton Next Gen work.
 
 | Need | Document |
 |---|---|
+| See what is finished, why it matters, and how readiness is counted | [Project status](PROJECT_STATUS.md) |
 | Understand the product and choose a surface | [User guide](USER_GUIDE.md) |
 | Understand components, contracts, and trust boundaries | [Architecture](ARCHITECTURE.md) |
 | Build, test, and package the macOS app | [Next Gen macOS README](../macos/TenderVerdictNextGen/README.md) |

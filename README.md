@@ -21,6 +21,7 @@
   <a href="#next-gen-macos-app">Next Gen macOS</a> ·
   <a href="#verdicts">Verdicts</a> ·
   <a href="docs/README.md">Docs</a> ·
+  <a href="docs/PROJECT_STATUS.md">Status</a> ·
   <a href="ROADMAP.md">Roadmap</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
   <a href="CONTRIBUTING.md">Contributing</a>
@@ -60,6 +61,11 @@ It does not read full procurement documents or decide whether you should bid.
 
 There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
 update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
+
+The verified competition snapshot is **19 of 22 local implementation milestones complete** and
+**7 of 12 final-submission gates ready**. These are transparent checklist counts, not a winning
+probability or a public-release claim. See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for
+the completed capability map, evidence baseline, old-plan reconciliation, and remaining order.
 
 ## Quick start
 

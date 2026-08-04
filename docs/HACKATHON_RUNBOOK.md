@@ -2,6 +2,8 @@
 
 This runbook turns the repository into a competition submission without upgrading unverified facts
 into claims. The controlling evidence record is [SHIPATON_EVIDENCE.md](SHIPATON_EVIDENCE.md).
+Current implementation and submission counts are tracked in
+[PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## Official submission gates
 
@@ -139,8 +141,9 @@ capture. Never use a fake entitlement state as evidence.
 - [ ] Devpost participation uses the qualifying academic email and student status is current.
 - [ ] Exact private Devpost fields are inspected after joining; required public claims and assets
   agree with the final repository state.
-- [ ] Public branch contains all source, assets, instructions, and the Apache-2.0 license.
-- [ ] CI passes on the submitted revision.
+- [x] Public draft branch contains the current source, assets, instructions, and Apache-2.0 license.
+- [x] All 18 required PR checks pass on pushed implementation baseline `33dbe87`.
+- [ ] CI passes again on the exact final submitted revision.
 - [x] Packaged `.app` checksum, signature, smoke test, and hands-on local-file flow pass.
 - [x] Test Store success, cancel, failure, retry, relaunch, restore, and dashboard evidence is
   recorded locally.

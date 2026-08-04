@@ -3,13 +3,17 @@
 - Overall status: **CONDITIONAL — TEST STORE FLOW VERIFIED; PUBLIC VIDEO AND SUBMISSION GATES OPEN**
 - RevenueCat-independent Portfolio Workspace: **IMPLEMENTED LOCALLY**
 - RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED AND TEST STORE-VERIFIED**
-- Evidence rechecked: **2026-08-04**
+- Repository evidence rechecked: **2026-08-05**
+- Official sources last rechecked: **2026-08-04**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Base before competition changes: `2f4f3855fbc9c7263f8822ace0b6b661ca959ab3`
 
 This file separates official rules, repository evidence, owner-attested actions, technical
 feasibility, and facts that remain unknown. It is not proof of eligibility or a Devpost
 submission.
+
+The countable implementation and submission snapshot is maintained in
+[PROJECT_STATUS.md](PROJECT_STATUS.md). It does not replace this evidence classification.
 
 ## Current decision
 
@@ -31,9 +35,9 @@ directed the build work to continue without waiting for one. The repository now 
 complete local product path: SwiftUI inputs, exact official SDK pin, canonical JSON adapter,
 fail-closed RevenueCat access client, embedded offline runtime, reproducible Release and Debug
 `.app` builders, actionable Free review queue, Premium notice-by-profile comparison, competition
-assets, and local Test Store evidence. No usable key, customer
-identifier, or account screenshot is retained. A public video, academic-email verification, public
-branch update, and Devpost submission remain open.
+assets, and local Test Store evidence. No usable key, customer identifier, or account screenshot is
+retained. The implementation revision is pushed to a public draft branch and all 18 PR checks pass.
+A public video, academic-email verification, private Devpost audit, and submission remain open.
 
 ## Requirement matrix
 
@@ -43,7 +47,7 @@ branch update, and Devpost submission remain open.
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
 | Student and academic email | `owner_attested_required` | Active enrollment and the exact Devpost email are entrant-specific and were not verified by this code audit. | `OWNER_CHECK` |
-| Public functional repository | `official_rule` + `repository_evidence` | The Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and local packaged smoke/UX/Test Store evidence are present. The new evidence is local until intentionally pushed. | `LOCAL_READY` |
+| Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Implementation baseline `33dbe87` is pushed and its 18 PR checks pass. | `PUBLIC_DRAFT_READY` |
 | Supported platform | `official_rule` | macOS is explicitly allowed by the rules and FAQ. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` + `observed_test_store` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_sdk` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements. | `CONFIRMED_TECHNICALLY` |
@@ -184,14 +188,14 @@ artifacts are stored in `submission/evidence/`; neither image contains a key or 
 
 The owner has elected not to wait for an organizer response. The remaining minimum is:
 
-1. repeat all local release gates on the review-queue revision and retain the clean commit SHA;
-2. complete the remaining accessibility settings and asynchronous-announcement checks;
+1. complete the remaining accessibility settings and asynchronous-announcement checks;
+2. run three opt-in workflow sessions and turn observed friction into bounded changes;
 3. inspect the exact private Devpost fields after the owner signs in and joins;
 4. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
    verified duration below two minutes;
 5. confirm active-student status and complete Devpost with the qualifying academic email;
-6. intentionally publish the evidence revision, verify the public repository and video while
-   logged out, and then complete the Devpost submission;
+6. verify the final public repository and video while logged out, and then complete the Devpost
+   submission;
 7. disclose the unresolved Test Store-only interpretation accurately and never claim a real
    payment, App Store transaction, or organizer approval.
 
@@ -235,5 +239,6 @@ this does not convert the unresolved interpretation into an official answer.
 - Devpost organizer question: **sent according to the owner; response not verified**.
 - Account registration email confirmation: **not completed; the observed verification messages
   contained a literal `{link}` placeholder, and the owner directed work to continue without it**.
-- Submission gate: **open on student/academic-email confirmation, intentional public branch update,
-  public sub-two-minute video, and final logged-out URL checks**.
+- Public implementation branch and CI: **pushed and green on baseline `33dbe87`**.
+- Submission gate: **open on student/academic-email confirmation, private Devpost audit, public
+  sub-two-minute video, organizer-risk handling, and final logged-out URL checks**.
