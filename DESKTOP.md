@@ -98,7 +98,8 @@ python3 tools/build_desktop.py
 
 GitHub Actions builds separate developer artifacts for macOS arm64, macOS Intel, and Windows x64.
 The artifacts attached to `v0.2.0-alpha.1` are copied from the successful workflow for the tagged
-commit; ordinary branch and pull-request artifacts remain short-lived.
+commit and record `public_release=true` in `BUILD_INFO.txt`; ordinary branch and pull-request
+artifacts remain short-lived and record `public_release=false`.
 
 Each archive is accompanied by a SHA-256 checksum and `BUILD_INFO.txt`, plus `START_HERE.txt` and
 synthetic example data inside the archive. Verify the checksum and manifest before a manual test,

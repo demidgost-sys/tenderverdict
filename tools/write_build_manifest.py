@@ -77,10 +77,17 @@ def main(argv: list[str] | None = None) -> int:
         choices=("adhoc", "not-signed"),
     )
     parser.add_argument("--ci", action="store_true")
+    parser.add_argument(
+        "--public-release",
+        action="store_true",
+        help="record that this CI artifact is intended for a public prerelease",
+    )
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)
 
     try:
+        if args.public_release and not args.ci:
+            raise ValueError("--public-release requires --ci provenance")
         provenance = _validate_environment(args.target, args.signature_state, ci=args.ci)
     except ValueError as exc:
         print(f"BUILD_MANIFEST_FAIL: {exc}", file=sys.stderr)
@@ -95,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
         for package in (*BUILD_PACKAGES, *platform_packages)
     )
     lines = [
-        "TenderVerdict desktop developer artifact",
+        "TenderVerdict desktop developer alpha artifact",
         f"target={args.target}",
         f"commit={provenance['commit']}",
         f"tenderverdict={__version__}",
@@ -113,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
         f"signature_state={args.signature_state}",
         "developer_id_signed=false",
         "notarized=false",
-        "public_release=false",
+        f"public_release={str(args.public_release).lower()}",
         "",
     ]
     try:

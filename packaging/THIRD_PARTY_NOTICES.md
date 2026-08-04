@@ -30,6 +30,8 @@ names, or trademarks.
 ## Release boundary
 
 The CI manifest records the exact Python, Tcl/Tk, and PyInstaller versions used for each artifact.
-Before any public desktop release, the extracted target bundle and the license files supplied by
-that target toolchain must be reviewed again. This notice is not a claim that an unsigned CI
-artifact is ready for redistribution.
+A workflow-dispatch build intended for a public prerelease records `public_release=true`; ordinary
+pull-request artifacts record `public_release=false`. This field records distribution intent, not
+code-signing, notarization, support, or security status. Before each public desktop prerelease, the
+extracted target bundle and the license files supplied by that target toolchain must be reviewed
+again.

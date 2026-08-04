@@ -63,6 +63,12 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn("GITHUB_SHA must be a full lowercase 40-character commit SHA", manifest)
         self.assertIn("desktop_build_lock_sha256=", manifest)
         self.assertIn("build_tools=", manifest)
+        self.assertIn('f"public_release={str(args.public_release).lower()}"', manifest)
+        self.assertIn("--public-release requires --ci provenance", manifest)
+        workflow = (ROOT / ".github" / "workflows" / "desktop.yml").read_text(encoding="utf-8")
+        self.assertIn("release_args+=(--public-release)", workflow)
+        self.assertIn('$releaseArgs += "--public-release"', workflow)
+        self.assertIn('github.event_name }}" == "workflow_dispatch"', workflow)
 
     def test_bundled_vocabularies_match_source_metadata(self) -> None:
         data = ROOT / "src" / "tenderverdict" / "data"
