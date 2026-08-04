@@ -144,6 +144,8 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn("--smoke-test", next_gen_builder)
         self.assertIn('"codesign", "--verify"', next_gen_builder)
         self.assertIn("api_key_included=false", next_gen_builder)
+        self.assertIn('choices=("debug", "release")', next_gen_builder)
+        self.assertIn('f"build_configuration={configuration}"', next_gen_builder)
 
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()

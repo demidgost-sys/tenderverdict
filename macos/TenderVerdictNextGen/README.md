@@ -90,6 +90,18 @@ The package pins the official Apple SDK to `5.83.0` and the resolved revision to
 4. verify offering, cancel, failure, success, relaunch/refresh, and restore states on the packaged
    app.
 
+RevenueCat intentionally rejects a Test Store key in a Release build. Build the local transaction
+evidence app with the same reproducible packager in Debug configuration:
+
+```bash
+.venv-build/bin/python tools/build_next_gen.py \
+  --configuration debug \
+  --output-dir dist/next-gen-debug \
+  --build-root build/next-gen-debug
+```
+
+The normal builder default remains `release`; never submit a Test Store key inside either bundle.
+
 The environment variable `REVENUECAT_TEST_STORE_API_KEY` remains available for controlled local
 automation. Never commit, log, screenshot, or publish a usable key.
 

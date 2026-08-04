@@ -1,8 +1,8 @@
 # Shipaton 2026 Next Gen evidence and implementation gate
 
-- Overall status: **CONDITIONAL — PACKAGED APP VERIFIED; TEST STORE EVIDENCE BLOCKED**
+- Overall status: **CONDITIONAL — TEST STORE FLOW VERIFIED; PUBLIC VIDEO AND SUBMISSION GATES OPEN**
 - RevenueCat-independent Portfolio Workspace: **IMPLEMENTED LOCALLY**
-- RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED, NOT TRANSACTION-VERIFIED**
+- RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED AND TEST STORE-VERIFIED**
 - Evidence rechecked: **2026-08-04**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Base before competition changes: `2f4f3855fbc9c7263f8822ace0b6b661ca959ab3`
@@ -13,11 +13,11 @@ submission.
 
 ## Current decision
 
-The store-exempt Next Gen path is technically plausible but not cleared for a qualifying
-transaction claim. Official materials require every Project to use the RevenueCat SDK for a
-purchase or ads. They confirm that Next Gen entrants can submit public source and a video without a
-store release or paid developer account, but they do not explicitly say that a Test Store-only
-purchase satisfies the Project requirement.
+The store-exempt Next Gen path is implemented and transaction-verified through RevenueCat Test
+Store, but it is not represented here as organizer-approved eligibility. Official materials require
+every Project to use the RevenueCat SDK for a purchase or ads. They confirm that Next Gen entrants
+can submit public source and a video without a store release or paid developer account, but they do
+not explicitly say that a Test Store-only purchase satisfies the Project requirement.
 
 RevenueCat documents Test Store as a real SDK test flow: it can return offerings, simulate purchase
 outcomes, update `CustomerInfo`, and activate entitlements without a real charge. Shipaton lists a
@@ -26,11 +26,13 @@ purchase. That proves the technical path and milestone, not the unresolved eligi
 interpretation.
 
 The owner reports that the exact clarification question below was sent through Devpost. No written
-organizer answer or public response URL has been verified in this repository. The repository now
-contains the complete local product path: SwiftUI inputs, exact official SDK pin, canonical JSON
-adapter, fail-closed RevenueCat access client, embedded offline runtime, reproducible `.app`
-builder, competition icon, and correctly sized pre-transaction screenshot. RevenueCat dashboard
-configuration, a usable key, any purchase or restore, and a submission claim remain blocked.
+organizer answer or public response URL has been verified in this repository, and the owner has
+directed the build work to continue without waiting for one. The repository now contains the
+complete local product path: SwiftUI inputs, exact official SDK pin, canonical JSON adapter,
+fail-closed RevenueCat access client, embedded offline runtime, reproducible Release and Debug
+`.app` builders, competition assets, and local Test Store evidence. No usable key, customer
+identifier, or account screenshot is retained. A public video, academic-email verification, public
+branch update, and Devpost submission remain open.
 
 ## Requirement matrix
 
@@ -40,12 +42,12 @@ configuration, a usable key, any purchase or restore, and a submission claim rem
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
 | Student and academic email | `owner_attested_required` | Active enrollment and the exact Devpost email are entrant-specific and were not verified by this code audit. | `OWNER_CHECK` |
-| Public functional repository | `official_rule` + `repository_evidence` | The Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and local packaged smoke/UX evidence are present. RevenueCat transaction evidence is not. | `PARTIAL` |
+| Public functional repository | `official_rule` + `repository_evidence` | The Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and local packaged smoke/UX/Test Store evidence are present. The new evidence is local until intentionally pushed. | `LOCAL_READY` |
 | Supported platform | `official_rule` | macOS is explicitly allowed by the rules and FAQ. | `CONFIRMED` |
-| RevenueCat is substantive | `official_rule` | The SDK must power at least one purchase or ads; documentation alone and the Python portfolio core do not satisfy this. | `BLOCKER` |
+| RevenueCat is substantive | `official_rule` + `observed_test_store` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_sdk` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements. | `CONFIRMED_TECHNICALLY` |
-| Test Store-only eligibility | `UNKNOWN` | No checked rule, Next Gen page, FAQ, or resource page explicitly says Test Store-only is sufficient for the submission requirement. | `BLOCKER` |
-| Required submission media | `official_rule` + `repository_evidence` | The 1024×1024 icon and an honest pre-transaction 1179×2556 screenshot are committed and structure-checked. A public YouTube/Vimeo demo under two minutes and genuine unlocked capture remain. | `PARTIAL` |
+| Test Store-only eligibility | `UNKNOWN` | No checked rule, Next Gen page, FAQ, or resource page explicitly says Test Store-only is sufficient for the submission requirement. Work proceeds by owner direction, without claiming organizer approval. | `DISCLOSED_RISK` |
+| Required submission media | `official_rule` + `repository_evidence` | The 1024×1024 icon and honest pre-transaction 1179×2556 screenshot are structure-checked. A genuine 1020×754 unlocked supplemental capture is recorded. A public YouTube/Vimeo demo under two minutes remains. | `PARTIAL` |
 
 ## Official sources checked
 
@@ -157,24 +159,41 @@ ran them through the embedded core, exported JSON, and matched the CLI output by
 invalid review point produced exit status 2 while preserving the previous valid report. Missing
 configuration and an `appl_` fixture both stayed fail-closed. See [UX_AUDIT.md](UX_AUDIT.md).
 
+The Test Store evidence pass used the separately packaged Debug app because RevenueCat deliberately
+rejects Test Store keys in Release builds. The key was pasted only into the process-local secure
+field and was not logged, captured, bundled, or committed. The current offering loaded with a
+localized `0,99 $` monthly package. Cancellation kept the app locked; simulated failure produced a
+retry state and remained locked; success activated `supplier_profiles_plus` and revealed all three
+profile reports. Relaunch required re-entering the process-local key and then recovered the same
+active entitlement without a second purchase. `restorePurchases()` preserved unlocked access, and
+the RevenueCat dashboard showed the corresponding sandbox subscription. The anonymous customer
+identifier was deliberately not recorded.
+
+With VoiceOver enabled, the native accessibility tree exposed distinct names and states for the
+inputs, review point, demo, export, and restore controls. Keyboard focus followed the logical order
+and skipped the disabled Run button. Restore was activated through the VoiceOver command and the
+entitlement remained active. VoiceOver was switched off again after the pass. Supplemental local
+artifacts are stored in `submission/evidence/`; neither image contains a key or customer identifier.
+
 ## Remaining evidence path
 
-If the organizer confirms Test Store-only eligibility, the remaining minimum is:
+The owner has elected not to wait for an organizer response. The remaining minimum is:
 
-1. sign in to RevenueCat and create the matching Test Store entitlement, product, package, and
-   offering outside the repository;
-2. supply the key only in the process-local secure field or controlled launch environment;
-3. verify offering load, success, cancellation, failure, restore, relaunch, stale access, and
-   missing/offline configuration hands-on;
-4. replace or supplement the pre-transaction screenshot with genuine unlocked evidence;
-5. record and publish the required sub-two-minute public video and final evidence record.
+1. repeat all local release gates on the evidence revision and retain the clean commit SHA;
+2. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
+   verified duration below two minutes;
+3. confirm active-student status and complete Devpost with the qualifying academic email;
+4. intentionally publish the evidence revision, verify the public repository and video while
+   logged out, and then complete the Devpost submission;
+5. disclose the unresolved Test Store-only interpretation accurately and never claim a real
+   payment, App Store transaction, or organizer approval.
 
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted
 backend, account system, telemetry, and a rewrite of the verdict engine remain out of scope.
 
 The previous active-hour estimate is no longer treated as an authoritative ledger: the Portfolio
-Workspace, native application, packaging, and local submission assets are now complete, while the
-organizer answer, interactive Test Store setup, transaction evidence, and public video remain.
+Workspace, native application, packaging, interactive Test Store setup, transaction evidence, and
+local submission assets are complete, while the public video and final submission gates remain.
 Remaining work must be re-estimated from a verified timer state before claiming compliance with any
 owner-imposed active-hour cap.
 
@@ -186,7 +205,8 @@ owner-imposed active-hour cap.
 > shows a Test Store purchase changing an entitlement-backed UI state, with no App Store product,
 > real-store API call, or real payment?
 
-No organizer answer has been verified as of the evidence date.
+No organizer answer has been verified as of the evidence date. Work continues by owner direction;
+this does not convert the unresolved interpretation into an official answer.
 
 ## Current stop record
 
@@ -196,12 +216,17 @@ No organizer answer has been verified as of the evidence date.
 - Self-contained macOS `.app`: **built, ad-hoc-signature-verified, and embedded-core-smoke-tested**.
 - Native choose/run/export flow: **hands-on verified with exact CLI byte equality**.
 - Competition icon and pre-transaction screenshot: **generated and exact-dimension validated**.
-- RevenueCat project, offering, product, or dashboard configuration: **not created**.
-- RevenueCat API key committed or configured: **no**.
-- Real or Test Store purchase: **not performed**.
-- Entitlement or restore flow: **not performed**.
+- RevenueCat Test Store project, offering, product, package, entitlement, and SDK key: **created and
+  hands-on verified outside the repository**.
+- RevenueCat API key committed, bundled, logged, or retained in evidence: **no**.
+- Test Store purchase: **performed successfully after separate cancel and failure scenarios; no
+  real payment was made**.
+- Entitlement, relaunch refresh, and restore flow: **hands-on verified in the packaged Debug app**.
+- Genuine unlocked and VoiceOver supplemental captures: **recorded locally without a key or
+  customer identifier**.
 - Public demo video, store submission, or Devpost project submission: **not performed in this audit**.
 - Devpost organizer question: **sent according to the owner; response not verified**.
-- Transaction and submission gate: **blocked on written Test Store clarification, owner
-  confirmation of student/email eligibility, RevenueCat account/project configuration, configured
-  hands-on transaction evidence, and the public demo video**.
+- Account registration email confirmation: **not completed; the observed verification messages
+  contained a literal `{link}` placeholder, and the owner directed work to continue without it**.
+- Submission gate: **open on student/academic-email confirmation, intentional public branch update,
+  public sub-two-minute video, and final logged-out URL checks**.

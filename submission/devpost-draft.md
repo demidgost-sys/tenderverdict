@@ -45,6 +45,8 @@ and invalid input had to preserve the last valid report.
 - Free mode preserves the existing single analysis and export.
 - The packaged local-file flow produces JSON bytes identical to the CLI.
 - Missing or non-Test RevenueCat configuration fails closed.
+- A packaged Debug build completed Test Store cancel, failure, retry, success, entitlement unlock,
+  relaunch refresh, and restore without retaining the key.
 - Public icon and screenshot assets are generated and dimension-checked.
 
 ## What we learned
@@ -54,9 +56,10 @@ owns access state; TenderVerdict owns explainable procurement metadata rules.
 
 ## What is next
 
-`[REMOVE AFTER VERIFIED]` Complete and record the organizer-approved Test Store purchase, restore,
-and relaunch evidence; publish the sub-two-minute demo; add the final public video and repository
-URLs.
+Publish the captioned sub-two-minute demo, confirm the qualifying academic email and student
+status, run CI on the submitted revision, and verify the final public repository and video URLs
+while logged out. The entry must describe the completed flow as a RevenueCat Test Store transaction,
+not a real payment or organizer-approved interpretation.
 
 ## Links
 

@@ -3,14 +3,14 @@
 - Audit date: 2026-08-04
 - App surface: self-contained macOS `.app`, default 1020×900 window
 - Data: committed three-profile synthetic workspace and three synthetic notices
-- RevenueCat configuration: absent except for one deliberately invalid local fixture
+- RevenueCat configuration: process-local Test Store key; no usable key retained in the app or repo
 
 ## Outcome
 
-The main local product path is now coherent and packaged: launch, select files, run, retain one Free
-profile, export deterministic JSON, and recover from invalid input. RevenueCat configuration,
-purchase, and restore controls are present, but transaction states remain unverified until a Test
-Store project is configured.
+The main local product path is coherent and packaged: launch, select files, run, retain one Free
+profile, export deterministic JSON, and recover from invalid input. The RevenueCat Test Store path
+was also exercised hands-on through offering load, cancel, failure, retry, success, entitlement
+unlock, relaunch refresh, and restore. These are sandbox outcomes, not a real payment.
 
 ## Flow health
 
@@ -25,8 +25,13 @@ Store project is configured.
 | Invalid `as_of` | Pass | Specific error appeared and the previous valid report stayed visible/exportable |
 | Missing RevenueCat key | Pass | Secure configuration UI shown; no SDK request initiated |
 | Non-Test key | Pass | `appl_invalid_fixture` was rejected locally and cleared from the secure field |
-| Test Store offering / cancel / failure | Blocked | Requires configured RevenueCat project and test key |
-| Entitlement unlock / restore / relaunch | Blocked | Requires verified Test Store transaction |
+| Test Store offering | Pass | Current monthly package loaded at localized `0,99 $`; product identifier matched the dashboard |
+| Cancellation | Pass | Test Store cancellation message appeared and access stayed locked |
+| Failure and retry | Pass | Simulated failure produced a recoverable error; retry returned to the locked offering state |
+| Entitlement unlock | Pass | Success activated `supplier_profiles_plus` and revealed all three reports |
+| Relaunch refresh | Pass | Process-local key had to be re-entered; the existing entitlement then returned without a second purchase |
+| Restore | Pass | Native Restore access called `restorePurchases()` and kept all reports unlocked |
+| Dashboard readback | Pass | Sandbox view showed the new subscription; anonymous customer identifier was not recorded |
 
 ## Visual audit
 
@@ -54,6 +59,12 @@ footer anchors the tall format and the locked card lists the real synthetic prof
 claiming entitlement access. It is exactly 1179×2556, contains no device frame or metadata chunks,
 and depicts the honest missing-key state. It is not transaction evidence.
 
+`submission/evidence/unlocked-test-store-2026-08-04.png` is a genuine 1020×754 capture from the
+packaged Debug app after the Test Store entitlement activated. It shows the active entitlement,
+Restore access, and three unlocked profile reports without exposing the secure field, key, or
+customer identifier. It is supplemental transaction evidence, not a replacement for the required
+1179×2556 portrait asset.
+
 ## Accessibility audit
 
 Passes observed in the macOS accessibility tree:
@@ -67,17 +78,19 @@ Passes observed in the macOS accessibility tree:
 - Locked profile-preview rows expose the profile name and whether it is included or Premium.
 - Native open and save panels provide standard keyboard and assistive-technology behavior.
 - Buttons use large native control sizing; clickable labels are not custom gesture-only views.
+- Tab focus followed Workspace → Notices → Review point → Load example → Export → Restore and
+  correctly skipped disabled Run portfolio.
+- VoiceOver exposed Restore access as a native button; activating it with VoiceOver preserved the
+  active entitlement. VoiceOver was switched off again after the pass.
 
 Still required before claiming full accessibility:
 
-- complete the entire purchase and restore flow with VoiceOver enabled;
 - verify logical announcements for asynchronous RevenueCat success, cancellation, and failure;
 - test Increase Contrast, Reduce Transparency, and a large system text setting;
 - confirm the final video captions and Devpost image alt text.
 
 ## Accepted follow-ups
 
-1. Configure and test the real Test Store states.
-2. Capture the unlocked state and repeat the visual comparison against the current design.
-3. Run the VoiceOver transaction path.
-4. Replace or supplement the pre-transaction competition screenshot with genuine unlocked evidence.
+1. Verify VoiceOver announcements during the asynchronous cancel/failure/success dialogs.
+2. Test Increase Contrast, Reduce Transparency, and a large system text setting.
+3. Caption and visually inspect the public sub-two-minute demo.

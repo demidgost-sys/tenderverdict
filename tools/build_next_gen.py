@@ -75,7 +75,7 @@ def _write_info_plist(path: Path, version: str) -> None:
         plistlib.dump(payload, handle, sort_keys=True)
 
 
-def _write_build_info(path: Path, version: str) -> None:
+def _write_build_info(path: Path, version: str, configuration: str) -> None:
     revision = _capture(["git", "rev-parse", "HEAD"])
     status = _capture(["git", "status", "--porcelain"])
     lines = [
@@ -83,6 +83,7 @@ def _write_build_info(path: Path, version: str) -> None:
         f"version={version}",
         f"source_revision={revision}",
         f"source_dirty={str(bool(status)).lower()}",
+        f"build_configuration={configuration}",
         "revenuecat_sdk=5.83.0",
         "entitlement=supplier_profiles_plus",
         "qualification_runtime=embedded-offline-python",
@@ -117,7 +118,14 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
     pyinstaller_work = build_root / f"pyinstaller-work-{uuid.uuid4().hex}"
     stage.mkdir()
     try:
-        swift_command = ["swift", "build", "-c", "release", "--package-path", str(PACKAGE)]
+        swift_command = [
+            "swift",
+            "build",
+            "-c",
+            args.configuration,
+            "--package-path",
+            str(PACKAGE),
+        ]
         if args.swift_scratch_path is not None:
             swift_command[4:4] = ["--scratch-path", str(args.swift_scratch_path.resolve())]
         _run(swift_command)
@@ -126,7 +134,7 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
             "swift",
             "build",
             "-c",
-            "release",
+            args.configuration,
             "--show-bin-path",
             "--package-path",
             str(PACKAGE),
@@ -178,7 +186,7 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
         _copy_swift_resources(swift_bin_path, resources)
         _write_info_plist(contents / "Info.plist", version)
         (contents / "PkgInfo").write_bytes(b"APPL????")
-        _write_build_info(resources / "BUILD_INFO.txt", version)
+        _write_build_info(resources / "BUILD_INFO.txt", version, args.configuration)
 
         _run(["codesign", "--force", "--deep", "--sign", "-", str(app)])
         _run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(app)])
@@ -213,6 +221,12 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--configuration",
+        choices=("debug", "release"),
+        default="release",
+        help="Swift build configuration; Test Store transactions require debug",
+    )
     parser.add_argument(
         "--output-dir",
         type=Path,

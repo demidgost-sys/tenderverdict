@@ -71,6 +71,9 @@ src/tenderverdict/vocabularies.py
 src/tenderverdict/workflow.py
 submission/README.md
 submission/devpost-draft.md
+submission/evidence/README.md
+submission/evidence/unlocked-test-store-2026-08-04.png
+submission/evidence/voiceover-restore-2026-08-04.png
 submission/icon-1024.png
 submission/screenshot-1179x2556.png
 tests/test_cli.py

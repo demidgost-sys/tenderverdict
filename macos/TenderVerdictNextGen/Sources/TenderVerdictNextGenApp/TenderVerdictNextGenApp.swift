@@ -709,6 +709,16 @@ struct PremiumWorkspaceSection: View {
           systemImage: "checkmark.seal.fill",
           tint: .green
         )
+        HStack {
+          Spacer()
+          Button {
+            Task { await controller.restore() }
+          } label: {
+            Label("Restore access", systemImage: "arrow.clockwise")
+          }
+          .buttonStyle(.bordered)
+          .disabled(!controller.canRestore)
+        }
         ForEach(report.visibleProfileReports(premiumUnlocked: true)) { profile in
           ProfileCard(report: profile)
         }
