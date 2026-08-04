@@ -7,6 +7,8 @@ identifiers and may change interfaces during the alpha period.
 
 ## [Unreleased]
 
+## [0.2.0a1] - 2026-08-04
+
 ### Added
 
 - Added an unreleased local desktop preview for editing supplier profiles, reviewing normalized
@@ -52,6 +54,12 @@ identifiers and may change interfaces during the alpha period.
   identical on Windows, macOS, and Linux.
 - Clarified the published CLI, unreleased source preview, short-lived native artifacts, and lack of
   a supported one-click desktop installation path across public documentation.
+- Published checksum-paired macOS arm64, macOS Intel, and Windows x64 archives as an unsigned
+  desktop developer alpha for opt-in evaluation.
+- Made hands-on Windows use post-release evidence rather than an alpha release blocker while
+  retaining native Windows build and frozen smoke-test requirements.
+- Deferred Apple Developer Program membership until three independent packaged installations or
+  one explicit request for a signed and notarized macOS build.
 
 ## [0.1.0a1] - 2026-08-02
 
@@ -64,3 +72,5 @@ identifiers and may change interfaces during the alpha period.
 - Offline tests, package checks, public-tree validation, and conservative content scanning.
 
 [0.1.0a1]: https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.1.0-alpha.1
+[0.2.0a1]: https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.2.0-alpha.1
+[Unreleased]: https://github.com/demidgost-sys/tenderverdict/compare/v0.2.0-alpha.1...HEAD

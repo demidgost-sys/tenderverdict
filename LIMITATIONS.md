@@ -47,8 +47,9 @@ answer.
   treated as an empty market.
 - A successful zero-row snapshot is distinct from a failure and produces an explicit zero-notice
   report.
-- The unsigned desktop preview has no trusted installer or update channel. Automated platform
-  smoke tests do not replace hands-on Windows, VoiceOver, or NVDA validation.
+- The unsigned desktop preview has no trusted installer or update channel. The Windows x64 alpha
+  has native automated startup and synthetic-flow evidence but no hands-on usability run.
+  Automated platform smoke tests do not replace hands-on Windows, VoiceOver, or NVDA validation.
 
 The software is provided under the warranty disclaimer in the Apache License 2.0. Nothing in this
 repository is legal advice or a professional procurement opinion.
