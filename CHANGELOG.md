@@ -34,6 +34,10 @@ identifiers and may change interfaces during the alpha period.
 
 - Extended the installed-wheel smoke test and public documentation to cover the new portfolio CLI
   while keeping the published single-profile CLI and desktop workflows unchanged.
+- Refined the SwiftUI app hierarchy with one indigo accent, native file-type cues, calmer surfaces,
+  clearer verdict metrics, and an honest profile-access preview in the locked Premium state.
+- Reworked the self-contained HTML report into a responsive report surface with semantic outcome
+  badges, automatic light and dark appearances, keyboard focus treatment, and print-safe styling.
 - Documented the conditional Shipaton Next Gen boundary: the portfolio, native app, packaging, and
   local submission assets are implemented, while dashboard configuration, a Test Store transaction,
   public video, and eligibility remain gated.

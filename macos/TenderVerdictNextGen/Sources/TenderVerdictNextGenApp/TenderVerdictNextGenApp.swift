@@ -12,7 +12,11 @@ struct TenderVerdictNextGenApp: App {
     if let flag = CommandLine.arguments.firstIndex(of: "--render-submission-screenshot"),
       CommandLine.arguments.indices.contains(flag + 1)
     {
-      Self.renderSubmissionScreenshot(at: CommandLine.arguments[flag + 1])
+      let colorScheme: ColorScheme = CommandLine.arguments.contains("--dark") ? .dark : .light
+      Self.renderSubmissionScreenshot(
+        at: CommandLine.arguments[flag + 1],
+        colorScheme: colorScheme
+      )
     }
     if CommandLine.arguments.contains("--smoke-test") {
       Self.runSmokeTest()
@@ -51,16 +55,19 @@ struct TenderVerdictNextGenApp: App {
   }
 
   @MainActor
-  private static func renderSubmissionScreenshot(at path: String) -> Never {
+  private static func renderSubmissionScreenshot(
+    at path: String,
+    colorScheme: ColorScheme
+  ) -> Never {
     do {
       let execution = try TenderVerdictProcess().loadSyntheticPortfolioSynchronously()
       let model = AppModel(previewExecution: execution)
-      let logicalWidth: CGFloat = 900
+      let logicalWidth: CGFloat = 760
       let logicalHeight: CGFloat = 2_556 * logicalWidth / 1_179
       let view = ContentView(model: model, startsAutomatically: false, scrollable: false)
         .frame(width: logicalWidth, height: logicalHeight, alignment: .top)
         .background(Color(nsColor: .windowBackgroundColor))
-        .environment(\.colorScheme, .light)
+        .environment(\.colorScheme, colorScheme)
       let bounds = NSRect(x: 0, y: 0, width: logicalWidth, height: logicalHeight)
       let hostingView = NSHostingView(rootView: view)
       hostingView.frame = bounds
@@ -72,6 +79,9 @@ struct TenderVerdictNextGenApp: App {
       )
       window.contentView = hostingView
       window.backgroundColor = .windowBackgroundColor
+      window.appearance = NSAppearance(
+        named: colorScheme == .dark ? .darkAqua : .aqua
+      )
       window.orderBack(nil)
       hostingView.layoutSubtreeIfNeeded()
       hostingView.displayIfNeeded()
@@ -105,7 +115,12 @@ struct TenderVerdictNextGenApp: App {
         withIntermediateDirectories: true
       )
       try png.write(to: output, options: [.atomic])
-      print("NEXT_GEN_SCREENSHOT_OK width=1179 height=2556 output=\(output.path)")
+      let appearance = colorScheme == .dark ? "dark" : "light"
+      print(
+        "NEXT_GEN_SCREENSHOT_OK width=1179 height=2556 "
+          + "appearance=\(appearance) "
+          + "output=\(output.path)"
+      )
       Darwin.exit(EXIT_SUCCESS)
     } catch {
       let message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
@@ -318,6 +333,7 @@ struct ContentView: View {
       }
     }
     .background(Color(nsColor: .windowBackgroundColor))
+    .tint(.indigo)
     .task {
       if startsAutomatically {
         model.start()
@@ -332,8 +348,8 @@ struct ContentView: View {
       PortfolioInputSection(model: model)
       freeAnalysis
       PremiumWorkspaceSection(report: model.report, controller: model.revenueCat)
-      footer
       Spacer(minLength: 0)
+      footer
     }
     .frame(maxWidth: 920, maxHeight: .infinity, alignment: .topLeading)
     .padding(.horizontal, 36)
@@ -341,38 +357,63 @@ struct ContentView: View {
   }
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      Text("SHIPATON · NEXT GEN")
-        .font(.caption.weight(.semibold))
+    HStack(alignment: .top, spacing: 16) {
+      ZStack {
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+          .fill(Color.indigo)
+        Image(systemName: "doc.text.magnifyingglass")
+          .font(.title2.weight(.semibold))
+          .foregroundStyle(.white.opacity(0.96))
+      }
+      .frame(width: 50, height: 50)
+      .shadow(color: Color.indigo.opacity(0.18), radius: 10, y: 4)
+      .accessibilityHidden(true)
+
+      VStack(alignment: .leading, spacing: 9) {
+        Text("TenderVerdict")
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(.indigo)
+        Text("Tender intelligence for every supplier profile.")
+          .font(.system(size: 38, weight: .bold, design: .default))
+          .tracking(-1.1)
+        Text(
+          "Run one explainable notice review across a named supplier portfolio, "
+            + "with the first profile always available for free."
+        )
+        .font(.title3)
         .foregroundStyle(.secondary)
-        .tracking(1.4)
-      Text("Tender intelligence for every supplier profile.")
-        .font(.system(size: 36, weight: .bold, design: .rounded))
-      Text(
-        "Run one explainable notice review across a named supplier portfolio, "
-          + "with the first profile always available for free."
-      )
-      .font(.title3)
-      .foregroundStyle(.secondary)
-      .fixedSize(horizontal: false, vertical: true)
+        .fixedSize(horizontal: false, vertical: true)
+      }
     }
     .accessibilityElement(children: .combine)
   }
 
   private var sourceStatus: some View {
-    HStack(spacing: 18) {
+    HStack(spacing: 0) {
       StatusLabel(title: "Local analysis", systemImage: "lock.shield")
+      statusDivider
       StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
+      statusDivider
       StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
     }
     .foregroundStyle(.secondary)
+    .padding(.vertical, 11)
+    .overlay(alignment: .top) { Divider() }
+    .overlay(alignment: .bottom) { Divider() }
+  }
+
+  private var statusDivider: some View {
+    Rectangle()
+      .fill(.quaternary)
+      .frame(width: 1, height: 15)
+      .padding(.horizontal, 14)
+      .accessibilityHidden(true)
   }
 
   @ViewBuilder
   private var freeAnalysis: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
-        eyebrow: "FREE",
         title: "Single-profile analysis",
         detail: "The first named profile and the existing verdict workflow remain free."
       )
@@ -414,28 +455,29 @@ struct PortfolioInputSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
-        eyebrow: "ANALYZE",
         title: "Portfolio inputs",
         detail: "Choose local files once, then run the same bounded notice set for every profile."
       )
-      PremiumCard(tint: .blue) {
+      PremiumCard(tint: .indigo) {
         VStack(alignment: .leading, spacing: 16) {
           inputRow(
             title: "Workspace",
+            systemImage: "square.stack.3d.up",
             value: model.workspaceName,
             buttonTitle: "Choose workspace…",
             action: model.chooseWorkspace
           )
           inputRow(
             title: "Notices",
+            systemImage: "doc.on.doc",
             value: model.noticesName,
             buttonTitle: "Choose notices…",
             action: model.chooseNotices
           )
           HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Text("Review point")
+            Label("Review point", systemImage: "calendar")
               .font(.subheadline.weight(.semibold))
-              .frame(width: 110, alignment: .leading)
+              .frame(width: 128, alignment: .leading)
             TextField("YYYY-MM-DD or RFC 3339", text: $model.asOf)
               .textFieldStyle(.roundedBorder)
               .accessibilityLabel("Review date or RFC 3339 instant")
@@ -446,6 +488,7 @@ struct PortfolioInputSection: View {
               model.runSelectedPortfolio()
             } label: {
               Label("Run portfolio", systemImage: "play.fill")
+                .lineLimit(1)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -455,6 +498,7 @@ struct PortfolioInputSection: View {
               model.loadSynthetic()
             } label: {
               Label("Load synthetic example", systemImage: "sparkles")
+                .lineLimit(1)
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
@@ -466,6 +510,7 @@ struct PortfolioInputSection: View {
               model.exportReport()
             } label: {
               Label("Export JSON…", systemImage: "square.and.arrow.down")
+                .lineLimit(1)
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
@@ -496,14 +541,15 @@ struct PortfolioInputSection: View {
 
   private func inputRow(
     title: String,
+    systemImage: String,
     value: String,
     buttonTitle: String,
     action: @escaping () -> Void
   ) -> some View {
     HStack(spacing: 16) {
-      Text(title)
+      Label(title, systemImage: systemImage)
         .font(.subheadline.weight(.semibold))
-        .frame(width: 110, alignment: .leading)
+        .frame(width: 128, alignment: .leading)
       Text(value)
         .foregroundStyle(.secondary)
         .lineLimit(1)
@@ -513,6 +559,7 @@ struct PortfolioInputSection: View {
       Button(buttonTitle, action: action)
         .buttonStyle(.bordered)
         .controlSize(.large)
+        .lineLimit(1)
     }
   }
 }
@@ -525,7 +572,6 @@ struct PremiumWorkspaceSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
-        eyebrow: "PREMIUM",
         title: "Portfolio Workspace",
         detail: "Reveal up to five independent profile reports through one RevenueCat entitlement."
       )
@@ -673,18 +719,56 @@ struct PremiumWorkspaceSection: View {
   }
 
   private var portfolioPreview: some View {
-    Group {
+    VStack(alignment: .leading, spacing: 10) {
       if let report {
         Label(
           "\(report.summary.profileCount) named profiles · "
             + "\(report.summary.noticeCount) shared notices",
           systemImage: "person.2"
         )
+        VStack(spacing: 0) {
+          ForEach(Array(report.profileReports.enumerated()), id: \.element.id) { item in
+            ProfilePreviewRow(profile: item.element, isFree: item.offset == 0)
+            if item.offset < report.profileReports.count - 1 {
+              Divider()
+            }
+          }
+        }
       } else {
         Label("Up to five named profiles", systemImage: "person.2")
       }
     }
     .font(.subheadline.weight(.medium))
+  }
+}
+
+struct ProfilePreviewRow: View {
+  let profile: ProfileReport
+  let isFree: Bool
+
+  private var accessDescription: String {
+    isFree ? "included" : "Premium"
+  }
+
+  var body: some View {
+    HStack(spacing: 10) {
+      Image(systemName: isFree ? "checkmark.circle.fill" : "lock.fill")
+        .foregroundStyle(isFree ? Color.green : Color.secondary)
+        .frame(width: 18)
+        .accessibilityHidden(true)
+      Text(profile.profile.name)
+        .lineLimit(1)
+        .truncationMode(.tail)
+      Spacer()
+      Text(isFree ? "Included" : "Premium")
+        .font(.caption.weight(.medium))
+        .foregroundStyle(.secondary)
+    }
+    .padding(.vertical, 8)
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(
+      "\(profile.profile.name), \(accessDescription)"
+    )
   }
 }
 
@@ -709,10 +793,14 @@ struct ProfileCard: View {
     }
     .padding(18)
     .background(
-      RoundedRectangle(cornerRadius: 18, style: .continuous)
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
         .fill(Color(nsColor: .controlBackgroundColor))
-        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
+        .shadow(color: Color.indigo.opacity(0.07), radius: 12, y: 5)
     )
+    .overlay {
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
+        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+    }
     .accessibilityElement(children: .combine)
     .accessibilityLabel(
       "\(report.profile.name), \(report.summary.openDocuments) open, "
@@ -736,6 +824,12 @@ struct VerdictMetric: View {
         .foregroundStyle(.secondary)
     }
     .frame(minWidth: 54)
+    .padding(.horizontal, 5)
+    .padding(.vertical, 8)
+    .background(
+      RoundedRectangle(cornerRadius: 12, style: .continuous)
+        .fill(tint.opacity(0.09))
+    )
   }
 }
 
@@ -748,13 +842,13 @@ struct PremiumCard<Content: View>: View {
       .padding(20)
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(
-        RoundedRectangle(cornerRadius: 22, style: .continuous)
-          .fill(tint.opacity(0.08))
-          .shadow(color: .black.opacity(0.07), radius: 10, y: 4)
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+          .fill(Color(nsColor: .controlBackgroundColor))
+          .shadow(color: tint.opacity(0.07), radius: 14, y: 6)
       )
       .overlay {
-        RoundedRectangle(cornerRadius: 22, style: .continuous)
-          .stroke(tint.opacity(0.24), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+          .stroke(tint.opacity(0.2), lineWidth: 1)
       }
   }
 }
@@ -770,10 +864,14 @@ struct NoticeCard: View {
       .padding(18)
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(
-        RoundedRectangle(cornerRadius: 18, style: .continuous)
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
           .fill(Color(nsColor: .controlBackgroundColor))
-          .shadow(color: .black.opacity(0.07), radius: 8, y: 3)
+          .shadow(color: tint.opacity(0.07), radius: 12, y: 5)
       )
+      .overlay {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+          .stroke(tint.opacity(0.15), lineWidth: 1)
+      }
   }
 }
 
@@ -810,7 +908,7 @@ struct LoadingCard: View {
     .padding(18)
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(
-      RoundedRectangle(cornerRadius: 18, style: .continuous)
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
         .fill(Color(nsColor: .controlBackgroundColor))
     )
     .accessibilityElement(children: .combine)
@@ -818,17 +916,12 @@ struct LoadingCard: View {
 }
 
 struct SectionHeading: View {
-  let eyebrow: String
   let title: String
   let detail: String
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Text(eyebrow)
-        .font(.caption2.weight(.bold))
-        .foregroundStyle(.secondary)
-        .tracking(1.1)
-      Text(title).font(.title2.weight(.bold))
+    VStack(alignment: .leading, spacing: 5) {
+      Text(title).font(.title2.weight(.semibold))
       Text(detail).foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
@@ -842,5 +935,6 @@ struct StatusLabel: View {
   var body: some View {
     Label(title, systemImage: systemImage)
       .font(.caption.weight(.medium))
+      .lineLimit(1)
   }
 }

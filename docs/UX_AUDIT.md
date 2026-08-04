@@ -30,9 +30,11 @@ Store project is configured.
 
 ## Visual audit
 
-The existing rounded native card system, indigo Premium treatment, typography, spacing, and SF
-Symbols were preserved. The added input card follows the same 18–22 pt radii and restrained shadow
-language. Primary hierarchy is now explicit:
+The existing native SwiftUI language was retained and refined rather than replaced. Repeated
+`ANALYZE`, `FREE`, and `PREMIUM` labels were removed, the product name and primary message now lead
+the page, and one indigo accent governs interactive and structural emphasis. File rows use native SF
+Symbols, cards share a 20 pt radius and restrained tinted shadow, and verdict metrics use nested
+12 pt semantic surfaces. Primary hierarchy remains explicit:
 
 1. choose inputs;
 2. run locally;
@@ -42,13 +44,15 @@ language. Primary hierarchy is now explicit:
 
 At the minimum 900 pt width, labels and actions fit without clipping. Long file names truncate in
 the middle while their complete accessible label remains available. The vertical scroll keeps the
-Premium section reachable at smaller window heights. Light appearance was visually checked; native
-semantic colors preserve dark-mode compatibility, but a separate dark-mode capture remains useful
-before a public product release.
+Premium section reachable at smaller window heights. Light and dark appearances were rendered from
+the real SwiftUI view and visually compared. Both preserve text hierarchy, semantic verdict colors,
+field boundaries, and disabled-control states.
 
 The committed competition screenshot is rendered from the real SwiftUI view through an AppKit
-hosting view. It is exactly 1179×2556, contains no device frame or metadata chunks, and depicts the
-honest missing-key state. It is not transaction evidence.
+hosting view. Its narrower logical canvas improves the required portrait composition, while the
+footer anchors the tall format and the locked card lists the real synthetic profile names without
+claiming entitlement access. It is exactly 1179×2556, contains no device frame or metadata chunks,
+and depicts the honest missing-key state. It is not transaction evidence.
 
 ## Accessibility audit
 
@@ -60,6 +64,7 @@ Passes observed in the macOS accessibility tree:
 - The secure field reports secure text rather than its value.
 - Status and error messages include textual meaning and do not rely on color alone.
 - Each profile exposes one combined label with its name and open/watch/reject counts.
+- Locked profile-preview rows expose the profile name and whether it is included or Premium.
 - Native open and save panels provide standard keyboard and assistive-technology behavior.
 - Buttons use large native control sizing; clickable labels are not custom gesture-only views.
 
