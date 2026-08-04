@@ -36,8 +36,11 @@ maps the `supplier_profiles_plus` entitlement to the complete workspace. Source 
 tests, native contract checks, local file selection, analysis, deterministic export, and invalid
 input retention pass locally. The reproducible builder produces an embedded-runtime, ad-hoc-signed
 app and checksum-paired archive. Exact-size icon and pre-transaction screenshot assets are also
-present. No configured Test Store project, transaction, restore, or public video has been
-established.
+present. A separate reproducible Debug artifact completed the configured RevenueCat Test Store
+offering, cancellation, failure, retry, purchase, entitlement unlock, relaunch refresh, restore,
+and VoiceOver restore path. No key is committed or bundled; this is not a real payment and does not
+settle whether Shipaton accepts Test Store-only for Next Gen. A public video and entrant-account
+eligibility check have not been established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -92,23 +95,22 @@ Maintainer runs and CI jobs do not count toward this threshold.
 
 The competition branch has a narrower conditional path documented in
 [`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core, native app,
-self-contained packaging, and local submission assets are implemented, but source and packaging do
-not satisfy the Shipaton RevenueCat purchase requirement. Test Store execution remains gated on a
-written organizer answer confirming whether a Test Store-only SDK flow is sufficient for the
-store-exempt Next Gen path.
+self-contained packaging, local submission assets, and hands-on Test Store transaction evidence are
+implemented. The official sources checked so far do not explicitly say that Test Store-only is
+sufficient for the store-exempt Next Gen path, so that interpretation remains a disclosed gate.
 
 The remaining order is:
 
-1. verify the organizer answer and the entrant's student/email eligibility;
-2. sign in and create the RevenueCat Test Store project objects for the committed entitlement
-   contract, without adding a production product or key;
-3. provide the Test Store key only through the process-local secure field or a controlled launch
-   environment and verify the locked, offering, success, cancellation, failure, restore, and
-   relaunch states hands-on;
-4. add deterministic controller-level tests around those observed state transitions without
-   embedding a usable key;
-5. capture genuine unlocked evidence and publish the required sub-two-minute demo video;
-6. complete the Devpost project, final evidence audit, and logged-out public-link review.
+1. finish the review-queue/comparison QA pass and run every repository gate on one clean commit;
+2. verify asynchronous RevenueCat announcements plus Increase Contrast, Reduce Transparency, and
+   large-text behavior without embedding a usable key;
+3. run three opt-in workflow sessions and convert observed friction into bounded product changes;
+4. implement a native local profile builder if those sessions confirm JSON authoring is the main
+   onboarding obstacle;
+5. verify the organizer answer and the entrant's student/email eligibility;
+6. inspect the exact private Devpost fields after the owner joins and signs in;
+7. only after owner approval, prepare the public demo and complete the final evidence and
+   logged-out-link audit.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.
@@ -117,13 +119,18 @@ to this conditional Next Gen implementation.
 
 Priorities are ordered by evidence value rather than feature count:
 
-1. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
+1. Run the Next Gen app with three opt-in procurement or supplier users and document two concrete
+   workflow changes using public, synthetic, or fully de-identified data.
+2. Add an in-app local profile builder for one to five profiles, including validation, reorder,
+   explicit save, and reset, if the workflow pass confirms that hand-authored JSON is the main
+   adoption barrier.
+3. Add notice search and buyer/deadline filters only after a bounded 100+ notice usability fixture
+   demonstrates the need.
+4. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
    Windows x64 machine; repeat the accessibility portion with NVDA.
-2. Repeat the packaged flow on macOS with VoiceOver and record which controls are exposed.
-3. Obtain three independent opt-in runs and two concrete procurement-workflow observations using
-   synthetic, public, or fully de-identified data.
-4. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
-5. Consider an updater or desktop TED action only after a signed distribution and privacy design
+5. Complete the remaining macOS accessibility settings and asynchronous announcement checks.
+6. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
+7. Consider an updater or desktop TED action only after a signed distribution and privacy design
    exist; until then the desktop remains local-only and updates remain manual.
 
 Automatic bidding, bidder or profile scoring, legal conclusions, confidential-document ingestion,

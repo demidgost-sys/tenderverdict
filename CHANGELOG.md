@@ -29,6 +29,13 @@ identifiers and may change interfaces during the alpha period.
   with ad-hoc signature verification, packaged smoke test, archive, checksum, and CI artifact.
 - Added an exact 1024×1024 icon, exact 1179×2556 pre-transaction screenshot, asset generators, a
   Devpost draft, timed demo script, architecture guide, user guide, UX audit, and hackathon runbook.
+- Added a native Free review queue with verdict filters, expandable reasons and unknowns, human next
+  steps, and safe supplied-source links.
+- Added a Premium notice-by-profile comparison matrix that preserves independent verdicts without
+  introducing score, ranking, or an automatic recommendation.
+- Added complete native result-contract validation for totals, identities, ordered shared notices,
+  and byte-stable portfolio consumption, plus a competition scorecard grounded in official rules
+  and recent winner patterns.
 
 ### Changed
 
@@ -37,10 +44,11 @@ identifiers and may change interfaces during the alpha period.
 - Refined the SwiftUI app hierarchy with one indigo accent, native file-type cues, calmer surfaces,
   clearer verdict metrics, and an honest profile-access preview in the locked Premium state.
 - Reworked the self-contained HTML report into a responsive report surface with semantic outcome
-  badges, automatic light and dark appearances, keyboard focus treatment, and print-safe styling.
+  badges, safe supplied-source links, automatic light and dark appearances, keyboard focus
+  treatment, and print-safe styling.
 - Documented the conditional Shipaton Next Gen boundary: the portfolio, native app, packaging, and
-  local submission assets are implemented, while dashboard configuration, a Test Store transaction,
-  public video, and eligibility remain gated.
+  local submission assets and Test Store transaction evidence are implemented, while a public
+  video, student-account verification, and organizer acceptance of Test Store-only remain gated.
 
 ## [0.2.0a1] - 2026-08-04
 

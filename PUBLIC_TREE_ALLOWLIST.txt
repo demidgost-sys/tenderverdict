@@ -22,6 +22,7 @@ SECURITY.md
 demo/index.html
 demo/screenshot.png
 docs/ARCHITECTURE.md
+docs/COMPETITION_SCORECARD.md
 docs/DEMO_SCRIPT.md
 docs/HACKATHON_RUNBOOK.md
 docs/README.md

@@ -16,10 +16,12 @@ TenderVerdict reads normalized public-procurement notice metadata and applies na
 deterministic rules for CPV fit, geography, deadline lead time, notice type, and missing fields. It
 returns `open_documents`, `watch`, or `reject` with reasons and a human next step.
 
-The free macOS experience keeps one complete supplier analysis and JSON export. Portfolio Workspace
-evaluates the same ordered notice set independently for up to five named profiles. An active
-RevenueCat entitlement, `supplier_profiles_plus`, reveals all profile reports. It never adds a
-cross-profile score or automatic bid recommendation.
+The free macOS experience keeps one complete supplier analysis and JSON export. Its review queue
+filters verdicts, keeps the human next step visible, expands reasons and unknowns on demand, and
+opens only syntactically valid supplied HTTPS sources. Portfolio Workspace evaluates the same
+ordered notice set independently for up to five named profiles. An active RevenueCat entitlement,
+`supplier_profiles_plus`, reveals a notice-by-profile comparison and every profile report. It never
+adds a cross-profile score or automatic bid recommendation.
 
 ## How we built it
 
@@ -44,6 +46,10 @@ and invalid input had to preserve the last valid report.
 - One notice set is parsed once and reviewed consistently for one to five profiles.
 - Free mode preserves the existing single analysis and export.
 - The packaged local-file flow produces JSON bytes identical to the CLI.
+- The native contract rejects mismatched totals, duplicate identities, changed notice metadata, or
+  reordered shared notices before presentation.
+- Free users can complete the real notice-review loop; Premium reduces repeated comparison work
+  across supplier profiles instead of withholding basic reasoning.
 - Missing or non-Test RevenueCat configuration fails closed.
 - A packaged Debug build completed Test Store cancel, failure, retry, success, entitlement unlock,
   relaunch refresh, and restore without retaining the key.
@@ -56,10 +62,11 @@ owns access state; TenderVerdict owns explainable procurement metadata rules.
 
 ## What is next
 
-Publish the captioned sub-two-minute demo, confirm the qualifying academic email and student
-status, run CI on the submitted revision, and verify the final public repository and video URLs
-while logged out. The entry must describe the completed flow as a RevenueCat Test Store transaction,
-not a real payment or organizer-approved interpretation.
+Complete the remaining accessibility settings and real-user workflow pass, inspect the exact
+private Devpost fields after joining, confirm the qualifying academic email and student status, run
+CI on the submitted revision, and verify the final public repository and video URLs while logged
+out. The entry must describe the completed flow as a RevenueCat Test Store transaction, not a real
+payment or organizer-approved interpretation.
 
 ## Links
 

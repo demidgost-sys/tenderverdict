@@ -64,12 +64,16 @@ public struct PortfolioWorkspaceReport: Decodable, Equatable, Sendable {
     var normalizedNames = Set<String>()
     var profileDigests = Set<String>()
     var noticeDigest: String?
+    var noticeSignatures: [NoticeSignature]?
     for report in profileReports {
       guard report.schemaVersion == 3,
         report.profile.schemaVersion == 1,
         report.asOf == asOf,
         report.summary.total == summary.noticeCount,
-        report.summary.isInternallyConsistent
+        report.summary.isInternallyConsistent,
+        report.results.count == report.summary.total,
+        report.resultsMatchSummary,
+        report.hasUniqueResults
       else {
         throw PortfolioContractError.invalidProfileReport
       }
@@ -91,6 +95,12 @@ public struct PortfolioWorkspaceReport: Decodable, Equatable, Sendable {
         throw PortfolioContractError.inconsistentNoticeSet
       }
       noticeDigest = report.provenance.noticesSHA256
+
+      let reportSignatures = report.results.map(\.noticeSignature)
+      if let noticeSignatures, noticeSignatures != reportSignatures {
+        throw PortfolioContractError.inconsistentNoticeSet
+      }
+      noticeSignatures = reportSignatures
     }
   }
 
@@ -126,6 +136,7 @@ public struct ProfileReport: Decodable, Equatable, Identifiable, Sendable {
   public let profile: SupplierProfile
   public let asOf: String
   public let summary: ProfileReportSummary
+  public let results: [QualificationResult]
 
   public var id: String { provenance.profileSHA256 }
 
@@ -135,7 +146,105 @@ public struct ProfileReport: Decodable, Equatable, Identifiable, Sendable {
     case profile
     case asOf = "as_of"
     case summary
+    case results
   }
+
+  var resultsMatchSummary: Bool {
+    let counts = results.reduce(into: (open: 0, watch: 0, reject: 0)) { partial, result in
+      switch result.verdict {
+      case .openDocuments:
+        partial.open += 1
+      case .watch:
+        partial.watch += 1
+      case .reject:
+        partial.reject += 1
+      }
+    }
+    return counts.open == summary.openDocuments
+      && counts.watch == summary.watch
+      && counts.reject == summary.reject
+  }
+
+  var hasUniqueResults: Bool {
+    var identities = Set<String>()
+    return results.allSatisfy { result in
+      !result.publicationNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        && !result.humanNextStep.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        && identities.insert(result.id).inserted
+    }
+  }
+}
+
+public enum QualificationVerdict: String, Decodable, Equatable, CaseIterable, Sendable {
+  case openDocuments = "open_documents"
+  case watch
+  case reject
+}
+
+public struct QualificationResult: Decodable, Equatable, Identifiable, Sendable {
+  public let publicationNumber: String
+  public let lotID: String?
+  public let title: String?
+  public let buyer: String?
+  public let deadline: String?
+  public let deadlineAt: String?
+  public let publicationDate: String?
+  public let sourceURL: String?
+  public let verdict: QualificationVerdict
+  public let reasons: [String]
+  public let unknowns: [String]
+  public let humanNextStep: String
+
+  public var id: String {
+    Self.normalizedIdentity(publicationNumber: publicationNumber, lotID: lotID)
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case publicationNumber = "publication_number"
+    case lotID = "lot_id"
+    case title
+    case buyer
+    case deadline
+    case deadlineAt = "deadline_at"
+    case publicationDate = "publication_date"
+    case sourceURL = "source_url"
+    case verdict
+    case reasons
+    case unknowns
+    case humanNextStep = "human_next_step"
+  }
+
+  fileprivate var noticeSignature: NoticeSignature {
+    NoticeSignature(
+      identity: id,
+      title: title,
+      buyer: buyer,
+      deadline: deadline,
+      deadlineAt: deadlineAt,
+      publicationDate: publicationDate,
+      sourceURL: sourceURL
+    )
+  }
+
+  private static func normalizedIdentity(publicationNumber: String, lotID: String?) -> String {
+    let publication = publicationNumber
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .lowercased()
+    let lot = lotID?
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .lowercased() ?? ""
+    return "\(publication)\u{1f}\(lot)"
+  }
+}
+
+private struct NoticeSignature: Equatable {
+  let identity: String
+  let title: String?
+  let buyer: String?
+  let deadline: String?
+  let deadlineAt: String?
+  let publicationDate: String?
+  let sourceURL: String?
 }
 
 public struct ReportProvenance: Decodable, Equatable, Sendable {

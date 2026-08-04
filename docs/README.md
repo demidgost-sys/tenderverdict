@@ -12,6 +12,7 @@ and Shipaton Next Gen work.
 | Understand components, contracts, and trust boundaries | [Architecture](ARCHITECTURE.md) |
 | Build, test, and package the macOS app | [Next Gen macOS README](../macos/TenderVerdictNextGen/README.md) |
 | Reproduce quality and accessibility checks | [UX and accessibility audit](UX_AUDIT.md) |
+| Map judging criteria to product priorities | [Competition scorecard](COMPETITION_SCORECARD.md) |
 | Prepare the Shipaton entry and RevenueCat evidence | [Hackathon runbook](HACKATHON_RUNBOOK.md) |
 | Record a sub-two-minute demo | [Demo script](DEMO_SCRIPT.md) |
 | Distinguish verified facts from open competition gates | [Shipaton evidence](SHIPATON_EVIDENCE.md) |

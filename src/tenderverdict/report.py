@@ -9,6 +9,7 @@ from html import escape as escape_html
 from unicodedata import category
 
 from .models import Profile, QualificationResult, Verdict
+from .qualification import is_verifiable_source_url
 
 
 @dataclass(frozen=True, slots=True)
@@ -349,6 +350,9 @@ def render_html(
     }}
     dt {{ font-weight: 700; }}
     dd {{ margin: 0; min-width: 0; overflow-wrap: anywhere; }}
+    .source-cell {{ display: flex; flex-wrap: wrap; gap: .2rem .65rem; align-items: baseline; }}
+    .source-link {{ color: var(--accent-strong); font-weight: 700; text-underline-offset: .16em; }}
+    .source-url {{ color: var(--muted); font-size: .82rem; }}
     .verdict {{
       display: inline-flex;
       align-items: center;
@@ -506,7 +510,7 @@ def _render_result_html(result: QualificationResult) -> str:
         _notice_identity(notice.publication_number, notice.lot_id)
     )
     buyer = _escape_html_text(notice.buyer or "(missing)")
-    source = _escape_html_text(notice.source_url or "(missing)")
+    source = _render_source_html(notice.source_url)
     deadline = _deadline_text(notice.deadline, notice.deadline_at)
     publication_date = (
         notice.publication_date.isoformat() if notice.publication_date else "(missing)"
@@ -528,7 +532,7 @@ def _render_result_html(result: QualificationResult) -> str:
           <dt>Buyer</dt><dd>{buyer}</dd>
           <dt>Deadline</dt><dd>{deadline}</dd>
           <dt>Published</dt><dd>{publication_date}</dd>
-          <dt>Source</dt><dd>{source}</dd>
+          <dt>Source</dt><dd class="source-cell">{source}</dd>
         </dl>
         <div class="evidence-grid">
           <section class="evidence"><h3>Reasons</h3><ul>{reasons}</ul></section>
@@ -561,6 +565,19 @@ def _render_provenance_html(provenance: ReportProvenance) -> str:
         "      <summary>Report provenance</summary>\n"
         f"      <dl>{rendered}</dl>\n"
         "    </details>"
+    )
+
+
+def _render_source_html(source_url: str | None) -> str:
+    if source_url is None:
+        return "(missing)"
+    source = _escape_html_text(source_url)
+    if not is_verifiable_source_url(source_url):
+        return source
+    return (
+        f'<a class="source-link" href="{source}" target="_blank" '
+        f'rel="noopener noreferrer">Open supplied source</a>'
+        f'<span class="source-url">{source}</span>'
     )
 
 

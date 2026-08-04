@@ -18,12 +18,14 @@ queue. Choose the surface that matches the job:
 2. To use your own data, choose a workspace v1 JSON file and normalized notices in CSV or JSON.
 3. Enter a review point as `YYYY-MM-DD` or a timezone-aware RFC 3339 instant.
 4. Select **Run portfolio**. A successful result updates the source label, review point, summary,
-   and Free profile.
+   and Free profile. Filter the review queue by verdict, expand **Reasons and unknowns**, and open a
+   syntactically valid supplied HTTPS source when the official notice needs inspection.
 5. Select **Export JSON…** to save the exact deterministic portfolio bytes. A failed analysis does
    not discard the previous valid result.
 6. For an organizer-approved Test Store demo, paste a RevenueCat `test_` key. TenderVerdict does not
-   store it. Use the current Test Store package or restore access; all profiles appear only while
-   `supplier_profiles_plus` is active.
+   store it. Use the current Test Store package or restore access; the cross-profile comparison and
+   all profile summaries appear only while `supplier_profiles_plus` is active. **Refresh offering**
+   retries offering and entitlement state after a recoverable connection or configuration issue.
 
 The open-source CLI stays usable without Premium. The native Premium experience is a product and
 competition integration boundary, not encryption or DRM.
@@ -62,7 +64,8 @@ current official notice and procurement documents.
 - `reject`: a configured hard metadata stop applies.
 
 These are workflow states, not legal conclusions. Portfolio Workspace never compares or ranks
-profiles.
+profiles. Premium's matrix aligns the same ordered notices across profiles so a human can see where
+outcomes differ; it does not compute a winner.
 
 ## Privacy and credentials
 
@@ -78,7 +81,10 @@ profiles.
 
 The macOS app uses native labelled buttons, text fields, a secure field, visible focus, text plus
 icons for status, and a linear keyboard order. Profile cards expose one combined VoiceOver label
-with the name and all three verdict counts. Hands-on VoiceOver transaction testing remains pending.
+with the name and all three verdict counts. Notice verdicts and comparison cells include text labels
+instead of relying on color. VoiceOver exposed the transaction controls and successfully activated
+Restore in one packaged Test Store pass. Asynchronous outcome announcements, Increase Contrast,
+Reduce Transparency, and large-text behavior still require dedicated verification.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains
 available. If Premium refresh fails, verify the RevenueCat entitlement, current offering, Test

@@ -97,6 +97,11 @@ class ReportTests(unittest.TestCase):
         self.assertNotIn("<input", output.casefold())
         self.assertNotIn("src=", output.casefold())
         self.assertIn("Report provenance", output)
+        self.assertIn(
+            '<a class="source-link" href="https://procurement.example/notices/SYN-OPEN-001" ',
+            output,
+        )
+        self.assertIn('rel="noopener noreferrer"', output)
 
     def test_user_content_is_escaped_in_both_formats(self) -> None:
         malicious_notice = replace(
@@ -122,6 +127,7 @@ class ReportTests(unittest.TestCase):
         self.assertNotIn("<img", html.casefold())
         self.assertIn("&lt;script&gt;", html)
         self.assertIn("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;", html)
+        self.assertNotIn('href="javascript:', html.casefold())
         self.assertEqual(result[0].verdict, Verdict.REJECT)
 
     def test_terminal_and_bidi_controls_are_rendered_visibly(self) -> None:

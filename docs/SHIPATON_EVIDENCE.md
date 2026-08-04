@@ -30,7 +30,8 @@ organizer answer or public response URL has been verified in this repository, an
 directed the build work to continue without waiting for one. The repository now contains the
 complete local product path: SwiftUI inputs, exact official SDK pin, canonical JSON adapter,
 fail-closed RevenueCat access client, embedded offline runtime, reproducible Release and Debug
-`.app` builders, competition assets, and local Test Store evidence. No usable key, customer
+`.app` builders, actionable Free review queue, Premium notice-by-profile comparison, competition
+assets, and local Test Store evidence. No usable key, customer
 identifier, or account screenshot is retained. A public video, academic-email verification, public
 branch update, and Devpost submission remain open.
 
@@ -139,13 +140,17 @@ The repository now contains `macos/TenderVerdictNextGen`, an unreleased macOS Sw
 - a configuration boundary that accepts only a locally supplied `test_` key, makes no RevenueCat
   request when it is absent, and commits no usable key;
 - native workspace/notices selection, explicit review point, local run, preserved prior result on
-  error, and atomic deterministic JSON export;
+  error, Free verdict filtering and reasoning review, safe supplied-source links, and atomic
+  deterministic JSON export;
+- an entitlement-only Premium comparison that aligns the same notices across profiles without a
+  score, ranking, or automatic recommendation;
 - a local process adapter that invokes either the source Python `portfolio` command or an embedded
   portfolio-only runtime, enforces a 30-second execution boundary, and validates schema, counts,
-  profile order, shared notice digest, and distinct profile digests before presentation;
+  result arrays, verdict totals, unique identities, profile order, the ordered shared notice set,
+  shared notice digest, and distinct profile digests before presentation;
 - an in-app process-only secure field for Test Store configuration in addition to the optional
   local environment variable;
-- six standalone native contract checks plus source and packaged end-to-end smoke tests;
+- ten standalone native contract checks plus source and packaged end-to-end smoke tests;
 - a reproducible builder that embeds Python, fixtures, licenses, Swift package resources, and build
   provenance, applies an ad-hoc signature, verifies it, and creates a checksum-paired archive;
 - a 1024×1024 icon and a 1179×2556 pre-transaction screenshot generated from reviewed source.
@@ -179,13 +184,15 @@ artifacts are stored in `submission/evidence/`; neither image contains a key or 
 
 The owner has elected not to wait for an organizer response. The remaining minimum is:
 
-1. repeat all local release gates on the evidence revision and retain the clean commit SHA;
-2. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
+1. repeat all local release gates on the review-queue revision and retain the clean commit SHA;
+2. complete the remaining accessibility settings and asynchronous-announcement checks;
+3. inspect the exact private Devpost fields after the owner signs in and joins;
+4. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
    verified duration below two minutes;
-3. confirm active-student status and complete Devpost with the qualifying academic email;
-4. intentionally publish the evidence revision, verify the public repository and video while
+5. confirm active-student status and complete Devpost with the qualifying academic email;
+6. intentionally publish the evidence revision, verify the public repository and video while
    logged out, and then complete the Devpost submission;
-5. disclose the unresolved Test Store-only interpretation accurately and never claim a real
+7. disclose the unresolved Test Store-only interpretation accurately and never claim a real
    payment, App Store transaction, or organizer approval.
 
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted

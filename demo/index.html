@@ -181,6 +181,9 @@
     }
     dt { font-weight: 700; }
     dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+    .source-cell { display: flex; flex-wrap: wrap; gap: .2rem .65rem; align-items: baseline; }
+    .source-link { color: var(--accent-strong); font-weight: 700; text-underline-offset: .16em; }
+    .source-url { color: var(--muted); font-size: .82rem; }
     .verdict {
       display: inline-flex;
       align-items: center;
@@ -330,7 +333,7 @@
           <dt>Buyer</dt><dd>Example City Procurement Office</dd>
           <dt>Deadline</dt><dd>2026-09-15</dd>
           <dt>Published</dt><dd>2026-08-01</dd>
-          <dt>Source</dt><dd>https://procurement.example/notices/SYN-OPEN-001</dd>
+          <dt>Source</dt><dd class="source-cell"><a class="source-link" href="https://procurement.example/notices/SYN-OPEN-001" target="_blank" rel="noopener noreferrer">Open supplied source</a><span class="source-url">https://procurement.example/notices/SYN-OPEN-001</span></dd>
         </dl>
         <div class="evidence-grid">
           <section class="evidence"><h3>Reasons</h3><ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 44 days, meeting the 14-day minimum.</li><li>Exact CPV match: 72260000.</li><li>Country match: AUT.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul></section>
@@ -347,7 +350,7 @@
           <dt>Buyer</dt><dd>Example Regional Authority</dd>
           <dt>Deadline</dt><dd>2026-09-20</dd>
           <dt>Published</dt><dd>2026-07-30</dd>
-          <dt>Source</dt><dd>https://procurement.example/notices/SYN-WATCH-001</dd>
+          <dt>Source</dt><dd class="source-cell"><a class="source-link" href="https://procurement.example/notices/SYN-WATCH-001" target="_blank" rel="noopener noreferrer">Open supplied source</a><span class="source-url">https://procurement.example/notices/SYN-WATCH-001</span></dd>
         </dl>
         <div class="evidence-grid">
           <section class="evidence"><h3>Reasons</h3><ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 49 days, meeting the 14-day minimum.</li><li>Four-digit CPV class match only: profile 72260000, notice 72261000.</li><li>Country match: DEU.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul></section>
@@ -364,7 +367,7 @@
           <dt>Buyer</dt><dd>Example Federal Agency</dd>
           <dt>Deadline</dt><dd>2026-08-05</dd>
           <dt>Published</dt><dd>2026-07-15</dd>
-          <dt>Source</dt><dd>https://procurement.example/notices/SYN-REJECT-001</dd>
+          <dt>Source</dt><dd class="source-cell"><a class="source-link" href="https://procurement.example/notices/SYN-REJECT-001" target="_blank" rel="noopener noreferrer">Open supplied source</a><span class="source-url">https://procurement.example/notices/SYN-REJECT-001</span></dd>
         </dl>
         <div class="evidence-grid">
           <section class="evidence"><h3>Reasons</h3><ul><li>Notice type is competition.</li><li>Notice title is supplied.</li><li>Buyer metadata is supplied.</li><li>Submission deadline leaves 3 days, below the 14-day minimum.</li><li>Exact CPV match: 72260000.</li><li>Country match: AUT.</li><li>A syntactically valid HTTPS source URL is supplied.</li></ul></section>

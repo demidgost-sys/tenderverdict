@@ -8,9 +8,10 @@
 ## Outcome
 
 The main local product path is coherent and packaged: launch, select files, run, retain one Free
-profile, export deterministic JSON, and recover from invalid input. The RevenueCat Test Store path
-was also exercised hands-on through offering load, cancel, failure, retry, success, entitlement
-unlock, relaunch refresh, and restore. These are sandbox outcomes, not a real payment.
+profile, inspect and filter its notice-level reasoning, open a valid supplied source, export
+deterministic JSON, and recover from invalid input. The RevenueCat Test Store path was also
+exercised hands-on through offering load, cancel, failure, retry, success, entitlement unlock,
+relaunch refresh, and restore. These are sandbox outcomes, not a real payment.
 
 ## Flow health
 
@@ -23,6 +24,10 @@ unlock, relaunch refresh, and restore. These are sandbox outcomes, not a real pa
 | Run selected inputs | Pass | Source label changed to both selected files; report remained 3 / 3 |
 | Export JSON | Pass | Native save panel wrote atomically; exported SHA-256 matched CLI stdout exactly |
 | Invalid `as_of` | Pass | Specific error appeared and the previous valid report stayed visible/exportable |
+| Free review queue | Pass | All/Open/Watch/Reject filters changed the visible result set without rerunning analysis |
+| Reason disclosure | Pass | Reasons, unknowns, and the human next step remained readable in the native accessibility tree |
+| Empty filter recovery | Pass | A zero-match filter produced an explicit recovery state rather than a blank panel |
+| Supplied source | Pass | A valid HTTPS source appeared as a named native link; invalid source shapes remain non-clickable |
 | Missing RevenueCat key | Pass | Secure configuration UI shown; no SDK request initiated |
 | Non-Test key | Pass | `appl_invalid_fixture` was rejected locally and cleared from the secure field |
 | Test Store offering | Pass | Current monthly package loaded at localized `0,99 $`; product identifier matched the dashboard |
@@ -43,9 +48,10 @@ Symbols, cards share a 20 pt radius and restrained tinted shadow, and verdict me
 
 1. choose inputs;
 2. run locally;
-3. review the always-free first profile;
-4. understand or unlock the Premium portfolio;
-5. export deterministic JSON.
+3. review and filter the always-free first profile at notice level;
+4. expand reasoning only where more context is needed;
+5. understand or unlock the Premium portfolio comparison;
+6. export deterministic JSON.
 
 At the minimum 900 pt width, labels and actions fit without clipping. Long file names truncate in
 the middle while their complete accessible label remains available. The vertical scroll keeps the
@@ -54,10 +60,18 @@ the real SwiftUI view and visually compared. Both preserve text hierarchy, seman
 field boundaries, and disabled-control states.
 
 The committed competition screenshot is rendered from the real SwiftUI view through an AppKit
-hosting view. Its narrower logical canvas improves the required portrait composition, while the
-footer anchors the tall format and the locked card lists the real synthetic profile names without
-claiming entitlement access. It is exactly 1179×2556, contains no device frame or metadata chunks,
-and depicts the honest missing-key state. It is not transaction evidence.
+hosting view. Its portrait-specific logical canvas keeps the complete hero, Free review queue,
+locked Premium card, and footer visible without truncating the product message. The locked card
+lists the real synthetic profile names without claiming entitlement access. It is exactly
+1179×2556, contains no device frame or metadata chunks, and depicts the honest missing-key state.
+It is not transaction evidence.
+
+A current 1020×754 hands-on pass compared the previous aggregate-only Free surface with the rebuilt
+review queue at the same viewport. The new hierarchy preserved the existing spacing, radius, type,
+and semantic color system while adding the missing user task. Expanded reasoning initially aligned
+too far inside the card; the content was corrected to use the complete available width and then
+rechecked. Verdict filtering, the empty state, disclosure, and the named source link remained
+operable after the fix.
 
 `submission/evidence/unlocked-test-store-2026-08-04.png` is a genuine 1020×754 capture from the
 packaged Debug app after the Test Store entitlement activated. It shows the active entitlement,
@@ -75,6 +89,9 @@ Passes observed in the macOS accessibility tree:
 - The secure field reports secure text rather than its value.
 - Status and error messages include textual meaning and do not rely on color alone.
 - Each profile exposes one combined label with its name and open/watch/reject counts.
+- Verdict filters expose selected radio-button state, result cards expose title, reference, buyer,
+  deadline, verdict, and next step, and every disclosure exposes its expanded state.
+- Safe supplied sources expose the named link and full destination as help text.
 - Locked profile-preview rows expose the profile name and whether it is included or Premium.
 - Native open and save panels provide standard keyboard and assistive-technology behavior.
 - Buttons use large native control sizing; clickable labels are not custom gesture-only views.

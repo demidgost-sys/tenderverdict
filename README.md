@@ -237,7 +237,9 @@ the `supplier_profiles_plus` entitlement as active.
 
 The native UI loads a bundled synthetic portfolio, accepts user-selected workspace and notice
 files, runs the local core with an explicit review point, preserves the previous report after a
-failed run, and atomically exports the exact deterministic JSON. The Swift package pins the
+failed run, presents an actionable Free review queue, compares the same notices across Premium
+profiles without ranking them, and atomically exports the exact deterministic JSON. The Swift
+package pins the
 official RevenueCat Apple SDK to `5.83.0` and contains current-offering, Test Store purchase,
 restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed: no key is committed, a
 missing key makes no RevenueCat request, a pasted key is not persisted, and any key that does not
@@ -253,9 +255,9 @@ TENDERVERDICT_WORKTREE="$PWD" \
   swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen --smoke-test
 ```
 
-The checks require no API key and the smoke test makes no RevenueCat request. They establish source
-compilation, SDK linkage, the free/Premium projection, and consumption of the real synthetic
-portfolio command.
+The ten checks require no API key and the smoke test makes no RevenueCat request. They establish
+source compilation, SDK linkage, full result decoding, ordered shared-notice validation, the
+free/Premium projection, and consumption of the real synthetic portfolio command.
 
 Build a self-contained, ad-hoc-signed `.app` with an embedded portfolio-only Python runtime:
 
@@ -268,12 +270,14 @@ python3 -m venv .venv-build
 ```
 
 The builder verifies the bundle and its embedded-runtime smoke test, then writes a zip and SHA-256
-checksum under `dist/next-gen/`. This packaged path and the native choose/run/export flow are
-locally verified; they are not evidence of a Test Store transaction, entitlement activation,
-restore, or Shipaton eligibility. See the
+checksum under `dist/next-gen/`. The ordinary Release artifact contains no key and is not itself
+transaction evidence. A separate reproducible Debug artifact has completed a local RevenueCat Test
+Store offering, cancel, failure, purchase, entitlement refresh, relaunch, and restore pass. That
+evidence is not a real payment and does not resolve Shipaton's Test Store-only eligibility. See the
 [`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
 [`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates. The complete
-documentation map is in [`docs/README.md`](docs/README.md).
+documentation map is in [`docs/README.md`](docs/README.md), and the judging-to-product map is in the
+[`competition scorecard`](docs/COMPETITION_SCORECARD.md).
 
 The complete CSV header is:
 

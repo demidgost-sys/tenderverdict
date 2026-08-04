@@ -54,15 +54,17 @@ profile.
 
 Both adapters invoke only `portfolio`, capture stdout and stderr in bounded temporary files, cap
 report output at 64 MiB, and terminate work that exceeds 30 seconds. The Swift decoder then checks
-the envelope, nested schema versions, counts, names, totals, profile hashes, and shared notice hash
-before the UI accepts the report.
+the envelope, nested schema versions, profile order and names, totals, result-array lengths, verdict
+counts, unique notice identities, profile hashes, the shared notice hash, and the complete ordered
+shared notice metadata before the UI accepts the report.
 
 ## Free and Premium contract
 
 - Free presentation calls `visibleProfileReports(premiumUnlocked: false)` and exposes only the
-  first profile report.
+  first profile report, including its complete review queue and deterministic export.
 - Premium presentation requires RevenueCat `CustomerInfo` to report the
-  `supplier_profiles_plus` entitlement as active.
+  `supplier_profiles_plus` entitlement as active, then adds a notice-by-profile comparison and all
+  profile summaries without ranking or scoring them.
 - The app loads the current offering, runs the selected Test Store package, handles cancellation,
   restores purchases, and refreshes access on launch.
 - Missing configuration makes no RevenueCat request. Non-`test_` keys are rejected before SDK
@@ -89,11 +91,11 @@ behavior; Premium is the native product experience, not DRM around Apache-2.0 co
 |---|---|
 | Python behavior | Offline unit and end-to-end suite |
 | Public tree | Exact allow-list, bounded binary validation, conservative content scan |
-| Swift contract | Six standalone schema, provenance, access-configuration, and deterministic-byte checks |
+| Swift contract | Ten standalone result, schema, provenance, access-configuration, ordering, and deterministic-byte checks |
 | Source bridge | Headless synthetic smoke test through the real `portfolio` command |
 | Packaged bridge | `.app` smoke test with no worktree or system Python dependency |
 | UX | Hands-on file chooser, local run, export, invalid-input, and missing/rejected-key audit |
-| RevenueCat transaction | Pending configured Test Store project and hands-on evidence |
+| RevenueCat transaction | Packaged Debug Test Store cancel, failure, purchase, refresh, relaunch, restore, and dashboard evidence; not a real payment |
 
 See [UX and accessibility audit](UX_AUDIT.md) and
 [Shipaton evidence](SHIPATON_EVIDENCE.md) for the current result rather than inferring a transaction

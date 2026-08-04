@@ -12,10 +12,14 @@ the complete one-to-five-profile workspace only for an active RevenueCat
 - accepts an explicit date or timezone-aware RFC 3339 review point;
 - runs the embedded deterministic Python core with a 30-second boundary;
 - keeps the previous valid report visible when a new run fails;
+- exposes the complete first-profile result as a filterable Free review queue with human next
+  steps, expandable reasoning, unknowns, and safe supplied-source links;
 - exports the exact combined JSON bytes atomically;
 - accepts a `test_` RevenueCat key in a process-only secure field;
 - loads the current offering, runs a Test Store purchase, handles cancellation, restores, refreshes
   `CustomerInfo`, and projects access through `supplier_profiles_plus`;
+- compares the same notices across all entitled profiles without score, ranking, or an automatic
+  recommendation;
 - rejects missing and non-Test configuration before an SDK request.
 
 The open-source CLI remains available and is not a tamper-resistant payment boundary. The app
@@ -36,8 +40,9 @@ TENDERVERDICT_WORKTREE="$PWD" \
   TenderVerdictNextGen
 ```
 
-`TenderVerdictNextGenChecks` runs six standalone checks for portfolio projection, invalid report
-rejection, Test Store key boundaries, selected-file execution, and byte determinism. The smoke test
+`TenderVerdictNextGenChecks` runs ten standalone checks for portfolio projection, full result
+preservation, empty inputs, nested totals, result-summary consistency, shared notice digest and
+order, Test Store key boundaries, selected-file execution, and byte determinism. The smoke test
 invokes the real Python `portfolio` command without launching a window or configuring RevenueCat.
 
 ## Self-contained app bundle
@@ -107,13 +112,15 @@ automation. Never commit, log, screenshot, or publish a usable key.
 
 ## Evidence boundary
 
-Verified locally: source build, six native checks, source smoke test, self-contained app assembly,
+Verified locally: source build, ten native checks, source smoke test, self-contained app assembly,
 ad-hoc signature verification, embedded-runtime smoke test, native file selection, selected-file
-analysis, atomic export, byte equality with the CLI, invalid-input retention, missing-key state,
-and non-Test-key rejection.
+analysis, Free result review, Premium comparison contract, atomic export, byte equality with the
+CLI, invalid-input retention, missing-key state, non-Test-key rejection, and a separately packaged
+Debug Test Store pass covering offering, cancellation, failure, purchase, entitlement activation,
+relaunch refresh, restore, and VoiceOver activation of Restore.
 
-Not yet verified: a configured RevenueCat project, Test Store offering response, transaction,
-cancellation sheet, entitlement activation, restore, relaunch persistence, VoiceOver purchase flow,
-or organizer acceptance of a Test Store-only Shipaton integration. See
+Not yet verified: organizer acceptance of a Test Store-only Shipaton integration, asynchronous
+VoiceOver announcements across every purchase outcome, Increase Contrast, Reduce Transparency,
+large-text behavior, the private Devpost form, or a public submission. See
 [the evidence record](../../docs/SHIPATON_EVIDENCE.md) and
 [hackathon runbook](../../docs/HACKATHON_RUNBOOK.md).

@@ -62,7 +62,7 @@ struct TenderVerdictNextGenApp: App {
     do {
       let execution = try TenderVerdictProcess().loadSyntheticPortfolioSynchronously()
       let model = AppModel(previewExecution: execution)
-      let logicalWidth: CGFloat = 760
+      let logicalWidth: CGFloat = 800
       let logicalHeight: CGFloat = 2_556 * logicalWidth / 1_179
       let view = ContentView(model: model, startsAutomatically: false, scrollable: false)
         .frame(width: logicalWidth, height: logicalHeight, alignment: .top)
@@ -376,6 +376,7 @@ struct ContentView: View {
         Text("Tender intelligence for every supplier profile.")
           .font(.system(size: 38, weight: .bold, design: .default))
           .tracking(-1.1)
+          .fixedSize(horizontal: false, vertical: true)
         Text(
           "Run one explainable notice review across a named supplier portfolio, "
             + "with the first profile always available for free."
@@ -421,6 +422,7 @@ struct ContentView: View {
         let primary = report.visibleProfileReports(premiumUnlocked: false).first
       {
         ProfileCard(report: primary)
+        ReviewQueue(report: primary)
       } else if model.isLoading {
         LoadingCard(label: "Running the local analysis…")
       } else {
@@ -674,6 +676,14 @@ struct PremiumWorkspaceSection: View {
           }
           .buttonStyle(.bordered)
           .disabled(!controller.canRestore)
+
+          Button {
+            Task { await controller.refresh() }
+          } label: {
+            Label("Refresh offering", systemImage: "arrow.triangle.2.circlepath")
+          }
+          .buttonStyle(.bordered)
+          .disabled(controller.state.isBusy)
         }
       }
     }
@@ -719,6 +729,10 @@ struct PremiumWorkspaceSection: View {
           .buttonStyle(.bordered)
           .disabled(!controller.canRestore)
         }
+        PortfolioComparison(report: report)
+        Text("Profile totals")
+          .font(.headline)
+          .padding(.top, 2)
         ForEach(report.visibleProfileReports(premiumUnlocked: true)) { profile in
           ProfileCard(report: profile)
         }
@@ -779,6 +793,418 @@ struct ProfilePreviewRow: View {
     .accessibilityLabel(
       "\(profile.profile.name), \(accessDescription)"
     )
+  }
+}
+
+private enum ReviewQueueFilter: String, CaseIterable, Identifiable {
+  case all
+  case openDocuments
+  case watch
+  case reject
+
+  var id: String { rawValue }
+
+  var label: String {
+    switch self {
+    case .all:
+      return "All"
+    case .openDocuments:
+      return "Open"
+    case .watch:
+      return "Watch"
+    case .reject:
+      return "Reject"
+    }
+  }
+
+  func includes(_ result: QualificationResult) -> Bool {
+    switch self {
+    case .all:
+      return true
+    case .openDocuments:
+      return result.verdict == .openDocuments
+    case .watch:
+      return result.verdict == .watch
+    case .reject:
+      return result.verdict == .reject
+    }
+  }
+}
+
+struct ReviewQueue: View {
+  let report: ProfileReport
+  @State private var filter = ReviewQueueFilter.all
+  @State private var displayLimit = 8
+
+  private var filteredResults: [QualificationResult] {
+    report.results.filter(filter.includes)
+  }
+
+  private var visibleResults: [QualificationResult] {
+    Array(filteredResults.prefix(displayLimit))
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      ViewThatFits(in: .horizontal) {
+        HStack(alignment: .firstTextBaseline, spacing: 18) {
+          queueHeading
+          Spacer(minLength: 18)
+          filterPicker
+        }
+        VStack(alignment: .leading, spacing: 10) {
+          queueHeading
+          filterPicker
+        }
+      }
+
+      if report.results.isEmpty {
+        NoticeCard(
+          title: "No notices in this run",
+          detail: "The input was valid, but the shared notice set was empty.",
+          systemImage: "tray",
+          tint: .gray
+        )
+      } else if visibleResults.isEmpty {
+        NoticeCard(
+          title: "No results in this view",
+          detail: "Choose another verdict filter to continue the review.",
+          systemImage: "line.3.horizontal.decrease.circle",
+          tint: .gray
+        )
+      } else {
+        LazyVStack(spacing: 10) {
+          ForEach(visibleResults) { result in
+            QualificationResultCard(result: result)
+          }
+        }
+      }
+
+      if visibleResults.count < filteredResults.count {
+        Button {
+          displayLimit += 8
+        } label: {
+          Label(
+            "Show (min(8, filteredResults.count - visibleResults.count)) more",
+            systemImage: "chevron.down"
+          )
+        }
+        .buttonStyle(.bordered)
+      }
+    }
+    .onChange(of: filter) { _ in
+      displayLimit = 8
+    }
+  }
+
+  private var queueHeading: some View {
+    VStack(alignment: .leading, spacing: 3) {
+      Text("Review queue")
+        .font(.headline)
+      Text("Open the reasoning only where a human needs more context.")
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+    }
+  }
+
+  private var filterPicker: some View {
+    Picker("Verdict filter", selection: $filter) {
+      ForEach(ReviewQueueFilter.allCases) { item in
+        Text(item.label).tag(item)
+      }
+    }
+    .pickerStyle(.segmented)
+    .frame(maxWidth: 360)
+  }
+}
+
+struct QualificationResultCard: View {
+  let result: QualificationResult
+  @State private var detailsVisible = false
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      HStack(alignment: .top, spacing: 14) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text(result.displayTitle)
+            .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
+          Text(result.referenceLabel)
+            .font(.caption.monospaced())
+            .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        VerdictBadge(verdict: result.verdict)
+      }
+
+      ViewThatFits(in: .horizontal) {
+        HStack(spacing: 18) {
+          metadata
+        }
+        VStack(alignment: .leading, spacing: 6) {
+          metadata
+        }
+      }
+
+      HStack(alignment: .top, spacing: 9) {
+        Image(systemName: "arrow.turn.down.right")
+          .foregroundStyle(result.verdict.tint)
+          .accessibilityHidden(true)
+        Text(result.humanNextStep)
+          .font(.subheadline.weight(.medium))
+          .fixedSize(horizontal: false, vertical: true)
+      }
+
+      DisclosureGroup("Reasons and unknowns", isExpanded: $detailsVisible) {
+        VStack(alignment: .leading, spacing: 12) {
+          explanationGroup(title: "Reasons", values: result.reasons)
+          explanationGroup(
+            title: "Unknowns",
+            values: result.unknowns.isEmpty
+              ? ["None from the supplied metadata."]
+              : result.unknowns
+          )
+          if let sourceURL = result.safeSourceURL {
+            Link(destination: sourceURL) {
+              Label("Open supplied source", systemImage: "arrow.up.right.square")
+            }
+            .buttonStyle(.link)
+            .help(sourceURL.absoluteString)
+          }
+        }
+        .padding(.top, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+      }
+      .font(.subheadline)
+    }
+    .padding(18)
+    .background(
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
+        .fill(Color(nsColor: .controlBackgroundColor))
+    )
+    .overlay {
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
+        .stroke(result.verdict.tint.opacity(0.18), lineWidth: 1)
+    }
+    .accessibilityElement(children: .contain)
+  }
+
+  @ViewBuilder
+  private var metadata: some View {
+    Label(result.displayBuyer, systemImage: "building.2")
+      .lineLimit(1)
+    Label(result.displayDeadline, systemImage: "calendar")
+      .lineLimit(1)
+  }
+
+  private func explanationGroup(title: String, values: [String]) -> some View {
+    VStack(alignment: .leading, spacing: 7) {
+      Text(title)
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.secondary)
+      ForEach(Array(values.enumerated()), id: \.offset) { item in
+        HStack(alignment: .top, spacing: 9) {
+          Image(systemName: "circle.fill")
+            .font(.system(size: 4))
+            .padding(.top, 7)
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
+          Text(item.element)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+      }
+    }
+  }
+}
+
+struct PortfolioComparison: View {
+  let report: PortfolioWorkspaceReport
+  private let rowLimit = 12
+
+  private var primaryResults: [QualificationResult] {
+    report.profileReports.first?.results ?? []
+  }
+
+  var body: some View {
+    PremiumCard(tint: .indigo) {
+      VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text("Same notices. Different outcomes.")
+            .font(.headline)
+          Text("Each cell is an independent verdict. Profiles are never scored or ranked.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+
+        if primaryResults.isEmpty {
+          Label("The shared notice set is empty.", systemImage: "tray")
+            .foregroundStyle(.secondary)
+        } else {
+          ScrollView(.horizontal, showsIndicators: true) {
+            Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
+              GridRow {
+                Text("Notice")
+                  .font(.caption.weight(.semibold))
+                  .foregroundStyle(.secondary)
+                  .frame(width: 224, alignment: .leading)
+                ForEach(report.profileReports) { profile in
+                  Text(profile.profile.name)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(2)
+                    .frame(width: 126, alignment: .leading)
+                    .frame(minHeight: 34, alignment: .leading)
+                }
+              }
+
+              ForEach(
+                Array(primaryResults.prefix(rowLimit).enumerated()),
+                id: \.element.id
+              ) { item in
+                GridRow {
+                  VStack(alignment: .leading, spacing: 3) {
+                    Text(item.element.displayTitle)
+                      .font(.subheadline.weight(.medium))
+                      .lineLimit(2)
+                    Text(item.element.referenceLabel)
+                      .font(.caption2.monospaced())
+                      .foregroundStyle(.tertiary)
+                  }
+                  .padding(10)
+                  .frame(width: 224, alignment: .leading)
+                  .frame(minHeight: 58, alignment: .leading)
+                  .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                      .fill(Color.primary.opacity(0.035))
+                  )
+
+                  ForEach(report.profileReports) { profile in
+                    let result = profile.results[item.offset]
+                    VerdictBadge(verdict: result.verdict, compact: true)
+                      .frame(width: 126)
+                      .frame(minHeight: 58)
+                      .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                          .fill(result.verdict.tint.opacity(0.055))
+                      )
+                      .accessibilityLabel(
+                        "\(profile.profile.name), \(item.element.displayTitle), "
+                          + result.verdict.label
+                      )
+                  }
+                }
+              }
+            }
+          }
+
+          if primaryResults.count > rowLimit {
+            Text(
+              "Showing the first \(rowLimit) of \(primaryResults.count) notices. "
+                + "Export JSON for the complete deterministic report."
+            )
+            .font(.caption)
+            .foregroundStyle(.tertiary)
+          }
+        }
+      }
+    }
+  }
+}
+
+struct VerdictBadge: View {
+  let verdict: QualificationVerdict
+  var compact = false
+
+  var body: some View {
+    Label(compact ? verdict.shortLabel : verdict.label, systemImage: verdict.systemImage)
+      .font(.caption.weight(.semibold))
+      .foregroundStyle(verdict.tint)
+      .lineLimit(1)
+      .padding(.horizontal, compact ? 9 : 11)
+      .padding(.vertical, 7)
+      .background(
+        Capsule(style: .continuous)
+          .fill(verdict.tint.opacity(0.11))
+      )
+      .overlay {
+        Capsule(style: .continuous)
+          .stroke(verdict.tint.opacity(0.16), lineWidth: 1)
+      }
+      .accessibilityLabel(verdict.label)
+  }
+}
+
+private extension QualificationVerdict {
+  var label: String {
+    switch self {
+    case .openDocuments:
+      return "Open documents"
+    case .watch:
+      return "Watch"
+    case .reject:
+      return "Reject"
+    }
+  }
+
+  var shortLabel: String {
+    self == .openDocuments ? "Open" : label
+  }
+
+  var systemImage: String {
+    switch self {
+    case .openDocuments:
+      return "doc.text.magnifyingglass"
+    case .watch:
+      return "eye"
+    case .reject:
+      return "xmark.circle"
+    }
+  }
+
+  var tint: Color {
+    switch self {
+    case .openDocuments:
+      return .green
+    case .watch:
+      return .orange
+    case .reject:
+      return .red
+    }
+  }
+}
+
+private extension QualificationResult {
+  var displayTitle: String {
+    let value = title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return value.isEmpty ? "Untitled notice" : value
+  }
+
+  var displayBuyer: String {
+    let value = buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return value.isEmpty ? "Buyer not supplied" : value
+  }
+
+  var displayDeadline: String {
+    deadlineAt ?? deadline ?? "Deadline not supplied"
+  }
+
+  var referenceLabel: String {
+    guard let lotID, !lotID.isEmpty else {
+      return publicationNumber
+    }
+    return "\(publicationNumber) / \(lotID)"
+  }
+
+  var safeSourceURL: URL? {
+    guard let sourceURL, let value = URL(string: sourceURL),
+      value.scheme?.lowercased() == "https",
+      value.host != nil,
+      value.user == nil,
+      value.password == nil,
+      value.fragment == nil
+    else {
+      return nil
+    }
+    return value
   }
 }
 

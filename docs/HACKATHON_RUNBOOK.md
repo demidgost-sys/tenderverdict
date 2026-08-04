@@ -11,6 +11,11 @@ of the RevenueCat SDK, an active-student/academic-email check, a public open-sou
 public demo video under two minutes, a 1024×1024 icon, and at least one 1179×2556 screenshot without
 a device frame.
 
+The public Devpost page currently lists Charlie Chapman and David Barnard as judges, while the
+Official Rules allow the panel to change. Product prioritization therefore follows the published
+problem, working-app, RevenueCat/monetization, and product/technical-care criteria recorded in the
+[competition scorecard](COMPETITION_SCORECARD.md), not inferred personal preferences.
+
 Sources rechecked on 2026-08-04:
 
 - [Official Rules](https://revenuecat-shipaton-2026.devpost.com/rules)
@@ -22,6 +27,10 @@ Sources rechecked on 2026-08-04:
 No checked Shipaton source explicitly resolves whether a Test Store-only purchase satisfies the
 purchase requirement. The owner has directed work to continue without waiting for a response, so
 retain this as a disclosed eligibility risk and do not describe it as organizer approval.
+
+The unauthenticated Devpost project page currently requires registration before exposing project
+editing. Do not invent private form fields: inspect them only after the owner joins and signs in.
+Until then, this runbook tracks the requirements visible in the public rules and pages.
 
 ## Reproducible local build
 
@@ -128,6 +137,8 @@ capture. Never use a fake entitlement state as evidence.
 - [ ] Either a written organizer answer permits the Test Store-only path or the unresolved risk is
   disclosed without claiming approval.
 - [ ] Devpost participation uses the qualifying academic email and student status is current.
+- [ ] Exact private Devpost fields are inspected after joining; required public claims and assets
+  agree with the final repository state.
 - [ ] Public branch contains all source, assets, instructions, and the Apache-2.0 license.
 - [ ] CI passes on the submitted revision.
 - [x] Packaged `.app` checksum, signature, smoke test, and hands-on local-file flow pass.
