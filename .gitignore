@@ -2,9 +2,11 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .coverage
+.build/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+.swiftpm/
 .venv/
 build/
 dist/

@@ -30,9 +30,17 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
 - Portfolio Workspace parses one bounded workspace and one bounded notice file before atomically
   emitting JSON; one invalid nested profile fails the whole run.
 - The tool does not require credentials and should not be given secrets.
-- The current repository contains no RevenueCat API key or purchase implementation. A future
-  native debug integration must keep Test Store configuration out of committed source and fail
-  closed when configuration is absent.
+- The unreleased Next Gen shell contains a pinned official RevenueCat SDK integration, but no API
+  key. It accepts only a locally supplied Test Store-shaped key, stays locked without one, and does
+  not configure the SDK or make a RevenueCat request in that default state.
+- A configured Next Gen launch can contact RevenueCat and initiate Test Store purchase or restore
+  only after the evaluator supplies local configuration and activates the corresponding UI
+  control. Do not put a key in source, reports, logs, issues, or build artifacts.
+- The native shell passes only a minimal environment to its Python child process; RevenueCat
+  configuration and unrelated parent-process variables are not forwarded.
+- The open-source Python CLI and local input files remain directly accessible. The SwiftUI
+  entitlement state is a product presentation boundary, not an anti-tamper or confidentiality
+  control.
 - Output can contain content copied from input metadata. Treat generated files as untrusted data.
 - A verdict is not a security, legal, eligibility, or procurement decision.
 

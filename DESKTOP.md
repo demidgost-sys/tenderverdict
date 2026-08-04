@@ -7,8 +7,10 @@ The preview is intended for evaluation. It is not a signed consumer release or a
 procurement, eligibility, or legal review.
 
 The Tk desktop remains a single-profile surface. The unreleased Portfolio Workspace contract is
-available only through the local `portfolio` CLI and is not evidence of a native premium UI,
-RevenueCat integration, purchase flow, or entitlement gate.
+available through the local `portfolio` CLI and an additional competition-only SwiftUI source
+shell under `macos/TenderVerdictNextGen`. That shell is not part of `v0.2.0-alpha.1` or its archives;
+its source build is not evidence of a Test Store transaction, packaged app, or qualifying
+submission.
 
 ## Release status
 

@@ -18,6 +18,7 @@
   <a href="#desktop-preview">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
   <a href="#portfolio-workspace-json">Portfolio Workspace</a> ·
+  <a href="#next-gen-macos-shell">Next Gen macOS</a> ·
   <a href="#verdicts">Verdicts</a> ·
   <a href="ROADMAP.md">Roadmap</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
@@ -54,6 +55,7 @@ It does not read full procurement documents or decide whether you should bid.
 | macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
 | Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
 | Portfolio Workspace CLI | Unreleased source feature | Current source checkout only |
+| Next Gen SwiftUI shell | Unreleased, source-buildable competition feature | macOS source checkout only |
 
 There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
 update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
@@ -220,6 +222,36 @@ digest for every profile. The command writes JSON atomically when `--output` is 
 the same JSON to stdout when it is omitted; it intentionally has no Markdown or HTML portfolio
 format yet.
 
+### Next Gen macOS shell
+
+The competition branch now includes an unreleased SwiftUI shell in
+[`macos/TenderVerdictNextGen`](macos/TenderVerdictNextGen). It consumes the Portfolio Workspace
+JSON instead of reimplementing qualification rules, preserves the first profile as the free
+single-analysis surface, and reveals all one to five profile reports only when RevenueCat reports
+the `supplier_profiles_plus` entitlement as active.
+
+The Swift package pins the official RevenueCat Apple SDK to `5.83.0` and contains current-offering,
+Test Store purchase, restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed:
+no key is committed, a missing key makes no RevenueCat request, and the source rejects any key that
+does not begin with `test_`. The open-source CLI remains accessible and is not presented as a
+tamper-resistant payment boundary.
+
+Build and verify the source on macOS from the repository root:
+
+```bash
+swift build --package-path macos/TenderVerdictNextGen
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+TENDERVERDICT_WORKTREE="$PWD" \
+  swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen --smoke-test
+```
+
+The checks require no API key and the smoke test makes no RevenueCat request. They establish source
+compilation, SDK linkage, the free/Premium projection, and consumption of the real synthetic
+portfolio command. They are not evidence of a Test Store transaction, entitlement activation,
+restore, packaged application, or Shipaton eligibility. See the
+[`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
+[`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates.
+
 The complete CSV header is:
 
 ```text
@@ -299,6 +331,8 @@ python3 tools/security_scan.py
 ruff check .
 ruff format --check .
 mypy
+swift build --package-path macos/TenderVerdictNextGen
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
 ```
 
 The functional test suite is offline; TED behaviour is tested with mocked HTTP responses.

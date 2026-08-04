@@ -12,6 +12,7 @@ documented evidence gates pass.
 | `v0.2.0-alpha.1` | Desktop developer alpha with CLI, library, and local UI | Technical evaluator |
 | Native desktop archives | Unsigned prerelease archives with checksums and build manifests | Opt-in evaluation only |
 | Portfolio Workspace in current source | Offline JSON CLI for one to five profiles | Technical evaluator |
+| Next Gen SwiftUI shell in current source | Source-buildable macOS UI with pinned RevenueCat SDK | Competition prototype evaluator |
 | Hosted service, accounts, production payments, analytics | Not implemented | Nobody |
 
 The current product contract remains narrow: local, deterministic pre-qualification of supplied
@@ -28,6 +29,13 @@ Current source also contains the RevenueCat-independent Portfolio Workspace foun
 the canonical profile and qualification rules, evaluates one notice set independently for up to
 five profiles, and emits JSON with one schema-3 report per profile. It is not included in the
 published `v0.2.0-alpha.1` tag and is not exposed by the Tk desktop.
+
+The competition branch additionally contains an unreleased SwiftUI shell that consumes this JSON,
+links the official `purchases-ios` `5.83.0` package, keeps one profile visible in free mode, and
+maps the `supplier_profiles_plus` entitlement to the complete workspace. Its build, native contract
+checks, and headless Python-adapter smoke test pass locally without a key or RevenueCat request.
+No configured Test Store project, transaction, restore, packaged app, or submission evidence has
+been established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -81,22 +89,24 @@ Maintainer runs and CI jobs do not count toward this threshold.
 ## Shipaton Next Gen branch
 
 The competition branch has a narrower conditional path documented in
-[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The offline Portfolio Workspace core is
-implemented, but it does not satisfy the Shipaton RevenueCat requirement on its own. Native work
-remains gated on a written organizer answer confirming whether an official SDK flow using only
-RevenueCat Test Store is sufficient for the store-exempt Next Gen path.
+[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core and native
+source shell are implemented, but neither source code nor a compile-only SDK link satisfies the
+Shipaton RevenueCat purchase requirement. Test Store execution remains gated on a written organizer
+answer confirming whether a Test Store-only SDK flow is sufficient for the store-exempt Next Gen
+path.
 
-If that answer is positive, the remaining order is:
+The remaining order is:
 
-1. install and select a compatible full Xcode toolchain;
-2. add a minimal SwiftUI macOS shell that consumes the documented portfolio JSON contract;
-3. integrate the official pinned RevenueCat Apple SDK for offering, purchase, restore, and
-   `supplier_profiles_plus` entitlement states;
-4. keep Test Store configuration fail-closed and out of committed source;
-5. test success, failure, cancellation, restore, missing configuration, and offline entitlement
-   presentation;
-6. produce the required public demo video, icon, screenshot, repository instructions, and final
-   evidence audit.
+1. verify the organizer answer and the entrant's student/email eligibility;
+2. install and select a compatible full Xcode toolchain for an interactive `.app` workflow;
+3. create the RevenueCat Test Store project objects for the committed entitlement contract,
+   without adding a production product or key;
+4. provide the Test Store key only through a local scheme or launch environment and verify the
+   locked, offering, success, cancellation, failure, restore, and relaunch states hands-on;
+5. add deterministic controller-level tests around those observed state transitions without
+   embedding a usable key;
+6. package the app and produce the required public demo video, icon, screenshot, repository
+   instructions, and final evidence audit.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.

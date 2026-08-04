@@ -48,6 +48,7 @@ include = [
   "/docs/SHIPATON_EVIDENCE.md",
   "/docs/assets",
   "/examples",
+  "/macos",
   "/packaging",
   "/src",
   "/tests",

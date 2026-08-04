@@ -249,10 +249,41 @@ jobs:
           retention-days: 7
           compression-level: 0
 
+  next-gen:
+    name: Validate Next Gen macOS source
+    needs: validate
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up exact Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.6"
+
+      - name: Build exact Swift package
+        run: swift build --package-path macos/TenderVerdictNextGen
+
+      - name: Run native contract checks
+        run: >-
+          swift run --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGenChecks
+
+      - name: Smoke-test the Python portfolio adapter
+        env:
+          TENDERVERDICT_WORKTREE: ${{ github.workspace }}
+        run: >-
+          swift run --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGen --smoke-test
+
   gate:
     name: Desktop gate
     if: always()
-    needs: [validate, build]
+    needs: [validate, build, next-gen]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -260,6 +291,8 @@ jobs:
         env:
           VALIDATE_RESULT: ${{ needs.validate.result }}
           BUILD_RESULT: ${{ needs.build.result }}
+          NEXT_GEN_RESULT: ${{ needs.next-gen.result }}
         run: |
           test "${VALIDATE_RESULT}" = "success"
           test "${BUILD_RESULT}" = "success"
+          test "${NEXT_GEN_RESULT}" = "success"

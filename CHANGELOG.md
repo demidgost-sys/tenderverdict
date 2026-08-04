@@ -14,13 +14,21 @@ identifiers and may change interfaces during the alpha period.
   every profile and emits deterministic JSON containing canonical schema-3 profile reports.
 - Added a three-profile synthetic workspace plus validation, ordering, provenance, empty-input,
   terminal-safety, atomic-output, and network-isolation regression coverage.
+- Added an unreleased SwiftUI Next Gen source shell that consumes the canonical portfolio report,
+  preserves one free profile, and presents all profiles for an active `supplier_profiles_plus`
+  entitlement.
+- Added the official RevenueCat Apple SDK pinned exactly to `5.83.0`, with fail-closed Test Store
+  configuration plus offering, purchase, cancellation, restore, and entitlement source paths.
+- Added standalone native contract checks, a headless Python-adapter smoke test, and a macOS CI job
+  for the Swift package.
 
 ### Changed
 
 - Extended the installed-wheel smoke test and public documentation to cover the new portfolio CLI
   while keeping the published single-profile CLI and desktop workflows unchanged.
-- Documented the conditional Shipaton Next Gen boundary: the RevenueCat-independent portfolio core
-  is implemented, while the native SDK purchase and entitlement flow remains gated.
+- Documented the conditional Shipaton Next Gen boundary: the portfolio and native source
+  foundations are implemented, while dashboard configuration, a Test Store transaction, packaged
+  app evidence, and eligibility remain gated.
 
 ## [0.2.0a1] - 2026-08-04
 

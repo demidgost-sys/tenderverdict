@@ -107,6 +107,28 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn('tools/security_scan.py --root "${sdist_root}" --sdist', workflow)
         self.assertNotIn('rm "${sdist_root}/PKG-INFO"', workflow)
 
+    def test_next_gen_sdk_pin_and_ci_are_explicit(self) -> None:
+        package_root = ROOT / "macos" / "TenderVerdictNextGen"
+        package = (package_root / "Package.swift").read_text(encoding="utf-8")
+        resolved = json.loads((package_root / "Package.resolved").read_text(encoding="utf-8"))
+        workflow = (ROOT / ".github" / "workflows" / "desktop.yml").read_text(encoding="utf-8")
+        metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+        self.assertIn('exact: "5.83.0"', package)
+        self.assertEqual(len(resolved["pins"]), 1)
+        pin = resolved["pins"][0]
+        self.assertEqual(pin["identity"], "purchases-ios")
+        self.assertEqual(pin["state"]["version"], "5.83.0")
+        self.assertEqual(
+            pin["state"]["revision"],
+            "c69a23f56c63bdfe96096fa64a1c65334d2592db",
+        )
+        self.assertIn("swift build --package-path macos/TenderVerdictNextGen", workflow)
+        self.assertIn("TenderVerdictNextGenChecks", workflow)
+        self.assertIn("TenderVerdictNextGen --smoke-test", workflow)
+        self.assertNotIn("REVENUECAT_TEST_STORE_API_KEY", workflow)
+        self.assertIn("/macos", metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"])
+
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
         local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
