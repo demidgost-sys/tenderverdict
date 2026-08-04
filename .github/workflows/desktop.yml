@@ -161,8 +161,12 @@ jobs:
           mkdir -p "$stage/Example data"
           cp examples/synthetic/profile.json examples/synthetic/notices.csv \
             "$stage/Example data/"
+          release_args=()
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            release_args+=(--public-release)
+          fi
           PYTHONPATH=src python tools/write_build_manifest.py \
-            --ci --signature-state adhoc \
+            --ci "${release_args[@]}" --signature-state adhoc \
             --target "${{ matrix.target }}" --output "$stage/BUILD_INFO.txt"
           ditto -c -k --norsrc --keepParent "$stage" \
             "TenderVerdict-${{ matrix.target }}.zip"
@@ -190,9 +194,13 @@ jobs:
           New-Item -ItemType Directory -Force "$stage\Example data" | Out-Null
           Copy-Item examples\synthetic\profile.json, examples\synthetic\notices.csv `
             "$stage\Example data"
+          $releaseArgs = @()
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $releaseArgs += "--public-release"
+          }
           $env:PYTHONPATH = "src"
           python tools\write_build_manifest.py `
-            --ci --signature-state not-signed `
+            --ci @releaseArgs --signature-state not-signed `
             --target "${{ matrix.target }}" --output "$stage\BUILD_INFO.txt"
           # Match the macOS artifacts: extraction creates one clearly named
           # top-level folder instead of scattering files into the destination.
