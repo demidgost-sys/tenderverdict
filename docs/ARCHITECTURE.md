@@ -6,9 +6,11 @@ forking the qualification rules.
 
 ```mermaid
 flowchart LR
-  W["Workspace v1 JSON\n1–5 profiles"] --> C["TenderVerdict Python core"]
-  N["Normalized notices\nCSV or JSON"] --> C
-  A["Explicit as_of"] --> C
+  B["Profile Builder\n1–5 profiles"] --> W["Workspace v1 JSON"]
+  W --> L["Private Next Gen launcher"]
+  N["Normalized notices\nCSV or JSON"] --> L
+  A["Explicit as_of"] --> L
+  L --> C["TenderVerdict Python core"]
   C --> R["Portfolio report v1"]
   R --> F["Free projection\nfirst schema-3 report"]
   R --> P["Premium projection\nall schema-3 reports"]
@@ -23,8 +25,9 @@ flowchart LR
 | `src/tenderverdict` | Parse, validate, qualify, serialize, and preserve provenance | None for `demo`, `qualify`, and `portfolio` |
 | `tenderverdict fetch-ted` | Explicit bounded metadata retrieval from TED | Yes, only when invoked |
 | Tk desktop | Existing single-profile input, review, and HTML/Markdown/JSON export | None |
-| `macos/TenderVerdictNextGen` | Native workspace input, free/Premium projection, and RevenueCat states | Only the RevenueCat SDK after a Test Store key is supplied |
-| `TenderVerdictCore` | PyInstaller-frozen, portfolio-only Python runtime embedded in the `.app` | None; TED and Tk modules are excluded |
+| `tools/next_gen_core_launcher.py` | Private app bridge for `portfolio`, strict workspace normalization, and bounded notice preview | None |
+| `macos/TenderVerdictNextGen` | Profile Builder, import preview, local continuity, Free/Premium review, and RevenueCat states | Only the RevenueCat SDK after a Test Store key is supplied |
+| `TenderVerdictCore` | PyInstaller-frozen copy of the private launcher embedded in the `.app` | None; public CLI, TED, and Tk modules are excluded |
 | `tools/build_next_gen.py` | Release Swift build, embedded-core build, bundle assembly, ad-hoc signing, smoke test, zip, checksum | May resolve the exactly pinned Swift package; the produced app and smoke test are offline |
 
 ## Qualification flow
@@ -43,20 +46,45 @@ flowchart LR
 There is deliberately no aggregate verdict total, score, ranking, confidence, or recommended
 profile.
 
+## Input preparation contract
+
+Workspace selection and the Profile Builder both converge on
+`normalize-workspace --workspace PATH`. The Python parser enforces the 256 KiB limit, strict
+envelope and nested profile schemas, one-to-five bound, case-insensitive unique names, authority
+tables, normalization, and deterministic ASCII-safe JSON. The builder writes those returned bytes
+atomically; Swift's local model is an additional fail-closed decoder, not a second authority.
+
+Notice selection converges on `inspect-notices --notices PATH --limit 5`. The canonical CSV/JSON
+parser validates the complete file once and returns an exact schema-1 preview with:
+
+- source kind and full notice count;
+- a fixed canonical field list and up to five normalized records in source order;
+- full-file missing counts for type, title, buyer, CPV codes, countries, deadline, and source URL.
+
+`deadline` is missing only when both the calendar-date and timestamp fields are absent. Preview
+output is capped at 4 MiB, its requested row limit is bounded to 1–20, and malformed input exits
+with code `2` and no stdout.
+
 ## Native runtime selection
 
 `TenderVerdictProcess` chooses one of two adapters:
 
-1. A packaged app uses `Contents/Resources/TenderVerdictCore/TenderVerdictCore` and bundled
-   synthetic fixtures. It does not need Python or a source checkout on the evaluator's machine.
-2. A source build uses `python3 -m tenderverdict` from `TENDERVERDICT_WORKTREE` or a detected source
-   root.
+1. A packaged app executes `Contents/Resources/TenderVerdictCore/TenderVerdictCore`, the frozen
+   private launcher, and bundled synthetic fixtures. It needs neither Python nor a source checkout
+   on the evaluator's machine.
+2. A source build executes `/usr/bin/env python3 tools/next_gen_core_launcher.py` from
+   `TENDERVERDICT_WORKTREE` or a detected source root.
 
-Both adapters invoke only `portfolio`, capture stdout and stderr in bounded temporary files, cap
-report output at 64 MiB, and terminate work that exceeds 30 seconds. The Swift decoder then checks
-the envelope, nested schema versions, profile order and names, totals, result-array lengths, verdict
-counts, unique notice identities, profile hashes, the shared notice hash, and the complete ordered
-shared notice metadata before the UI accepts the report.
+Neither adapter uses a shell. Both expose only `portfolio`, `normalize-workspace`, and
+`inspect-notices`, run with a reduced child environment, capture stdout and stderr in bounded
+temporary files, cap report output at 64 MiB and stderr at 64 KiB, and terminate work that exceeds
+30 seconds. Workspace normalization is capped at 256 KiB and notice preview at 4 MiB.
+
+After `portfolio`, the Swift decoder checks the envelope, nested schema versions, profile order and
+names, totals, result-array lengths, verdict counts, unique notice identities, profile hashes, the
+shared notice hash, and the complete ordered shared notice metadata before the UI accepts the
+report. Workspace and preview responses have their own strict unknown-field, bound, normalization,
+and consistency checks.
 
 ## Free and Premium contract
 
@@ -65,14 +93,35 @@ shared notice metadata before the UI accepts the report.
 - Premium presentation requires RevenueCat `CustomerInfo` to report the
   `supplier_profiles_plus` entitlement as active, then adds a notice-by-profile comparison and all
   profile summaries without ranking or scoring them.
+- Free review uses verdict, text, buyer, and deadline-presence filters with progressive disclosure.
+  Premium applies text, buyer, and deadline filters to the shared notice identities. Matrix cells
+  resolve a profile/result pair by stable IDs, never by the current filtered offset, before opening
+  complete result detail.
 - The app loads the current offering, runs the selected Test Store package, handles cancellation,
   restores purchases, and refreshes access on launch.
 - Missing configuration makes no RevenueCat request. Non-`test_` keys are rejected before SDK
   configuration. A key pasted into the app is held only for that process and is not persisted by
   TenderVerdict.
 
+The Shipaton Manager confirmed that the Test Store path is sufficient and that macOS has no
+judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
+[macOS answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
+
 The public CLI can still produce the complete portfolio report. This is intentional open-source
 behavior; Premium is the native product experience, not DRM around Apache-2.0 code.
+
+## Local continuity and accessibility
+
+File continuity is opt-in. `WorkspaceContinuity` stores only the selected workspace and notices as
+macOS security-scoped bookmarks in app defaults. Disabling the setting removes both bookmarks.
+Restored selections are validated again and are never run automatically. Tender contents,
+generated report bytes, review dates, and RevenueCat configuration remain session-only.
+
+Premium terminal states map to pure announcement, recovery-action, and focus-target values. When
+VoiceOver is enabled and a visible app window exists, the app posts the terminal announcement. It
+restores focus only after an explicit user action, avoiding launch-time focus theft. Native cards
+also respond to Increase Contrast and Reduce Transparency, while verdict meaning always remains in
+text as well as color.
 
 ## Failure and privacy boundaries
 
@@ -82,19 +131,20 @@ behavior; Premium is the native product experience, not DRM around Apache-2.0 co
 - Local profile and notice data are sent only to the embedded child process. They are not sent to
   RevenueCat.
 - RevenueCat receives its normal SDK identifiers and Test Store operations only after the evaluator
-  explicitly supplies a Test Store key.
+  explicitly supplies a Test Store key. Its normal SDK customer state is distinct from
+  TenderVerdict's session-only API-key field and offline input path.
 - The app bundle is ad-hoc signed and not notarized. It remains an evaluation artifact.
 
 ## Verification layers
 
 | Layer | Evidence |
 |---|---|
-| Python behavior | Offline unit and end-to-end suite |
+| Python behavior | 122 offline tests, including six private-launcher contract tests and three release-scanner regressions |
 | Public tree | Exact allow-list, bounded binary validation, conservative content scan |
-| Swift contract | Ten standalone result, schema, provenance, access-configuration, ordering, and deterministic-byte checks |
-| Source bridge | Headless synthetic smoke test through the real `portfolio` command |
-| Packaged bridge | `.app` smoke test with no worktree or system Python dependency |
-| UX | Hands-on file chooser, local run, export, invalid-input, and missing/rejected-key audit |
+| Swift contract | 15 standalone result, schema, provenance, input-preview, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
+| Source bridge | Headless synthetic smoke through the private launcher; no RevenueCat configuration |
+| Packaged bridge | Current Release `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect deterministic; ad-hoc signature verified |
+| UX | Source implementation includes Profile Builder, import preview, filters, detail, focus, contrast, and transparency handling; refreshed screenshot/settings QA remains separate |
 | RevenueCat transaction | Packaged Debug Test Store cancel, failure, purchase, refresh, relaunch, restore, and dashboard evidence; not a real payment |
 
 See [UX and accessibility audit](UX_AUDIT.md) and

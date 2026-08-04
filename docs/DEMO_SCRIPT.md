@@ -1,26 +1,35 @@
-# Two-minute Shipaton demo script
+# Shipaton demo script
 
-Target duration: **1:55**. Record the packaged macOS app, not `swift run`. Keep the cursor deliberate
-and the window large enough to read.
+Target duration: **1:48**. This is a ready-to-record script for the final packaged Debug build; it
+does not require recording during implementation. Keep the app window readable and use committed
+synthetic data only.
 
-| Time | Screen action | Narration point |
+| Time | Screen action | Narration |
 |---|---|---|
-| 0:00–0:12 | Show title and synthetic result | Suppliers often need to review the same tender feed for several legal entities or service profiles. |
-| 0:12–0:27 | Point to Local analysis, Schema verified, and the Free card | TenderVerdict applies explainable, deterministic metadata rules locally; the first profile remains free. |
-| 0:27–0:45 | Choose the three-profile workspace and notices, confirm `as_of`, run | One bounded notice set is parsed once and evaluated independently for each named profile. |
-| 0:45–0:58 | Show Free metrics and export | The existing schema-3 report and deterministic JSON export are preserved; there is no ranking or black-box score. |
-| 0:58–1:15 | Show locked Premium section and connect the Test Store key off-camera/pasted | The native Portfolio Workspace is gated by RevenueCat entitlement `supplier_profiles_plus`; the key is not stored. |
-| 1:15–1:30 | Run the official Test Store purchase | RevenueCat owns the offering, purchase result, and `CustomerInfo` entitlement state. State exactly that this is Test Store with no real charge. |
-| 1:30–1:44 | Show all profile cards after success | Active entitlement reveals the complete portfolio without changing any qualification result. |
-| 1:44–1:53 | Restore or relaunch and show access returning | Restore/relaunch proves the UI is driven by RevenueCat access state rather than a local demo toggle. |
-| 1:53–1:55 | End card/window | Open-source macOS app, public repository, Apache-2.0. |
+| 0:00–0:08 | Show the TenderVerdict hero and three-profile synthetic result. | One tender feed can mean three different decisions for three supplier profiles. TenderVerdict keeps that review local, deterministic, and explainable. |
+| 0:08–0:22 | Open **Build profiles…**; show names, CPVs, countries, lead time, ordering, and **Validate & Save As…**; close without changing the prepared fixture. | The native Profile Builder creates one to five named profiles and validates every value through the canonical bundled rules—no hand-edited JSON required. |
+| 0:22–0:36 | Choose the committed workspace and notices. Pause on the import preview and its metadata-gap badges, leave bookmark continuity visibly optional, then run. | Before analysis, the import preview shows the file type, total notices, sample records, and missing metadata. Remembering only the two file bookmarks is explicit opt-in; no report, review date, or key is stored. |
+| 0:36–0:52 | In the always-free first report, search or choose buyer/deadline/verdict filters; expand one result and point to Export JSON. | The first complete analysis and deterministic export stay free. Search and filters narrow the review queue, while every result keeps its verdict, reasons, unknowns, and human next step. |
+| 0:52–1:02 | Show the locked Portfolio Workspace with the current localized Test Store package already loaded. Do not show the key. | RevenueCat controls one meaningful upgrade: `supplier_profiles_plus` reveals cross-profile comparison. This is the official Test Store path, with no real charge. |
+| 1:02–1:24 | Run the real RevenueCat Test Store purchase and keep the purchase sheet plus resulting unlocked state in one continuous segment. | RevenueCat owns the offering, purchase outcome, and `CustomerInfo` entitlement. The qualification results never change when access unlocks. |
+| 1:24–1:40 | Filter the shared comparison, select a verdict cell, and show that profile/notice detail with reasons and next step. | Each cell is an independent verdict, never a score or ranking. One click opens the exact evidence for that supplier and notice. |
+| 1:40–1:46 | Close the detail and activate **Restore access**; show the unlocked state returning or remaining active. | Restore proves access comes from RevenueCat state, not a hidden demo switch. |
+| 1:46–1:48 | End on the unlocked product title or repository end card. | Open source, macOS, Apache 2.0. |
 
-## Recording rules
+## Capture setup
 
-- Do not show the API key, account email, browser cookies, dashboard secrets, or unrelated files.
-- Use only committed synthetic notices and profiles.
-- Show the RevenueCat purchase sheet and the resulting unlocked app state in one continuous cut.
-- If restore cannot fit under two minutes, show it in a short accelerated segment, but do not hide a
-  failure or splice a fake state.
-- Avoid calling the verdicts legal decisions, recommendations, or AI predictions.
-- Publish to public YouTube or Vimeo only after the final cut is checked at normal speed with sound.
+- Build the exact final revision with `--configuration debug`; Test Store purchases do not run in
+  the ordinary Release package.
+- Record only after the full verification emits `NEXT_GEN_CHECKS_OK checks=15` on that final
+  revision.
+- Prepare the selected synthetic files and a valid `test_` key before capture. Connect the offering
+  without showing the key, terminal, account email, or RevenueCat dashboard secrets.
+- Keep the RevenueCat purchase sheet and resulting entitlement state in one continuous segment.
+  Cuts may tighten navigation elsewhere, but must not hide a failure or fabricate state.
+- If the Test Store sheet or Restore exceeds the budget, shorten the Profile Builder and filter
+  pauses first. Keep the final published video **at or below 1:50** and the official under-two-minute
+  limit.
+- State **Test Store, no real charge**. Do not call it an App Store payment.
+- Avoid calling verdicts legal decisions, recommendations, AI predictions, scores, or rankings.
+- Add accurate captions, then check the final public YouTube/Vimeo cut at normal speed with sound
+  before entering its URL in Devpost.

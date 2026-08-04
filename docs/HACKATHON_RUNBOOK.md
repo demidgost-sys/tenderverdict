@@ -1,8 +1,8 @@
 # Shipaton Next Gen runbook
 
 This runbook turns the repository into a competition submission without upgrading unverified facts
-into claims. The controlling evidence record is [SHIPATON_EVIDENCE.md](SHIPATON_EVIDENCE.md).
-Current implementation and submission counts are tracked in
+into claims. The controlling evidence record is [SHIPATON_EVIDENCE.md](SHIPATON_EVIDENCE.md), and
+current implementation and submission counts are tracked in
 [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## Official submission gates
@@ -13,26 +13,58 @@ of the RevenueCat SDK, an active-student/academic-email check, a public open-sou
 public demo video under two minutes, a 1024×1024 icon, and at least one 1179×2556 screenshot without
 a device frame.
 
+Two previously open interpretation gates now have written organizer answers:
+
+- On 2026-08-05, Shipaton Manager Perttu confirmed that a RevenueCat Test Store-only purchase is
+  acceptable for the Next Gen entry. Preserve the complete thread as submission evidence:
+  [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient).
+- The Shipaton team also confirmed that a macOS app is eligible and is not disadvantaged merely for
+  being a macOS submission:
+  [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
+
+These answers resolve the platform and Test Store interpretation gates. They do not replace the
+remaining personal eligibility, public repository, media, final-revision, or Devpost form checks.
+Do not broaden either answer into a promise about judging outcome.
+
 The public Devpost page currently lists Charlie Chapman and David Barnard as judges, while the
 Official Rules allow the panel to change. Product prioritization therefore follows the published
 problem, working-app, RevenueCat/monetization, and product/technical-care criteria recorded in the
 [competition scorecard](COMPETITION_SCORECARD.md), not inferred personal preferences.
 
-Sources rechecked on 2026-08-04:
+Sources rechecked on 2026-08-05:
 
 - [Official Rules](https://revenuecat-shipaton-2026.devpost.com/rules)
 - [Next Gen Award](https://www.shipaton.com/next-gen)
 - [FAQ](https://www.shipaton.com/faq)
 - [RevenueCat Test Store](https://www.revenuecat.com/docs/test-and-launch/sandbox/test-store)
 - [RevenueCat macOS installation](https://www.revenuecat.com/docs/getting-started/installation/macos)
+- [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
+- [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-No checked Shipaton source explicitly resolves whether a Test Store-only purchase satisfies the
-purchase requirement. The owner has directed work to continue without waiting for a response, so
-retain this as a disclosed eligibility risk and do not describe it as organizer approval.
-
-The unauthenticated Devpost project page currently requires registration before exposing project
+The unauthenticated Devpost project page still requires registration before exposing project
 editing. Do not invent private form fields: inspect them only after the owner joins and signs in.
-Until then, this runbook tracks the requirements visible in the public rules and pages.
+
+## Current product proof
+
+The current source adds a complete local Portfolio Workspace journey on top of the deterministic
+Python contracts:
+
+1. Create, reorder, and validate one to five supplier profiles in the native Profile Builder.
+2. Choose normalized CSV or JSON notices and inspect their count, first records, and metadata gaps
+   before running anything.
+3. Optionally remember only security-scoped bookmarks for the two chosen files. Tender contents,
+   reports, review dates, and the RevenueCat key remain session-only; restoring those files never
+   runs the selected portfolio automatically.
+4. Run one bounded notice set through the canonical core and keep the first complete report and
+   export free.
+5. Search and filter the review queue by text, buyer, deadline presence, and verdict.
+6. Unlock the full comparison through `supplier_profiles_plus`, then open any comparison cell to
+   inspect that exact profile/notice verdict, reasons, unknowns, next step, and safe HTTPS source.
+
+The native contract suite now contains 15 checks, including strict/deterministic workspace
+documents, import previews, large-list filtering with stable identities, process-byte equality,
+pure terminal RevenueCat announcement/recovery/focus outcomes, fail-closed configuration, and the
+existing portfolio/provenance invariants.
 
 ## Reproducible local build
 
@@ -56,6 +88,22 @@ It builds the release Swift executable, freezes a portfolio-only Python core, co
 licenses, embeds Swift package resources, ad-hoc signs the app, runs the app smoke test from `/`
 without a worktree, archives it, and writes a checksum. The bundle is not notarized.
 
+The fresh 2026-08-05 Release build from the current source passed embedded workspace normalization
+and notice inspection twice with byte-identical output, contract decoding, ad-hoc signature
+verification, and a worktree-independent app smoke test. The `.app`, zip, and SHA-256 companion
+were created on regenerable SSD build/output paths. A fresh Debug transaction build is still
+required because Release intentionally rejects Test Store transactions.
+
+After any native source or asset change, regenerate all three outputs rather than presenting the
+older bundle as the current candidate. If build scratch must live on a separate volume, use the
+documented flags rather than moving the repository or toolchain:
+
+```bash
+.venv-build/bin/python tools/build_next_gen.py \
+  --build-root /absolute/regenerable/build-root \
+  --swift-scratch-path /absolute/regenerable/swift-scratch
+```
+
 ## RevenueCat dashboard contract
 
 Configured and hands-on verified on 2026-08-04:
@@ -70,9 +118,9 @@ Configured and hands-on verified on 2026-08-04:
 | SDK | Apple Purchases `5.83.0` |
 
 Do not put a key in Git, a scheme committed to Git, screenshots, terminal logs, or Devpost text.
-Paste the `test_` key into the secure in-app field for the current launch.
-RevenueCat rejects Test Store keys in Release builds by design, so run the hands-on transaction
-sequence from a separately packaged Debug build:
+Paste the `test_` key into the secure in-app field for the current launch. RevenueCat rejects Test
+Store keys in Release builds by design, so run the hands-on transaction sequence from a separately
+packaged Debug build:
 
 ```bash
 .venv-build/bin/python tools/build_next_gen.py \
@@ -86,14 +134,14 @@ usable API key.
 
 ## Required transaction evidence
 
-Record one continuous hands-on sequence on the packaged app:
+Record one continuous hands-on sequence on the freshly packaged Debug app:
 
 1. No key: app is locked and makes no RevenueCat request.
 2. Invalid non-Test key: rejected locally.
 3. Valid Test Store key: current offering and localized price load.
 4. Cancel outcome: access stays locked.
 5. Failure outcome: clear retry state appears.
-6. Success outcome: `CustomerInfo` activates `supplier_profiles_plus` and all three reports appear.
+6. Success outcome: `CustomerInfo` activates `supplier_profiles_plus` and all reports appear.
 7. Relaunch or refresh: active access returns.
 8. Restore: access returns through `restorePurchases()`.
 9. RevenueCat dashboard: the same anonymous customer and Test Store event are visible.
@@ -101,27 +149,33 @@ Record one continuous hands-on sequence on the packaged app:
 Capture dates, app revision, SDK version, entitlement identifier, and outcome. Do not claim a real
 payment or App Store transaction.
 
-The 2026-08-04 packaged Debug pass completed all nine steps. The current offering loaded at a
+The 2026-08-04 packaged Debug baseline completed all nine steps. The current offering loaded at a
 localized `0,99 $`; cancel and failure stayed locked; retry recovered; success activated
 `supplier_profiles_plus`; relaunch with process-local key re-entry recovered the entitlement;
 Restore access invoked `restorePurchases()`; and RevenueCat showed the sandbox subscription. The
 key and anonymous customer identifier were not retained. VoiceOver exposed and activated Restore,
 and was switched off again after the pass.
 
+That baseline proves the RevenueCat architecture, but native UX changed afterward. Before using it
+as final-revision proof, create a fresh packaged Debug build and repeat the sequence. The code now
+maps terminal access states to accessibility announcements and restores focus after user-triggered
+actions; manual VoiceOver verification of asynchronous success, cancellation, and failure remains
+pending.
+
 ## Submission assets
 
-The repository already contains:
+The repository contains:
 
 - `submission/icon-1024.png` — canonical reviewed icon at exactly 1024×1024;
-- `submission/screenshot-1179x2556.png` — honest pre-transaction app state at exactly 1179×2556;
+- `submission/screenshot-1179x2556.png` — current pre-transaction screenshot at exactly
+  1179×2556, regenerated, sanitized, and visually reviewed in light and dark appearance;
 - `submission/evidence/unlocked-test-store-2026-08-04.png` — genuine 1020×754 supplemental unlocked
-  state, not a replacement for the required portrait screenshot;
-- `submission/evidence/voiceover-restore-2026-08-04.png` — local assistive-technology pass showing
-  Restore focus with VoiceOver enabled;
+  baseline, not a replacement for the required portrait screenshot or fresh-build evidence;
+- `submission/evidence/voiceover-restore-2026-08-04.png` — baseline assistive-technology evidence;
 - [a timed demo script](DEMO_SCRIPT.md);
 - [a Devpost draft](../submission/devpost-draft.md).
 
-Regenerate the image assets with:
+Regenerate the portrait image after building the current revision:
 
 ```bash
 TENDERVERDICT_WORKTREE="$PWD" \
@@ -131,25 +185,30 @@ TENDERVERDICT_WORKTREE="$PWD" \
 python3 tools/prepare_submission_assets.py
 ```
 
-The final submission may use the exact portrait screenshot plus the genuine unlocked supplemental
-capture. Never use a fake entitlement state as evidence.
+The final entry may use the exact portrait screenshot plus a genuine unlocked supplemental capture.
+Never use a fake entitlement state as evidence.
 
 ## Final checklist
 
-- [ ] Either a written organizer answer permits the Test Store-only path or the unresolved risk is
-  disclosed without claiming approval.
+- [x] Shipaton Manager Perttu confirmed the Test Store-only purchase path on 2026-08-05.
+- [x] Shipaton confirmed that macOS is eligible and carries no platform-only disadvantage.
 - [ ] Devpost participation uses the qualifying academic email and student status is current.
-- [ ] Exact private Devpost fields are inspected after joining; required public claims and assets
-  agree with the final repository state.
-- [x] Public draft branch contains the current source, assets, instructions, and Apache-2.0 license.
-- [x] All 18 required PR checks pass on pushed implementation baseline `33dbe87`.
-- [ ] CI passes again on the exact final submitted revision.
-- [x] Packaged `.app` checksum, signature, smoke test, and hands-on local-file flow pass.
-- [x] Test Store success, cancel, failure, retry, relaunch, restore, and dashboard evidence is
-  recorded locally.
-- [ ] Public YouTube or Vimeo demo is under two minutes and shows the app on macOS.
+- [ ] Exact private Devpost fields are inspected after joining; required claims and assets agree
+  with the final repository state.
+- [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
+- [x] A fresh Release package from the current source passes checksum creation, signature,
+  embedded-core contract/determinism, and worktree-independent smoke checks.
+- [ ] A fresh Debug package is generated from the final revision for the hands-on Test Store pass.
+- [x] The current candidate passes all 15 native checks, 122 Python tests, Ruff, Mypy, Swift format,
+  source smoke, package smoke, public-tree, security, asset, and diff checks locally.
+- [ ] The exact final submitted revision passes its pushed PR CI checks.
+- [ ] Test Store success, cancel, failure, retry, relaunch, restore, and dashboard evidence is
+  refreshed on the final Debug package.
+- [ ] VoiceOver announces asynchronous success, cancellation, and failure and restores useful focus.
+- [ ] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
+  light/dark and the regenerated portrait screenshot already pass visual review.
+- [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.
 - [x] Icon is exactly 1024×1024.
-- [x] At least one screenshot is exactly 1179×2556 and has no device frame.
-- [x] Devpost draft contains no key, private data, unsupported eligibility claim, or real-payment
-  claim.
+- [x] At least one current screenshot is exactly 1179×2556 and has no device frame.
+- [x] Devpost draft contains no key, private data, unsupported payment claim, or fabricated result.
 - [ ] Repository URL, video URL, and final commit SHA are entered and checked in a logged-out view.

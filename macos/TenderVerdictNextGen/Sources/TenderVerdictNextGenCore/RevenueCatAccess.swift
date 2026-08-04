@@ -50,6 +50,108 @@ public enum PremiumAccessState: Equatable, Sendable {
   public var isBusy: Bool {
     self == .loading
   }
+
+  public var terminalAccessibilityOutcome: PremiumAccessAccessibilityOutcome? {
+    switch self {
+    case .configurationMissing:
+      return PremiumAccessAccessibilityOutcome(
+        announcement: "RevenueCat Test Store is not connected. Enter a Test Store API key.",
+        recoveryActions: [.connectTestStore],
+        focusTarget: .testStoreAPIKey
+      )
+    case .configurationRejected:
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "RevenueCat Test Store key rejected. Enter a key beginning with test underscore.",
+        recoveryActions: [.connectTestStore],
+        focusTarget: .testStoreAPIKey
+      )
+    case .loading:
+      return nil
+    case .locked(let price):
+      if price == nil {
+        return PremiumAccessAccessibilityOutcome(
+          announcement:
+            "Premium access is locked. No current Test Store package is available. "
+            + "Restore access or refresh the offering.",
+          recoveryActions: [.restore, .refreshOffering],
+          focusTarget: .restore
+        )
+      }
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "Premium access is locked. A Test Store package is available. "
+          + "You can purchase, restore, or refresh access.",
+        recoveryActions: [.purchase, .restore, .refreshOffering],
+        focusTarget: .purchase
+      )
+    case .unlocked:
+      return PremiumAccessAccessibilityOutcome(
+        announcement: "Portfolio Workspace unlocked. Premium access is active.",
+        recoveryActions: [.restore],
+        focusTarget: .restore
+      )
+    case .cancelled(let price):
+      if price == nil {
+        return PremiumAccessAccessibilityOutcome(
+          announcement:
+            "Test Store purchase cancelled. Premium access remains locked. "
+            + "Restore access or refresh the offering.",
+          recoveryActions: [.restore, .refreshOffering],
+          focusTarget: .restore
+        )
+      }
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "Test Store purchase cancelled. Premium access remains locked. "
+          + "You can retry the purchase, restore, or refresh access.",
+        recoveryActions: [.purchase, .restore, .refreshOffering],
+        focusTarget: .purchase
+      )
+    case .failed:
+      return PremiumAccessAccessibilityOutcome(
+        announcement: "Premium status could not be refreshed. Retry or restore access.",
+        recoveryActions: [.retry, .restore],
+        focusTarget: .retry
+      )
+    }
+  }
+}
+
+public enum PremiumAccessRecoveryAction: Hashable, Sendable {
+  case connectTestStore
+  case purchase
+  case refreshOffering
+  case retry
+  case restore
+}
+
+public enum PremiumAccessFocusTarget: Hashable, Sendable {
+  case testStoreAPIKey
+  case purchase
+  case refreshOffering
+  case retry
+  case restore
+}
+
+public struct PremiumAccessAccessibilityOutcome: Equatable, Sendable {
+  public let announcement: String
+  public let recoveryActions: [PremiumAccessRecoveryAction]
+  public let focusTarget: PremiumAccessFocusTarget
+
+  public var primaryRecoveryAction: PremiumAccessRecoveryAction? {
+    recoveryActions.first
+  }
+
+  public init(
+    announcement: String,
+    recoveryActions: [PremiumAccessRecoveryAction],
+    focusTarget: PremiumAccessFocusTarget
+  ) {
+    self.announcement = announcement
+    self.recoveryActions = recoveryActions
+    self.focusTarget = focusTarget
+  }
 }
 
 @MainActor

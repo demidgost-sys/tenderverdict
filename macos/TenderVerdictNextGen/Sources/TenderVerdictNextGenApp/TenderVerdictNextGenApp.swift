@@ -39,11 +39,13 @@ struct TenderVerdictNextGenApp: App {
       let report = execution.report
       let freeCount = report.visibleProfileReports(premiumUnlocked: false).count
       let premiumCount = report.visibleProfileReports(premiumUnlocked: true).count
+      try WorkspaceContinuity.verifyIsolatedRoundTrip()
       print(
         "NEXT_GEN_SMOKE_OK schema=\(report.schemaVersion) "
           + "profiles=\(report.summary.profileCount) "
           + "notices=\(report.summary.noticeCount) "
           + "free_visible=\(freeCount) premium_visible=\(premiumCount) "
+          + "continuity=bookmark_only "
           + "entitlement=\(RevenueCatAccessController.entitlementIdentifier)"
       )
       Darwin.exit(EXIT_SUCCESS)
@@ -134,20 +136,29 @@ struct TenderVerdictNextGenApp: App {
 final class AppModel: ObservableObject {
   @Published private(set) var report: PortfolioWorkspaceReport?
   @Published private(set) var loadError: String?
+  @Published private(set) var inputError: String?
   @Published private(set) var isLoading = false
+  @Published private(set) var isPreparingInput = false
   @Published private(set) var workspaceURL: URL?
   @Published private(set) var noticesURL: URL?
+  @Published private(set) var workspaceDocument: PortfolioWorkspaceDocument?
+  @Published private(set) var noticePreview: NoticeImportPreview?
+  @Published private(set) var rememberSelections = false
   @Published private(set) var sourceDescription = "Synthetic example"
   @Published private(set) var statusMessage: String?
+  @Published var isProfileBuilderPresented = false
   @Published var asOf = TenderVerdictProcess.syntheticAsOf
 
   let revenueCat: RevenueCatAccessController
 
   private let runner: TenderVerdictProcess?
+  private let continuity: WorkspaceContinuity
   private var reportData: Data?
   private var started = false
 
   init() {
+    continuity = WorkspaceContinuity()
+    rememberSelections = continuity.isEnabled
     revenueCat = RevenueCatAccessController()
     do {
       runner = try TenderVerdictProcess()
@@ -161,6 +172,7 @@ final class AppModel: ObservableObject {
   }
 
   init(previewExecution: PortfolioExecution) {
+    continuity = WorkspaceContinuity()
     revenueCat = RevenueCatAccessController(environment: [:])
     runner = nil
     report = previewExecution.report
@@ -172,8 +184,9 @@ final class AppModel: ObservableObject {
   }
 
   var canRunSelected: Bool {
-    workspaceURL != nil && noticesURL != nil && !asOf.trimmingCharacters(in: .whitespaces).isEmpty
-      && !isLoading
+    workspaceURL != nil && noticesURL != nil && workspaceDocument != nil
+      && noticePreview != nil && !asOf.trimmingCharacters(in: .whitespaces).isEmpty
+      && !isLoading && !isPreparingInput
   }
 
   var canExport: Bool {
@@ -194,6 +207,7 @@ final class AppModel: ObservableObject {
     }
     started = true
     Task { await revenueCat.start() }
+    restoreRememberedSelections()
     loadSynthetic()
   }
 
@@ -207,22 +221,81 @@ final class AppModel: ObservableObject {
     guard panel.runModal() == .OK, let url = panel.url else {
       return
     }
-    workspaceURL = url
-    statusMessage = "Workspace selected. Choose notices and run the analysis."
+    prepareWorkspace(url)
   }
 
   func chooseNotices() {
     let panel = NSOpenPanel()
     panel.title = "Choose normalized tender notices"
     panel.prompt = "Choose Notices"
-    panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText]
+    panel.allowedContentTypes = [.json, .commaSeparatedText]
     panel.allowsMultipleSelection = false
     panel.canChooseDirectories = false
     guard panel.runModal() == .OK, let url = panel.url else {
       return
     }
-    noticesURL = url
-    statusMessage = "Notices selected. Review the as-of value and run the analysis."
+    prepareNotices(url)
+  }
+
+  func presentProfileBuilder() {
+    inputError = nil
+    isProfileBuilderPresented = true
+  }
+
+  func saveWorkspace(_ document: PortfolioWorkspaceDocument) {
+    guard let runner, !isPreparingInput else { return }
+    isPreparingInput = true
+    inputError = nil
+    statusMessage = "Validating the workspace against bundled authority tables…"
+    Task {
+      let temporaryURL = FileManager.default.temporaryDirectory
+        .appendingPathComponent("TenderVerdictWorkspace-\(UUID().uuidString).json")
+      defer { try? FileManager.default.removeItem(at: temporaryURL) }
+      do {
+        try document.normalizedJSONData().write(to: temporaryURL, options: [.atomic])
+        let normalization = try await runner.normalizeWorkspace(temporaryURL)
+        let panel = NSSavePanel()
+        panel.title = "Save TenderVerdict workspace"
+        panel.prompt = "Save Workspace"
+        panel.allowedContentTypes = [.json]
+        panel.canCreateDirectories = true
+        panel.nameFieldStringValue = "portfolio-workspace.json"
+        guard panel.runModal() == .OK, let url = panel.url else {
+          isPreparingInput = false
+          statusMessage = "Workspace validation passed; saving was cancelled."
+          return
+        }
+        try normalization.jsonData.write(to: url, options: [.atomic])
+        workspaceURL = url
+        workspaceDocument = normalization.document
+        let continuityReady = rememberCurrentSelectionsIfNeeded()
+        isPreparingInput = false
+        isProfileBuilderPresented = false
+        inputError = nil
+        statusMessage =
+          "Saved \(normalization.document.profiles.count) validated profiles in "
+          + "\(url.lastPathComponent)."
+          + (continuityReady ? "" : " File access will not be remembered.")
+      } catch {
+        failInput(error, fallback: "The workspace could not be validated and saved.")
+      }
+    }
+  }
+
+  func setRememberSelections(_ enabled: Bool) {
+    do {
+      try continuity.setEnabled(enabled, workspace: workspaceURL, notices: noticesURL)
+      rememberSelections = enabled
+      inputError = nil
+      statusMessage =
+        enabled
+        ? "This Mac will remember only the two selected file bookmarks."
+        : "Remembered file selections were forgotten. Current files remain selected."
+    } catch {
+      rememberSelections = false
+      try? continuity.setEnabled(false, workspace: nil, notices: nil)
+      failInput(error, fallback: "The selected files could not be remembered on this Mac.")
+    }
   }
 
   func runSelectedPortfolio() {
@@ -297,6 +370,92 @@ final class AppModel: ObservableObject {
     statusMessage = "Running local deterministic analysis…"
   }
 
+  private func prepareWorkspace(_ url: URL) {
+    guard let runner, !isPreparingInput else { return }
+    isPreparingInput = true
+    inputError = nil
+    statusMessage = "Validating \(url.lastPathComponent)…"
+    Task {
+      let access = url.startAccessingSecurityScopedResource()
+      defer { if access { url.stopAccessingSecurityScopedResource() } }
+      do {
+        let normalization = try await runner.normalizeWorkspace(url)
+        workspaceURL = url
+        workspaceDocument = normalization.document
+        let continuityReady = rememberCurrentSelectionsIfNeeded()
+        isPreparingInput = false
+        inputError = nil
+        statusMessage =
+          "Workspace ready: \(normalization.document.profiles.count) validated profiles."
+          + (continuityReady ? "" : " File access will not be remembered.")
+      } catch {
+        failInput(error, fallback: "The selected workspace is not valid.")
+      }
+    }
+  }
+
+  private func prepareNotices(_ url: URL) {
+    guard let runner, !isPreparingInput else { return }
+    isPreparingInput = true
+    inputError = nil
+    statusMessage = "Inspecting \(url.lastPathComponent)…"
+    Task {
+      let access = url.startAccessingSecurityScopedResource()
+      defer { if access { url.stopAccessingSecurityScopedResource() } }
+      do {
+        let preview = try await runner.inspectNotices(url)
+        noticesURL = url
+        noticePreview = preview
+        let continuityReady = rememberCurrentSelectionsIfNeeded()
+        isPreparingInput = false
+        inputError = nil
+        statusMessage =
+          "Notices ready: \(preview.noticeCount) normalized records."
+          + (continuityReady ? "" : " File access will not be remembered.")
+      } catch {
+        failInput(error, fallback: "The selected notices file is not valid.")
+      }
+    }
+  }
+
+  private func restoreRememberedSelections() {
+    guard rememberSelections, runner != nil else { return }
+    let restored = continuity.restore()
+    guard restored.workspace != nil || restored.notices != nil else { return }
+    if let workspace = restored.workspace {
+      prepareWorkspace(workspace)
+    }
+    if let notices = restored.notices {
+      Task {
+        while isPreparingInput {
+          try? await Task.sleep(nanoseconds: 20_000_000)
+        }
+        prepareNotices(notices)
+      }
+    }
+    if restored.refreshedStaleBookmark {
+      statusMessage = "Refreshed remembered file access. No analysis was run automatically."
+    }
+  }
+
+  private func rememberCurrentSelectionsIfNeeded() -> Bool {
+    guard rememberSelections else { return true }
+    do {
+      try continuity.update(workspace: workspaceURL, notices: noticesURL)
+      return true
+    } catch {
+      rememberSelections = false
+      try? continuity.setEnabled(false, workspace: nil, notices: nil)
+      return false
+    }
+  }
+
+  private func failInput(_ error: Error, fallback: String) {
+    inputError = Self.message(for: error, fallback: fallback)
+    isPreparingInput = false
+    statusMessage = nil
+  }
+
   private func apply(_ execution: PortfolioExecution, source: String) {
     report = execution.report
     reportData = execution.jsonData
@@ -323,6 +482,7 @@ struct ContentView: View {
   @ObservedObject var model: AppModel
   var startsAutomatically = true
   var scrollable = true
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   var body: some View {
     Group {
@@ -337,6 +497,15 @@ struct ContentView: View {
     .task {
       if startsAutomatically {
         model.start()
+      }
+    }
+    .sheet(isPresented: $model.isProfileBuilderPresented) {
+      ProfileBuilderView(
+        document: model.workspaceDocument,
+        externalError: model.inputError,
+        isSaving: model.isPreparingInput
+      ) { document in
+        model.saveWorkspace(document)
       }
     }
   }
@@ -366,7 +535,11 @@ struct ContentView: View {
           .foregroundStyle(.white.opacity(0.96))
       }
       .frame(width: 50, height: 50)
-      .shadow(color: Color.indigo.opacity(0.18), radius: 10, y: 4)
+      .shadow(
+        color: reduceTransparency ? .clear : Color.indigo.opacity(0.18),
+        radius: reduceTransparency ? 0 : 10,
+        y: reduceTransparency ? 0 : 4
+      )
       .accessibilityHidden(true)
 
       VStack(alignment: .leading, spacing: 9) {
@@ -374,8 +547,7 @@ struct ContentView: View {
           .font(.subheadline.weight(.semibold))
           .foregroundStyle(.indigo)
         Text("Tender intelligence for every supplier profile.")
-          .font(.system(size: 38, weight: .bold, design: .default))
-          .tracking(-1.1)
+          .font(.largeTitle.bold())
           .fixedSize(horizontal: false, vertical: true)
         Text(
           "Run one explainable notice review across a named supplier portfolio, "
@@ -390,12 +562,19 @@ struct ContentView: View {
   }
 
   private var sourceStatus: some View {
-    HStack(spacing: 0) {
-      StatusLabel(title: "Local analysis", systemImage: "lock.shield")
-      statusDivider
-      StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
-      statusDivider
-      StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: 0) {
+        StatusLabel(title: "Local analysis", systemImage: "lock.shield")
+        statusDivider
+        StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
+        statusDivider
+        StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
+      }
+      VStack(alignment: .leading, spacing: 8) {
+        StatusLabel(title: "Local analysis", systemImage: "lock.shield")
+        StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
+        StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
+      }
     }
     .foregroundStyle(.secondary)
     .padding(.vertical, 11)
@@ -437,17 +616,23 @@ struct ContentView: View {
   }
 
   private var footer: some View {
-    HStack(alignment: .firstTextBaseline) {
-      Label("Local source: \(model.sourceDescription)", systemImage: "externaldrive")
-        .lineLimit(1)
-      Spacer()
-      if let report = model.report {
-        Text("Review point \(report.asOf)")
-      }
+    ViewThatFits(in: .horizontal) {
+      HStack(alignment: .firstTextBaseline) { footerContents }
+      VStack(alignment: .leading, spacing: 6) { footerContents }
     }
     .font(.caption)
     .foregroundStyle(.tertiary)
     .accessibilityElement(children: .combine)
+  }
+
+  @ViewBuilder
+  private var footerContents: some View {
+    Label("Local source: \(model.sourceDescription)", systemImage: "externaldrive")
+      .lineLimit(1)
+    Spacer()
+    if let report = model.report {
+      Text("Review point \(report.asOf)")
+    }
   }
 }
 
@@ -469,6 +654,19 @@ struct PortfolioInputSection: View {
             buttonTitle: "Choose workspace…",
             action: model.chooseWorkspace
           )
+          HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text("No workspace yet? Build and validate one without editing JSON.")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+            Spacer()
+            Button {
+              model.presentProfileBuilder()
+            } label: {
+              Label("Build profiles…", systemImage: "person.2.badge.gearshape")
+            }
+            .buttonStyle(.bordered)
+            .disabled(model.isPreparingInput || model.isLoading)
+          }
           inputRow(
             title: "Notices",
             systemImage: "doc.on.doc",
@@ -476,6 +674,9 @@ struct PortfolioInputSection: View {
             buttonTitle: "Choose notices…",
             action: model.chooseNotices
           )
+          if let preview = model.noticePreview {
+            NoticeImportPreviewView(preview: preview)
+          }
           HStack(alignment: .firstTextBaseline, spacing: 16) {
             Label("Review point", systemImage: "calendar")
               .font(.subheadline.weight(.semibold))
@@ -485,38 +686,35 @@ struct PortfolioInputSection: View {
               .accessibilityLabel("Review date or RFC 3339 instant")
           }
           Divider()
-          HStack(spacing: 10) {
-            Button {
-              model.runSelectedPortfolio()
-            } label: {
-              Label("Run portfolio", systemImage: "play.fill")
-                .lineLimit(1)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(!model.canRunSelected)
+          ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) { actionButtons }
+            VStack(alignment: .leading, spacing: 10) { actionButtons }
+          }
 
-            Button {
-              model.loadSynthetic()
-            } label: {
-              Label("Load synthetic example", systemImage: "sparkles")
-                .lineLimit(1)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .disabled(model.isLoading)
+          Toggle(
+            "Remember these two file selections on this Mac",
+            isOn: Binding(
+              get: { model.rememberSelections },
+              set: { value in model.setRememberSelections(value) }
+            )
+          )
+          .toggleStyle(.checkbox)
+          .disabled(model.isPreparingInput)
+          Text(
+            "Opt in to security-scoped bookmarks only. Tender data, reports, review dates, "
+              + "and the RevenueCat key are never persisted by this feature."
+          )
+          .font(.caption)
+          .foregroundStyle(.tertiary)
+          .fixedSize(horizontal: false, vertical: true)
 
-            Spacer()
-
-            Button {
-              model.exportReport()
-            } label: {
-              Label("Export JSON…", systemImage: "square.and.arrow.down")
-                .lineLimit(1)
+          if model.isPreparingInput {
+            HStack(spacing: 10) {
+              ProgressView().controlSize(.small)
+              Text("Validating local input…")
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .disabled(!model.canExport)
+            .foregroundStyle(.secondary)
+            .accessibilityElement(children: .combine)
           }
 
           if model.isLoading {
@@ -526,7 +724,7 @@ struct PortfolioInputSection: View {
             }
             .foregroundStyle(.secondary)
             .accessibilityElement(children: .combine)
-          } else if let error = model.loadError {
+          } else if let error = model.inputError ?? model.loadError {
             Label(error, systemImage: "exclamationmark.triangle.fill")
               .foregroundStyle(.orange)
               .fixedSize(horizontal: false, vertical: true)
@@ -541,6 +739,41 @@ struct PortfolioInputSection: View {
     }
   }
 
+  @ViewBuilder
+  private var actionButtons: some View {
+    Button {
+      model.runSelectedPortfolio()
+    } label: {
+      Label("Run portfolio", systemImage: "play.fill")
+        .lineLimit(1)
+    }
+    .buttonStyle(.borderedProminent)
+    .controlSize(.large)
+    .disabled(!model.canRunSelected)
+
+    Button {
+      model.loadSynthetic()
+    } label: {
+      Label("Load synthetic example", systemImage: "sparkles")
+        .lineLimit(1)
+    }
+    .buttonStyle(.bordered)
+    .controlSize(.large)
+    .disabled(model.isLoading || model.isPreparingInput)
+
+    Spacer()
+
+    Button {
+      model.exportReport()
+    } label: {
+      Label("Export JSON…", systemImage: "square.and.arrow.down")
+        .lineLimit(1)
+    }
+    .buttonStyle(.bordered)
+    .controlSize(.large)
+    .disabled(!model.canExport)
+  }
+
   private func inputRow(
     title: String,
     systemImage: String,
@@ -548,21 +781,50 @@ struct PortfolioInputSection: View {
     buttonTitle: String,
     action: @escaping () -> Void
   ) -> some View {
-    HStack(spacing: 16) {
-      Label(title, systemImage: systemImage)
-        .font(.subheadline.weight(.semibold))
-        .frame(width: 128, alignment: .leading)
-      Text(value)
-        .foregroundStyle(.secondary)
-        .lineLimit(1)
-        .truncationMode(.middle)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityLabel("\(title): \(value)")
-      Button(buttonTitle, action: action)
-        .buttonStyle(.bordered)
-        .controlSize(.large)
-        .lineLimit(1)
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: 16) {
+        inputRowContents(
+          title: title,
+          systemImage: systemImage,
+          value: value,
+          buttonTitle: buttonTitle,
+          action: action
+        )
+      }
+      VStack(alignment: .leading, spacing: 10) {
+        inputRowContents(
+          title: title,
+          systemImage: systemImage,
+          value: value,
+          buttonTitle: buttonTitle,
+          action: action
+        )
+      }
     }
+  }
+
+  @ViewBuilder
+  private func inputRowContents(
+    title: String,
+    systemImage: String,
+    value: String,
+    buttonTitle: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    Label(title, systemImage: systemImage)
+      .font(.subheadline.weight(.semibold))
+      .frame(width: 128, alignment: .leading)
+    Text(value)
+      .foregroundStyle(.secondary)
+      .lineLimit(1)
+      .truncationMode(.middle)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .accessibilityLabel("\(title): \(value)")
+    Button(buttonTitle, action: action)
+      .buttonStyle(.bordered)
+      .controlSize(.large)
+      .lineLimit(1)
+      .disabled(model.isPreparingInput || model.isLoading)
   }
 }
 
@@ -570,6 +832,8 @@ struct PremiumWorkspaceSection: View {
   let report: PortfolioWorkspaceReport?
   @ObservedObject var controller: RevenueCatAccessController
   @State private var apiKeyEntry = ""
+  @State private var pendingUserAction = false
+  @FocusState private var premiumFocus: PremiumAccessFocusTarget?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
@@ -578,6 +842,14 @@ struct PremiumWorkspaceSection: View {
         detail: "Reveal up to five independent profile reports through one RevenueCat entitlement."
       )
       premiumContent
+    }
+    .onChange(of: controller.state) { state in
+      guard let outcome = state.terminalAccessibilityOutcome else { return }
+      PremiumAccessibilityAnnouncer.post(outcome)
+      if pendingUserAction {
+        premiumFocus = outcome.focusTarget
+        pendingUserAction = false
+      }
     }
   }
 
@@ -628,19 +900,9 @@ struct PremiumWorkspaceSection: View {
           systemImage: "lock.shield",
           tint: .indigo
         )
-        HStack(spacing: 10) {
-          SecureField("test_…", text: $apiKeyEntry)
-            .textFieldStyle(.roundedBorder)
-            .accessibilityLabel("RevenueCat Test Store API key")
-          Button {
-            let key = apiKeyEntry
-            apiKeyEntry = ""
-            Task { await controller.configure(testStoreAPIKey: key) }
-          } label: {
-            Label("Connect Test Store", systemImage: "link")
-          }
-          .buttonStyle(.borderedProminent)
-          .disabled(apiKeyEntry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 10) { configurationControls }
+          VStack(alignment: .leading, spacing: 10) { configurationControls }
         }
         portfolioPreview
         Text("Entitlement: \(RevenueCatAccessController.entitlementIdentifier)")
@@ -648,6 +910,24 @@ struct PremiumWorkspaceSection: View {
           .foregroundStyle(.tertiary)
       }
     }
+  }
+
+  @ViewBuilder
+  private var configurationControls: some View {
+    SecureField("test_…", text: $apiKeyEntry)
+      .textFieldStyle(.roundedBorder)
+      .accessibilityLabel("RevenueCat Test Store API key")
+      .focused($premiumFocus, equals: .testStoreAPIKey)
+    Button {
+      let key = apiKeyEntry
+      apiKeyEntry = ""
+      pendingUserAction = true
+      Task { await controller.configure(testStoreAPIKey: key) }
+    } label: {
+      Label("Connect Test Store", systemImage: "link")
+    }
+    .buttonStyle(.borderedProminent)
+    .disabled(apiKeyEntry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
   }
 
   private func actionableLockedCard(title: String, detail: String) -> some View {
@@ -660,33 +940,45 @@ struct PremiumWorkspaceSection: View {
           tint: .indigo
         )
         portfolioPreview
-        HStack(spacing: 10) {
-          Button {
-            Task { await controller.purchaseCurrentPackage() }
-          } label: {
-            Label("Run Test Store purchase", systemImage: "cart")
-          }
-          .buttonStyle(.borderedProminent)
-          .disabled(!controller.canPurchase)
-
-          Button {
-            Task { await controller.restore() }
-          } label: {
-            Label("Restore access", systemImage: "arrow.clockwise")
-          }
-          .buttonStyle(.bordered)
-          .disabled(!controller.canRestore)
-
-          Button {
-            Task { await controller.refresh() }
-          } label: {
-            Label("Refresh offering", systemImage: "arrow.triangle.2.circlepath")
-          }
-          .buttonStyle(.bordered)
-          .disabled(controller.state.isBusy)
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 10) { lockedActions }
+          VStack(alignment: .leading, spacing: 10) { lockedActions }
         }
       }
     }
+  }
+
+  @ViewBuilder
+  private var lockedActions: some View {
+    Button {
+      pendingUserAction = true
+      Task { await controller.purchaseCurrentPackage() }
+    } label: {
+      Label("Run Test Store purchase", systemImage: "cart")
+    }
+    .buttonStyle(.borderedProminent)
+    .disabled(!controller.canPurchase)
+    .focused($premiumFocus, equals: .purchase)
+
+    Button {
+      pendingUserAction = true
+      Task { await controller.restore() }
+    } label: {
+      Label("Restore access", systemImage: "arrow.clockwise")
+    }
+    .buttonStyle(.bordered)
+    .disabled(!controller.canRestore)
+    .focused($premiumFocus, equals: .restore)
+
+    Button {
+      pendingUserAction = true
+      Task { await controller.refresh() }
+    } label: {
+      Label("Refresh offering", systemImage: "arrow.triangle.2.circlepath")
+    }
+    .buttonStyle(.bordered)
+    .disabled(controller.state.isBusy)
+    .focused($premiumFocus, equals: .refreshOffering)
   }
 
   private var failedCard: some View {
@@ -698,15 +990,29 @@ struct PremiumWorkspaceSection: View {
           systemImage: "exclamationmark.arrow.triangle.2.circlepath",
           tint: .orange
         )
-        HStack(spacing: 10) {
-          Button("Retry") { Task { await controller.refresh() } }
-            .buttonStyle(.borderedProminent)
-          Button("Restore access") { Task { await controller.restore() } }
-            .buttonStyle(.bordered)
-            .disabled(!controller.canRestore)
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 10) { failedActions }
+          VStack(alignment: .leading, spacing: 10) { failedActions }
         }
       }
     }
+  }
+
+  @ViewBuilder
+  private var failedActions: some View {
+    Button("Retry") {
+      pendingUserAction = true
+      Task { await controller.refresh() }
+    }
+    .buttonStyle(.borderedProminent)
+    .focused($premiumFocus, equals: .retry)
+    Button("Restore access") {
+      pendingUserAction = true
+      Task { await controller.restore() }
+    }
+    .buttonStyle(.bordered)
+    .disabled(!controller.canRestore)
+    .focused($premiumFocus, equals: .restore)
   }
 
   @ViewBuilder
@@ -722,12 +1028,14 @@ struct PremiumWorkspaceSection: View {
         HStack {
           Spacer()
           Button {
+            pendingUserAction = true
             Task { await controller.restore() }
           } label: {
             Label("Restore access", systemImage: "arrow.clockwise")
           }
           .buttonStyle(.bordered)
           .disabled(!controller.canRestore)
+          .focused($premiumFocus, equals: .restore)
         }
         PortfolioComparison(report: report)
         Text("Profile totals")
@@ -833,11 +1141,21 @@ private enum ReviewQueueFilter: String, CaseIterable, Identifiable {
 
 struct ReviewQueue: View {
   let report: ProfileReport
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @State private var filter = ReviewQueueFilter.all
+  @State private var searchText = ""
+  @State private var buyerText = ""
+  @State private var deadlinePresence = DeadlinePresenceFilter.any
   @State private var displayLimit = 8
 
   private var filteredResults: [QualificationResult] {
-    report.results.filter(filter.includes)
+    ReviewQuery(
+      searchText: searchText,
+      buyerText: buyerText,
+      deadlinePresence: deadlinePresence
+    )
+    .apply(to: report.results)
+    .filter(filter.includes)
   }
 
   private var visibleResults: [QualificationResult] {
@@ -858,6 +1176,16 @@ struct ReviewQueue: View {
         }
       }
 
+      VStack(alignment: .leading, spacing: 10) {
+        TextField("Search title, buyer, notice or lot ID", text: $searchText)
+          .textFieldStyle(.roundedBorder)
+          .accessibilityLabel("Search the review queue")
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 10) { secondaryFilters }
+          VStack(alignment: .leading, spacing: 10) { secondaryFilters }
+        }
+      }
+
       if report.results.isEmpty {
         NoticeCard(
           title: "No notices in this run",
@@ -868,7 +1196,7 @@ struct ReviewQueue: View {
       } else if visibleResults.isEmpty {
         NoticeCard(
           title: "No results in this view",
-          detail: "Choose another verdict filter to continue the review.",
+          detail: "Adjust the search, buyer, deadline, or verdict filters to continue.",
           systemImage: "line.3.horizontal.decrease.circle",
           tint: .gray
         )
@@ -885,7 +1213,7 @@ struct ReviewQueue: View {
           displayLimit += 8
         } label: {
           Label(
-            "Show (min(8, filteredResults.count - visibleResults.count)) more",
+            "Show \(min(8, filteredResults.count - visibleResults.count)) more",
             systemImage: "chevron.down"
           )
         }
@@ -895,6 +1223,9 @@ struct ReviewQueue: View {
     .onChange(of: filter) { _ in
       displayLimit = 8
     }
+    .onChange(of: searchText) { _ in displayLimit = 8 }
+    .onChange(of: buyerText) { _ in displayLimit = 8 }
+    .onChange(of: deadlinePresence) { _ in displayLimit = 8 }
   }
 
   private var queueHeading: some View {
@@ -908,13 +1239,68 @@ struct ReviewQueue: View {
   }
 
   private var filterPicker: some View {
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        verdictPicker
+          .pickerStyle(.menu)
+      } else {
+        verdictPicker
+          .pickerStyle(.segmented)
+      }
+    }
+    .frame(maxWidth: 360)
+  }
+
+  private var verdictPicker: some View {
     Picker("Verdict filter", selection: $filter) {
       ForEach(ReviewQueueFilter.allCases) { item in
         Text(item.label).tag(item)
       }
     }
-    .pickerStyle(.segmented)
-    .frame(maxWidth: 360)
+  }
+
+  @ViewBuilder
+  private var secondaryFilters: some View {
+    Picker("Buyer", selection: $buyerText) {
+      Text("All buyers").tag("")
+      ForEach(availableBuyers, id: \.self) { buyer in
+        Text(buyer).tag(buyer)
+      }
+    }
+    .pickerStyle(.menu)
+    .frame(maxWidth: 260)
+
+    Picker("Deadline", selection: $deadlinePresence) {
+      Text("Any deadline").tag(DeadlinePresenceFilter.any)
+      Text("Deadline supplied").tag(DeadlinePresenceFilter.supplied)
+      Text("Deadline missing").tag(DeadlinePresenceFilter.missing)
+    }
+    .pickerStyle(.menu)
+    .frame(maxWidth: 220)
+
+    Text("\(filteredResults.count) results")
+      .font(.caption.monospacedDigit())
+      .foregroundStyle(.secondary)
+
+    if !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any {
+      Button("Clear filters") {
+        searchText = ""
+        buyerText = ""
+        deadlinePresence = .any
+      }
+      .buttonStyle(.borderless)
+    }
+  }
+
+  private var availableBuyers: [String] {
+    Array(
+      Set(
+        report.results.compactMap { result in
+          let buyer = result.buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+          return buyer.isEmpty ? nil : buyer
+        }
+      )
+    ).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
   }
 }
 
@@ -1019,10 +1405,23 @@ struct QualificationResultCard: View {
 
 struct PortfolioComparison: View {
   let report: PortfolioWorkspaceReport
-  private let rowLimit = 12
+  @State private var searchText = ""
+  @State private var buyerText = ""
+  @State private var deadlinePresence = DeadlinePresenceFilter.any
+  @State private var displayLimit = 12
+  @State private var selection: ComparisonSelection?
 
   private var primaryResults: [QualificationResult] {
-    report.profileReports.first?.results ?? []
+    let results = report.profileReports.first?.results ?? []
+    return ReviewQuery(
+      searchText: searchText,
+      buyerText: buyerText,
+      deadlinePresence: deadlinePresence
+    ).apply(to: results)
+  }
+
+  private var visibleResults: [QualificationResult] {
+    Array(primaryResults.prefix(displayLimit))
   }
 
   var body: some View {
@@ -1036,9 +1435,23 @@ struct PortfolioComparison: View {
             .foregroundStyle(.secondary)
         }
 
+        TextField("Find a notice across every profile", text: $searchText)
+          .textFieldStyle(.roundedBorder)
+          .accessibilityLabel("Search the portfolio comparison")
+
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 10) { comparisonFilters }
+          VStack(alignment: .leading, spacing: 10) { comparisonFilters }
+        }
+
         if primaryResults.isEmpty {
-          Label("The shared notice set is empty.", systemImage: "tray")
-            .foregroundStyle(.secondary)
+          Label(
+            report.summary.noticeCount == 0
+              ? "The shared notice set is empty."
+              : "No shared notices match these filters.",
+            systemImage: "tray"
+          )
+          .foregroundStyle(.secondary)
         } else {
           ScrollView(.horizontal, showsIndicators: true) {
             Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
@@ -1056,63 +1469,160 @@ struct PortfolioComparison: View {
                 }
               }
 
-              ForEach(
-                Array(primaryResults.prefix(rowLimit).enumerated()),
-                id: \.element.id
-              ) { item in
-                GridRow {
-                  VStack(alignment: .leading, spacing: 3) {
-                    Text(item.element.displayTitle)
-                      .font(.subheadline.weight(.medium))
-                      .lineLimit(2)
-                    Text(item.element.referenceLabel)
-                      .font(.caption2.monospaced())
-                      .foregroundStyle(.tertiary)
-                  }
-                  .padding(10)
-                  .frame(width: 224, alignment: .leading)
-                  .frame(minHeight: 58, alignment: .leading)
-                  .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                      .fill(Color.primary.opacity(0.035))
+              ForEach(visibleResults) { notice in
+                ComparisonGridRow(report: report, notice: notice) { selectedProfileID in
+                  selection = ComparisonSelection(
+                    profileID: selectedProfileID,
+                    resultID: notice.id
                   )
-
-                  ForEach(report.profileReports) { profile in
-                    let result = profile.results[item.offset]
-                    VerdictBadge(verdict: result.verdict, compact: true)
-                      .frame(width: 126)
-                      .frame(minHeight: 58)
-                      .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                          .fill(result.verdict.tint.opacity(0.055))
-                      )
-                      .accessibilityLabel(
-                        "\(profile.profile.name), \(item.element.displayTitle), "
-                          + result.verdict.label
-                      )
-                  }
                 }
               }
             }
           }
 
-          if primaryResults.count > rowLimit {
-            Text(
-              "Showing the first \(rowLimit) of \(primaryResults.count) notices. "
-                + "Export JSON for the complete deterministic report."
-            )
-            .font(.caption)
-            .foregroundStyle(.tertiary)
+          if visibleResults.count < primaryResults.count {
+            Button {
+              displayLimit += 12
+            } label: {
+              Label(
+                "Show \(min(12, primaryResults.count - visibleResults.count)) more comparisons",
+                systemImage: "chevron.down"
+              )
+            }
+            .buttonStyle(.bordered)
           }
+        }
+      }
+    }
+    .onChange(of: searchText) { _ in displayLimit = 12 }
+    .onChange(of: buyerText) { _ in displayLimit = 12 }
+    .onChange(of: deadlinePresence) { _ in displayLimit = 12 }
+    .sheet(item: $selection) { selected in
+      ComparisonDetailView(report: report, selection: selected)
+    }
+  }
+
+  @ViewBuilder
+  private var comparisonFilters: some View {
+    Picker("Buyer", selection: $buyerText) {
+      Text("All buyers").tag("")
+      ForEach(availableBuyers, id: \.self) { buyer in
+        Text(buyer).tag(buyer)
+      }
+    }
+    .pickerStyle(.menu)
+    .frame(maxWidth: 260)
+
+    Picker("Deadline", selection: $deadlinePresence) {
+      Text("Any deadline").tag(DeadlinePresenceFilter.any)
+      Text("Deadline supplied").tag(DeadlinePresenceFilter.supplied)
+      Text("Deadline missing").tag(DeadlinePresenceFilter.missing)
+    }
+    .pickerStyle(.menu)
+    .frame(maxWidth: 220)
+
+    Text("\(primaryResults.count) shared notices")
+      .font(.caption.monospacedDigit())
+      .foregroundStyle(.secondary)
+
+    if !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any {
+      Button("Clear filters") {
+        searchText = ""
+        buyerText = ""
+        deadlinePresence = .any
+      }
+      .buttonStyle(.borderless)
+    }
+  }
+
+  private var availableBuyers: [String] {
+    Array(
+      Set(
+        (report.profileReports.first?.results ?? []).compactMap { result in
+          let buyer = result.buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+          return buyer.isEmpty ? nil : buyer
+        }
+      )
+    ).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+  }
+
+}
+
+private struct ComparisonGridRow: View {
+  let report: PortfolioWorkspaceReport
+  let notice: QualificationResult
+  let selectProfile: (String) -> Void
+
+  var body: some View {
+    GridRow {
+      VStack(alignment: .leading, spacing: 3) {
+        Text(notice.displayTitle)
+          .font(.subheadline.weight(.medium))
+          .lineLimit(2)
+        Text(notice.referenceLabel)
+          .font(.caption2.monospaced())
+          .foregroundStyle(.tertiary)
+      }
+      .padding(10)
+      .frame(width: 224, alignment: .leading)
+      .frame(minHeight: 58, alignment: .leading)
+      .background(
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .fill(Color.primary.opacity(0.035))
+      )
+
+      ForEach(report.profileReports) { profile in
+        if let result = report.result(profileID: profile.id, resultID: notice.id) {
+          ComparisonVerdictCell(
+            profileName: profile.profile.name,
+            noticeTitle: notice.displayTitle,
+            result: result
+          ) {
+            selectProfile(profile.id)
+          }
+        } else {
+          Text("Unavailable")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(width: 126)
+            .frame(minHeight: 58)
         }
       }
     }
   }
 }
 
+private struct ComparisonVerdictCell: View {
+  let profileName: String
+  let noticeTitle: String
+  let result: QualificationResult
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      VerdictBadge(verdict: result.verdict, compact: true)
+        .frame(width: 126)
+        .frame(minHeight: 58)
+        .contentShape(Rectangle())
+        .background(
+          RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(result.verdict.tint.opacity(0.055))
+        )
+    }
+    .buttonStyle(.plain)
+    .help("Open reasons and unknowns")
+    .accessibilityLabel(accessibilityLabel)
+  }
+
+  private var accessibilityLabel: String {
+    "\(profileName), \(noticeTitle), \(result.verdict.label). Open details."
+  }
+}
+
 struct VerdictBadge: View {
   let verdict: QualificationVerdict
   var compact = false
+  @Environment(\.colorSchemeContrast) private var contrast
 
   var body: some View {
     Label(compact ? verdict.shortLabel : verdict.label, systemImage: verdict.systemImage)
@@ -1123,18 +1633,21 @@ struct VerdictBadge: View {
       .padding(.vertical, 7)
       .background(
         Capsule(style: .continuous)
-          .fill(verdict.tint.opacity(0.11))
+          .fill(verdict.tint.opacity(contrast == .increased ? 0.18 : 0.11))
       )
       .overlay {
         Capsule(style: .continuous)
-          .stroke(verdict.tint.opacity(0.16), lineWidth: 1)
+          .stroke(
+            verdict.tint.opacity(contrast == .increased ? 0.42 : 0.16),
+            lineWidth: contrast == .increased ? 1.5 : 1
+          )
       }
       .accessibilityLabel(verdict.label)
   }
 }
 
-private extension QualificationVerdict {
-  var label: String {
+extension QualificationVerdict {
+  fileprivate var label: String {
     switch self {
     case .openDocuments:
       return "Open documents"
@@ -1145,11 +1658,11 @@ private extension QualificationVerdict {
     }
   }
 
-  var shortLabel: String {
+  fileprivate var shortLabel: String {
     self == .openDocuments ? "Open" : label
   }
 
-  var systemImage: String {
+  fileprivate var systemImage: String {
     switch self {
     case .openDocuments:
       return "doc.text.magnifyingglass"
@@ -1160,7 +1673,7 @@ private extension QualificationVerdict {
     }
   }
 
-  var tint: Color {
+  fileprivate var tint: Color {
     switch self {
     case .openDocuments:
       return .green
@@ -1172,29 +1685,29 @@ private extension QualificationVerdict {
   }
 }
 
-private extension QualificationResult {
-  var displayTitle: String {
+extension QualificationResult {
+  fileprivate var displayTitle: String {
     let value = title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     return value.isEmpty ? "Untitled notice" : value
   }
 
-  var displayBuyer: String {
+  fileprivate var displayBuyer: String {
     let value = buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     return value.isEmpty ? "Buyer not supplied" : value
   }
 
-  var displayDeadline: String {
+  fileprivate var displayDeadline: String {
     deadlineAt ?? deadline ?? "Deadline not supplied"
   }
 
-  var referenceLabel: String {
+  fileprivate var referenceLabel: String {
     guard let lotID, !lotID.isEmpty else {
       return publicationNumber
     }
     return "\(publicationNumber) / \(lotID)"
   }
 
-  var safeSourceURL: URL? {
+  fileprivate var safeSourceURL: URL? {
     guard let sourceURL, let value = URL(string: sourceURL),
       value.scheme?.lowercased() == "https",
       value.host != nil,
@@ -1210,38 +1723,61 @@ private extension QualificationResult {
 
 struct ProfileCard: View {
   let report: ProfileReport
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+  @Environment(\.colorSchemeContrast) private var contrast
 
   var body: some View {
-    HStack(alignment: .center, spacing: 22) {
-      VStack(alignment: .leading, spacing: 5) {
-        Text(report.profile.name)
-          .font(.headline)
-          .lineLimit(2)
-        Text("\(report.summary.total) notices · schema \(report.schemaVersion)")
-          .font(.caption)
-          .foregroundStyle(.secondary)
+    ViewThatFits(in: .horizontal) {
+      HStack(alignment: .center, spacing: 22) {
+        profileTitle
+        profileMetrics
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-      VerdictMetric(value: report.summary.openDocuments, label: "Open", tint: .green)
-      VerdictMetric(value: report.summary.watch, label: "Watch", tint: .orange)
-      VerdictMetric(value: report.summary.reject, label: "Reject", tint: .red)
+      VStack(alignment: .leading, spacing: 14) {
+        profileTitle
+        HStack(spacing: 10) { profileMetrics }
+      }
     }
     .padding(18)
     .background(
       RoundedRectangle(cornerRadius: 20, style: .continuous)
         .fill(Color(nsColor: .controlBackgroundColor))
-        .shadow(color: Color.indigo.opacity(0.07), radius: 12, y: 5)
+        .shadow(
+          color: reduceTransparency ? .clear : Color.indigo.opacity(0.07),
+          radius: reduceTransparency ? 0 : 12,
+          y: reduceTransparency ? 0 : 5
+        )
     )
     .overlay {
       RoundedRectangle(cornerRadius: 20, style: .continuous)
-        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        .stroke(
+          Color.primary.opacity(contrast == .increased ? 0.24 : 0.08),
+          lineWidth: contrast == .increased ? 1.5 : 1
+        )
     }
     .accessibilityElement(children: .combine)
     .accessibilityLabel(
       "\(report.profile.name), \(report.summary.openDocuments) open, "
         + "\(report.summary.watch) watch, \(report.summary.reject) reject"
     )
+  }
+
+  private var profileTitle: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Text(report.profile.name)
+        .font(.headline)
+        .lineLimit(2)
+      Text("\(report.summary.total) notices · schema \(report.schemaVersion)")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  @ViewBuilder
+  private var profileMetrics: some View {
+    VerdictMetric(value: report.summary.openDocuments, label: "Open", tint: .green)
+    VerdictMetric(value: report.summary.watch, label: "Watch", tint: .orange)
+    VerdictMetric(value: report.summary.reject, label: "Reject", tint: .red)
   }
 }
 
@@ -1272,6 +1808,8 @@ struct VerdictMetric: View {
 struct PremiumCard<Content: View>: View {
   let tint: Color
   @ViewBuilder let content: Content
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+  @Environment(\.colorSchemeContrast) private var contrast
 
   var body: some View {
     content
@@ -1280,11 +1818,18 @@ struct PremiumCard<Content: View>: View {
       .background(
         RoundedRectangle(cornerRadius: 20, style: .continuous)
           .fill(Color(nsColor: .controlBackgroundColor))
-          .shadow(color: tint.opacity(0.07), radius: 14, y: 6)
+          .shadow(
+            color: reduceTransparency ? .clear : tint.opacity(0.07),
+            radius: reduceTransparency ? 0 : 14,
+            y: reduceTransparency ? 0 : 6
+          )
       )
       .overlay {
         RoundedRectangle(cornerRadius: 20, style: .continuous)
-          .stroke(tint.opacity(0.2), lineWidth: 1)
+          .stroke(
+            tint.opacity(contrast == .increased ? 0.46 : 0.2),
+            lineWidth: contrast == .increased ? 1.5 : 1
+          )
       }
   }
 }
@@ -1294,6 +1839,8 @@ struct NoticeCard: View {
   let detail: String
   let systemImage: String
   let tint: Color
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+  @Environment(\.colorSchemeContrast) private var contrast
 
   var body: some View {
     NoticeCardContent(title: title, detail: detail, systemImage: systemImage, tint: tint)
@@ -1302,11 +1849,18 @@ struct NoticeCard: View {
       .background(
         RoundedRectangle(cornerRadius: 20, style: .continuous)
           .fill(Color(nsColor: .controlBackgroundColor))
-          .shadow(color: tint.opacity(0.07), radius: 12, y: 5)
+          .shadow(
+            color: reduceTransparency ? .clear : tint.opacity(0.07),
+            radius: reduceTransparency ? 0 : 12,
+            y: reduceTransparency ? 0 : 5
+          )
       )
       .overlay {
         RoundedRectangle(cornerRadius: 20, style: .continuous)
-          .stroke(tint.opacity(0.15), lineWidth: 1)
+          .stroke(
+            tint.opacity(contrast == .increased ? 0.42 : 0.15),
+            lineWidth: contrast == .increased ? 1.5 : 1
+          )
       }
   }
 }

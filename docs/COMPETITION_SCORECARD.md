@@ -9,8 +9,8 @@ decisions. It does not predict a result, claim private judge preferences, or rep
 [evidence record](SHIPATON_EVIDENCE.md).
 
 The measurable progress ledger is maintained separately in
-[PROJECT_STATUS.md](PROJECT_STATUS.md): 19 of 22 local implementation milestones are complete and
-7 of 12 final-submission gates are ready. This scorecard explains quality and strategic fit; the
+[PROJECT_STATUS.md](PROJECT_STATUS.md): 20 of 22 local implementation milestones are complete and
+8 of 12 final-submission gates are ready. This scorecard explains quality and strategic fit; the
 ledger prevents those judgments from being confused with verified completion.
 
 ## Public judges and judging contract
@@ -26,11 +26,12 @@ The Next Gen criteria are paraphrased below from the
 |---|---|---|---|
 | Problem and experience | A clear, useful, interesting, original answer to a real problem | One notice feed is evaluated differently for several supplier profiles; verdicts remain explainable and human-owned | `STRONG_CONCEPT` |
 | Working application | Meaningful progress toward a functioning app, with core behavior visible in the repository and demo | Offline Python core, self-contained macOS app, real local files, deterministic export, and native review UI run locally | `VERIFIED_LOCALLY` |
-| RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised | `VERIFIED_TEST_STORE`, eligibility interpretation still `UNKNOWN` |
-| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict contracts, offline privacy, provenance, failure recovery, accessibility evidence, packaging, and public documentation | `STRONG_WITH_OPEN_QA` |
+| RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised, and the Shipaton Manager confirmed Test Store is enough for Next Gen | `VERIFIED_TEST_STORE`, `ORGANIZER_CONFIRMED` |
+| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, and public documentation | `STRONG_WITH_OPEN_FINAL_QA` |
 
-The remaining weakness is not missing feature volume. It is external proof that the narrow workflow
-is genuinely useful, plus the unresolved organizer interpretation of Test Store-only integration.
+The remaining weakness is not missing feature volume, Test Store eligibility, or package
+reproducibility. It is external proof that the narrow workflow is genuinely useful, plus the
+fresh final-Debug Test Store and interactive accessibility evidence pass on the final UX revision.
 
 ## What recent winners demonstrate
 
@@ -69,18 +70,31 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 5. The Swift decoder validates complete result arrays, result counts, verdict totals, unique notice
    identities, and the shared ordered notice set before anything is presented.
 6. A visible offering refresh action improves recovery without weakening the entitlement boundary.
+7. The native Profile Builder creates, renames, reorders, validates, and saves one to five complete
+   profiles; canonical Python normalization still decides what is accepted.
+8. CSV and JSON imports now show a deterministic bounded preview, canonical fields, metadata
+   warnings, and missing-field counts before analysis.
+9. Repeated work can opt in to security-scoped workspace/notices bookmarks, with explicit Forget,
+   no saved report, key, tender content, or review point, and no automatic analysis.
+10. Review and comparison use text, buyer, deadline-presence, and verdict filters backed by pure
+    queries; filtered results retain stable identity.
+11. Selecting a comparison cell opens the exact matching profile/notice reasons, unknowns, next
+    step, and safe source without relying on a filtered array offset.
+12. RevenueCat terminal states map to VoiceOver announcements and recovery focus, while contrast and
+    transparency treatments adapt to system accessibility settings.
 
 ### Next product work before calling the app release-ready
 
 | Priority | Improvement | Current state | Why it matters | Acceptance evidence |
 |---|---|---|---|---|
-| P1 | Complete accessibility pass | `PARTIAL` | Converts native semantics into verified usability | VoiceOver async announcements, Increase Contrast, Reduce Transparency, and large-text checks |
+| P1 | Complete accessibility evidence pass | `IMPLEMENTED_PENDING_MANUAL_QA` | Converts deterministic terminal-state handling into verified real-flow usability | Fresh packaged purchase/cancel/failure/refresh/restore announcements plus Increase Contrast, Reduce Transparency, and large-text checks |
 | P1 | Real-user workflow pass | `OPEN` | Tests whether verdict wording and comparison actually reduce review work | Three opt-in sessions and two documented workflow changes using public, synthetic, or de-identified data |
-| P1 | Native profile builder and editor | `EVIDENCE_GATED` | Removes hand-authored JSON only if users confirm it is the main obstacle | Create, rename, reorder, validate, and save 1–5 local profiles without leaving the app |
-| P1 | Local workspace continuity | `OPEN` | Makes repeated supplier review feel like a product, not a one-off demo | Explicitly saved recent workspace; no silent upload or hidden telemetry; clear reset action |
-| P2 | Notice search and buyer/deadline filters | `FIXTURE_GATED` | Helps only after realistic files exceed the three-row demo | Tested with a bounded 100+ notice fixture; keyboard and screen-reader usable |
-| P2 | Profile-focused drill-down | `PARTIAL` | Lets a user move from comparison to evidence without losing context | Selecting a matrix cell opens the matching notice reasoning for that profile |
-| P2 | Saved local export presets | `OPEN` | Reduces repeated export friction without creating accounts | User-controlled destination and format choice; atomic writes and recovery tests remain intact |
+| P1 | Native profile builder and editor | `IMPLEMENTED` | Removes hand-authored workspace JSON while preserving the strict canonical contract | Source checks and fresh Release embedded codec/normalizer determinism are green; interactive packaged UI pass remains |
+| P1 | Local workspace continuity | `IMPLEMENTED_OPT_IN` | Makes repeated supplier review feel like a product without creating an account | Only two security-scoped bookmarks persist; Forget clears them; no content/report/key/review point or auto-run |
+| P2 | Notice search and buyer/deadline filters | `IMPLEMENTED` | Keeps realistic files navigable without changing qualification semantics | Pure review-query checks and stable identities are green; final large-file hands-on pass remains |
+| P2 | Profile-focused drill-down | `IMPLEMENTED` | Lets a user move from comparison to evidence without losing context | A matrix cell opens the exact stable profile/notice reasons, unknowns, next step, and safe source |
+| P2 | Guided notice import | `IMPLEMENTED_BOUNDED` | Reveals source quality before a run without adding a fragile mapping language | Deterministic CSV/JSON preview, canonical fields, warnings, and missing-field counts |
+| P3 | Saved local export presets | `DEFERRED` | Current atomic Save panel is adequate; a preset does not close a judging or trust gap | Reconsider only if opt-in sessions repeatedly identify export destination friction |
 
 Do not add cross-profile ranking, bid automation, confidential-document ingestion, hosted accounts,
 analytics, or production billing merely to look larger. None fixes the current proof gap, and each
@@ -92,11 +106,12 @@ The project is not ready for an external release or final Devpost submission unt
 true:
 
 - the complete Python, Swift, package, public-tree, and security checks pass on the final candidate;
-- the final self-contained app passes launch, local-file run, result review, source link, export,
-  failure retention, and entitlement recovery checks;
+- a fresh self-contained app passes launch, local-file run, Profile Builder save, import preview,
+  filtered review, comparison drill-down, source link, export, failure retention, and entitlement
+  recovery checks;
+- actual Test Store terminal outcomes announce and restore focus correctly with VoiceOver, and the
+  final layout remains usable with Increase Contrast, Reduce Transparency, and large text;
 - the student and academic-email requirement is confirmed in the entrant account;
-- the Test Store-only interpretation is answered by the organizer or disclosed as an unresolved
-  submission risk;
 - exact private Devpost fields are inspected after the owner signs in and joins the hackathon;
 - public repository and final submission URLs are intentionally checked while logged out.
 
@@ -105,15 +120,19 @@ not pretend that private form fields have been verified. Publicly documented des
 video, icon, screenshot, platform, and eligibility requirements are already tracked in the
 [runbook](HACKATHON_RUNBOOK.md).
 
-The same gate set already passed on clean pushed implementation baseline `33dbe87`; it must be
-repeated on any later final candidate rather than treated as permanently inherited evidence.
+The previous gate set passed on pushed baseline `67bb555`; the current candidate has 122 Python
+tests, 15 native checks, and green source smoke. Its 2026-08-05 SSD Release build produced the
+`.app`, `.zip`, and SHA-256 file; twice verified embedded normalization/inspection byte determinism
+and contracts; verified the ad-hoc signature; and passed worktree-independent app smoke. The
+refreshed assets and complete local suite also pass. A fresh final-Debug transaction run,
+interactive packaged UX, and manual accessibility outcomes still must be verified rather than
+treated as inherited evidence.
 
 ## Owner inputs — later, not required for this implementation pass
 
 When the local product and QA pass is complete, the owner will need to provide or confirm:
 
-1. the organizer's written answer about Test Store-only acceptance, if one arrives;
-2. the qualifying academic email and current student-status confirmation inside Devpost;
-3. access to the joined Devpost project so its exact private fields can be audited;
-4. three opt-in workflow testers or permission to use already identified volunteers;
-5. final approval of the exact commit and public claims before any release or submission action.
+1. the qualifying academic email and current student-status confirmation inside Devpost;
+2. access to the joined Devpost project so its exact private fields can be audited;
+3. three opt-in workflow testers or permission to use already identified volunteers;
+4. final approval of the exact commit and public claims before any release or submission action.

@@ -1,113 +1,148 @@
 # Next Gen UX and accessibility audit
 
-- Audit date: 2026-08-04
-- App surface: self-contained macOS `.app`, default 1020×900 window
-- Data: committed three-profile synthetic workspace and three synthetic notices
-- RevenueCat configuration: process-local Test Store key; no usable key retained in the app or repo
+- Audit date: 2026-08-05
+- App surface: SwiftUI macOS app, default 1020×900 window
+- Data boundary: local workspace JSON plus normalized CSV/JSON notices
+- RevenueCat boundary: process-local Test Store key; no usable key retained in the app or repo
+
+## Verification vocabulary
+
+This document deliberately separates four evidence levels:
+
+| Label | Meaning |
+|---|---|
+| `code_verified` | The current source and contract were inspected; this is not a runtime claim. |
+| `automated` | A deterministic check ran successfully on the current source revision. |
+| `manual` | A human exercised the stated behavior on the dated packaged baseline. |
+| `pending` | The current revision still needs the stated hands-on or artifact evidence. |
 
 ## Outcome
 
-The main local product path is coherent and packaged: launch, select files, run, retain one Free
-profile, inspect and filter its notice-level reasoning, open a valid supplied source, export
-deterministic JSON, and recover from invalid input. The RevenueCat Test Store path was also
-exercised hands-on through offering load, cancel, failure, retry, success, entitlement unlock,
-relaunch refresh, and restore. These are sandbox outcomes, not a real payment.
+The current source closes the largest product gaps in the earlier aggregate-only portfolio demo.
+A user can now build and validate profiles without hand-editing JSON, inspect a notice file before
+analysis, opt into safe file-selection continuity, filter larger result sets, and move from a
+Premium comparison cell to the exact profile/notice reasoning. The first complete analysis and
+deterministic export remain free.
 
-## Flow health
+The native suite now contains 15 checks, including a pure terminal RevenueCat accessibility-outcome
+check, and a fresh worktree-independent Release package passes on the current app source. The final
+15-check execution and complete 122-test Python suite pass on the current candidate. The prior packaged Debug
+baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
+predates the newest UX changes. The current portrait asset has been regenerated and reviewed in
+light and dark appearance; a fresh Debug transaction build and manual VoiceOver checks for
+asynchronous purchase outcomes remain pending.
 
-| Step | Result | Evidence |
+## Current source audit (`code_verified`)
+
+| Surface | Outcome | Boundary checked |
 |---|---|---|
-| Packaged launch without source tree | Pass | Embedded core loaded 3 profiles / 3 notices with no `TENDERVERDICT_WORKTREE` |
-| Synthetic first run | Pass | Free card showed Example Austria Services: 1 open, 0 watch, 2 reject |
-| Choose workspace | Pass | Native open panel accepted `portfolio-workspace.json` |
-| Choose notices | Pass | Native open panel accepted `notices.json` |
-| Run selected inputs | Pass | Source label changed to both selected files; report remained 3 / 3 |
-| Export JSON | Pass | Native save panel wrote atomically; exported SHA-256 matched CLI stdout exactly |
-| Invalid `as_of` | Pass | Specific error appeared and the previous valid report stayed visible/exportable |
-| Free review queue | Pass | All/Open/Watch/Reject filters changed the visible result set without rerunning analysis |
-| Reason disclosure | Pass | Reasons, unknowns, and the human next step remained readable in the native accessibility tree |
-| Empty filter recovery | Pass | A zero-match filter produced an explicit recovery state rather than a blank panel |
-| Supplied source | Pass | A valid HTTPS source appeared as a named native link; invalid source shapes remain non-clickable |
-| Missing RevenueCat key | Pass | Secure configuration UI shown; no SDK request initiated |
-| Non-Test key | Pass | `appl_invalid_fixture` was rejected locally and cleared from the secure field |
-| Test Store offering | Pass | Current monthly package loaded at localized `0,99 $`; product identifier matched the dashboard |
-| Cancellation | Pass | Test Store cancellation message appeared and access stayed locked |
-| Failure and retry | Pass | Simulated failure produced a recoverable error; retry returned to the locked offering state |
-| Entitlement unlock | Pass | Success activated `supplier_profiles_plus` and revealed all three reports |
-| Relaunch refresh | Pass | Process-local key had to be re-entered; the existing entitlement then returned without a second purchase |
-| Restore | Pass | Native Restore access called `restorePurchases()` and kept all reports unlocked |
-| Dashboard readback | Pass | Sandbox view showed the new subscription; anonymous customer identifier was not recorded |
+| Profile Builder | Pass | Creates, removes, and reorders 1–5 profiles; edits name, CPV codes, countries, and minimum lead time; rejects malformed or duplicate names; validates through the bundled Python authority tables before atomic Save As. |
+| Workspace contract | Pass | Schema 1 only, strict unknown-field rejection, 256 KiB bound, deterministic normalized JSON, profile order preserved. |
+| Notice import preview | Pass | Accepts normalized CSV or JSON, shows source type, total count, first five records, warnings, and full-file missing-field counts before analysis. It does not invent arbitrary column mapping. |
+| Input failure retention | Pass | Invalid workspace or notices remain an input error; the last valid report/export is not replaced. |
+| Local continuity | Pass | Explicit opt-in persists only security-scoped bookmarks for workspace and notices. Turning it off removes the bookmarks. It never stores tender contents, reports, `as_of`, or the RevenueCat key, and restored files do not auto-run. |
+| Free review queue | Pass | Text search covers notice/lot ID, title, and buyer; buyer, deadline-presence, and verdict filters compose; results load in bounded pages and can be reset. |
+| Stable large-list identity | Pass | Filters retain canonical result IDs; a filtered offset is never reused as a cross-profile lookup key. |
+| Premium comparison | Pass | Text, buyer, and deadline filters apply to the shared notice order; each cell is a native button with profile, notice, and verdict semantics. |
+| Comparison drill-down | Pass | A selected cell resolves by stable profile/result IDs and shows verdict, buyer, deadline, next step, reasons, unknowns, and only a safe supplied HTTPS source. |
+| RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. It does not modify qualification bytes, add rankings, or create a local entitlement toggle. |
+| Async recovery model | Pass | Every terminal Premium state has explicit announcement text, recovery actions, and a useful focus target. Focus restoration occurs only after a user-triggered connect/purchase/restore/refresh action. |
+| Responsive layout | Pass | Fixed hero typography was replaced by semantic `largeTitle`; input, action, RevenueCat, metadata, filter, and detail rows use horizontal-to-vertical `ViewThatFits` fallbacks. |
+| Contrast/transparency response | Pass | Semantic card boundaries strengthen under Increase Contrast; decorative shadows/surfaces are reduced when Reduce Transparency is enabled. Textual state never relies on color alone. |
 
-## Visual audit
+## Native contract checks (`automated`, current candidate passed)
 
-The existing native SwiftUI language was retained and refined rather than replaced. Repeated
-`ANALYZE`, `FREE`, and `PREMIUM` labels were removed, the product name and primary message now lead
-the page, and one indigo accent governs interactive and structural emphasis. File rows use native SF
-Symbols, cards share a 20 pt radius and restrained tinted shadow, and verdict metrics use nested
-12 pt semantic surfaces. Primary hierarchy remains explicit:
+The final verification command is:
 
-1. choose inputs;
-2. run locally;
-3. review and filter the always-free first profile at notice level;
-4. expand reasoning only where more context is needed;
-5. understand or unlock the Premium portfolio comparison;
-6. export deterministic JSON.
+```bash
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+# expected: NEXT_GEN_CHECKS_OK checks=15
+```
 
-At the minimum 900 pt width, labels and actions fit without clipping. Long file names truncate in
-the middle while their complete accessible label remains available. The vertical scroll keeps the
-Premium section reachable at smaller window heights. Light and dark appearances were rendered from
-the real SwiftUI view and visually compared. Both preserve text hierarchy, semantic verdict colors,
-field boundaries, and disabled-control states.
+The 15 checks cover:
 
-The committed competition screenshot is rendered from the real SwiftUI view through an AppKit
-hosting view. Its portrait-specific logical canvas keeps the complete hero, Free review queue,
-locked Premium card, and footer visible without truncating the product message. The locked card
-lists the real synthetic profile names without claiming entitlement access. It is exactly
-1179×2556, contains no device frame or metadata chunks, and depicts the honest missing-key state.
-It is not transaction evidence.
+1. Free/Premium portfolio projection.
+2. Complete notice-level result preservation.
+3. Empty notice sets.
+4. Profile-count consistency.
+5. Shared notice digest consistency.
+6. Shared notice ordering.
+7. Nested verdict totals.
+8. Result/summary consistency.
+9. Strict, bounded, deterministic workspace documents.
+10. Strict notice import-preview decoding.
+11. Search/buyer/deadline filters and stable lookup.
+12. Stable identities across a synthetic 125-notice result set.
+13. Terminal Premium announcement, recovery-action, and focus outcomes.
+14. Fail-closed Test Store configuration.
+15. Process-adapter deterministic byte preservation.
 
-A current 1020×754 hands-on pass compared the previous aggregate-only Free surface with the rebuilt
-review queue at the same viewport. The new hierarchy preserved the existing spacing, radius, type,
-and semantic color system while adding the missing user task. Expanded reasoning initially aligned
-too far inside the card; the content was corrected to use the complete available width and then
-rechecked. Verdict filtering, the empty state, disclosure, and the named source link remained
-operable after the fix.
+These checks validate contracts and pure state. They do not claim AppKit rendering quality, an
+actual RevenueCat transaction, or VoiceOver speech.
 
-`submission/evidence/unlocked-test-store-2026-08-04.png` is a genuine 1020×754 capture from the
-packaged Debug app after the Test Store entitlement activated. It shows the active entitlement,
-Restore access, and three unlocked profile reports without exposing the secure field, key, or
-customer identifier. It is supplemental transaction evidence, not a replacement for the required
-1179×2556 portrait asset.
+The current 2026-08-05 Release packaging run also passed the embedded normalization and import
+preview contracts twice with byte-identical output, ad-hoc signature verification, and app smoke
+from outside the worktree. It produced the `.app`, zip, and SHA-256 companion on regenerable SSD
+paths. Release is the no-key distributable and cannot substitute for the pending Debug Test Store
+pass.
 
-## Accessibility audit
+## Packaged baseline (`manual`, 2026-08-04)
 
-Passes observed in the macOS accessibility tree:
+The previous packaged Debug revision was exercised hands-on. This evidence remains useful for the
+unchanged RevenueCat architecture, but must not be presented as a fresh-current-revision pass.
 
-- Workspace, notices, review point, run, demo, export, secure key, and connect controls have distinct
-  names.
-- Disabled buttons remain exposed with their disabled state.
-- The secure field reports secure text rather than its value.
-- Status and error messages include textual meaning and do not rely on color alone.
-- Each profile exposes one combined label with its name and open/watch/reject counts.
-- Verdict filters expose selected radio-button state, result cards expose title, reference, buyer,
-  deadline, verdict, and next step, and every disclosure exposes its expanded state.
-- Safe supplied sources expose the named link and full destination as help text.
-- Locked profile-preview rows expose the profile name and whether it is included or Premium.
-- Native open and save panels provide standard keyboard and assistive-technology behavior.
-- Buttons use large native control sizing; clickable labels are not custom gesture-only views.
-- Tab focus followed Workspace → Notices → Review point → Load example → Export → Restore and
-  correctly skipped disabled Run portfolio.
-- VoiceOver exposed Restore access as a native button; activating it with VoiceOver preserved the
-  active entitlement. VoiceOver was switched off again after the pass.
+| Step | Baseline outcome |
+|---|---|
+| Worktree-independent launch | Embedded core loaded three profiles and three notices. |
+| Selected local files | Native panels accepted the synthetic workspace and notices. |
+| Deterministic export | Atomic export bytes matched canonical CLI output. |
+| Invalid `as_of` | Specific error appeared and the previous valid report stayed exportable. |
+| Missing key | Locked configuration UI appeared and no SDK request started. |
+| Non-Test key | Rejected locally. |
+| Test Store offering | Current monthly package loaded at localized `0,99 $`. |
+| Cancellation | Access stayed locked with a recoverable state. |
+| Failure and retry | Failure was explicit; retry returned to the offering. |
+| Entitlement unlock | `supplier_profiles_plus` revealed every profile report and comparison. |
+| Relaunch refresh | Re-entering the process-local key recovered the existing entitlement. |
+| Restore | `restorePurchases()` kept access unlocked. |
+| Dashboard readback | RevenueCat showed the sandbox subscription without retaining its anonymous customer identifier. |
+| VoiceOver Restore | Restore was exposed and activated as a native button, then VoiceOver was switched off. |
 
-Still required before claiming full accessibility:
+These are Test Store outcomes with no real payment or App Store transaction.
 
-- verify logical announcements for asynchronous RevenueCat success, cancellation, and failure;
-- test Increase Contrast, Reduce Transparency, and a large system text setting;
-- confirm the final video captions and Devpost image alt text.
+## Visual and accessibility implementation
 
-## Accepted follow-ups
+The visual language remains intentionally native: one indigo product accent, semantic verdict
+colors plus text labels, 18–20 pt card radii, restrained depth, native controls, and progressive
+reason disclosure. The hierarchy is now:
 
-1. Verify VoiceOver announcements during the asynchronous cancel/failure/success dialogs.
-2. Test Increase Contrast, Reduce Transparency, and a large system text setting.
-3. Caption and visually inspect the public sub-two-minute demo.
+1. build or choose a validated workspace;
+2. choose notices and inspect the import preview;
+3. choose an explicit review point and run locally;
+4. search/filter the complete free first-profile review queue;
+5. opt into file-bookmark continuity only if useful;
+6. understand or unlock Premium;
+7. filter the shared comparison and open exact cell reasoning;
+8. export deterministic JSON.
+
+Accessibility-relevant code outcomes include distinct labels for secure configuration and file
+actions, disabled-state preservation, combined profile summaries, native disclosures and links,
+stable focus targets after Premium actions, VoiceOver announcements only when VoiceOver and a
+visible app window are present, flexible row layouts, and Increased Contrast/Reduced Transparency
+adaptation. Announcement content contains no key, customer identifier, or tender data.
+
+## Still required (`pending`)
+
+1. Build a fresh Debug `.app` from the exact final revision and repeat the selected-file and Test
+   Store flow. Re-run the already-passing Release build only if the source changes afterward.
+2. Manually inspect the remaining large-text, Increase Contrast, and Reduce Transparency states.
+   The current light/dark portrait has already been regenerated and reviewed; regenerate it again
+   only if later visual source changes are made.
+3. With VoiceOver enabled, manually exercise Test Store purchase success, cancellation, failure,
+   retry, and restore. Confirm each asynchronous announcement is spoken once and focus lands on the
+   documented recovery control.
+4. Preserve dated evidence without an API key, customer identifier, account email, or unrelated
+   desktop content.
+
+Until those steps pass, describe announcement routing and visual adaptation as implemented and
+automated-contract-checked, not as fully hands-on verified on the final package.

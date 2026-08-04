@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import plistlib
 import shutil
@@ -87,11 +88,67 @@ def _write_build_info(path: Path, version: str, configuration: str) -> None:
         "revenuecat_sdk=5.83.0",
         "entitlement=supplier_profiles_plus",
         "qualification_runtime=embedded-offline-python",
+        "workspace_normalization=embedded-offline-python",
+        "notice_import_preview=embedded-offline-python",
         "signature=adhoc",
         "notarized=false",
         "api_key_included=false",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="ascii")
+
+
+def _verify_embedded_core(executable: Path) -> None:
+    environment = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "LANG": os.environ.get("LANG", "en_US.UTF-8"),
+    }
+    examples = ROOT / "examples" / "synthetic"
+    commands = {
+        "workspace": [
+            str(executable),
+            "normalize-workspace",
+            "--workspace",
+            str(examples / "portfolio-workspace.json"),
+        ],
+        "notices": [
+            str(executable),
+            "inspect-notices",
+            "--notices",
+            str(examples / "notices.json"),
+        ],
+    }
+    outputs: dict[str, bytes] = {}
+    for label, command in commands.items():
+        first = subprocess.run(
+            command,
+            cwd=Path("/"),
+            env=environment,
+            check=True,
+            capture_output=True,
+        ).stdout
+        second = subprocess.run(
+            command,
+            cwd=Path("/"),
+            env=environment,
+            check=True,
+            capture_output=True,
+        ).stdout
+        if first != second:
+            raise BuildError(f"embedded {label} command is not byte-deterministic")
+        outputs[label] = first
+
+    workspace = json.loads(outputs["workspace"])
+    if workspace.get("schema_version") != 1 or len(workspace.get("profiles", [])) != 3:
+        raise BuildError("embedded workspace normalization returned an invalid contract")
+
+    notices = json.loads(outputs["notices"])
+    if (
+        notices.get("schema_version") != 1
+        or notices.get("kind") != "notice_import_preview"
+        or notices.get("notice_count") != 3
+        or len(notices.get("preview", [])) != 3
+    ):
+        raise BuildError("embedded notice inspection returned an invalid contract")
 
 
 def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
@@ -167,8 +224,10 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
             env=pyinstaller_environment,
         )
         core = pyinstaller_dist / "TenderVerdictCore"
-        if not (core / "TenderVerdictCore").is_file():
+        core_executable = core / "TenderVerdictCore"
+        if not core_executable.is_file():
             raise BuildError("PyInstaller did not produce the embedded core")
+        _verify_embedded_core(core_executable)
 
         app = stage / BUNDLE_NAME
         contents = app / "Contents"

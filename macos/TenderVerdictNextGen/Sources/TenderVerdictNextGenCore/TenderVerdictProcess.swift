@@ -7,6 +7,7 @@ public enum TenderVerdictProcessError: Error, LocalizedError {
   case commandFailed(Int32, String)
   case timedOut
   case oversizedOutput
+  case invalidPreviewLimit
 
   public var errorDescription: String? {
     switch self {
@@ -17,11 +18,13 @@ public enum TenderVerdictProcessError: Error, LocalizedError {
       return "The bundled synthetic fixture is missing: \(name)."
     case .commandFailed(let status, let detail):
       let suffix = detail.isEmpty ? "" : " \(detail)"
-      return "TenderVerdict portfolio exited with status \(status).\(suffix)"
+      return "TenderVerdict core command exited with status \(status).\(suffix)"
     case .timedOut:
-      return "TenderVerdict portfolio did not finish within 30 seconds."
+      return "TenderVerdict core command did not finish within 30 seconds."
     case .oversizedOutput:
-      return "TenderVerdict returned an unexpectedly large portfolio report."
+      return "TenderVerdict returned an unexpectedly large response."
+    case .invalidPreviewLimit:
+      return "The notice preview limit must be between 1 and 20."
     }
   }
 }
@@ -41,6 +44,7 @@ public struct TenderVerdictProcess: Sendable {
   public static let syntheticAsOf = "2026-08-02"
 
   private static let maximumReportBytes = 64 * 1_024 * 1_024
+  private static let maximumPreviewBytes = 4 * 1_024 * 1_024
   private static let maximumErrorBytes = 64 * 1_024
   private static let timeout: TimeInterval = 30
 
@@ -130,14 +134,73 @@ public struct TenderVerdictProcess: Sendable {
     notices: URL,
     asOf: String
   ) throws -> PortfolioExecution {
-    let output = try executePortfolio(workspace: workspace, notices: notices, asOf: asOf)
+    let output = try execute(
+      arguments: [
+        "portfolio",
+        "--workspace",
+        workspace.standardizedFileURL.path,
+        "--notices",
+        notices.standardizedFileURL.path,
+        "--as-of",
+        asOf,
+      ],
+      maximumOutputBytes: Self.maximumReportBytes
+    )
     return PortfolioExecution(
       report: try PortfolioWorkspaceReport.decode(output),
       jsonData: output
     )
   }
 
-  private func executePortfolio(workspace: URL, notices: URL, asOf: String) throws -> Data {
+  public func normalizeWorkspace(_ workspace: URL) async throws -> WorkspaceNormalization {
+    try await Task.detached(priority: .userInitiated) {
+      try normalizeWorkspaceSynchronously(workspace)
+    }.value
+  }
+
+  public func normalizeWorkspaceSynchronously(_ workspace: URL) throws -> WorkspaceNormalization {
+    let output = try execute(
+      arguments: [
+        "normalize-workspace",
+        "--workspace",
+        workspace.standardizedFileURL.path,
+      ],
+      maximumOutputBytes: PortfolioWorkspaceDocument.maximumBytes
+    )
+    return WorkspaceNormalization(
+      document: try PortfolioWorkspaceDocument.decode(output),
+      jsonData: output
+    )
+  }
+
+  public func inspectNotices(_ notices: URL, limit: Int = 5) async throws
+    -> NoticeImportPreview
+  {
+    try await Task.detached(priority: .userInitiated) {
+      try inspectNoticesSynchronously(notices, limit: limit)
+    }.value
+  }
+
+  public func inspectNoticesSynchronously(_ notices: URL, limit: Int = 5) throws
+    -> NoticeImportPreview
+  {
+    guard (1...NoticeImportPreview.maximumPreviewCount).contains(limit) else {
+      throw TenderVerdictProcessError.invalidPreviewLimit
+    }
+    let output = try execute(
+      arguments: [
+        "inspect-notices",
+        "--notices",
+        notices.standardizedFileURL.path,
+        "--limit",
+        String(limit),
+      ],
+      maximumOutputBytes: Self.maximumPreviewBytes
+    )
+    return try NoticeImportPreview.decode(output)
+  }
+
+  private func execute(arguments: [String], maximumOutputBytes: Int) throws -> Data {
     let fileManager = FileManager.default
     let temporaryDirectory = fileManager.temporaryDirectory
       .appendingPathComponent("TenderVerdictNextGen-\(UUID().uuidString)", isDirectory: true)
@@ -163,22 +226,14 @@ public struct TenderVerdictProcess: Sendable {
     }
 
     let process = Process()
-    let arguments = [
-      "portfolio",
-      "--workspace",
-      workspace.standardizedFileURL.path,
-      "--notices",
-      notices.standardizedFileURL.path,
-      "--as-of",
-      asOf,
-    ]
     if let embeddedExecutable {
       process.executableURL = embeddedExecutable
       process.arguments = arguments
       process.currentDirectoryURL = embeddedExecutable.deletingLastPathComponent()
     } else if let worktree {
+      let launcher = worktree.appendingPathComponent("tools/next_gen_core_launcher.py")
       process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-      process.arguments = ["python3", "-m", "tenderverdict"] + arguments
+      process.arguments = ["python3", launcher.path] + arguments
       process.currentDirectoryURL = worktree
     } else {
       throw TenderVerdictProcessError.invalidRuntime
@@ -192,7 +247,7 @@ public struct TenderVerdictProcess: Sendable {
     while process.isRunning && Date() < deadline {
       let outputBytes = try fileSize(at: standardOutputURL)
       let errorBytes = try fileSize(at: standardErrorURL)
-      if outputBytes > Self.maximumReportBytes || errorBytes > Self.maximumErrorBytes {
+      if outputBytes > maximumOutputBytes || errorBytes > Self.maximumErrorBytes {
         terminate(process)
         throw TenderVerdictProcessError.oversizedOutput
       }
@@ -211,7 +266,7 @@ public struct TenderVerdictProcess: Sendable {
         .trimmingCharacters(in: .whitespacesAndNewlines)
       throw TenderVerdictProcessError.commandFailed(process.terminationStatus, detail)
     }
-    guard try fileSize(at: standardOutputURL) <= Self.maximumReportBytes else {
+    guard try fileSize(at: standardOutputURL) <= maximumOutputBytes else {
       throw TenderVerdictProcessError.oversizedOutput
     }
     return try Data(contentsOf: standardOutputURL, options: [.mappedIfSafe])
@@ -261,6 +316,9 @@ public struct TenderVerdictProcess: Sendable {
     FileManager.default.fileExists(atPath: url.appendingPathComponent("pyproject.toml").path)
       && FileManager.default.fileExists(
         atPath: url.appendingPathComponent("src/tenderverdict").path
+      )
+      && FileManager.default.fileExists(
+        atPath: url.appendingPathComponent("tools/next_gen_core_launcher.py").path
       )
   }
 }

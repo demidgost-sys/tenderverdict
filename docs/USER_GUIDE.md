@@ -15,17 +15,31 @@ queue. Choose the surface that matches the job:
 
 1. Launch the app. The bundled three-profile synthetic example runs locally and shows the first
    profile in the Free section.
-2. To use your own data, choose a workspace v1 JSON file and normalized notices in CSV or JSON.
-3. Enter a review point as `YYYY-MM-DD` or a timezone-aware RFC 3339 instant.
-4. Select **Run portfolio**. A successful result updates the source label, review point, summary,
-   and Free profile. Filter the review queue by verdict, expand **Reasons and unknowns**, and open a
-   syntactically valid supplied HTTPS source when the official notice needs inspection.
-5. Select **Export JSON…** to save the exact deterministic portfolio bytes. A failed analysis does
-   not discard the previous valid result.
-6. For an organizer-approved Test Store demo, paste a RevenueCat `test_` key. TenderVerdict does not
-   store it. Use the current Test Store package or restore access; the cross-profile comparison and
-   all profile summaries appear only while `supplier_profiles_plus` is active. **Refresh offering**
+2. To create your own workspace, select **Build profiles…**. Add, remove, or reorder one to five
+   profiles, then use **Validate & Save As…**. The app first checks the fields, then asks the
+   canonical Python parser to normalize and validate the complete workspace before saving it.
+   Alternatively, choose an existing workspace v1 JSON file; it passes through the same parser.
+3. Choose normalized notices in CSV or JSON. The complete file is validated before it becomes
+   runnable. Confirm the displayed format, total count, first five normalized records, and
+   full-file missing-field counts.
+4. Enter a review point as `YYYY-MM-DD` or a timezone-aware RFC 3339 instant, then select
+   **Run portfolio**. A successful result updates the source label, review point, summary, and Free
+   profile. A failed analysis does not discard the previous valid result.
+5. Narrow the Free queue by verdict, text, buyer, or whether a deadline was supplied. Use
+   **Show more** to reveal the next bounded group, expand **Reasons and unknowns**, and open a
+   syntactically safe supplied HTTPS source when the official notice needs inspection.
+6. Select **Export JSON…** to save the exact deterministic portfolio bytes.
+7. Optional: enable **Remember these two file selections on this Mac**. This persists only the two
+   security-scoped bookmarks. Relaunch validates the restored selections but never analyzes them
+   automatically. Disable the toggle to forget the bookmarks.
+8. For the Shipaton Test Store demo, paste a RevenueCat `test_` key. TenderVerdict does not store
+   it. Use the current Test Store package or restore access; the cross-profile comparison and all
+   profile summaries appear only while `supplier_profiles_plus` is active. **Refresh offering**
    retries offering and entitlement state after a recoverable connection or configuration issue.
+
+The Shipaton Manager confirmed both that a Test Store purchase is sufficient for judging and that
+a macOS entry has no judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
+[macOS answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
 
 The open-source CLI stays usable without Premium. The native Premium experience is a product and
 competition integration boundary, not encryption or DRM.
@@ -52,10 +66,25 @@ competition integration boundary, not encryption or DRM.
 - Unknown fields, invalid codes, unsupported versions, or one invalid profile reject the complete
   workspace.
 - The workspace file is bounded to 256 KiB.
+- The builder accepts comma-, semicolon-, whitespace-, or newline-separated code values, removes
+  exact duplicates, uppercases countries, and preserves profile order. Final authority-table and
+  schema validation still happens in the Python core.
 
 Notice format and limits are documented in the root [README](../README.md). A notice file can hold
 at most 1,000 records and 10 MiB. Treat every report as a metadata review aid, then inspect the
 current official notice and procurement documents.
+
+## Notice import preview
+
+Choosing notices runs the same bounded parser used for qualification; preview is not a separate
+permissive import path. The app shows at most the first five normalized records but computes the
+record total and missing-field counts across the complete file. The counted fields are notice type,
+title, buyer, CPV codes, countries, deadline (`deadline` or `deadline_at`), and source URL.
+
+The normalized preview contract also carries publication/lot identity, publication date, metadata
+warnings, and the fixed canonical field list. An invalid suffix, malformed UTF-8/CSV/JSON,
+unsupported value, duplicate notice identity, oversized file, or other schema failure leaves the
+previous selection and report intact and shows an actionable error.
 
 ## Understanding the result
 
@@ -65,15 +94,26 @@ current official notice and procurement documents.
 
 These are workflow states, not legal conclusions. Portfolio Workspace never compares or ranks
 profiles. Premium's matrix aligns the same ordered notices across profiles so a human can see where
-outcomes differ; it does not compute a winner.
+outcomes differ; it does not compute a winner. Search, buyer, and deadline filters are applied to
+the shared primary notice identities. Selecting a verdict cell resolves the matching result by its
+stable profile/result IDs—not by a filtered row offset—and opens the profile, notice metadata,
+reasons, unknowns, human next step, and safe source link.
 
 ## Privacy and credentials
 
 - `demo`, `qualify`, and `portfolio` do not make network requests.
-- The Next Gen app runs profile and notice analysis through its embedded offline core.
+- The Next Gen app runs profile and notice analysis through its private offline bridge. Source
+  builds launch `tools/next_gen_core_launcher.py`; packaged builds freeze the same launcher as
+  `TenderVerdictCore`. Neither path uses a shell.
 - File contents are not sent to RevenueCat.
 - A Test Store key enables normal RevenueCat SDK network activity. The in-app field is secure and
   process-only; no key is committed or written to TenderVerdict settings.
+- The optional continuity setting stores only two macOS security-scoped bookmarks in app defaults.
+  It does not persist tender contents, generated reports, the review point, or the RevenueCat key,
+  and it does not auto-run remembered files.
+- After explicit configuration, RevenueCat receives the identifiers and Test Store operations
+  normally used by its SDK. That network boundary is separate from TenderVerdict's offline input
+  and report path.
 - Keep confidential tender documents outside this alpha. The product is designed for normalized
   notice metadata, not full-document ingestion.
 
@@ -82,9 +122,16 @@ outcomes differ; it does not compute a winner.
 The macOS app uses native labelled buttons, text fields, a secure field, visible focus, text plus
 icons for status, and a linear keyboard order. Profile cards expose one combined VoiceOver label
 with the name and all three verdict counts. Notice verdicts and comparison cells include text labels
-instead of relying on color. VoiceOver exposed the transaction controls and successfully activated
-Restore in one packaged Test Store pass. Asynchronous outcome announcements, Increase Contrast,
-Reduce Transparency, and large-text behavior still require dedicated verification.
+instead of relying on color. Terminal RevenueCat states have explicit VoiceOver announcements and
+recovery targets; focus returns to purchase, retry, restore, or the key field only after a related
+user action, not an automatic launch refresh. Cards adapt their borders/fills for Increase Contrast
+and remove decorative transparency/shadows when Reduce Transparency is active.
+
+Those paths are implemented and the current Release package passes its embedded-core and signature
+checks, but it still needs a hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency,
+and large text before submission. A previous Debug Test Store pass confirmed that VoiceOver exposed
+the transaction controls and activated Restore; it is historical transaction evidence, not fresh
+settings QA for the current package.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains
 available. If Premium refresh fails, verify the RevenueCat entitlement, current offering, Test

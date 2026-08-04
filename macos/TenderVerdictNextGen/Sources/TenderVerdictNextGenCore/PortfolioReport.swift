@@ -78,9 +78,7 @@ public struct PortfolioWorkspaceReport: Decodable, Equatable, Sendable {
         throw PortfolioContractError.invalidProfileReport
       }
 
-      let normalizedName = report.profile.name
-        .trimmingCharacters(in: .whitespacesAndNewlines)
-        .lowercased()
+      let normalizedName = normalizedIdentityText(report.profile.name)
       guard !normalizedName.isEmpty, normalizedNames.insert(normalizedName).inserted else {
         throw PortfolioContractError.duplicateProfileName
       }
@@ -166,7 +164,7 @@ public struct ProfileReport: Decodable, Equatable, Identifiable, Sendable {
   }
 
   var hasUniqueResults: Bool {
-    var identities = Set<String>()
+    var identities = Set<NoticeIdentity>()
     return results.allSatisfy { result in
       !result.publicationNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         && !result.humanNextStep.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -195,8 +193,8 @@ public struct QualificationResult: Decodable, Equatable, Identifiable, Sendable 
   public let unknowns: [String]
   public let humanNextStep: String
 
-  public var id: String {
-    Self.normalizedIdentity(publicationNumber: publicationNumber, lotID: lotID)
+  public var id: NoticeIdentity {
+    normalizedNoticeIdentity(publicationNumber: publicationNumber, lotID: lotID)
   }
 
   enum CodingKeys: String, CodingKey {
@@ -225,20 +223,10 @@ public struct QualificationResult: Decodable, Equatable, Identifiable, Sendable 
       sourceURL: sourceURL
     )
   }
-
-  private static func normalizedIdentity(publicationNumber: String, lotID: String?) -> String {
-    let publication = publicationNumber
-      .trimmingCharacters(in: .whitespacesAndNewlines)
-      .lowercased()
-    let lot = lotID?
-      .trimmingCharacters(in: .whitespacesAndNewlines)
-      .lowercased() ?? ""
-    return "\(publication)\u{1f}\(lot)"
-  }
 }
 
 private struct NoticeSignature: Equatable {
-  let identity: String
+  let identity: NoticeIdentity
   let title: String?
   let buyer: String?
   let deadline: String?
@@ -257,13 +245,107 @@ public struct ReportProvenance: Decodable, Equatable, Sendable {
   }
 }
 
-public struct SupplierProfile: Decodable, Equatable, Sendable {
+public struct SupplierProfile: Codable, Equatable, Sendable {
+  public static let maximumNameCharacters = 200
+  public static let maximumCodes = 100
+  public static let maximumCountries = 100
+  public static let maximumMinimumDaysToDeadline = 3_650
+
   public let schemaVersion: Int
   public let name: String
+  public let cpvCodes: [String]
+  public let countries: [String]
+  public let minimumDaysToDeadline: Int
 
-  enum CodingKeys: String, CodingKey {
-    case schemaVersion = "schema_version"
-    case name
+  public init(
+    name: String,
+    cpvCodes: [String],
+    countries: [String],
+    minimumDaysToDeadline: Int
+  ) throws {
+    try Self.validate(
+      schemaVersion: 1,
+      name: name,
+      cpvCodes: cpvCodes,
+      countries: countries,
+      minimumDaysToDeadline: minimumDaysToDeadline
+    )
+    schemaVersion = 1
+    self.name = name
+    self.cpvCodes = cpvCodes
+    self.countries = countries
+    self.minimumDaysToDeadline = minimumDaysToDeadline
+  }
+
+  public init(from decoder: Decoder) throws {
+    let values = try strictContainer(
+      from: decoder,
+      allowedKeys: [
+        "schema_version", "name", "cpv_codes", "countries", "minimum_days_to_deadline",
+      ],
+      label: "profile"
+    )
+    let schemaVersion = try values.decode(Int.self, forKey: JSONKey("schema_version"))
+    let name = try values.decode(String.self, forKey: JSONKey("name"))
+    let cpvCodes = try values.decode([String].self, forKey: JSONKey("cpv_codes"))
+    let countries = try values.decode([String].self, forKey: JSONKey("countries"))
+    let minimumDaysToDeadline = try values.decode(
+      Int.self,
+      forKey: JSONKey("minimum_days_to_deadline")
+    )
+    try Self.validate(
+      schemaVersion: schemaVersion,
+      name: name,
+      cpvCodes: cpvCodes,
+      countries: countries,
+      minimumDaysToDeadline: minimumDaysToDeadline
+    )
+    self.schemaVersion = schemaVersion
+    self.name = name
+    self.cpvCodes = cpvCodes
+    self.countries = countries
+    self.minimumDaysToDeadline = minimumDaysToDeadline
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var values = encoder.container(keyedBy: JSONKey.self)
+    try values.encode(schemaVersion, forKey: JSONKey("schema_version"))
+    try values.encode(name, forKey: JSONKey("name"))
+    try values.encode(cpvCodes, forKey: JSONKey("cpv_codes"))
+    try values.encode(countries, forKey: JSONKey("countries"))
+    try values.encode(minimumDaysToDeadline, forKey: JSONKey("minimum_days_to_deadline"))
+  }
+
+  private static func validate(
+    schemaVersion: Int,
+    name: String,
+    cpvCodes: [String],
+    countries: [String],
+    minimumDaysToDeadline: Int
+  ) throws {
+    let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard schemaVersion == 1,
+      name == trimmedName,
+      !name.isEmpty,
+      name.count <= maximumNameCharacters,
+      (1...maximumCodes).contains(cpvCodes.count),
+      (1...maximumCountries).contains(countries.count),
+      (0...maximumMinimumDaysToDeadline).contains(minimumDaysToDeadline),
+      Set(cpvCodes).count == cpvCodes.count,
+      Set(countries).count == countries.count,
+      cpvCodes.allSatisfy(Self.isNormalizedCPV),
+      countries.allSatisfy(Self.isNormalizedCountry)
+    else {
+      throw WorkspaceDocumentError.invalidProfile
+    }
+  }
+
+  private static func isNormalizedCPV(_ value: String) -> Bool {
+    value.utf8.count == 8 && value.utf8.allSatisfy { (48...57).contains($0) }
+  }
+
+  private static func isNormalizedCountry(_ value: String) -> Bool {
+    value.utf8.count == 3 && value.utf8.allSatisfy { (65...90).contains($0) }
   }
 }
 

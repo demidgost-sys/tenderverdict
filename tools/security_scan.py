@@ -35,13 +35,24 @@ SECRET_PATTERNS = (
     re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"),
     SECRET_ASSIGNMENT_PATTERN,
 )
+PRICE_MARKER_PATTERN = re.compile(r"(?:€|\$|EUR\s*)\s*\d+(?:[.,]\d{1,2})?")
 COMMERCIAL_PATTERNS = (
     re.compile(r"(?i)\bstr[i]pe\b"),
     re.compile(r"(?i)\bpric[i]ng\b"),
     re.compile(r"(?i)\bpaid\s+pilot\b"),
     re.compile(r"(?i)\b(?:buy|purchase|subscribe|donate|pay)\s+(?:now|here|us)\b"),
-    re.compile(r"(?:€|\$|EUR\s*)\s*\d+(?:[.,]\d{1,2})?"),
+    PRICE_MARKER_PATTERN,
 )
+_SWIFT_TRIVIA_SOURCE = r"(?:\s|//[^\n]*(?:\n|$)|/\*.*?\*/)*"
+SWIFT_STRING_LITERAL_PATTERN = re.compile(
+    r'(?P<raw_hashes>#+)"(?P<raw_body>.*?)"(?P=raw_hashes)'
+    r'|"(?P<standard_body>(?:\\.|[^"\\])*)"',
+    re.DOTALL,
+)
+SWIFT_CONCATENATION_LINK_PATTERN = re.compile(
+    rf"{_SWIFT_TRIVIA_SOURCE}\+{_SWIFT_TRIVIA_SOURCE}", re.DOTALL
+)
+SWIFT_CLOSURE_ARGUMENT_PATTERN = re.compile(r"\$\d+\b")
 WORKFLOW_USES_PATTERN = re.compile(r"^\s*-?\s*uses:\s*([^\s#]+)", re.MULTILINE)
 PINNED_ACTION_PATTERN = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 _ORGANISATION_SUFFIXES = (
@@ -169,7 +180,10 @@ def _scan_text(relative: str, text: str, errors: list[str]) -> None:
 
     if relative != "LICENSE":
         for pattern in COMMERCIAL_PATTERNS:
-            if pattern.search(text):
+            searchable_text = text
+            if relative.endswith(".swift") and pattern is PRICE_MARKER_PATTERN:
+                searchable_text = _swift_commercial_text(text)
+            if pattern.search(searchable_text):
                 errors.append(f"{relative}: commercial call-to-action or price marker")
 
     if ORGANISATION_SUFFIX_PATTERN.search(text):
@@ -183,6 +197,38 @@ def _scan_text(relative: str, text: str, errors: list[str]) -> None:
 
     _scan_json_synthetic_fields(relative, text, errors)
     _scan_csv_synthetic_fields(relative, text, errors)
+
+
+def _swift_commercial_text(text: str) -> str:
+    """Mask closure shorthand outside literals while preserving visible string content."""
+    pieces: list[str] = []
+    cursor = 0
+    literals = list(SWIFT_STRING_LITERAL_PATTERN.finditer(text))
+    for match in literals:
+        pieces.append(
+            SWIFT_CLOSURE_ARGUMENT_PATTERN.sub("SWIFT_ARGUMENT", text[cursor : match.start()])
+        )
+        pieces.append(match.group(0))
+        cursor = match.end()
+    pieces.append(SWIFT_CLOSURE_ARGUMENT_PATTERN.sub("SWIFT_ARGUMENT", text[cursor:]))
+
+    concatenated_values: list[str] = []
+    current_value: str | None = None
+    for previous, current in zip(literals, literals[1:], strict=False):
+        link = text[previous.end() : current.start()]
+        if SWIFT_CONCATENATION_LINK_PATTERN.fullmatch(link):
+            if current_value is None:
+                current_value = _swift_literal_body(previous)
+            current_value += _swift_literal_body(current)
+            concatenated_values.append(current_value)
+        else:
+            current_value = None
+    return "".join(pieces) + "\n" + "\n".join(concatenated_values)
+
+
+def _swift_literal_body(match: re.Match[str]) -> str:
+    raw_body = match.group("raw_body")
+    return raw_body if raw_body is not None else match.group("standard_body") or ""
 
 
 def _scan_workflows(root: Path, files: list[str], errors: list[str]) -> None:

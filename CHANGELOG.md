@@ -38,6 +38,17 @@ identifiers and may change interfaces during the alpha period.
   and recent winner patterns.
 - Added a canonical project-status ledger that separates local implementation progress, final
   submission readiness, verified evidence, previous-plan completion, and open owner gates.
+- Added a native one-to-five-profile builder with reorder, reset, deterministic Save As, strict
+  Swift decoding, and canonical Python vocabulary validation before a workspace is accepted.
+- Added private offline `normalize-workspace` and `inspect-notices` bridge commands, a typed bounded
+  CSV/JSON preview with full-file missing-field counts, and frozen-runtime determinism checks.
+- Added explicit opt-in continuity for only the two security-scoped input bookmarks. Tender data,
+  reports, review points, and RevenueCat configuration remain session-only, and reopening never
+  starts an analysis automatically.
+- Added text, buyer, deadline-presence, and verdict filtering for the Free review queue, plus
+  searchable Premium comparison and stable-ID reasoning drill-down for each profile/notice cell.
+- Added deterministic RevenueCat terminal-state announcements, user-initiated recovery focus,
+  increased-contrast styling, reduced-transparency treatment, and a 125-notice native stress case.
 
 ### Changed
 
@@ -45,12 +56,17 @@ identifiers and may change interfaces during the alpha period.
   while keeping the published single-profile CLI and desktop workflows unchanged.
 - Refined the SwiftUI app hierarchy with one indigo accent, native file-type cues, calmer surfaces,
   clearer verdict metrics, and an honest profile-access preview in the locked Premium state.
+- Made buyer Picker filters exact after normalization, replaced delimiter-based notice IDs with
+  collision-safe structured identities, and hardened the release scanner against split Swift price
+  literals without misclassifying closure shorthand.
 - Reworked the self-contained HTML report into a responsive report surface with semantic outcome
   badges, safe supplied-source links, automatic light and dark appearances, keyboard focus
   treatment, and print-safe styling.
 - Documented the conditional Shipaton Next Gen boundary: the portfolio, native app, packaging, and
-  local submission assets and Test Store transaction evidence are implemented, while a public
-  video, student-account verification, and organizer acceptance of Test Store-only remain gated.
+  local submission assets and Test Store transaction evidence are implemented. Shipaton Managers
+  have now confirmed that Test Store is sufficient for Next Gen and that macOS is eligible without
+  a platform disadvantage; public video, student-account verification, private-form inspection,
+  final accessibility evidence, and submission remain gated.
 
 ## [0.2.0a1] - 2026-08-04
 

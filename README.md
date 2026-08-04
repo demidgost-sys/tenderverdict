@@ -57,15 +57,14 @@ It does not read full procurement documents or decide whether you should bid.
 | macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
 | Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
 | Portfolio Workspace CLI | Unreleased source feature | Current source checkout only |
-| Next Gen SwiftUI app | Unreleased competition feature; self-contained app build verified locally | Current competition source checkout |
+| Next Gen SwiftUI app | Unreleased competition feature; current Release package and embedded bridge verified locally | Current competition source checkout |
 
 There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
 update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
 
-The verified competition snapshot is **19 of 22 local implementation milestones complete** and
-**7 of 12 final-submission gates ready**. These are transparent checklist counts, not a winning
-probability or a public-release claim. See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for
-the completed capability map, evidence baseline, old-plan reconciliation, and remaining order.
+Current completion and final-submission gate counts are maintained in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). They are evidence checklists, not a winning
+probability or a public-release claim.
 
 ## Quick start
 
@@ -241,11 +240,27 @@ the `supplier_profiles_plus` entitlement as active.
   <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS Portfolio Workspace showing local inputs, the free single-profile result, and a locked RevenueCat Premium section.">
 </p>
 
-The native UI loads a bundled synthetic portfolio, accepts user-selected workspace and notice
-files, runs the local core with an explicit review point, preserves the previous report after a
-failed run, presents an actionable Free review queue, compares the same notices across Premium
-profiles without ranking them, and atomically exports the exact deterministic JSON. The Swift
-package pins the
+> [!NOTE]
+> This is the current pre-transaction submission asset. It was regenerated from the latest native
+> UX, sanitized, dimension-checked at 1179×2556, and visually reviewed in light and dark appearance.
+> Large-text, Increase Contrast, and Reduce Transparency variants remain manual final-candidate QA.
+
+The native UI loads a bundled synthetic portfolio and also includes a Profile Builder for one to
+five named profiles. A selected workspace is strictly normalized by the Python core before use.
+A selected CSV or JSON notice file is fully validated once, then the app shows its format, total
+record count, the first five normalized records, and full-file missing-field counts before a run.
+The app preserves the previous report after a failed run and atomically exports its exact
+deterministic JSON bytes.
+
+The Free review queue supports verdict, text, buyer, and deadline-presence filters with bounded
+progressive disclosure. Premium applies text, buyer, and deadline-presence filters to the
+cross-profile matrix; selecting a cell resolves the result by stable profile and notice identities
+and opens its reasons, unknowns, human next step, and safe supplied-source link. Profiles are never
+scored or ranked.
+
+Remembering selected inputs is explicit opt-in. It stores only two macOS security-scoped file
+bookmarks; it does not store tender data, a generated report, the review point, or a RevenueCat
+key, and remembered inputs are never analyzed automatically. The Swift package pins the
 official RevenueCat Apple SDK to `5.83.0` and contains current-offering, Test Store purchase,
 restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed: no key is committed, a
 missing key makes no RevenueCat request, a pasted key is not persisted, and any key that does not
@@ -261,11 +276,17 @@ TENDERVERDICT_WORKTREE="$PWD" \
   swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen --smoke-test
 ```
 
-The ten checks require no API key and the smoke test makes no RevenueCat request. They establish
-source compilation, SDK linkage, full result decoding, ordered shared-notice validation, the
-free/Premium projection, and consumption of the real synthetic portfolio command.
+The 15 native checks require no API key and the smoke test makes no RevenueCat request. They cover
+strict workspace and import-preview decoding, full report preservation, ordered shared-notice
+validation, large review filtering with stable-ID lookup, the Free/Premium projection, Test Store
+configuration and terminal accessibility outcomes, deterministic bytes, and the real private core
+bridge. The Python suite currently contains 122 tests in total, including six launcher-specific
+tests for strict normalization, CSV/JSON preview, missing-field counts, limits, deterministic
+ASCII-safe output, exit code `2`, and the offline boundary, plus three release-scanner regression
+tests.
 
-Build a self-contained, ad-hoc-signed `.app` with an embedded portfolio-only Python runtime:
+Build a self-contained, ad-hoc-signed `.app` with a private embedded Python runtime limited to
+portfolio execution, workspace normalization, and notice inspection:
 
 ```bash
 python3 -m venv .venv-build
@@ -277,10 +298,20 @@ python3 -m venv .venv-build
 
 The builder verifies the bundle and its embedded-runtime smoke test, then writes a zip and SHA-256
 checksum under `dist/next-gen/`. The ordinary Release artifact contains no key and is not itself
-transaction evidence. A separate reproducible Debug artifact has completed a local RevenueCat Test
-Store offering, cancel, failure, purchase, entitlement refresh, relaunch, and restore pass. That
-evidence is not a real payment and does not resolve Shipaton's Test Store-only eligibility. See the
-[`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
+transaction evidence. The current Release build has passed ad-hoc signature verification,
+worktree-independent smoke execution, and repeated deterministic embedded workspace-normalization
+and notice-preview checks; its `.app`, zip, and checksum were created on the external build volume.
+A previous reproducible Debug artifact completed a local RevenueCat Test Store offering, cancel,
+failure, purchase, entitlement refresh, relaunch, and restore pass; that is test evidence, not a
+real payment. The current icon and portrait screenshot were regenerated and structure-checked; the
+portrait was also visually reviewed in light and dark appearance. Final-package large-text,
+contrast/transparency, and asynchronous VoiceOver outcomes remain manual evidence gates.
+
+The Shipaton Manager has confirmed that a Test Store integration is sufficient for judging and
+that a macOS app is accepted without a judging disadvantage:
+[Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
+[macOS answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
+See the [`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
 [`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates. The complete
 documentation map is in [`docs/README.md`](docs/README.md), and the judging-to-product map is in the
 [`competition scorecard`](docs/COMPETITION_SCORECARD.md).
@@ -369,6 +400,9 @@ swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
 ```
 
 The functional test suite is offline; TED behaviour is tested with mocked HTTP responses.
+The current expected summaries are `Ran 122 tests` and `NEXT_GEN_CHECKS_OK checks=15`; six of the
+Python tests target the private Next Gen launcher directly. Re-run them rather than copying these
+counts into release evidence without current command output.
 Reproducible bug reports and research feedback are welcome through
 [`GitHub Issues`](https://github.com/demidgost-sys/tenderverdict/issues). There is no guaranteed
 support or response time during the alpha period.

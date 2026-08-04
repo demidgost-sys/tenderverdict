@@ -5,8 +5,8 @@ dates, support, compatibility, or continued development. A milestone advances on
 documented evidence gates pass.
 
 The current measured snapshot and the reconciliation with earlier plans live in
-[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). As of 2026-08-05, 19 of 22 local Shipaton
-implementation milestones are complete and 7 of 12 final-submission gates are ready. The counts
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). As of 2026-08-05, 20 of 22 local Shipaton
+implementation milestones are complete and 8 of 12 final-submission gates are ready. The counts
 are a progress ledger, not a probability of winning or a public-release claim.
 
 ## Current state
@@ -37,15 +37,19 @@ published `v0.2.0-alpha.1` tag and is not exposed by the Tk desktop.
 
 The competition branch additionally contains an unreleased SwiftUI app that consumes this JSON,
 links the official `purchases-ios` `5.83.0` package, keeps one profile visible in free mode, and
-maps the `supplier_profiles_plus` entitlement to the complete workspace. Source and packaged smoke
-tests, native contract checks, local file selection, analysis, deterministic export, and invalid
-input retention pass locally. The reproducible builder produces an embedded-runtime, ad-hoc-signed
-app and checksum-paired archive. Exact-size icon and pre-transaction screenshot assets are also
-present. A separate reproducible Debug artifact completed the configured RevenueCat Test Store
-offering, cancellation, failure, retry, purchase, entitlement unlock, relaunch refresh, restore,
-and VoiceOver restore path. No key is committed or bundled; this is not a real payment and does not
-settle whether Shipaton accepts Test Store-only for Next Gen. A public video and entrant-account
-eligibility check have not been established.
+maps the `supplier_profiles_plus` entitlement to the complete workspace. It now includes a native
+one-to-five-profile builder, bounded CSV/JSON import preview, opt-in bookmark-only continuity,
+large-list review filters, and stable comparison drill-down. Source and packaged smoke tests,
+strict bridge contracts, native checks, local analysis, deterministic export, and invalid-input
+retention pass locally. The reproducible builder produces an embedded-runtime, ad-hoc-signed app
+and checksum-paired archive and verifies the private normalize/import commands inside the frozen
+runtime. Exact-size icon and pre-transaction screenshot assets are also present. A separate
+reproducible Debug artifact completed the configured RevenueCat Test Store offering, cancellation,
+failure, retry, purchase, entitlement unlock, relaunch refresh, restore, and VoiceOver restore
+path. No key is committed or bundled; this is not a real payment. A Shipaton Manager has now
+confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
+eligible without a platform disadvantage. A public video and entrant-account eligibility check
+have not been established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -101,24 +105,26 @@ Maintainer runs and CI jobs do not count toward this threshold.
 The competition branch has a narrower conditional path documented in
 [`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core, native app,
 self-contained packaging, local submission assets, and hands-on Test Store transaction evidence are
-implemented. The official sources checked so far do not explicitly say that Test Store-only is
-sufficient for the store-exempt Next Gen path, so that interpretation remains a disclosed gate.
+implemented. The organizer gate is closed: a
+[Shipaton Manager confirmed that Test Store is enough for Next Gen](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient),
+and a separate
+[Manager response confirms macOS eligibility without disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
 
 The remaining order is:
 
-1. verify asynchronous RevenueCat announcements plus Increase Contrast, Reduce Transparency, and
-   large-text behavior without embedding a usable key;
+1. build a fresh final-revision Debug app and manually verify asynchronous RevenueCat
+   announcements, Increase Contrast, Reduce Transparency, and large-text behavior without
+   embedding a usable key;
 2. run three opt-in workflow sessions and convert observed friction into bounded product changes;
-3. implement a native local profile builder if those sessions confirm JSON authoring is the main
-   onboarding obstacle;
-4. verify the organizer answer and the entrant's student/email eligibility;
-5. inspect the exact private Devpost fields after the owner joins and signs in;
-6. only after owner approval, prepare the public demo and complete the final evidence and
+3. verify the entrant's student/email eligibility and inspect the exact private Devpost fields
+   after the owner joins and signs in;
+4. only after owner approval, prepare the public demo and complete the final evidence and
    logged-out-link audit.
 
-The previous first step is complete: the review queue, comparison matrix, safe-link behavior,
-native contract checks, hands-on UX pass, and full repository gate set passed on clean pushed
-implementation commit `33dbe87f928575dd168b64e6a10022cf79d1d000`.
+The pre-final pushed baseline is `67bb5557806279a7dcd6dfa1fcc467c7c41043d7`. The current candidate
+adds the builder, import preview, continuity, filters, drill-down, and accessibility hardening and
+passes its own complete local source, package, security, and asset gate. Draft PR #12 remains the
+authoritative pushed-revision CI record.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.
@@ -127,18 +133,16 @@ to this conditional Next Gen implementation.
 
 Priorities are ordered by evidence value rather than feature count:
 
-1. Run the Next Gen app with three opt-in procurement or supplier users and document two concrete
+1. Complete the final packaged accessibility/settings pass and preserve only evidence that cannot
+   expose a Test Store key or customer identifier.
+2. Run the Next Gen app with three opt-in procurement or supplier users and document two concrete
    workflow changes using public, synthetic, or fully de-identified data.
-2. Add an in-app local profile builder for one to five profiles, including validation, reorder,
-   explicit save, and reset, if the workflow pass confirms that hand-authored JSON is the main
-   adoption barrier.
-3. Add notice search and buyer/deadline filters only after a bounded 100+ notice usability fixture
-   demonstrates the need.
+3. Revisit builder defaults, import guidance, and comparison wording only when those sessions show
+   a repeated point of friction; the current bounded implementations are complete.
 4. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
    Windows x64 machine; repeat the accessibility portion with NVDA.
-5. Complete the remaining macOS accessibility settings and asynchronous announcement checks.
-6. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
-7. Consider an updater or desktop TED action only after a signed distribution and privacy design
+5. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
+6. Consider an updater or desktop TED action only after a signed distribution and privacy design
    exist; until then the desktop remains local-only and updates remain manual.
 
 Automatic bidding, bidder or profile scoring, legal conclusions, confidential-document ingestion,
