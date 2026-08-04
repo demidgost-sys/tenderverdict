@@ -1,6 +1,6 @@
 # Shipaton 2026 Next Gen evidence and implementation gate
 
-- Overall status: **CONDITIONAL — NATIVE SOURCE BUILDS; TEST STORE EVIDENCE BLOCKED**
+- Overall status: **CONDITIONAL — PACKAGED APP VERIFIED; TEST STORE EVIDENCE BLOCKED**
 - RevenueCat-independent Portfolio Workspace: **IMPLEMENTED LOCALLY**
 - RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED, NOT TRANSACTION-VERIFIED**
 - Evidence rechecked: **2026-08-04**
@@ -26,9 +26,10 @@ purchase. That proves the technical path and milestone, not the unresolved eligi
 interpretation.
 
 The owner reports that the exact clarification question below was sent through Devpost. No written
-organizer answer or public response URL has been verified in this repository. The owner has since
-requested the local native source foundation: a SwiftUI target, exact official SDK pin, JSON
-adapter, and fail-closed RevenueCat access client are now implemented. RevenueCat dashboard
+organizer answer or public response URL has been verified in this repository. The repository now
+contains the complete local product path: SwiftUI inputs, exact official SDK pin, canonical JSON
+adapter, fail-closed RevenueCat access client, embedded offline runtime, reproducible `.app`
+builder, competition icon, and correctly sized pre-transaction screenshot. RevenueCat dashboard
 configuration, a usable key, any purchase or restore, and a submission claim remain blocked.
 
 ## Requirement matrix
@@ -39,12 +40,12 @@ configuration, a usable key, any purchase or restore, and a submission claim rem
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
 | Student and academic email | `owner_attested_required` | Active enrollment and the exact Devpost email are entrant-specific and were not verified by this code audit. | `OWNER_CHECK` |
-| Public functional repository | `official_rule` + `repository_evidence` | The Python product, Apache-2.0 license, synthetic fixtures, SwiftUI source target, exact SDK pin, and run instructions are present. There is no configured or transaction-verified RevenueCat app artifact. | `PARTIAL` |
+| Public functional repository | `official_rule` + `repository_evidence` | The Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and local packaged smoke/UX evidence are present. RevenueCat transaction evidence is not. | `PARTIAL` |
 | Supported platform | `official_rule` | macOS is explicitly allowed by the rules and FAQ. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` | The SDK must power at least one purchase or ads; documentation alone and the Python portfolio core do not satisfy this. | `BLOCKER` |
 | Test Store technical capability | `official_sdk` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements. | `CONFIRMED_TECHNICALLY` |
 | Test Store-only eligibility | `UNKNOWN` | No checked rule, Next Gen page, FAQ, or resource page explicitly says Test Store-only is sufficient for the submission requirement. | `BLOCKER` |
-| Required submission media | `official_rule` | A public YouTube or Vimeo demo under two minutes, a 1024×1024 icon, and at least one 1179×2556 screenshot without a device frame are still required. | `PENDING` |
+| Required submission media | `official_rule` + `repository_evidence` | The 1024×1024 icon and an honest pre-transaction 1179×2556 screenshot are committed and structure-checked. A public YouTube/Vimeo demo under two minutes and genuine unlocked capture remain. | `PARTIAL` |
 
 ## Official sources checked
 
@@ -95,7 +96,7 @@ The completed local audit runs 113 offline tests and includes public-tree, conse
 format, type, package, clean-wheel, and installed-CLI checks. Portfolio Workspace is public
 Apache-2.0 code and is not an anti-tamper or payment-enforcement boundary.
 
-## RevenueCat feasibility spike
+## RevenueCat feasibility history
 
 The bounded spike is outside the repository and contains only public code, synthetic fixtures, and
 the official `purchases-ios` package pinned to `5.83.0`. It supplies no API key and deliberately
@@ -118,10 +119,10 @@ RevenueCat SDK linked for macOS; entitlement=supplier_profiles_plus
 TenderVerdict core schema=3; total=3; open=1; watch=1; reject=1
 ```
 
-This spike proved only that the official SDK could link through Swift Package Manager and that a
-native process could consume the current Python CLI. It was not a macOS application, Test Store
-transaction, entitlement activation, restore, packaged build, or submission artifact. The spike
-has now been replaced by the repository source target described below.
+This spike initially proved only that the official SDK could link through Swift Package Manager and
+that a native process could consume the current Python CLI. It has now been superseded by the
+packaged repository application described below. It remains no evidence of a Test Store
+transaction, entitlement activation, or restore.
 
 ## Implemented native source architecture
 
@@ -135,36 +136,47 @@ The repository now contains `macos/TenderVerdictNextGen`, an unreleased macOS Sw
   `supplier_profiles_plus` entitlement code paths through the official SDK;
 - a configuration boundary that accepts only a locally supplied `test_` key, makes no RevenueCat
   request when it is absent, and commits no usable key;
-- a local process adapter that invokes the real Python `portfolio` command with a minimal child
-  environment and validates schema, counts, profile order, shared notice digest, and distinct
-  profile digests before presentation;
-- five standalone native contract checks plus a headless end-to-end smoke test that proves the
-  synthetic Python workspace projects to one free and three Premium-visible profiles.
+- native workspace/notices selection, explicit review point, local run, preserved prior result on
+  error, and atomic deterministic JSON export;
+- a local process adapter that invokes either the source Python `portfolio` command or an embedded
+  portfolio-only runtime, enforces a 30-second execution boundary, and validates schema, counts,
+  profile order, shared notice digest, and distinct profile digests before presentation;
+- an in-app process-only secure field for Test Store configuration in addition to the optional
+  local environment variable;
+- six standalone native contract checks plus source and packaged end-to-end smoke tests;
+- a reproducible builder that embeds Python, fixtures, licenses, Swift package resources, and build
+  provenance, applies an ad-hoc signature, verifies it, and creates a checksum-paired archive;
+- a 1024×1024 icon and a 1179×2556 pre-transaction screenshot generated from reviewed source.
 
-The local Command Line Tools build now succeeds, so full Xcode is no longer a source-compilation
-prerequisite. Full Xcode remains necessary for the intended interactive application workflow,
-packaging, StoreKit/Test Store state verification, and submission media.
+The local Command Line Tools build, interactive app, self-contained packaging, and screenshot
+generation now succeed. Full Xcode is not a prerequisite for this competition workflow. It may be
+needed only if a later Apple-specific signing, scheme, or debugging step actually requires it.
+
+The packaged hands-on audit selected the committed workspace and notices through native panels,
+ran them through the embedded core, exported JSON, and matched the CLI output byte-for-byte. An
+invalid review point produced exit status 2 while preserving the previous valid report. Missing
+configuration and an `appl_` fixture both stayed fail-closed. See [UX_AUDIT.md](UX_AUDIT.md).
 
 ## Remaining evidence path
 
 If the organizer confirms Test Store-only eligibility, the remaining minimum is:
 
-1. install and select compatible full Xcode;
-2. create the matching RevenueCat Test Store entitlement, product, package, and offering outside
-   the repository;
-3. supply the key only in a local scheme or launch environment;
-4. verify offering load, success, cancellation, failure, restore, relaunch, stale access, and
+1. sign in to RevenueCat and create the matching Test Store entitlement, product, package, and
+   offering outside the repository;
+2. supply the key only in the process-local secure field or controlled launch environment;
+3. verify offering load, success, cancellation, failure, restore, relaunch, stale access, and
    missing/offline configuration hands-on;
-5. package the app and produce the required public video, icon, screenshot, and final evidence
-   record.
+4. replace or supplement the pre-transaction screenshot with genuine unlocked evidence;
+5. record and publish the required sub-two-minute public video and final evidence record.
 
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted
 backend, account system, telemetry, and a rewrite of the verdict engine remain out of scope.
 
 The previous active-hour estimate is no longer treated as an authoritative ledger: the Portfolio
-Workspace and native source foundations are now complete, while the organizer answer, interactive
-Test Store setup, and full Xcode workflow remain unresolved. Remaining work must be re-estimated
-from a verified timer state before claiming compliance with any owner-imposed active-hour cap.
+Workspace, native application, packaging, and local submission assets are now complete, while the
+organizer answer, interactive Test Store setup, transaction evidence, and public video remain.
+Remaining work must be re-estimated from a verified timer state before claiming compliance with any
+owner-imposed active-hour cap.
 
 ## Organizer question — owner-attested as sent
 
@@ -181,13 +193,15 @@ No organizer answer has been verified as of the evidence date.
 - RevenueCat-independent Portfolio Workspace: **implemented and locally validated**.
 - Native SwiftUI source application: **implemented, compiled, and headless-smoke-tested locally**.
 - Official RevenueCat Apple SDK: **pinned to 5.83.0 and linked by the repository build**.
+- Self-contained macOS `.app`: **built, ad-hoc-signature-verified, and embedded-core-smoke-tested**.
+- Native choose/run/export flow: **hands-on verified with exact CLI byte equality**.
+- Competition icon and pre-transaction screenshot: **generated and exact-dimension validated**.
 - RevenueCat project, offering, product, or dashboard configuration: **not created**.
 - RevenueCat API key committed or configured: **no**.
 - Real or Test Store purchase: **not performed**.
 - Entitlement or restore flow: **not performed**.
-- Push, pull request, release, store submission, or Devpost project submission: **not performed in
-  this audit**.
+- Public demo video, store submission, or Devpost project submission: **not performed in this audit**.
 - Devpost organizer question: **sent according to the owner; response not verified**.
 - Transaction and submission gate: **blocked on written Test Store clarification, owner
-  confirmation of student/email eligibility, a compatible full Xcode workflow, and configured
-  hands-on evidence**.
+  confirmation of student/email eligibility, RevenueCat account/project configuration, configured
+  hands-on transaction evidence, and the public demo video**.

@@ -20,7 +20,8 @@ enum TenderVerdictNextGenChecks {
     try checkPortfolioContractRejectsDifferentNoticeDigests()
     try checkPortfolioContractRejectsInvalidNestedTotals()
     try checkTestStoreConfigurationFailsClosed()
-    print("NEXT_GEN_CHECKS_OK checks=5")
+    try checkProcessAdapterPreservesDeterministicBytes()
+    print("NEXT_GEN_CHECKS_OK checks=6")
   }
 
   private static func checkPortfolioContractPreservesFreeAndPremiumSurfaces() throws {
@@ -81,6 +82,34 @@ enum TenderVerdictNextGenChecks {
         in: [RevenueCatTestStoreConfiguration.environmentName: "test_public_fixture"]
       ) == .accepted,
       "synthetic Test Store-shaped key was rejected"
+    )
+  }
+
+  private static func checkProcessAdapterPreservesDeterministicBytes() throws {
+    let runner = try TenderVerdictProcess()
+    guard let worktree = runner.worktree else {
+      throw CheckFailure.failed("source adapter worktree was not discovered")
+    }
+    let workspace = worktree.appendingPathComponent(
+      "examples/synthetic/portfolio-workspace.json"
+    )
+    let notices = worktree.appendingPathComponent("examples/synthetic/notices.json")
+    let first = try runner.runPortfolioSynchronously(
+      workspace: workspace,
+      notices: notices,
+      asOf: TenderVerdictProcess.syntheticAsOf
+    )
+    let second = try runner.runPortfolioSynchronously(
+      workspace: workspace,
+      notices: notices,
+      asOf: TenderVerdictProcess.syntheticAsOf
+    )
+
+    try require(first.report == second.report, "selected-input reports were not deterministic")
+    try require(first.jsonData == second.jsonData, "selected-input JSON bytes changed between runs")
+    try require(
+      first.report.summary.profileCount == 3,
+      "selected workspace did not preserve profile count"
     )
   }
 

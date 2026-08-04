@@ -21,7 +21,13 @@ ROADMAP.md
 SECURITY.md
 demo/index.html
 demo/screenshot.png
+docs/ARCHITECTURE.md
+docs/DEMO_SCRIPT.md
+docs/HACKATHON_RUNBOOK.md
+docs/README.md
 docs/SHIPATON_EVIDENCE.md
+docs/USER_GUIDE.md
+docs/UX_AUDIT.md
 docs/assets/tenderverdict-banner.svg
 examples/synthetic/expected-brief.md
 examples/synthetic/notices.csv
@@ -39,6 +45,7 @@ macos/TenderVerdictNextGen/Tests/TenderVerdictNextGenCoreTests/TenderVerdictNext
 packaging/START_HERE.txt
 packaging/THIRD_PARTY_NOTICES.md
 packaging/TenderVerdict.spec
+packaging/TenderVerdictNextGenCore.spec
 packaging/tenderverdict-icon.icns
 packaging/tenderverdict-icon.ico
 packaging/tenderverdict-icon.svg
@@ -62,6 +69,10 @@ src/tenderverdict/report.py
 src/tenderverdict/ted.py
 src/tenderverdict/vocabularies.py
 src/tenderverdict/workflow.py
+submission/README.md
+submission/devpost-draft.md
+submission/icon-1024.png
+submission/screenshot-1179x2556.png
 tests/test_cli.py
 tests/test_desktop.py
 tests/test_models.py
@@ -73,8 +84,11 @@ tests/test_report.py
 tests/test_ted.py
 tests/test_workflow.py
 tools/build_desktop.py
+tools/build_next_gen.py
 tools/check_public_tree.py
 tools/desktop_launcher.py
+tools/next_gen_core_launcher.py
+tools/prepare_submission_assets.py
 tools/security_scan.py
 tools/update_vocabularies.py
 tools/write_build_manifest.py

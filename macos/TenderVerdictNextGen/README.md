@@ -1,55 +1,107 @@
-# TenderVerdict Next Gen macOS shell
+# TenderVerdict Next Gen for macOS
 
-This unreleased SwiftUI target is the native presentation layer for the Shipaton Next Gen branch.
-It consumes the canonical Python Portfolio Workspace JSON, links the official RevenueCat Apple SDK,
-and keeps the qualification rules in the existing Python core.
+This unreleased SwiftUI app is the native Shipaton Next Gen surface. It consumes the canonical
+Python Portfolio Workspace report, preserves the first profile as the Free experience, and reveals
+the complete one-to-five-profile workspace only for an active RevenueCat
+`supplier_profiles_plus` entitlement.
 
-## What is implemented
+## Implemented product flow
 
-- one free schema-3 profile report remains visible;
-- an active `supplier_profiles_plus` entitlement reveals the complete one-to-five-profile
-  workspace;
-- RevenueCat current-offering, purchase, restore, and `CustomerInfo` entitlement paths use
-  `purchases-ios` `5.83.0`, pinned exactly in `Package.resolved`;
-- a missing key leaves Premium locked and makes no RevenueCat request;
-- a non-Test Store-shaped key is rejected before SDK configuration;
-- the Python child process receives only a minimal environment and reads the bundled synthetic
-  workspace and notices locally.
+- launches with a bundled three-profile synthetic portfolio;
+- chooses any local workspace v1 JSON and normalized CSV/JSON notices through native panels;
+- accepts an explicit date or timezone-aware RFC 3339 review point;
+- runs the embedded deterministic Python core with a 30-second boundary;
+- keeps the previous valid report visible when a new run fails;
+- exports the exact combined JSON bytes atomically;
+- accepts a `test_` RevenueCat key in a process-only secure field;
+- loads the current offering, runs a Test Store purchase, handles cancellation, restores, refreshes
+  `CustomerInfo`, and projects access through `supplier_profiles_plus`;
+- rejects missing and non-Test configuration before an SDK request.
 
-The committed source contains no usable API key. The open-source Python CLI remains available and
-is not a payment-enforcement boundary.
+The open-source CLI remains available and is not a tamper-resistant payment boundary. The app
+stores no RevenueCat key and sends no profile or notice contents to RevenueCat.
 
-## Build and verify
+## Source build and checks
 
-Run from the repository root on macOS with Swift 6 and Python 3.11 or newer:
+From the repository root on macOS with Swift 6 and Python 3.11+:
 
 ```bash
 swift build --package-path macos/TenderVerdictNextGen
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
 TENDERVERDICT_WORKTREE="$PWD" \
-  swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen --smoke-test
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen --smoke-test
+TENDERVERDICT_WORKTREE="$PWD" \
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen
 ```
 
-The smoke test invokes the real local `tenderverdict portfolio` command and checks the resulting
-workspace contract without launching a window or configuring RevenueCat.
+`TenderVerdictNextGenChecks` runs six standalone checks for portfolio projection, invalid report
+rejection, Test Store key boundaries, selected-file execution, and byte determinism. The smoke test
+invokes the real Python `portfolio` command without launching a window or configuring RevenueCat.
 
-Launch the SwiftUI shell with:
+## Self-contained app bundle
+
+Install the hash-locked packaging tools, then build:
+
+```bash
+python3 -m venv .venv-build
+.venv-build/bin/python -m pip install \
+  --require-hashes --only-binary=:all: --no-deps \
+  -r requirements-desktop-build.txt
+.venv-build/bin/python tools/build_next_gen.py
+```
+
+Outputs appear under `dist/next-gen/`. The `.app` contains:
+
+- the release SwiftUI executable and RevenueCat Swift package resources;
+- a PyInstaller-frozen `TenderVerdictCore` that supports only the offline `portfolio` operation;
+- synthetic fixtures, Apache-2.0 license, notice, third-party notices, icon, and build provenance.
+
+The builder ad-hoc signs the bundle, verifies the signature, launches the app executable from `/`
+with no worktree, confirms the embedded-core smoke test, and writes a zip plus SHA-256 checksum.
+Full Xcode is not required for this source/package workflow; Apple Developer ID signing,
+notarization, and App Store distribution are not provided.
+
+Use `--output-dir`, `--build-root`, and `--swift-scratch-path` to route generated artifacts and
+caches. Existing output is preserved unless `--replace` is explicit.
+
+## Submission asset generation
 
 ```bash
 TENDERVERDICT_WORKTREE="$PWD" \
-  swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen --render-submission-screenshot \
+  "$PWD/submission/screenshot-1179x2556.png"
+python3 tools/prepare_submission_assets.py
 ```
 
-Without local Test Store configuration, the expected UI state is locked. For a later organizer-
-approved interactive test, provide `REVENUECAT_TEST_STORE_API_KEY` only in the local launch
-environment or Xcode scheme. The source accepts only values beginning with `test_`; never commit a
-key. A configured launch can contact RevenueCat, and the purchase and restore buttons can change
-Test Store state.
+This produces the exact 1179×2556 pre-transaction view and canonical 1024×1024 icon. The committed
+screenshot honestly shows missing Test Store configuration; it is not purchase evidence.
+
+## RevenueCat configuration
+
+The package pins the official Apple SDK to `5.83.0` and the resolved revision to
+`c69a23f56c63bdfe96096fa64a1c65334d2592db`. For an organizer-approved test:
+
+1. create `supplier_profiles_plus` in a RevenueCat Test Store project;
+2. attach a Test Store product to one package in the current offering;
+3. paste the public Test Store `test_` key into the secure field for that launch;
+4. verify offering, cancel, failure, success, relaunch/refresh, and restore states on the packaged
+   app.
+
+The environment variable `REVENUECAT_TEST_STORE_API_KEY` remains available for controlled local
+automation. Never commit, log, screenshot, or publish a usable key.
 
 ## Evidence boundary
 
-A successful build, contract-check run, and headless smoke test prove source compilation, SDK
-linkage, JSON consumption, and fail-closed presentation logic. They do not prove a Test Store
-transaction, entitlement activation, restore, cancellation, packaged `.app`, screenshot, or
-Shipaton eligibility. Those require a configured RevenueCat project, a compatible full Xcode
-workflow, hands-on state checks, and the still-unverified organizer clarification.
+Verified locally: source build, six native checks, source smoke test, self-contained app assembly,
+ad-hoc signature verification, embedded-runtime smoke test, native file selection, selected-file
+analysis, atomic export, byte equality with the CLI, invalid-input retention, missing-key state,
+and non-Test-key rejection.
+
+Not yet verified: a configured RevenueCat project, Test Store offering response, transaction,
+cancellation sheet, entitlement activation, restore, relaunch persistence, VoiceOver purchase flow,
+or organizer acceptance of a Test Store-only Shipaton integration. See
+[the evidence record](../../docs/SHIPATON_EVIDENCE.md) and
+[hackathon runbook](../../docs/HACKATHON_RUNBOOK.md).

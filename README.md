@@ -18,8 +18,9 @@
   <a href="#desktop-preview">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
   <a href="#portfolio-workspace-json">Portfolio Workspace</a> ·
-  <a href="#next-gen-macos-shell">Next Gen macOS</a> ·
+  <a href="#next-gen-macos-app">Next Gen macOS</a> ·
   <a href="#verdicts">Verdicts</a> ·
+  <a href="docs/README.md">Docs</a> ·
   <a href="ROADMAP.md">Roadmap</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
   <a href="CONTRIBUTING.md">Contributing</a>
@@ -55,7 +56,7 @@ It does not read full procurement documents or decide whether you should bid.
 | macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
 | Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
 | Portfolio Workspace CLI | Unreleased source feature | Current source checkout only |
-| Next Gen SwiftUI shell | Unreleased, source-buildable competition feature | macOS source checkout only |
+| Next Gen SwiftUI app | Unreleased competition feature; self-contained app build verified locally | Current competition source checkout |
 
 There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
 update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
@@ -222,19 +223,26 @@ digest for every profile. The command writes JSON atomically when `--output` is 
 the same JSON to stdout when it is omitted; it intentionally has no Markdown or HTML portfolio
 format yet.
 
-### Next Gen macOS shell
+### Next Gen macOS app
 
-The competition branch now includes an unreleased SwiftUI shell in
+The competition branch now includes an unreleased SwiftUI app in
 [`macos/TenderVerdictNextGen`](macos/TenderVerdictNextGen). It consumes the Portfolio Workspace
 JSON instead of reimplementing qualification rules, preserves the first profile as the free
 single-analysis surface, and reveals all one to five profile reports only when RevenueCat reports
 the `supplier_profiles_plus` entitlement as active.
 
-The Swift package pins the official RevenueCat Apple SDK to `5.83.0` and contains current-offering,
-Test Store purchase, restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed:
-no key is committed, a missing key makes no RevenueCat request, and the source rejects any key that
-does not begin with `test_`. The open-source CLI remains accessible and is not presented as a
-tamper-resistant payment boundary.
+<p align="center">
+  <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS Portfolio Workspace showing local inputs, the free single-profile result, and a locked RevenueCat Premium section.">
+</p>
+
+The native UI loads a bundled synthetic portfolio, accepts user-selected workspace and notice
+files, runs the local core with an explicit review point, preserves the previous report after a
+failed run, and atomically exports the exact deterministic JSON. The Swift package pins the
+official RevenueCat Apple SDK to `5.83.0` and contains current-offering, Test Store purchase,
+restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed: no key is committed, a
+missing key makes no RevenueCat request, a pasted key is not persisted, and any key that does not
+begin with `test_` is rejected before SDK configuration. The open-source CLI remains accessible and
+is not presented as a tamper-resistant payment boundary.
 
 Build and verify the source on macOS from the repository root:
 
@@ -247,10 +255,25 @@ TENDERVERDICT_WORKTREE="$PWD" \
 
 The checks require no API key and the smoke test makes no RevenueCat request. They establish source
 compilation, SDK linkage, the free/Premium projection, and consumption of the real synthetic
-portfolio command. They are not evidence of a Test Store transaction, entitlement activation,
-restore, packaged application, or Shipaton eligibility. See the
+portfolio command.
+
+Build a self-contained, ad-hoc-signed `.app` with an embedded portfolio-only Python runtime:
+
+```bash
+python3 -m venv .venv-build
+.venv-build/bin/python -m pip install \
+  --require-hashes --only-binary=:all: --no-deps \
+  -r requirements-desktop-build.txt
+.venv-build/bin/python tools/build_next_gen.py
+```
+
+The builder verifies the bundle and its embedded-runtime smoke test, then writes a zip and SHA-256
+checksum under `dist/next-gen/`. This packaged path and the native choose/run/export flow are
+locally verified; they are not evidence of a Test Store transaction, entitlement activation,
+restore, or Shipaton eligibility. See the
 [`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
-[`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates.
+[`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates. The complete
+documentation map is in [`docs/README.md`](docs/README.md).
 
 The complete CSV header is:
 

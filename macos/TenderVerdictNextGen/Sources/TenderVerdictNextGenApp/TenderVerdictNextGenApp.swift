@@ -2,12 +2,18 @@ import AppKit
 import Darwin
 import SwiftUI
 import TenderVerdictNextGenCore
+import UniformTypeIdentifiers
 
 @main
 struct TenderVerdictNextGenApp: App {
   @StateObject private var model: AppModel
 
   init() {
+    if let flag = CommandLine.arguments.firstIndex(of: "--render-submission-screenshot"),
+      CommandLine.arguments.indices.contains(flag + 1)
+    {
+      Self.renderSubmissionScreenshot(at: CommandLine.arguments[flag + 1])
+    }
     if CommandLine.arguments.contains("--smoke-test") {
       Self.runSmokeTest()
     }
@@ -17,15 +23,16 @@ struct TenderVerdictNextGenApp: App {
   var body: some Scene {
     WindowGroup("TenderVerdict Next Gen") {
       ContentView(model: model)
-        .frame(minWidth: 860, minHeight: 680)
+        .frame(minWidth: 900, minHeight: 720)
     }
-    .defaultSize(width: 980, height: 820)
+    .defaultSize(width: 1_020, height: 900)
   }
 
   private static func runSmokeTest() -> Never {
     do {
       let runner = try TenderVerdictProcess()
-      let report = try runner.loadSyntheticPortfolioSynchronously()
+      let execution = try runner.loadSyntheticPortfolioSynchronously()
+      let report = execution.report
       let freeCount = report.visibleProfileReports(premiumUnlocked: false).count
       let premiumCount = report.visibleProfileReports(premiumUnlocked: true).count
       print(
@@ -42,15 +49,87 @@ struct TenderVerdictNextGenApp: App {
       Darwin.exit(EXIT_FAILURE)
     }
   }
+
+  @MainActor
+  private static func renderSubmissionScreenshot(at path: String) -> Never {
+    do {
+      let execution = try TenderVerdictProcess().loadSyntheticPortfolioSynchronously()
+      let model = AppModel(previewExecution: execution)
+      let logicalWidth: CGFloat = 900
+      let logicalHeight: CGFloat = 2_556 * logicalWidth / 1_179
+      let view = ContentView(model: model, startsAutomatically: false, scrollable: false)
+        .frame(width: logicalWidth, height: logicalHeight, alignment: .top)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .environment(\.colorScheme, .light)
+      let bounds = NSRect(x: 0, y: 0, width: logicalWidth, height: logicalHeight)
+      let hostingView = NSHostingView(rootView: view)
+      hostingView.frame = bounds
+      let window = NSWindow(
+        contentRect: bounds,
+        styleMask: [.borderless],
+        backing: .buffered,
+        defer: false
+      )
+      window.contentView = hostingView
+      window.backgroundColor = .windowBackgroundColor
+      window.orderBack(nil)
+      hostingView.layoutSubtreeIfNeeded()
+      hostingView.displayIfNeeded()
+      guard
+        let bitmap = NSBitmapImageRep(
+          bitmapDataPlanes: nil,
+          pixelsWide: 1_179,
+          pixelsHigh: 2_556,
+          bitsPerSample: 8,
+          samplesPerPixel: 4,
+          hasAlpha: true,
+          isPlanar: false,
+          colorSpaceName: .deviceRGB,
+          bytesPerRow: 1_179 * 4,
+          bitsPerPixel: 32
+        )
+      else {
+        throw CocoaError(.fileWriteUnknown)
+      }
+      bitmap.size = NSSize(width: logicalWidth, height: logicalHeight)
+      hostingView.cacheDisplay(in: bounds, to: bitmap)
+      window.orderOut(nil)
+      guard
+        let png = bitmap.representation(using: .png, properties: [.compressionFactor: 0.85])
+      else {
+        throw CocoaError(.fileWriteUnknown)
+      }
+      let output = URL(fileURLWithPath: path).standardizedFileURL
+      try FileManager.default.createDirectory(
+        at: output.deletingLastPathComponent(),
+        withIntermediateDirectories: true
+      )
+      try png.write(to: output, options: [.atomic])
+      print("NEXT_GEN_SCREENSHOT_OK width=1179 height=2556 output=\(output.path)")
+      Darwin.exit(EXIT_SUCCESS)
+    } catch {
+      let message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+      FileHandle.standardError.write(Data("NEXT_GEN_SCREENSHOT_FAIL: \(message)\n".utf8))
+      Darwin.exit(EXIT_FAILURE)
+    }
+  }
 }
 
 @MainActor
 final class AppModel: ObservableObject {
   @Published private(set) var report: PortfolioWorkspaceReport?
   @Published private(set) var loadError: String?
+  @Published private(set) var isLoading = false
+  @Published private(set) var workspaceURL: URL?
+  @Published private(set) var noticesURL: URL?
+  @Published private(set) var sourceDescription = "Synthetic example"
+  @Published private(set) var statusMessage: String?
+  @Published var asOf = TenderVerdictProcess.syntheticAsOf
+
   let revenueCat: RevenueCatAccessController
 
   private let runner: TenderVerdictProcess?
+  private var reportData: Data?
   private var started = false
 
   init() {
@@ -59,10 +138,39 @@ final class AppModel: ObservableObject {
       runner = try TenderVerdictProcess()
     } catch {
       runner = nil
-      loadError =
-        (error as? LocalizedError)?.errorDescription
-        ?? "TenderVerdict source root is unavailable."
+      loadError = Self.message(
+        for: error,
+        fallback: "TenderVerdict runtime is unavailable."
+      )
     }
+  }
+
+  init(previewExecution: PortfolioExecution) {
+    revenueCat = RevenueCatAccessController(environment: [:])
+    runner = nil
+    report = previewExecution.report
+    reportData = previewExecution.jsonData
+    sourceDescription = "Synthetic example"
+    statusMessage =
+      "Analyzed \(previewExecution.report.summary.noticeCount) notices for "
+      + "\(previewExecution.report.summary.profileCount) profiles."
+  }
+
+  var canRunSelected: Bool {
+    workspaceURL != nil && noticesURL != nil && !asOf.trimmingCharacters(in: .whitespaces).isEmpty
+      && !isLoading
+  }
+
+  var canExport: Bool {
+    reportData != nil && !isLoading
+  }
+
+  var workspaceName: String {
+    workspaceURL?.lastPathComponent ?? "Choose a workspace v1 JSON file"
+  }
+
+  var noticesName: String {
+    noticesURL?.lastPathComponent ?? "Choose normalized CSV or JSON notices"
   }
 
   func start() {
@@ -70,45 +178,166 @@ final class AppModel: ObservableObject {
       return
     }
     started = true
+    Task { await revenueCat.start() }
+    loadSynthetic()
+  }
 
-    Task {
-      await revenueCat.start()
+  func chooseWorkspace() {
+    let panel = NSOpenPanel()
+    panel.title = "Choose a TenderVerdict workspace"
+    panel.prompt = "Choose Workspace"
+    panel.allowedContentTypes = [.json]
+    panel.allowsMultipleSelection = false
+    panel.canChooseDirectories = false
+    guard panel.runModal() == .OK, let url = panel.url else {
+      return
     }
+    workspaceURL = url
+    statusMessage = "Workspace selected. Choose notices and run the analysis."
+  }
+
+  func chooseNotices() {
+    let panel = NSOpenPanel()
+    panel.title = "Choose normalized tender notices"
+    panel.prompt = "Choose Notices"
+    panel.allowedContentTypes = [.json, .commaSeparatedText, .plainText]
+    panel.allowsMultipleSelection = false
+    panel.canChooseDirectories = false
+    guard panel.runModal() == .OK, let url = panel.url else {
+      return
+    }
+    noticesURL = url
+    statusMessage = "Notices selected. Review the as-of value and run the analysis."
+  }
+
+  func runSelectedPortfolio() {
+    guard let runner, let workspaceURL, let noticesURL, canRunSelected else {
+      return
+    }
+    beginLoading()
+    let reviewPoint = asOf.trimmingCharacters(in: .whitespacesAndNewlines)
+    Task {
+      let workspaceAccess = workspaceURL.startAccessingSecurityScopedResource()
+      let noticesAccess = noticesURL.startAccessingSecurityScopedResource()
+      defer {
+        if workspaceAccess { workspaceURL.stopAccessingSecurityScopedResource() }
+        if noticesAccess { noticesURL.stopAccessingSecurityScopedResource() }
+      }
+      do {
+        let execution = try await runner.runPortfolio(
+          workspace: workspaceURL,
+          notices: noticesURL,
+          asOf: reviewPoint
+        )
+        apply(
+          execution,
+          source: "\(workspaceURL.lastPathComponent) + \(noticesURL.lastPathComponent)"
+        )
+      } catch {
+        fail(error, fallback: "The selected portfolio could not be analyzed.")
+      }
+    }
+  }
+
+  func loadSynthetic() {
     guard let runner else {
       return
     }
+    beginLoading()
     Task {
       do {
-        report = try await runner.loadSyntheticPortfolio()
+        let execution = try await runner.loadSyntheticPortfolio()
+        apply(execution, source: "Synthetic example")
       } catch {
-        loadError =
-          (error as? LocalizedError)?.errorDescription
-          ?? "The synthetic portfolio could not be loaded."
+        fail(error, fallback: "The synthetic portfolio could not be loaded.")
       }
     }
+  }
+
+  func exportReport() {
+    guard let reportData else {
+      return
+    }
+    let panel = NSSavePanel()
+    panel.title = "Export deterministic portfolio report"
+    panel.prompt = "Export JSON"
+    panel.allowedContentTypes = [.json]
+    panel.canCreateDirectories = true
+    panel.nameFieldStringValue = "tenderverdict-portfolio-report.json"
+    guard panel.runModal() == .OK, let url = panel.url else {
+      return
+    }
+    do {
+      try reportData.write(to: url, options: [.atomic])
+      statusMessage = "Exported \(url.lastPathComponent)."
+      loadError = nil
+    } catch {
+      loadError = Self.message(for: error, fallback: "The report could not be exported.")
+    }
+  }
+
+  private func beginLoading() {
+    isLoading = true
+    loadError = nil
+    statusMessage = "Running local deterministic analysis…"
+  }
+
+  private func apply(_ execution: PortfolioExecution, source: String) {
+    report = execution.report
+    reportData = execution.jsonData
+    sourceDescription = source
+    loadError = nil
+    isLoading = false
+    statusMessage =
+      "Analyzed \(execution.report.summary.noticeCount) notices for "
+      + "\(execution.report.summary.profileCount) profiles."
+  }
+
+  private func fail(_ error: Error, fallback: String) {
+    loadError = Self.message(for: error, fallback: fallback)
+    isLoading = false
+    statusMessage = nil
+  }
+
+  private static func message(for error: Error, fallback: String) -> String {
+    (error as? LocalizedError)?.errorDescription ?? fallback
   }
 }
 
 struct ContentView: View {
   @ObservedObject var model: AppModel
+  var startsAutomatically = true
+  var scrollable = true
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 28) {
-        header
-        sourceStatus
-        freeAnalysis
-        PremiumWorkspaceSection(report: model.report, controller: model.revenueCat)
-        footer
+    Group {
+      if scrollable {
+        ScrollView { content }
+      } else {
+        content
       }
-      .frame(maxWidth: 900, alignment: .leading)
-      .padding(.horizontal, 36)
-      .padding(.vertical, 32)
     }
     .background(Color(nsColor: .windowBackgroundColor))
     .task {
-      model.start()
+      if startsAutomatically {
+        model.start()
+      }
     }
+  }
+
+  private var content: some View {
+    VStack(alignment: .leading, spacing: 28) {
+      header
+      sourceStatus
+      PortfolioInputSection(model: model)
+      freeAnalysis
+      PremiumWorkspaceSection(report: model.report, controller: model.revenueCat)
+      footer
+      Spacer(minLength: 0)
+    }
+    .frame(maxWidth: 920, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.horizontal, 36)
+    .padding(.vertical, 32)
   }
 
   private var header: some View {
@@ -120,8 +349,8 @@ struct ContentView: View {
       Text("Tender intelligence for every supplier profile.")
         .font(.system(size: 36, weight: .bold, design: .rounded))
       Text(
-        "Run the same explainable notice review across a named portfolio, "
-          + "while preserving one free analysis."
+        "Run one explainable notice review across a named supplier portfolio, "
+          + "with the first profile always available for free."
       )
       .font(.title3)
       .foregroundStyle(.secondary)
@@ -145,28 +374,29 @@ struct ContentView: View {
       SectionHeading(
         eyebrow: "FREE",
         title: "Single-profile analysis",
-        detail: "The existing verdict workflow remains available without Premium."
+        detail: "The first named profile and the existing verdict workflow remain free."
       )
-      if let loadError = model.loadError {
-        NoticeCard(
-          title: "Portfolio data unavailable",
-          detail: loadError,
-          systemImage: "exclamationmark.triangle",
-          tint: .orange
-        )
-      } else if let report = model.report,
+      if let report = model.report,
         let primary = report.visibleProfileReports(premiumUnlocked: false).first
       {
         ProfileCard(report: primary)
+      } else if model.isLoading {
+        LoadingCard(label: "Running the local analysis…")
       } else {
-        LoadingCard(label: "Running the local synthetic analysis…")
+        NoticeCard(
+          title: "No report loaded",
+          detail: model.loadError ?? "Choose inputs above or load the synthetic example.",
+          systemImage: "doc.badge.plus",
+          tint: .orange
+        )
       }
     }
   }
 
   private var footer: some View {
     HStack(alignment: .firstTextBaseline) {
-      Label("Synthetic local demo · no tender data uploaded", systemImage: "externaldrive")
+      Label("Local source: \(model.sourceDescription)", systemImage: "externaldrive")
+        .lineLimit(1)
       Spacer()
       if let report = model.report {
         Text("Review point \(report.asOf)")
@@ -178,16 +408,126 @@ struct ContentView: View {
   }
 }
 
+struct PortfolioInputSection: View {
+  @ObservedObject var model: AppModel
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      SectionHeading(
+        eyebrow: "ANALYZE",
+        title: "Portfolio inputs",
+        detail: "Choose local files once, then run the same bounded notice set for every profile."
+      )
+      PremiumCard(tint: .blue) {
+        VStack(alignment: .leading, spacing: 16) {
+          inputRow(
+            title: "Workspace",
+            value: model.workspaceName,
+            buttonTitle: "Choose workspace…",
+            action: model.chooseWorkspace
+          )
+          inputRow(
+            title: "Notices",
+            value: model.noticesName,
+            buttonTitle: "Choose notices…",
+            action: model.chooseNotices
+          )
+          HStack(alignment: .firstTextBaseline, spacing: 16) {
+            Text("Review point")
+              .font(.subheadline.weight(.semibold))
+              .frame(width: 110, alignment: .leading)
+            TextField("YYYY-MM-DD or RFC 3339", text: $model.asOf)
+              .textFieldStyle(.roundedBorder)
+              .accessibilityLabel("Review date or RFC 3339 instant")
+          }
+          Divider()
+          HStack(spacing: 10) {
+            Button {
+              model.runSelectedPortfolio()
+            } label: {
+              Label("Run portfolio", systemImage: "play.fill")
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(!model.canRunSelected)
+
+            Button {
+              model.loadSynthetic()
+            } label: {
+              Label("Load synthetic example", systemImage: "sparkles")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .disabled(model.isLoading)
+
+            Spacer()
+
+            Button {
+              model.exportReport()
+            } label: {
+              Label("Export JSON…", systemImage: "square.and.arrow.down")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .disabled(!model.canExport)
+          }
+
+          if model.isLoading {
+            HStack(spacing: 10) {
+              ProgressView().controlSize(.small)
+              Text("Running locally…")
+            }
+            .foregroundStyle(.secondary)
+            .accessibilityElement(children: .combine)
+          } else if let error = model.loadError {
+            Label(error, systemImage: "exclamationmark.triangle.fill")
+              .foregroundStyle(.orange)
+              .fixedSize(horizontal: false, vertical: true)
+              .accessibilityLabel("Analysis error: \(error)")
+          } else if let status = model.statusMessage {
+            Label(status, systemImage: "checkmark.circle.fill")
+              .foregroundStyle(.secondary)
+              .accessibilityLabel("Analysis status: \(status)")
+          }
+        }
+      }
+    }
+  }
+
+  private func inputRow(
+    title: String,
+    value: String,
+    buttonTitle: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    HStack(spacing: 16) {
+      Text(title)
+        .font(.subheadline.weight(.semibold))
+        .frame(width: 110, alignment: .leading)
+      Text(value)
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .truncationMode(.middle)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel("\(title): \(value)")
+      Button(buttonTitle, action: action)
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+    }
+  }
+}
+
 struct PremiumWorkspaceSection: View {
   let report: PortfolioWorkspaceReport?
   @ObservedObject var controller: RevenueCatAccessController
+  @State private var apiKeyEntry = ""
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
         eyebrow: "PREMIUM",
         title: "Portfolio Workspace",
-        detail: "Evaluate up to five named profiles against one shared notice set."
+        detail: "Reveal up to five independent profile reports through one RevenueCat entitlement."
       )
       premiumContent
     }
@@ -197,15 +537,14 @@ struct PremiumWorkspaceSection: View {
   private var premiumContent: some View {
     switch controller.state {
     case .configurationMissing:
-      lockedCard(
-        title: "Test Store configuration is missing",
-        detail: "The app stays locked and makes no RevenueCat request. "
-          + "Supply a Test Store key only in the developer environment."
+      configurationCard(
+        title: "Connect a RevenueCat Test Store project",
+        detail: "Paste a test_ key for this launch. The key is not stored by TenderVerdict."
       )
     case .configurationRejected:
-      lockedCard(
-        title: "Non-Test Store configuration rejected",
-        detail: "This competition build accepts only a RevenueCat key beginning with test_."
+      configurationCard(
+        title: "That key was rejected",
+        detail: "Only a non-empty RevenueCat Test Store key beginning with test_ is accepted."
       )
     case .loading:
       LoadingCard(label: "Checking Premium access…")
@@ -232,22 +571,33 @@ struct PremiumWorkspaceSection: View {
     }
   }
 
-  private func lockedCard(title: String, detail: String) -> some View {
+  private func configurationCard(title: String, detail: String) -> some View {
     PremiumCard(tint: .indigo) {
-      HStack(alignment: .top, spacing: 16) {
-        Image(systemName: "lock")
-          .font(.title2.weight(.semibold))
-          .foregroundStyle(.indigo)
-          .frame(width: 30)
-          .accessibilityHidden(true)
-        VStack(alignment: .leading, spacing: 8) {
-          Text(title).font(.headline)
-          Text(detail).foregroundStyle(.secondary)
-          portfolioPreview
-          Text("Entitlement: \(RevenueCatAccessController.entitlementIdentifier)")
-            .font(.caption.monospaced())
-            .foregroundStyle(.tertiary)
+      VStack(alignment: .leading, spacing: 16) {
+        NoticeCardContent(
+          title: title,
+          detail: detail,
+          systemImage: "lock.shield",
+          tint: .indigo
+        )
+        HStack(spacing: 10) {
+          SecureField("test_…", text: $apiKeyEntry)
+            .textFieldStyle(.roundedBorder)
+            .accessibilityLabel("RevenueCat Test Store API key")
+          Button {
+            let key = apiKeyEntry
+            apiKeyEntry = ""
+            Task { await controller.configure(testStoreAPIKey: key) }
+          } label: {
+            Label("Connect Test Store", systemImage: "link")
+          }
+          .buttonStyle(.borderedProminent)
+          .disabled(apiKeyEntry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
+        portfolioPreview
+        Text("Entitlement: \(RevenueCatAccessController.entitlementIdentifier)")
+          .font(.caption.monospaced())
+          .foregroundStyle(.tertiary)
       }
     }
   }
@@ -255,18 +605,13 @@ struct PremiumWorkspaceSection: View {
   private func actionableLockedCard(title: String, detail: String) -> some View {
     PremiumCard(tint: .indigo) {
       VStack(alignment: .leading, spacing: 16) {
-        HStack(alignment: .top, spacing: 16) {
-          Image(systemName: "lock")
-            .font(.title2.weight(.semibold))
-            .foregroundStyle(.indigo)
-            .frame(width: 30)
-            .accessibilityHidden(true)
-          VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
-            Text(detail).foregroundStyle(.secondary)
-            portfolioPreview
-          }
-        }
+        NoticeCardContent(
+          title: title,
+          detail: detail,
+          systemImage: "lock",
+          tint: .indigo
+        )
+        portfolioPreview
         HStack(spacing: 10) {
           Button {
             Task { await controller.purchaseCurrentPackage() }
@@ -293,21 +638,16 @@ struct PremiumWorkspaceSection: View {
       VStack(alignment: .leading, spacing: 14) {
         NoticeCardContent(
           title: "Premium status could not be refreshed",
-          detail:
-            "Check the Test Store project, offering, entitlement, and connection, then retry.",
+          detail: "Check the Test Store offering, entitlement, and connection, then retry.",
           systemImage: "exclamationmark.arrow.triangle.2.circlepath",
           tint: .orange
         )
         HStack(spacing: 10) {
-          Button("Retry") {
-            Task { await controller.refresh() }
-          }
-          .buttonStyle(.borderedProminent)
-          Button("Restore access") {
-            Task { await controller.restore() }
-          }
-          .buttonStyle(.bordered)
-          .disabled(!controller.canRestore)
+          Button("Retry") { Task { await controller.refresh() } }
+            .buttonStyle(.borderedProminent)
+          Button("Restore access") { Task { await controller.restore() } }
+            .buttonStyle(.bordered)
+            .disabled(!controller.canRestore)
         }
       }
     }
@@ -328,7 +668,7 @@ struct PremiumWorkspaceSection: View {
         }
       }
     } else {
-      LoadingCard(label: "Loading the local portfolio…")
+      LoadingCard(label: "Load a local portfolio to use Premium access.")
     }
   }
 
@@ -345,7 +685,6 @@ struct PremiumWorkspaceSection: View {
       }
     }
     .font(.subheadline.weight(.medium))
-    .padding(.top, 2)
   }
 }
 
@@ -474,6 +813,7 @@ struct LoadingCard: View {
       RoundedRectangle(cornerRadius: 18, style: .continuous)
         .fill(Color(nsColor: .controlBackgroundColor))
     )
+    .accessibilityElement(children: .combine)
   }
 }
 

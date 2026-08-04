@@ -126,8 +126,24 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn("swift build --package-path macos/TenderVerdictNextGen", workflow)
         self.assertIn("TenderVerdictNextGenChecks", workflow)
         self.assertIn("TenderVerdictNextGen --smoke-test", workflow)
+        self.assertIn("python tools/build_next_gen.py", workflow)
+        self.assertIn("TenderVerdictNextGen-macos-${{ github.sha }}", workflow)
         self.assertNotIn("REVENUECAT_TEST_STORE_API_KEY", workflow)
         self.assertIn("/macos", metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"])
+        self.assertIn(
+            "/submission",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
+
+        core_spec = (ROOT / "packaging" / "TenderVerdictNextGenCore.spec").read_text(
+            encoding="utf-8"
+        )
+        next_gen_builder = (ROOT / "tools" / "build_next_gen.py").read_text(encoding="utf-8")
+        self.assertIn('"tenderverdict.ted"', core_spec)
+        self.assertIn("console=True", core_spec)
+        self.assertIn("--smoke-test", next_gen_builder)
+        self.assertIn('"codesign", "--verify"', next_gen_builder)
+        self.assertIn("api_key_included=false", next_gen_builder)
 
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()

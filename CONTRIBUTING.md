@@ -42,6 +42,22 @@ mypy
 python -m build --no-isolation
 ```
 
+On macOS, changes under `macos/TenderVerdictNextGen`, `submission`, or the embedded runtime also
+require:
+
+```bash
+swift build --package-path macos/TenderVerdictNextGen
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+TENDERVERDICT_WORKTREE="$PWD" \
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen --smoke-test
+python3 tools/prepare_submission_assets.py
+```
+
+The self-contained app builder and manual evidence sequence are documented in the
+[Next Gen README](macos/TenderVerdictNextGen/README.md) and
+[UX audit](docs/UX_AUDIT.md).
+
 `requirements-package-build.txt` is the reviewed, hash-locked package-build environment. Desktop
 bundles use the separate `requirements-desktop-build.txt` lock. The vocabulary snapshots under
 `src/tenderverdict/data/` are intentional release inputs: do not run

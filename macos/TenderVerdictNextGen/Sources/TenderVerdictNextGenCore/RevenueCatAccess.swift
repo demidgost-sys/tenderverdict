@@ -58,7 +58,7 @@ public final class RevenueCatAccessController: ObservableObject {
 
   @Published public private(set) var state: PremiumAccessState
 
-  private let apiKey: String?
+  private var apiKey: String?
   private var currentPackage: Package?
   private var didConfigure = false
 
@@ -80,6 +80,24 @@ public final class RevenueCatAccessController: ObservableObject {
 
   public var canRestore: Bool {
     didConfigure && !state.isBusy
+  }
+
+  public func configure(testStoreAPIKey: String) async {
+    guard !didConfigure else {
+      await refreshConfiguredAccess()
+      return
+    }
+    let environment = [
+      RevenueCatTestStoreConfiguration.environmentName: testStoreAPIKey
+    ]
+    guard let validatedKey = RevenueCatTestStoreConfiguration.apiKey(in: environment) else {
+      apiKey = nil
+      state = .configurationRejected
+      return
+    }
+    apiKey = validatedKey
+    state = .loading
+    await start()
   }
 
   public func start() async {

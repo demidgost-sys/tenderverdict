@@ -12,7 +12,7 @@ documented evidence gates pass.
 | `v0.2.0-alpha.1` | Desktop developer alpha with CLI, library, and local UI | Technical evaluator |
 | Native desktop archives | Unsigned prerelease archives with checksums and build manifests | Opt-in evaluation only |
 | Portfolio Workspace in current source | Offline JSON CLI for one to five profiles | Technical evaluator |
-| Next Gen SwiftUI shell in current source | Source-buildable macOS UI with pinned RevenueCat SDK | Competition prototype evaluator |
+| Next Gen SwiftUI app in current source | Source-buildable and self-contained packaged macOS UI with pinned RevenueCat SDK | Competition prototype evaluator |
 | Hosted service, accounts, production payments, analytics | Not implemented | Nobody |
 
 The current product contract remains narrow: local, deterministic pre-qualification of supplied
@@ -30,12 +30,14 @@ the canonical profile and qualification rules, evaluates one notice set independ
 five profiles, and emits JSON with one schema-3 report per profile. It is not included in the
 published `v0.2.0-alpha.1` tag and is not exposed by the Tk desktop.
 
-The competition branch additionally contains an unreleased SwiftUI shell that consumes this JSON,
+The competition branch additionally contains an unreleased SwiftUI app that consumes this JSON,
 links the official `purchases-ios` `5.83.0` package, keeps one profile visible in free mode, and
-maps the `supplier_profiles_plus` entitlement to the complete workspace. Its build, native contract
-checks, and headless Python-adapter smoke test pass locally without a key or RevenueCat request.
-No configured Test Store project, transaction, restore, packaged app, or submission evidence has
-been established.
+maps the `supplier_profiles_plus` entitlement to the complete workspace. Source and packaged smoke
+tests, native contract checks, local file selection, analysis, deterministic export, and invalid
+input retention pass locally. The reproducible builder produces an embedded-runtime, ad-hoc-signed
+app and checksum-paired archive. Exact-size icon and pre-transaction screenshot assets are also
+present. No configured Test Store project, transaction, restore, or public video has been
+established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -89,24 +91,24 @@ Maintainer runs and CI jobs do not count toward this threshold.
 ## Shipaton Next Gen branch
 
 The competition branch has a narrower conditional path documented in
-[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core and native
-source shell are implemented, but neither source code nor a compile-only SDK link satisfies the
-Shipaton RevenueCat purchase requirement. Test Store execution remains gated on a written organizer
-answer confirming whether a Test Store-only SDK flow is sufficient for the store-exempt Next Gen
-path.
+[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core, native app,
+self-contained packaging, and local submission assets are implemented, but source and packaging do
+not satisfy the Shipaton RevenueCat purchase requirement. Test Store execution remains gated on a
+written organizer answer confirming whether a Test Store-only SDK flow is sufficient for the
+store-exempt Next Gen path.
 
 The remaining order is:
 
 1. verify the organizer answer and the entrant's student/email eligibility;
-2. install and select a compatible full Xcode toolchain for an interactive `.app` workflow;
-3. create the RevenueCat Test Store project objects for the committed entitlement contract,
-   without adding a production product or key;
-4. provide the Test Store key only through a local scheme or launch environment and verify the
-   locked, offering, success, cancellation, failure, restore, and relaunch states hands-on;
-5. add deterministic controller-level tests around those observed state transitions without
+2. sign in and create the RevenueCat Test Store project objects for the committed entitlement
+   contract, without adding a production product or key;
+3. provide the Test Store key only through the process-local secure field or a controlled launch
+   environment and verify the locked, offering, success, cancellation, failure, restore, and
+   relaunch states hands-on;
+4. add deterministic controller-level tests around those observed state transitions without
    embedding a usable key;
-6. package the app and produce the required public demo video, icon, screenshot, repository
-   instructions, and final evidence audit.
+5. capture genuine unlocked evidence and publish the required sub-two-minute demo video;
+6. complete the Devpost project, final evidence audit, and logged-out public-link review.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.

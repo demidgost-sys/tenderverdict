@@ -52,11 +52,12 @@ answer.
   report.
 - A portfolio workspace is limited to five profiles and 256 KiB. Its JSON output is a machine
   contract; combined Markdown and HTML are not implemented. The only multi-profile presentation is
-  an unreleased macOS SwiftUI competition shell, not the published Tk desktop.
+  an unreleased macOS SwiftUI competition app, not the published Tk desktop.
 - The Next Gen source links the official RevenueCat SDK and implements offering, Test Store
-  purchase, restore, and entitlement-driven presentation states. It has no committed or configured
-  key, verified transaction, packaged application, account system, production billing, or organizer
-  eligibility confirmation. The open-source portfolio CLI is not a payment-enforcement boundary.
+  purchase, restore, and entitlement-driven presentation states. The self-contained app build and
+  local choose/run/export flow are verified, but there is no committed or configured key, verified
+  transaction, account system, production billing, or organizer eligibility confirmation. The
+  open-source portfolio CLI is not a payment-enforcement boundary.
 - The unsigned desktop preview has no trusted installer or update channel. The Windows x64 alpha
   has native automated startup and synthetic-flow evidence but no hands-on usability run.
   Automated platform smoke tests do not replace hands-on Windows, VoiceOver, or NVDA validation.
