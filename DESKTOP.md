@@ -6,6 +6,10 @@ local interface over the same deterministic qualification workflow used by the C
 The preview is intended for evaluation. It is not a signed consumer release or a replacement for
 procurement, eligibility, or legal review.
 
+The Tk desktop remains a single-profile surface. The unreleased Portfolio Workspace contract is
+available only through the local `portfolio` CLI and is not evidence of a native premium UI,
+RevenueCat integration, purchase flow, or entitlement gate.
+
 ## Release status
 
 The source UI and unsigned native archives are published in the `v0.2.0-alpha.1` prerelease. Each

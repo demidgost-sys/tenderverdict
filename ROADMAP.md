@@ -11,7 +11,8 @@ documented evidence gates pass.
 | `v0.1.0-alpha.1` | Published, immutable CLI developer alpha | Python-capable evaluator |
 | `v0.2.0-alpha.1` | Desktop developer alpha with CLI, library, and local UI | Technical evaluator |
 | Native desktop archives | Unsigned prerelease archives with checksums and build manifests | Opt-in evaluation only |
-| Hosted service, accounts, payments, analytics | Not implemented | Nobody |
+| Portfolio Workspace in current source | Offline JSON CLI for one to five profiles | Technical evaluator |
+| Hosted service, accounts, production payments, analytics | Not implemented | Nobody |
 
 The current product contract remains narrow: local, deterministic pre-qualification of supplied
 public-procurement notice metadata. It does not read full tender documents, provide legal advice,
@@ -22,6 +23,11 @@ support, verified eForms XML expansion for multi-lot TED results, result filteri
 hash-locked Python build dependencies, and a first-run handoff inside native archives. The release
 remains an evaluation build, not evidence that platform usability or procurement-workflow fit has
 been established.
+
+Current source also contains the RevenueCat-independent Portfolio Workspace foundation. It reuses
+the canonical profile and qualification rules, evaluates one notice set independently for up to
+five profiles, and emits JSON with one schema-3 report per profile. It is not included in the
+published `v0.2.0-alpha.1` tag and is not exposed by the Tk desktop.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -72,6 +78,29 @@ either three independent successful packaged desktop installations, including at
 macOS, or one explicit opt-in request for a Developer ID-signed and notarized macOS build.
 Maintainer runs and CI jobs do not count toward this threshold.
 
+## Shipaton Next Gen branch
+
+The competition branch has a narrower conditional path documented in
+[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The offline Portfolio Workspace core is
+implemented, but it does not satisfy the Shipaton RevenueCat requirement on its own. Native work
+remains gated on a written organizer answer confirming whether an official SDK flow using only
+RevenueCat Test Store is sufficient for the store-exempt Next Gen path.
+
+If that answer is positive, the remaining order is:
+
+1. install and select a compatible full Xcode toolchain;
+2. add a minimal SwiftUI macOS shell that consumes the documented portfolio JSON contract;
+3. integrate the official pinned RevenueCat Apple SDK for offering, purchase, restore, and
+   `supplier_profiles_plus` entitlement states;
+4. keep Test Store configuration fail-closed and out of committed source;
+5. test success, failure, cancellation, restore, missing configuration, and offline entitlement
+   presentation;
+6. produce the required public demo video, icon, screenshot, repository instructions, and final
+   evidence audit.
+
+No App Store release, real payment, hosted backend, account system, or production API key belongs
+to this conditional Next Gen implementation.
+
 ## Candidate follow-on work
 
 Priorities are ordered by evidence value rather than feature count:
@@ -85,5 +114,5 @@ Priorities are ordered by evidence value rather than feature count:
 5. Consider an updater or desktop TED action only after a signed distribution and privacy design
    exist; until then the desktop remains local-only and updates remain manual.
 
-Automatic bidding, bidder scoring, legal conclusions, confidential-document ingestion, accounts,
-hosted execution, payments, and analytics are outside the current roadmap.
+Automatic bidding, bidder or profile scoring, legal conclusions, confidential-document ingestion,
+accounts, hosted execution, production payments, and analytics are outside the current roadmap.

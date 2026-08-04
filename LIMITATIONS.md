@@ -13,6 +13,9 @@ a conclusion about whether an organisation can or should participate in a procur
 - `open_documents` means only that the configured deterministic metadata checks passed.
 - `watch` means that a person must resolve missing or ambiguous metadata.
 - `reject` records a configured metadata stop factor; it is not a legal disqualification.
+- Portfolio Workspace repeats the same metadata checks independently for each profile. It does not
+  compare, rank, score, or recommend profiles, and its top-level notice count is the size of the
+  shared input rather than a sum of repeated profile evaluations.
 
 ## Input and source risk
 
@@ -47,6 +50,11 @@ answer.
   treated as an empty market.
 - A successful zero-row snapshot is distinct from a failure and produces an explicit zero-notice
   report.
+- A portfolio workspace is limited to five profiles and 256 KiB. Its JSON output is a machine
+  contract only; combined Markdown, HTML, and desktop presentation are not implemented.
+- No RevenueCat SDK, entitlement state, paywall, account, production billing, or Test Store
+  purchase flow is implemented in the repository yet. The open-source portfolio CLI is not a
+  payment-enforcement boundary.
 - The unsigned desktop preview has no trusted installer or update channel. The Windows x64 alpha
   has native automated startup and synthetic-flow evidence but no hands-on usability run.
   Automated platform smoke tests do not replace hands-on Windows, VoiceOver, or NVDA validation.

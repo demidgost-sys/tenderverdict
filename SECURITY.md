@@ -24,10 +24,15 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
 
 ## Security boundaries
 
-- `demo` and `qualify` operate on local files and require no network access.
+- `demo`, `qualify`, and `portfolio` operate on local files and require no network access.
 - `fetch-ted` is the only command that intentionally contacts an external service.
 - The desktop preview does not call `fetch-ted`; it accepts local normalized notice metadata.
+- Portfolio Workspace parses one bounded workspace and one bounded notice file before atomically
+  emitting JSON; one invalid nested profile fails the whole run.
 - The tool does not require credentials and should not be given secrets.
+- The current repository contains no RevenueCat API key or purchase implementation. A future
+  native debug integration must keep Test Store configuration out of committed source and fail
+  closed when configuration is absent.
 - Output can contain content copied from input metadata. Treat generated files as untrusted data.
 - A verdict is not a security, legal, eligibility, or procurement decision.
 
