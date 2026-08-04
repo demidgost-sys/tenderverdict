@@ -21,10 +21,12 @@ ROADMAP.md
 SECURITY.md
 demo/index.html
 demo/screenshot.png
+docs/SHIPATON_EVIDENCE.md
 docs/assets/tenderverdict-banner.svg
 examples/synthetic/expected-brief.md
 examples/synthetic/notices.csv
 examples/synthetic/notices.json
+examples/synthetic/portfolio-workspace.json
 examples/synthetic/profile.json
 packaging/START_HERE.txt
 packaging/THIRD_PARTY_NOTICES.md

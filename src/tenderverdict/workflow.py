@@ -15,12 +15,15 @@ from .demo_data import DEMO_AS_OF, demo_notices, demo_profile
 from .models import (
     MAX_NOTICES_FILE_BYTES,
     MAX_PROFILE_FILE_BYTES,
+    MAX_WORKSPACE_FILE_BYTES,
     Notice,
+    PortfolioWorkspace,
     Profile,
     QualificationResult,
     notice_collection_from_file_bytes,
     notices_from_data,
     parse_iso_date,
+    portfolio_workspace_from_json_bytes,
     profile_from_dict,
     profile_from_json_bytes,
     read_bounded_file_bytes,
@@ -48,6 +51,23 @@ class QualificationRun:
             provenance=self.provenance,
         )
         return dict(cast(dict[str, int], payload["summary"]))
+
+
+@dataclass(frozen=True, slots=True)
+class PortfolioWorkspaceRun:
+    """One deterministic run of the same notices across ordered profiles."""
+
+    workspace: PortfolioWorkspace
+    as_of: date | datetime
+    profile_runs: tuple[QualificationRun, ...]
+
+    @property
+    def summary(self) -> dict[str, int]:
+        notice_count = len(self.profile_runs[0].results) if self.profile_runs else 0
+        return {
+            "profile_count": len(self.profile_runs),
+            "notice_count": notice_count,
+        }
 
 
 def qualify_inputs(
@@ -84,6 +104,44 @@ def qualify_inputs(
     )
 
 
+def qualify_portfolio_inputs(
+    workspace: PortfolioWorkspace,
+    notices: Sequence[Notice],
+    *,
+    as_of: date | datetime,
+    source_kind: str = "in_memory",
+    notices_sha256: str | None = None,
+    ted_query: str | None = None,
+    retrieved_at: str | None = None,
+    lot_policy: str | None = None,
+) -> PortfolioWorkspaceRun:
+    """Evaluate one validated notice sequence independently for every profile."""
+
+    normalized_notices = tuple(notices)
+    shared_notices_sha256 = notices_sha256 or _canonical_sha256(
+        [notice.to_dict() for notice in normalized_notices]
+    )
+    profile_runs = tuple(
+        qualify_inputs(
+            profile,
+            normalized_notices,
+            as_of=as_of,
+            source_kind=source_kind,
+            profile_sha256=_canonical_sha256(profile.to_dict()),
+            notices_sha256=shared_notices_sha256,
+            ted_query=ted_query,
+            retrieved_at=retrieved_at,
+            lot_policy=lot_policy,
+        )
+        for profile in workspace.profiles
+    )
+    return PortfolioWorkspaceRun(
+        workspace=workspace,
+        as_of=as_of,
+        profile_runs=profile_runs,
+    )
+
+
 def qualify_files(
     profile_path: str | Path,
     notices_path: str | Path,
@@ -109,6 +167,37 @@ def qualify_files(
         as_of=as_of,
         source_kind=collection.source_kind,
         profile_sha256=_bytes_sha256(profile_payload),
+        notices_sha256=_bytes_sha256(notices_payload),
+        ted_query=collection.ted_query,
+        retrieved_at=collection.retrieved_at,
+        lot_policy=collection.lot_policy,
+    )
+
+
+def qualify_portfolio_files(
+    workspace_path: str | Path,
+    notices_path: str | Path,
+    *,
+    as_of: date | datetime,
+) -> PortfolioWorkspaceRun:
+    """Load one workspace and evaluate one bounded local notice collection."""
+
+    workspace_payload = read_bounded_file_bytes(
+        workspace_path,
+        MAX_WORKSPACE_FILE_BYTES,
+        "workspace",
+    )
+    notices_payload = read_bounded_file_bytes(
+        notices_path,
+        MAX_NOTICES_FILE_BYTES,
+        "notices",
+    )
+    collection = notice_collection_from_file_bytes(notices_payload, notices_path)
+    return qualify_portfolio_inputs(
+        portfolio_workspace_from_json_bytes(workspace_payload, workspace_path),
+        collection.notices,
+        as_of=as_of,
+        source_kind=collection.source_kind,
         notices_sha256=_bytes_sha256(notices_payload),
         ted_query=collection.ted_query,
         retrieved_at=collection.retrieved_at,
@@ -158,6 +247,32 @@ def render_run(run: QualificationRun, format_name: str) -> str:
             )
         )
     raise ValueError(f"unsupported format: {format_name}")
+
+
+def portfolio_report_as_dict(run: PortfolioWorkspaceRun) -> dict[str, object]:
+    """Return the stable JSON-compatible portfolio report contract."""
+
+    return {
+        "schema_version": 1,
+        "kind": "portfolio_workspace_report",
+        "as_of": run.as_of.isoformat(),
+        "summary": run.summary,
+        "profile_reports": [
+            report_as_dict(
+                profile_run.profile,
+                profile_run.results,
+                as_of=profile_run.as_of,
+                provenance=profile_run.provenance,
+            )
+            for profile_run in run.profile_runs
+        ],
+    }
+
+
+def render_portfolio_run(run: PortfolioWorkspaceRun) -> str:
+    """Render a completed portfolio run as deterministic ASCII-safe JSON."""
+
+    return dump_json(portfolio_report_as_dict(run))
 
 
 def write_run(run: QualificationRun, destination: str | Path, format_name: str) -> None:

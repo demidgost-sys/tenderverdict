@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "schema_version": 1,
+      "name": "Example Austria Services",
+      "cpv_codes": [
+        "72260000"
+      ],
+      "countries": [
+        "AUT"
+      ],
+      "minimum_days_to_deadline": 14
+    },
+    {
+      "schema_version": 1,
+      "name": "Example Germany Support",
+      "cpv_codes": [
+        "72261000"
+      ],
+      "countries": [
+        "DEU"
+      ],
+      "minimum_days_to_deadline": 14
+    },
+    {
+      "schema_version": 1,
+      "name": "Example DACH Operations",
+      "cpv_codes": [
+        "72260000",
+        "72261000"
+      ],
+      "countries": [
+        "AUT",
+        "DEU"
+      ],
+      "minimum_days_to_deadline": 30
+    }
+  ]
+}

@@ -45,6 +45,7 @@ include = [
   "/.gitattributes",
   "/.github",
   "/demo",
+  "/docs/SHIPATON_EVIDENCE.md",
   "/docs/assets",
   "/examples",
   "/packaging",

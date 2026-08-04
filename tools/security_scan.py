@@ -57,14 +57,18 @@ APPROVED_SYNTHETIC_ORGANISATION = "Example Software GmbH"
 OFFICIAL_URL_HOSTS = {
     "api.ted.europa.eu",
     "data.europa.eu",
+    "developer.apple.com",
     "docs.ted.europa.eu",
     "git-lfs.github.com",
     "github.com",
     "op.europa.eu",
     "publications.europa.eu",
     "purl.org",
+    "revenuecat-shipaton-2026.devpost.com",
     "ted.europa.eu",
     "www.apache.org",
+    "www.revenuecat.com",
+    "www.shipaton.com",
     "www.w3.org",
 }
 

@@ -7,6 +7,21 @@ identifiers and may change interfaces during the alpha period.
 
 ## [Unreleased]
 
+### Added
+
+- Added a bounded Portfolio Workspace v1 contract for one to five uniquely named supplier profiles.
+- Added the offline `portfolio` command, which evaluates one shared notice set independently for
+  every profile and emits deterministic JSON containing canonical schema-3 profile reports.
+- Added a three-profile synthetic workspace plus validation, ordering, provenance, empty-input,
+  terminal-safety, atomic-output, and network-isolation regression coverage.
+
+### Changed
+
+- Extended the installed-wheel smoke test and public documentation to cover the new portfolio CLI
+  while keeping the published single-profile CLI and desktop workflows unchanged.
+- Documented the conditional Shipaton Next Gen boundary: the RevenueCat-independent portfolio core
+  is implemented, while the native SDK purchase and entitlement flow remains gated.
+
 ## [0.2.0a1] - 2026-08-04
 
 ### Added

@@ -17,6 +17,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#desktop-preview">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
+  <a href="#portfolio-workspace-json">Portfolio Workspace</a> ·
   <a href="#verdicts">Verdicts</a> ·
   <a href="ROADMAP.md">Roadmap</a> ·
   <a href="LIMITATIONS.md">Limitations</a> ·
@@ -33,7 +34,7 @@ It does not read full procurement documents or decide whether you should bid.
 
 | Property | What it means |
 |---|---|
-| **Local-first** | `demo` and `qualify` read local files and make no network requests. |
+| **Local-first** | `demo`, `qualify`, and `portfolio` read local files and make no network requests. |
 | **Deterministic** | The same inputs and explicit `--as-of` review point produce the same verdicts. |
 | **Traceable** | Reports preserve reasons, unknowns, source metadata, generator version, and input SHA-256 digests. |
 | **Fail closed** | Invalid input or a failed fetch returns an error without publishing partial output. |
@@ -52,6 +53,7 @@ It does not read full procurement documents or decide whether you should bid.
 | Desktop UI | Published developer alpha | Source with Tk or unsigned native archive |
 | macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
 | Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
+| Portfolio Workspace CLI | Unreleased source feature | Current source checkout only |
 
 There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
 update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
@@ -168,6 +170,56 @@ Minimal company profile:
 }
 ```
 
+### Portfolio Workspace JSON
+
+> [!NOTE]
+> Portfolio Workspace is an unreleased source feature and is not present in the immutable
+> `v0.2.0-alpha.1` tag. Install the current source checkout to evaluate it.
+
+The additive, offline `portfolio` command evaluates one local notice set independently for one to
+five named profiles. It leaves the existing single-profile command and its Markdown, HTML, and JSON
+exports unchanged. The combined workspace result is deterministic JSON for a future
+entitlement-backed desktop experience:
+
+```bash
+tenderverdict portfolio \
+  --workspace examples/synthetic/portfolio-workspace.json \
+  --notices examples/synthetic/notices.json \
+  --as-of 2026-08-02 \
+  --output portfolio-report.json
+```
+
+The workspace file is a bounded UTF-8 JSON object. It accepts no unknown fields, is limited to
+256 KiB, and contains the existing profile schema without introducing a second qualification
+model:
+
+```json
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "schema_version": 1,
+      "name": "Example Austria Services",
+      "cpv_codes": ["72260000"],
+      "countries": ["AUT"],
+      "minimum_days_to_deadline": 14
+    }
+  ]
+}
+```
+
+There must be between one and five profiles. Names are trimmed and must be unique after
+case-insensitive comparison. Any invalid nested profile rejects the entire workspace before an
+output file is replaced.
+
+Each entry in `profile_reports` is the existing schema-3 report for one profile. The top-level
+summary reports only the profile count and the shared input notice count; it does not rank profiles
+or combine their verdict totals. Profile and notice input order are preserved. Nested provenance
+contains a separate canonical profile digest for each normalized profile and the same notice-file
+digest for every profile. The command writes JSON atomically when `--output` is supplied and prints
+the same JSON to stdout when it is omitted; it intentionally has no Markdown or HTML portfolio
+format yet.
+
 The complete CSV header is:
 
 ```text
@@ -259,13 +311,13 @@ Read [`ROADMAP.md`](ROADMAP.md), [`CONTRIBUTING.md`](CONTRIBUTING.md),
 
 ## Deutsch
 
-TenderVerdict ist ein experimentelles, quelloffenes und lokal ausgeführtes CLI zur
+TenderVerdict ist ein experimentelles, quelloffenes und lokal ausgeführtes Werkzeug zur
 Vorqualifizierung von Metadaten öffentlicher Ausschreibungen aus Sicht von Anbietern. Ein lokales
 Unternehmensprofil und strukturierte Notice-Daten aus CSV oder JSON werden nachvollziehbar als
 `open_documents`, `watch` oder `reject` eingeordnet. Das Werkzeug bietet keine Rechtsberatung,
 trifft keine Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung der
-Ausschreibungsunterlagen. Die veröffentlichte Alpha-Version ist ein CLI; `main` enthält zusätzlich
-eine noch unveröffentlichte Desktop-Vorschau ohne unterstützten Ein-Klick-Installer.
+Ausschreibungsunterlagen. `v0.2.0-alpha.1` enthält das CLI und eine unsignierte Desktop-Vorschau;
+der aktuelle Quellstand ergänzt außerdem einen noch unveröffentlichten Portfolio-JSON-Workflow.
 
 ## License and attribution
 
