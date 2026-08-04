@@ -52,7 +52,9 @@ deliberately not simulated by CI.
 ## Evaluation after the desktop alpha
 
 Feedback remains opt-in through public GitHub issues using synthetic, public, or fully de-identified
-examples. TenderVerdict does not collect telemetry or contact prospective users automatically.
+examples. The `v0.2.0-alpha.1` desktop evaluation is tracked in
+[issue #9](https://github.com/demidgost-sys/tenderverdict/issues/9). TenderVerdict does not collect
+telemetry or contact prospective users automatically.
 
 Continue desktop work only if the evaluation produces at least:
 
