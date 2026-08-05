@@ -35,13 +35,15 @@ struct ComparisonDetailView: View {
             header(profile: profile, result: result)
             Divider()
             detailGroup(title: "Recommended next step", values: [result.displayHumanNextStep])
-            detailGroup(title: "Reasons", values: result.displayReasons)
-            detailGroup(
-              title: "Unknowns",
-              values: result.unknowns.isEmpty
-                ? ["None from the supplied metadata."]
-                : result.displayUnknowns
-            )
+            if !result.displayVerdictDrivers.isEmpty {
+              detailGroup(title: "Verdict drivers", values: result.displayVerdictDrivers)
+            }
+            if !result.displayUnknowns.isEmpty {
+              detailGroup(title: "Needs confirmation", values: result.displayUnknowns)
+            }
+            if !result.displaySupportingChecks.isEmpty {
+              detailGroup(title: "Checks passed", values: result.displaySupportingChecks)
+            }
             if let sourceURL = result.safeSourceURL {
               Link(destination: sourceURL) {
                 Label("Open supplied HTTPS source", systemImage: "arrow.up.right.square")

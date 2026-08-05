@@ -36,6 +36,28 @@ struct NoticeImportPreviewView: View {
           }
         }
       }
+
+      if !visibleWarnings.isEmpty {
+        DisclosureGroup {
+          VStack(alignment: .leading, spacing: 7) {
+            ForEach(Array(visibleWarnings.enumerated()), id: \.offset) { item in
+              Label(item.element, systemImage: "exclamationmark.triangle")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+          .padding(.top, 6)
+        } label: {
+          Label(
+            "\(visibleWarnings.count) metadata warning"
+              + (visibleWarnings.count == 1 ? " in preview" : "s in preview"),
+            systemImage: "exclamationmark.triangle.fill"
+          )
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(.orange)
+        }
+      }
     }
     .padding(16)
     .background(
@@ -128,6 +150,14 @@ struct NoticeImportPreviewView: View {
       return "TED snapshot"
     default:
       return preview.sourceKind
+    }
+  }
+
+  private var visibleWarnings: [String] {
+    preview.preview.flatMap { record in
+      record.displayMetadataWarnings.map { warning in
+        "\(record.displayReference): \(warning)"
+      }
     }
   }
 

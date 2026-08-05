@@ -53,6 +53,26 @@ by [the developer guide](DEVELOPMENT.md); current totals and results are owned b
 | P2 | The builder did not execute configuration-specific native checks and obscured the alpha suffix in provenance | A package could pass smoke without testing its exact Debug/Release contract, and manifest version evidence was ambiguous | Builder runs the matching native-check binary and records full project version, numeric bundle version, configuration, Test Store availability, revision, dirty state, architecture, signing, and key absence |
 | P3 | Durable and submission documents copied suite totals, stale SHAs, package labels, and an obsolete Test Store uncertainty | Readers could not tell a current fact from a historical baseline | `PROJECT_STATUS.md` owns mutable values; durable pages link to it, organizer evidence remains in one ledger, and executable metadata tests validate the documentation on-ramp and links |
 
+## Follow-up logical and UX audit
+
+The post-remediation pass traced the real first-run, changed-input, failed-rerun, filtered-review,
+builder, import-preview, and locked-Premium states. It closed these smaller but credibility-relevant
+gaps without changing report schemas or qualification ownership:
+
+| Finding | Risk | Closure |
+|---|---|---|
+| Startup showed a synthetic report beside empty input selectors with no explicit provenance state | A user could mistake demo evidence for a selected-input result | Demo, current, and retained previous reports now have distinct context cards and report-specific footer language |
+| An accepted input/review-point change or failed rerun could leave old bytes exportable without prominent stale wording | Failure retention was correct but the presentation could overstate freshness | The old report is marked previous before rerun and after accepted input/date changes; export action, Save panel, and success message preserve that qualifier |
+| Synthetic first profile showed no Watch despite the three-verdict product story | The first judging screen under-demonstrated the core workflow | Shared synthetic geography now produces one Open, one Watch, and one Reject for the Free profile; fixture parity and summary are regression-tested |
+| Profile Builder footer reused a spacer in vertical fallback and returned one generic schema error | Compact-height layout and recovery were fragile | Message/actions are separate layout groups, example profiles match the shipped workspace, field-specific fixes and code-format help are visible |
+| Passed checks buried Watch/Reject drivers; filters and import warnings had discoverability gaps | Human review took unnecessary scanning and could retain invisible state | Presentation separates drivers/confirmation/passed checks, Clear includes verdict, report identity resets filters, and preview warnings have a visible disclosure |
+| Locked Premium named profiles but did not demonstrate why comparison matters | Upgrade value depended on explanation rather than product evidence | A bounded count shows how many shared notices differ across profiles while keeping gated reports hidden and adding no score |
+
+Native checks cover the pure review-point, reason-grouping, disagreement-count, and deterministic
+fixture contracts. Light/dark portrait inspection covers the generated first-run view; interactive
+settings, final packaged Profile Builder, and asynchronous RevenueCat accessibility remain the
+manual evidence boundary described below.
+
 ## Contract reconciliation
 
 | Contract | Audit conclusion |

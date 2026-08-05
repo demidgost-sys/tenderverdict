@@ -129,6 +129,10 @@ class WorkflowTests(unittest.TestCase):
             [report["profile"]["name"] for report in profile_reports],
             [profile.name for profile in run.workspace.profiles],
         )
+        self.assertEqual(
+            profile_reports[0]["summary"],
+            {"total": 3, "open_documents": 1, "watch": 1, "reject": 1},
+        )
 
         expected_notice_order = [
             notice.publication_number for notice in load_notices(EXAMPLES / "notices.json")

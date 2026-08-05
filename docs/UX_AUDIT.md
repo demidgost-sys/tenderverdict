@@ -23,7 +23,9 @@ The current source closes the largest product gaps in the earlier aggregate-only
 A user can now build and validate profiles without hand-editing JSON, inspect a notice file before
 analysis, opt into safe file-selection continuity, filter larger result sets, and move from a
 Premium comparison cell to the exact profile/notice reasoning. The first complete analysis and
-deterministic export remain free.
+deterministic export remain free. The latest polish pass also makes demo/current/previous report
+state explicit, validates the review point inline, gives the synthetic Free profile one example of
+each verdict, separates verdict drivers from passed checks, and keeps stale export wording honest.
 
 The native suite now covers pure terminal RevenueCat accessibility outcomes in both Debug and
 Release, and the complete Python/source gate passes on the current candidate. It also verifies that
@@ -43,16 +45,19 @@ asynchronous purchase outcomes remain pending.
 | Workspace contract | Pass | Schema 1 only, strict unknown-field rejection, 256 KiB bound, deterministic normalized JSON, profile order preserved. |
 | Notice import preview | Pass | Accepts normalized CSV or JSON, shows source type, total count, first five records, warnings, and full-file missing-field counts before analysis. It does not invent arbitrary column mapping. |
 | Input failure retention | Pass | Invalid workspace or notices remain an input error; the last valid report/export is not replaced. |
+| Report truth state | Pass | Synthetic, current selected-input, and retained previous reports have distinct visible context; previous export remains possible but is explicitly labelled in the action and Save panel. |
+| Review-point recovery | Pass | Strict date/RFC-3339 validation appears inline, **Use today** supplies a local calendar date, and an invalid value does not launch the child process. |
 | Local continuity | Pass | Explicit opt-in persists only security-scoped bookmarks for workspace and notices. Turning it off removes the bookmarks. It never stores tender contents, reports, `as_of`, or the RevenueCat key, and restored files do not auto-run. |
-| Free review queue | Pass | Text search covers notice/lot ID, title, and buyer; buyer, deadline-presence, and verdict filters compose; results load in bounded pages and can be reset. |
+| Free review queue | Pass | Text search covers notice/lot ID, title, and buyer; buyer, deadline-presence, and verdict filters compose; results load in bounded pages; Clear resets every filter, and a changed report identity resets state. |
+| Explanation hierarchy | Pass | Existing reason order is preserved in exports while native disclosure presents verdict drivers, confirmation items, and routine passed checks as separate groups. |
 | Stable large-list identity | Pass | Filters retain canonical result IDs; a filtered offset is never reused as a cross-profile lookup key. |
-| Premium comparison | Pass | Text, buyer, and deadline filters apply to the shared notice order; each cell is a native button with profile, notice, and verdict semantics. |
+| Premium comparison | Pass | Text, buyer, and deadline filters apply to the shared notice order; each cell is a native button with profile, notice, and verdict semantics; locked state reveals only the bounded disagreement count. |
 | Comparison drill-down | Pass | A selected cell resolves by stable profile/result IDs and shows verdict, buyer, deadline, next step, reasons, unknowns, and only a safe supplied HTTPS source. |
 | Untrusted display text | Pass | C0, DEL/C1, and Unicode format controls are visibly escaped in native text and accessibility labels; source evidence and deterministic export bytes are preserved. |
 | RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. Free exports the first complete schema-3 report; Premium exports the exact portfolio bytes. Neither path modifies qualification bytes, adds rankings, or creates a local entitlement toggle. |
 | RevenueCat configuration | Pass | Debug accepts only a well-shaped process-local Test Store key and an exact offering/package/product match. Release exposes no key field and refuses configuration before any SDK call. |
 | Async recovery model | Pass | Every terminal Premium state has explicit announcement text, recovery actions, and a useful focus target. Focus restoration occurs only after a user-triggered connect/purchase/restore/refresh action. |
-| Responsive layout | Pass | Fixed hero typography was replaced by semantic `largeTitle`; input, action, RevenueCat, metadata, filter, and detail rows use horizontal-to-vertical `ViewThatFits` fallbacks. |
+| Responsive layout | Pass | Fixed hero typography uses semantic `largeTitle`; input, action, RevenueCat, metadata, filter, and detail rows use horizontal-to-vertical fallbacks; Profile Builder keeps message and action areas separate so its footer does not create a vertical spacer gap. |
 | Contrast/transparency response | Pass | Semantic card boundaries strengthen under Increase Contrast; decorative shadows/surfaces are reduced when Reduce Transparency is enabled. Textual state never relies on color alone. |
 
 ## Native contract checks (`automated`, current candidate passed)
@@ -70,6 +75,8 @@ The checks cover:
 - Free/Premium projection and schema-3 Free export isolation;
 - complete notice-level result and provenance preservation;
 - visible display normalization for control and bidi-formatting characters;
+- strict review-point validation and deterministic **Use today** calendar semantics;
+- verdict-driver/supporting-check separation and cross-profile disagreement counts;
 - empty notice sets, profile counts, shared digests, and ordered shared metadata;
 - nested verdict totals and result/summary consistency;
 - strict, bounded, deterministic workspace and notice-preview documents;
@@ -121,12 +128,12 @@ reason disclosure. The hierarchy is now:
 
 1. build or choose a validated workspace;
 2. choose notices and inspect the import preview;
-3. choose an explicit review point and run locally;
+3. choose an explicit review point, resolve any inline format error, and run locally;
 4. search/filter the complete free first-profile review queue;
 5. opt into file-bookmark continuity only if useful;
 6. understand or unlock Premium;
 7. filter the shared comparison and open exact cell reasoning;
-8. export deterministic JSON.
+8. export deterministic JSON with current/previous state made explicit.
 
 Accessibility-relevant code outcomes include distinct labels for secure configuration and file
 actions, disabled-state preservation, combined profile summaries, native disclosures and links,

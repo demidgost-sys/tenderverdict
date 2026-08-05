@@ -29,6 +29,118 @@ public enum TenderVerdictProcessError: Error, LocalizedError {
   }
 }
 
+/// Keeps the native review-point affordance aligned with Python's strict date contract.
+public enum ReviewPointInputValidator {
+  public static let guidance =
+    "Enter a review point as YYYY-MM-DD or RFC 3339, for example "
+    + "2026-08-02 or 2026-08-02T12:30:00Z."
+
+  public static func validationMessage(for rawValue: String) -> String? {
+    let value = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !value.isEmpty else {
+      return guidance
+    }
+    if hasDateShape(value), isValidCalendarDate(value) {
+      return nil
+    }
+    if hasRFC3339Shape(value), isValidRFC3339(value) {
+      return nil
+    }
+    return guidance
+  }
+
+  public static func todayString(
+    referenceDate: Date = Date(),
+    timeZone: TimeZone = .current
+  ) -> String {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = timeZone
+    let components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
+    return String(
+      format: "%04d-%02d-%02d",
+      components.year ?? 0,
+      components.month ?? 0,
+      components.day ?? 0
+    )
+  }
+
+  private static func hasDateShape(_ value: String) -> Bool {
+    let bytes = Array(value.utf8)
+    guard bytes.count == 10, bytes[4] == 45, bytes[7] == 45 else { return false }
+    return bytes.enumerated().allSatisfy { index, byte in
+      index == 4 || index == 7 || (48...57).contains(byte)
+    }
+  }
+
+  private static func isValidCalendarDate(_ value: String) -> Bool {
+    let parts = value.split(separator: "-", omittingEmptySubsequences: false)
+    guard parts.count == 3,
+      let year = Int(parts[0]),
+      let month = Int(parts[1]),
+      let day = Int(parts[2])
+    else {
+      return false
+    }
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+    guard let date = calendar.date(from: DateComponents(year: year, month: month, day: day))
+    else {
+      return false
+    }
+    let checked = calendar.dateComponents([.year, .month, .day], from: date)
+    return checked.year == year && checked.month == month && checked.day == day
+  }
+
+  private static func hasRFC3339Shape(_ value: String) -> Bool {
+    let bytes = Array(value.utf8)
+    guard bytes.count == 20 || bytes.count == 25 else { return false }
+    let fixedSeparators: [Int: UInt8] = [4: 45, 7: 45, 10: 84, 13: 58, 16: 58]
+    for (index, expected) in fixedSeparators where bytes[index] != expected {
+      return false
+    }
+    let digitPositions = [0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18]
+    guard digitPositions.allSatisfy({ (48...57).contains(bytes[$0]) }) else {
+      return false
+    }
+    if bytes.count == 20 {
+      return bytes[19] == 90
+    }
+    guard bytes[19] == 43 || bytes[19] == 45, bytes[22] == 58 else { return false }
+    return [20, 21, 23, 24].allSatisfy { (48...57).contains(bytes[$0]) }
+  }
+
+  private static func isValidRFC3339(_ value: String) -> Bool {
+    let bytes = Array(value.utf8)
+    guard isValidCalendarDate(String(value.prefix(10))),
+      let hour = twoDigitInt(bytes, at: 11),
+      let minute = twoDigitInt(bytes, at: 14),
+      let second = twoDigitInt(bytes, at: 17),
+      (0..<24).contains(hour),
+      (0..<60).contains(minute),
+      (0..<60).contains(second)
+    else {
+      return false
+    }
+    guard bytes.count == 25 else { return true }
+    guard let offsetHour = twoDigitInt(bytes, at: 20),
+      let offsetMinute = twoDigitInt(bytes, at: 23)
+    else {
+      return false
+    }
+    return (0..<24).contains(offsetHour) && (0..<60).contains(offsetMinute)
+  }
+
+  private static func twoDigitInt(_ bytes: [UInt8], at index: Int) -> Int? {
+    guard bytes.indices.contains(index + 1),
+      (48...57).contains(bytes[index]),
+      (48...57).contains(bytes[index + 1])
+    else {
+      return nil
+    }
+    return Int(bytes[index] - 48) * 10 + Int(bytes[index + 1] - 48)
+  }
+}
+
 public struct PortfolioExecution: Sendable {
   public let report: PortfolioWorkspaceReport
   public let jsonData: Data

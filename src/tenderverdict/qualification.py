@@ -21,7 +21,10 @@ _NEXT_STEPS = {
         "Open and review the official procurement documents; a human decides whether to proceed."
     ),
     Verdict.WATCH: "Verify the flagged metadata before opening the procurement documents.",
-    Verdict.REJECT: "Stop review unless the notice metadata is corrected.",
+    Verdict.REJECT: (
+        "Do not proceed for this profile. If the source metadata changes, correct the input "
+        "and run again."
+    ),
 }
 
 

@@ -99,17 +99,26 @@ struct ProfileBuilderView: View {
   }
 
   private var footer: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 10) { footerContents }
-      VStack(alignment: .leading, spacing: 10) { footerContents }
+    VStack(alignment: .leading, spacing: 12) {
+      footerMessage
+      ViewThatFits(in: .horizontal) {
+        HStack(spacing: 10) {
+          Spacer(minLength: 0)
+          footerButtons
+        }
+        VStack(alignment: .trailing, spacing: 10) {
+          footerButtons
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+      }
     }
     .padding(20)
   }
 
   @ViewBuilder
-  private var footerContents: some View {
+  private var footerMessage: some View {
     if let externalError {
-      Label(externalError, systemImage: "exclamationmark.triangle.fill")
+      Label(normalizedDisplayText(externalError), systemImage: "exclamationmark.triangle.fill")
         .font(.subheadline)
         .foregroundStyle(.orange)
         .fixedSize(horizontal: false, vertical: true)
@@ -123,7 +132,10 @@ struct ProfileBuilderView: View {
         .font(.subheadline)
         .foregroundStyle(.secondary)
     }
-    Spacer()
+  }
+
+  @ViewBuilder
+  private var footerButtons: some View {
     Button("Reset example") {
       profiles = Self.exampleProfiles
       attemptedSave = false
@@ -189,6 +201,14 @@ struct ProfileBuilderView: View {
         }
       }
 
+      Text(
+        "CPV uses official 8-digit procurement codes. Countries use ISO alpha-3 codes "
+          + "such as AUT or DEU; lowercase input is normalized when saved."
+      )
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      .fixedSize(horizontal: false, vertical: true)
+
       if attemptedSave, let error = profileValidationMessage(at: index) {
         Label(error, systemImage: "exclamationmark.circle")
           .font(.caption)
@@ -241,6 +261,11 @@ struct ProfileBuilderView: View {
   }
 
   private var validationMessage: String? {
+    for index in profiles.indices {
+      if let message = profileValidationMessage(at: index) {
+        return "Profile \(index + 1): \(message)"
+      }
+    }
     do {
       _ = try makeDocument()
       return nil
@@ -252,12 +277,51 @@ struct ProfileBuilderView: View {
   }
 
   private func profileValidationMessage(at index: Int) -> String? {
+    let draft = profiles[index]
+    let name = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    if name.isEmpty {
+      return "Enter a profile name."
+    }
+    if name.count > SupplierProfile.maximumNameCharacters {
+      return "Shorten the profile name to 200 characters or fewer."
+    }
+
+    let cpvCodes = Self.tokens(from: draft.cpvCodes)
+    if cpvCodes.isEmpty {
+      return "Add at least one official 8-digit CPV code, such as 72260000."
+    }
+    if cpvCodes.count > SupplierProfile.maximumCodes {
+      return "Use no more than 100 CPV codes in one profile."
+    }
+    if let invalidCPV = cpvCodes.first(where: { !Self.isEightDigitCode($0) }) {
+      return "CPV code \(normalizedDisplayText(invalidCPV)) must contain exactly 8 digits."
+    }
+
+    let countries = Self.tokens(from: draft.countries)
+    if countries.isEmpty {
+      return "Add at least one 3-letter country code, such as AUT or DEU."
+    }
+    if countries.count > SupplierProfile.maximumCountries {
+      return "Use no more than 100 country codes in one profile."
+    }
+    if let invalidCountry = countries.first(where: { !Self.isThreeLetterCode($0) }) {
+      return
+        "Country code \(normalizedDisplayText(invalidCountry)) must contain exactly 3 letters."
+    }
+
+    guard let minimumDays = Int(draft.minimumDays.trimmingCharacters(in: .whitespacesAndNewlines))
+    else {
+      return "Enter the minimum lead time as a whole number of days."
+    }
+    guard (0...SupplierProfile.maximumMinimumDaysToDeadline).contains(minimumDays) else {
+      return "Use a minimum lead time from 0 to 3650 days."
+    }
+
     do {
-      _ = try makeProfile(from: profiles[index])
+      _ = try makeProfile(from: draft)
       return nil
     } catch {
-      return
-        "Use a name, one or more 8-digit CPV codes, one or more 3-letter countries, and 0–3650 days."
+      return "Review this profile's name, codes, countries, and lead time."
     }
   }
 
@@ -287,6 +351,17 @@ struct ProfileBuilderView: View {
       .filter { !$0.isEmpty && seen.insert($0).inserted }
   }
 
+  private static func isEightDigitCode(_ value: String) -> Bool {
+    value.utf8.count == 8 && value.utf8.allSatisfy { (48...57).contains($0) }
+  }
+
+  private static func isThreeLetterCode(_ value: String) -> Bool {
+    value.utf8.count == 3
+      && value.utf8.allSatisfy { byte in
+        (65...90).contains(byte) || (97...122).contains(byte)
+      }
+  }
+
   private static let exampleProfiles = [
     DraftProfile(
       name: "Example Austria Services",
@@ -295,16 +370,16 @@ struct ProfileBuilderView: View {
       minimumDays: 14
     ),
     DraftProfile(
-      name: "DACH Software Delivery",
+      name: "Example Germany Support",
       cpvCodes: "72261000",
-      countries: "AUT, DEU",
-      minimumDays: 10
+      countries: "DEU",
+      minimumDays: 14
     ),
     DraftProfile(
-      name: "Alpine Facilities",
-      cpvCodes: "50700000",
-      countries: "AUT",
-      minimumDays: 21
+      name: "Example DACH Operations",
+      cpvCodes: "72260000, 72261000",
+      countries: "AUT, DEU",
+      minimumDays: 30
     ),
   ]
 

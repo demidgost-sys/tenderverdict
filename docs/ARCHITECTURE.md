@@ -60,6 +60,7 @@ parser validates the complete file once and returns an exact schema-1 preview wi
 
 - source kind and full notice count;
 - a fixed canonical field list and up to five normalized records in source order;
+- per-record warnings that the UI collects into a visible preview warning disclosure;
 - full-file missing counts for type, title, buyer, CPV codes, countries, deadline, and source URL.
 
 `deadline` is missing only when both the calendar-date and timestamp fields are absent. Preview
@@ -99,6 +100,10 @@ and consistency checks.
   Premium applies text, buyer, and deadline filters to the shared notice identities. Matrix cells
   resolve a profile/result pair by stable IDs, never by the current filtered offset, before opening
   complete result detail.
+- Native reason presentation separates existing ordered strings into verdict drivers, unknowns that
+  need confirmation, and routine passed checks. This does not rewrite the report or export schema.
+- The locked portfolio preview derives only a disagreement count across the already validated
+  shared notice order. It reveals no gated reason or profile-report content and creates no score.
 - A configured Debug app accepts only offering `supplier_profiles_plus`, package `$rc_monthly`, and
   product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, and
   refreshes access on launch. An unexpected dashboard shape stays locked.
@@ -113,6 +118,25 @@ judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpo
 
 The public CLI can still produce the complete portfolio report. This is intentional open-source
 behavior; Premium is the native product experience, not DRM around Apache-2.0 code.
+
+## Report presentation state
+
+The native app distinguishes three presentation states without adding fields to the portfolio
+contract:
+
+- **Bundled demo report** — a known synthetic run, currently designed to show one Open, one Watch,
+  and one Reject in the first Free profile;
+- **Current selected-input report** — a successful run whose source label and `as_of` match the
+  accepted presentation inputs;
+- **Previous report kept for reference** — retained valid bytes after an accepted input or review
+  point changes, or while/after a selected-input rerun that has not succeeded.
+
+The previous report remains exportable to preserve the failure-retention contract, but both the
+visible context card and export action identify it as previous. A successful run atomically replaces
+the in-memory report bytes, aligns the review-point field to the accepted report, resets report
+filters through its profile/notice identity, and returns the presentation to current. Strict native
+review-point validation mirrors Python's whole-second date/RFC-3339 grammar before process launch;
+the Python parser remains authoritative.
 
 ## Local continuity and accessibility
 
@@ -151,7 +175,7 @@ able to reorder or conceal evidence. Raw report bytes and deterministic exports 
 |---|---|
 | Python behavior | Complete offline suite covering the CLI, model, report, desktop, bridge, security, and distribution contracts; current totals live in [project status](PROJECT_STATUS.md) |
 | Public tree | Exact allow-list, bounded binary validation, conservative content scan |
-| Swift contract | Standalone Debug and Release result, schema, provenance, display-safety, input-preview, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
+| Swift contract | Standalone Debug and Release result, schema, provenance, display-safety, review-point, input-preview, reason grouping, disagreement-count, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
 | Source bridge | Headless synthetic smoke through the private launcher; no RevenueCat configuration |
 | Packaged bridge | Builder-enforced `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect determinism; ad-hoc signature and manifest verification |
 | UX | Source implementation includes Profile Builder, import preview, filters, detail, focus, contrast, and transparency handling; refreshed screenshot/settings QA remains separate |

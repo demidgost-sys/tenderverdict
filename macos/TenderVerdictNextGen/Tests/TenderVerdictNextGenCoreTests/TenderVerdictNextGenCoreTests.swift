@@ -18,6 +18,8 @@ enum TenderVerdictNextGenChecks {
     try checkPortfolioContractPreservesFreeAndPremiumSurfaces()
     try checkPortfolioContractPreservesResultDetails()
     try checkDisplayTextMakesControlsVisible()
+    try checkVerdictPresentationHelpers()
+    try checkReviewPointValidation()
     try checkPortfolioContractAcceptsEmptyNoticeSet()
     try checkPortfolioContractRejectsInconsistentProfileCount()
     try checkPortfolioContractRejectsDifferentNoticeDigests()
@@ -31,7 +33,7 @@ enum TenderVerdictNextGenChecks {
     try checkPremiumAccessibilityOutcomes()
     try await checkTestStoreConfigurationFailsClosed()
     try checkProcessAdapterPreservesDeterministicBytes()
-    print("NEXT_GEN_CHECKS_OK checks=16")
+    print("NEXT_GEN_CHECKS_OK checks=18")
   }
 
   private static func checkPortfolioContractPreservesFreeAndPremiumSurfaces() throws {
@@ -139,6 +141,68 @@ enum TenderVerdictNextGenChecks {
     try require(
       report.profileReports[0].profile.displayName == "München\\u007f Services",
       "profile display text exposed a raw DEL character"
+    )
+  }
+
+  private static func checkVerdictPresentationHelpers() throws {
+    let report = try PortfolioWorkspaceReport.decode(makeReportData(profileCount: 1))
+    let openResult = report.profileReports[0].results[0]
+    let watchResult = report.profileReports[0].results[1]
+
+    try require(
+      openResult.displayVerdictDrivers.isEmpty,
+      "routine positive checks were shown as verdict drivers"
+    )
+    try require(
+      openResult.displaySupportingChecks == [
+        "Exact CPV match: 72260000.", "Country match: AUT.",
+      ],
+      "positive checks were not preserved"
+    )
+    try require(
+      watchResult.displayVerdictDrivers == ["Broader CPV class match."],
+      "watch driver was hidden among supporting checks"
+    )
+    try require(
+      watchResult.displayUnknowns == ["Confirm the exact procurement scope."],
+      "watch unknowns changed"
+    )
+  }
+
+  private static func checkReviewPointValidation() throws {
+    for value in [
+      "2026-08-02",
+      "2026-08-02T12:30:00Z",
+      "2026-08-02T12:30:00+02:00",
+    ] {
+      try require(
+        ReviewPointInputValidator.validationMessage(for: value) == nil,
+        "valid review point was rejected: \(value)"
+      )
+    }
+    for value in [
+      "",
+      "2026-02-30",
+      "2026-8-2",
+      "2026-02-30T12:30:00Z",
+      "2026-08-02 12:30:00Z",
+      "2026-08-02T12:30:00",
+      "2026-08-02T12:30:00.000Z",
+      "2026-08-02T25:30:00+02:00",
+      "2026-08-02T12:30:00+24:00",
+    ] {
+      try require(
+        ReviewPointInputValidator.validationMessage(for: value)
+          == ReviewPointInputValidator.guidance,
+        "invalid review point was accepted: \(value)"
+      )
+    }
+    try require(
+      ReviewPointInputValidator.todayString(
+        referenceDate: Date(timeIntervalSince1970: 0),
+        timeZone: TimeZone(secondsFromGMT: 0)!
+      ) == "1970-01-01",
+      "today shortcut changed calendar or time-zone semantics"
     )
   }
 
@@ -373,6 +437,10 @@ enum TenderVerdictNextGenChecks {
   private static func checkLargeReviewQueryPreservesStableIdentities() throws {
     let report = try PortfolioWorkspaceReport.decode(
       makeLargeReportData(profileCount: 3, noticeCount: 125)
+    )
+    try require(
+      report.divergentNoticeCount == 125,
+      "portfolio disagreement teaser changed shared verdict comparison"
     )
     let primary = report.profileReports[0]
     let missing = ReviewQuery(deadlinePresence: .missing).apply(to: primary.results)
@@ -797,7 +865,7 @@ private func makeResults(firstSourceURL: String? = nil) -> [[String: Any]] {
       "publication_date": "2026-08-01",
       "source_url": firstSourceURL ?? "https://procurement.example/notices/SYN-OPEN-001",
       "verdict": "open_documents",
-      "reasons": ["Exact CPV match.", "Country match."],
+      "reasons": ["Exact CPV match: 72260000.", "Country match: AUT."],
       "unknowns": [],
       "human_next_step": "Open and review the official procurement documents.",
     ],
@@ -827,7 +895,7 @@ private func makeResults(firstSourceURL: String? = nil) -> [[String: Any]] {
       "verdict": "reject",
       "reasons": ["Deadline is below the configured minimum."],
       "unknowns": [],
-      "human_next_step": "Stop review unless the metadata is corrected.",
+      "human_next_step": "Do not proceed for this profile.",
     ],
   ]
 }

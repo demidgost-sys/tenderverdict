@@ -145,9 +145,18 @@ final class AppModel: ObservableObject {
   @Published private(set) var noticePreview: NoticeImportPreview?
   @Published private(set) var rememberSelections = false
   @Published private(set) var sourceDescription = "Synthetic example"
+  @Published private(set) var reportIsPrevious = false
   @Published private(set) var statusMessage: String?
   @Published var isProfileBuilderPresented = false
-  @Published var asOf = TenderVerdictProcess.syntheticAsOf
+  @Published var asOf = TenderVerdictProcess.syntheticAsOf {
+    didSet {
+      guard !isApplyingReport, oldValue != asOf else { return }
+      markReportAsPrevious()
+      if inputError == ReviewPointInputValidator.guidance {
+        inputError = nil
+      }
+    }
+  }
 
   let revenueCat: RevenueCatAccessController
 
@@ -155,6 +164,7 @@ final class AppModel: ObservableObject {
   private let continuity: WorkspaceContinuity
   private var reportData: Data?
   private var started = false
+  private var isApplyingReport = false
 
   init() {
     continuity = WorkspaceContinuity()
@@ -185,8 +195,7 @@ final class AppModel: ObservableObject {
 
   var canRunSelected: Bool {
     workspaceURL != nil && noticesURL != nil && workspaceDocument != nil
-      && noticePreview != nil && !asOf.trimmingCharacters(in: .whitespaces).isEmpty
-      && !isLoading && !isPreparingInput
+      && noticePreview != nil && !isLoading && !isPreparingInput
   }
 
   var canExport: Bool {
@@ -199,6 +208,20 @@ final class AppModel: ObservableObject {
 
   var noticesName: String {
     noticesURL?.lastPathComponent ?? "Choose normalized CSV or JSON notices"
+  }
+
+  var reviewPointError: String? {
+    ReviewPointInputValidator.validationMessage(for: asOf)
+  }
+
+  var exportButtonTitle: String {
+    reportIsPrevious ? "Export previous JSON…" : "Export JSON…"
+  }
+
+  var syntheticButtonTitle: String {
+    sourceDescription == "Synthetic example" && report != nil && !reportIsPrevious
+      ? "Reload synthetic example"
+      : "Load synthetic example"
   }
 
   func start() {
@@ -268,6 +291,7 @@ final class AppModel: ObservableObject {
         try normalization.jsonData.write(to: url, options: [.atomic])
         workspaceURL = url
         workspaceDocument = normalization.document
+        markReportAsPrevious()
         let continuityReady = rememberCurrentSelectionsIfNeeded()
         isPreparingInput = false
         isProfileBuilderPresented = false
@@ -302,8 +326,14 @@ final class AppModel: ObservableObject {
     guard let runner, let workspaceURL, let noticesURL, canRunSelected else {
       return
     }
-    beginLoading()
     let reviewPoint = asOf.trimmingCharacters(in: .whitespacesAndNewlines)
+    if let reviewPointError {
+      inputError = reviewPointError
+      statusMessage = nil
+      return
+    }
+    markReportAsPrevious()
+    beginLoading()
     Task {
       let workspaceAccess = workspaceURL.startAccessingSecurityScopedResource()
       let noticesAccess = noticesURL.startAccessingSecurityScopedResource()
@@ -350,8 +380,12 @@ final class AppModel: ObservableObject {
     let panel = NSSavePanel()
     panel.title =
       premiumUnlocked
-      ? "Export deterministic portfolio report"
-      : "Export deterministic single-profile report"
+      ? reportIsPrevious
+        ? "Export previous deterministic portfolio report"
+        : "Export deterministic portfolio report"
+      : reportIsPrevious
+        ? "Export previous deterministic single-profile report"
+        : "Export deterministic single-profile report"
     panel.prompt = "Export JSON"
     panel.allowedContentTypes = [.json]
     panel.canCreateDirectories = true
@@ -368,7 +402,10 @@ final class AppModel: ObservableObject {
         ? reportData
         : try primary.deterministicJSONData()
       try exportData.write(to: url, options: [.atomic])
-      statusMessage = "Exported \(url.lastPathComponent)."
+      statusMessage =
+        reportIsPrevious
+        ? "Exported previous report as \(url.lastPathComponent)."
+        : "Exported \(url.lastPathComponent)."
       loadError = nil
     } catch {
       loadError = Self.message(for: error, fallback: "The report could not be exported.")
@@ -393,6 +430,7 @@ final class AppModel: ObservableObject {
         let normalization = try await runner.normalizeWorkspace(url)
         workspaceURL = url
         workspaceDocument = normalization.document
+        markReportAsPrevious()
         let continuityReady = rememberCurrentSelectionsIfNeeded()
         isPreparingInput = false
         inputError = nil
@@ -417,6 +455,7 @@ final class AppModel: ObservableObject {
         let preview = try await runner.inspectNotices(url)
         noticesURL = url
         noticePreview = preview
+        markReportAsPrevious()
         let continuityReady = rememberCurrentSelectionsIfNeeded()
         isPreparingInput = false
         inputError = nil
@@ -468,9 +507,13 @@ final class AppModel: ObservableObject {
   }
 
   private func apply(_ execution: PortfolioExecution, source: String) {
+    isApplyingReport = true
     report = execution.report
     reportData = execution.jsonData
+    asOf = execution.report.asOf
     sourceDescription = source
+    reportIsPrevious = false
+    isApplyingReport = false
     loadError = nil
     isLoading = false
     statusMessage =
@@ -485,7 +528,22 @@ final class AppModel: ObservableObject {
   }
 
   private static func message(for error: Error, fallback: String) -> String {
-    (error as? LocalizedError)?.errorDescription ?? fallback
+    if let processError = error as? TenderVerdictProcessError,
+      case .commandFailed(_, let detail) = processError
+    {
+      var cleaned = normalizedDisplayText(detail)
+      if cleaned.lowercased().hasPrefix("error:") {
+        cleaned = String(cleaned.dropFirst(6)).trimmingCharacters(in: .whitespaces)
+      }
+      return cleaned.isEmpty ? fallback : cleaned
+    }
+    return (error as? LocalizedError)?.errorDescription ?? fallback
+  }
+
+  private func markReportAsPrevious() {
+    if report != nil {
+      reportIsPrevious = true
+    }
   }
 }
 
@@ -579,12 +637,12 @@ struct ContentView: View {
         statusDivider
         StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
         statusDivider
-        StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
+        StatusLabel(title: "RevenueCat Premium", systemImage: "shippingbox")
       }
       VStack(alignment: .leading, spacing: 8) {
         StatusLabel(title: "Local analysis", systemImage: "lock.shield")
         StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
-        StatusLabel(title: "RevenueCat SDK 5.83.0", systemImage: "shippingbox")
+        StatusLabel(title: "RevenueCat Premium", systemImage: "shippingbox")
       }
     }
     .foregroundStyle(.secondary)
@@ -611,6 +669,7 @@ struct ContentView: View {
       if let report = model.report,
         let primary = report.visibleProfileReports(premiumUnlocked: false).first
       {
+        reportContextCard(report: report)
         ProfileCard(report: primary)
         ReviewQueue(report: primary)
       } else if model.isLoading {
@@ -626,6 +685,25 @@ struct ContentView: View {
     }
   }
 
+  private func reportContextCard(report: PortfolioWorkspaceReport) -> some View {
+    let isSynthetic = model.sourceDescription == "Synthetic example"
+    return NoticeCard(
+      title: model.reportIsPrevious
+        ? "Previous report kept for reference"
+        : isSynthetic ? "Bundled demo report" : "Current selected-input report",
+      detail: model.reportIsPrevious
+        ? "This report still reflects \(model.sourceDescription) at \(report.asOf). "
+          + "Run the selected inputs before treating it as current."
+        : isSynthetic
+          ? "Synthetic data at \(report.asOf). Choose both local inputs above to run your own review."
+          : "\(model.sourceDescription) · review point \(report.asOf)",
+      systemImage: model.reportIsPrevious
+        ? "clock.badge.exclamationmark"
+        : isSynthetic ? "sparkles" : "checkmark.seal.fill",
+      tint: model.reportIsPrevious ? .orange : isSynthetic ? .indigo : .green
+    )
+  }
+
   private var footer: some View {
     ViewThatFits(in: .horizontal) {
       HStack(alignment: .firstTextBaseline) { footerContents }
@@ -638,11 +716,11 @@ struct ContentView: View {
 
   @ViewBuilder
   private var footerContents: some View {
-    Label("Local source: \(model.sourceDescription)", systemImage: "externaldrive")
+    Label("Report source: \(model.sourceDescription)", systemImage: "externaldrive")
       .lineLimit(1)
     Spacer()
     if let report = model.report {
-      Text("Review point \(report.asOf)")
+      Text("Report review point \(report.asOf)")
     }
   }
 }
@@ -688,13 +766,18 @@ struct PortfolioInputSection: View {
           if let preview = model.noticePreview {
             NoticeImportPreviewView(preview: preview)
           }
-          HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Label("Review point", systemImage: "calendar")
-              .font(.subheadline.weight(.semibold))
-              .frame(width: 128, alignment: .leading)
-            TextField("YYYY-MM-DD or RFC 3339", text: $model.asOf)
-              .textFieldStyle(.roundedBorder)
-              .accessibilityLabel("Review date or RFC 3339 instant")
+          VStack(alignment: .leading, spacing: 7) {
+            ViewThatFits(in: .horizontal) {
+              HStack(alignment: .firstTextBaseline, spacing: 16) { reviewPointControls }
+              VStack(alignment: .leading, spacing: 9) { reviewPointControls }
+            }
+            if let error = model.reviewPointError {
+              Label(error, systemImage: "exclamationmark.circle")
+                .font(.caption)
+                .foregroundStyle(.orange)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel("Review point error: \(error)")
+            }
           }
           Divider()
           ViewThatFits(in: .horizontal) {
@@ -751,6 +834,28 @@ struct PortfolioInputSection: View {
   }
 
   @ViewBuilder
+  private var reviewPointControls: some View {
+    Label("Evaluate as of", systemImage: "calendar")
+      .font(.subheadline.weight(.semibold))
+      .frame(width: 128, alignment: .leading)
+    TextField(
+      "YYYY-MM-DD or RFC 3339",
+      text: Binding(
+        get: { model.asOf },
+        set: { model.asOf = $0 }
+      )
+    )
+    .textFieldStyle(.roundedBorder)
+    .accessibilityLabel("Evaluate notices as of this date or RFC 3339 instant")
+    .accessibilityHint("Use YYYY-MM-DD or a timestamp with an explicit UTC offset.")
+    Button("Use today") {
+      model.asOf = ReviewPointInputValidator.todayString()
+    }
+    .buttonStyle(.bordered)
+    .disabled(model.isPreparingInput || model.isLoading)
+  }
+
+  @ViewBuilder
   private var actionButtons: some View {
     Button {
       model.runSelectedPortfolio()
@@ -765,7 +870,7 @@ struct PortfolioInputSection: View {
     Button {
       model.loadSynthetic()
     } label: {
-      Label("Load synthetic example", systemImage: "sparkles")
+      Label(model.syntheticButtonTitle, systemImage: "sparkles")
         .lineLimit(1)
     }
     .buttonStyle(.bordered)
@@ -777,7 +882,7 @@ struct PortfolioInputSection: View {
     Button {
       model.exportReport()
     } label: {
-      Label("Export JSON…", systemImage: "square.and.arrow.down")
+      Label(model.exportButtonTitle, systemImage: "square.and.arrow.down")
         .lineLimit(1)
     }
     .buttonStyle(.bordered)
@@ -1095,6 +1200,18 @@ struct PremiumWorkspaceSection: View {
             + "\(report.summary.noticeCount) shared notices",
           systemImage: "person.2"
         )
+        if report.summary.profileCount > 1, report.summary.noticeCount > 0 {
+          Label(
+            "\(report.divergentNoticeCount) of \(report.summary.noticeCount) notices "
+              + "produce different profile outcomes",
+            systemImage: "arrow.triangle.branch"
+          )
+          .foregroundStyle(.secondary)
+          .accessibilityLabel(
+            "\(report.divergentNoticeCount) of \(report.summary.noticeCount) notices "
+              + "have different verdicts between profiles"
+          )
+        }
         VStack(spacing: 0) {
           ForEach(Array(report.profileReports.enumerated()), id: \.element.id) { item in
             ProfilePreviewRow(profile: item.element, isFree: item.offset == 0)
@@ -1199,6 +1316,14 @@ struct ReviewQueue: View {
     Array(filteredResults.prefix(displayLimit))
   }
 
+  private var reportIdentity: String {
+    "\(report.id):\(report.asOf):\(report.provenance.noticesSHA256)"
+  }
+
+  private var hasActiveFilters: Bool {
+    filter != .all || !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       ViewThatFits(in: .horizontal) {
@@ -1231,12 +1356,18 @@ struct ReviewQueue: View {
           tint: .gray
         )
       } else if visibleResults.isEmpty {
-        NoticeCard(
-          title: "No results in this view",
-          detail: "Adjust the search, buyer, deadline, or verdict filters to continue.",
-          systemImage: "line.3.horizontal.decrease.circle",
-          tint: .gray
-        )
+        VStack(alignment: .leading, spacing: 10) {
+          NoticeCard(
+            title: "No results in this view",
+            detail: "Adjust the search, buyer, deadline, or verdict filters to continue.",
+            systemImage: "line.3.horizontal.decrease.circle",
+            tint: .gray
+          )
+          if hasActiveFilters {
+            Button("Clear all filters") { clearFilters() }
+              .buttonStyle(.bordered)
+          }
+        }
       } else {
         LazyVStack(spacing: 10) {
           ForEach(visibleResults) { result in
@@ -1263,6 +1394,7 @@ struct ReviewQueue: View {
     .onChange(of: searchText) { _ in displayLimit = 8 }
     .onChange(of: buyerText) { _ in displayLimit = 8 }
     .onChange(of: deadlinePresence) { _ in displayLimit = 8 }
+    .onChange(of: reportIdentity) { _ in clearFilters() }
   }
 
   private var queueHeading: some View {
@@ -1319,14 +1451,20 @@ struct ReviewQueue: View {
       .font(.caption.monospacedDigit())
       .foregroundStyle(.secondary)
 
-    if !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any {
+    if hasActiveFilters {
       Button("Clear filters") {
-        searchText = ""
-        buyerText = ""
-        deadlinePresence = .any
+        clearFilters()
       }
       .buttonStyle(.borderless)
     }
+  }
+
+  private func clearFilters() {
+    filter = .all
+    searchText = ""
+    buyerText = ""
+    deadlinePresence = .any
+    displayLimit = 8
   }
 
   private var availableBuyers: [String] {
@@ -1378,15 +1516,17 @@ struct QualificationResultCard: View {
           .fixedSize(horizontal: false, vertical: true)
       }
 
-      DisclosureGroup("Reasons and unknowns", isExpanded: $detailsVisible) {
+      DisclosureGroup("Why this verdict", isExpanded: $detailsVisible) {
         VStack(alignment: .leading, spacing: 12) {
-          explanationGroup(title: "Reasons", values: result.displayReasons)
-          explanationGroup(
-            title: "Unknowns",
-            values: result.unknowns.isEmpty
-              ? ["None from the supplied metadata."]
-              : result.displayUnknowns
-          )
+          if !result.displayVerdictDrivers.isEmpty {
+            explanationGroup(title: "Verdict drivers", values: result.displayVerdictDrivers)
+          }
+          if !result.displayUnknowns.isEmpty {
+            explanationGroup(title: "Needs confirmation", values: result.displayUnknowns)
+          }
+          if !result.displaySupportingChecks.isEmpty {
+            explanationGroup(title: "Checks passed", values: result.displaySupportingChecks)
+          }
           if let sourceURL = result.safeSourceURL {
             Link(destination: sourceURL) {
               Label("Open supplied source", systemImage: "arrow.up.right.square")
@@ -1459,6 +1599,12 @@ struct PortfolioComparison: View {
 
   private var visibleResults: [QualificationResult] {
     Array(primaryResults.prefix(displayLimit))
+  }
+
+  private var reportIdentity: String {
+    let profiles = report.profileReports.map(\.id).joined(separator: ":")
+    return
+      "\(profiles):\(report.asOf):\(report.profileReports.first?.provenance.noticesSHA256 ?? "")"
   }
 
   var body: some View {
@@ -1534,6 +1680,7 @@ struct PortfolioComparison: View {
     .onChange(of: searchText) { _ in displayLimit = 12 }
     .onChange(of: buyerText) { _ in displayLimit = 12 }
     .onChange(of: deadlinePresence) { _ in displayLimit = 12 }
+    .onChange(of: reportIdentity) { _ in clearFilters() }
     .sheet(item: $selection) { selected in
       ComparisonDetailView(report: report, selection: selected)
     }
@@ -1564,12 +1711,18 @@ struct PortfolioComparison: View {
 
     if !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any {
       Button("Clear filters") {
-        searchText = ""
-        buyerText = ""
-        deadlinePresence = .any
+        clearFilters()
       }
       .buttonStyle(.borderless)
     }
+  }
+
+  private func clearFilters() {
+    searchText = ""
+    buyerText = ""
+    deadlinePresence = .any
+    displayLimit = 12
+    selection = nil
   }
 
   private var availableBuyers: [String] {

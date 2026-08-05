@@ -138,6 +138,17 @@ public struct PortfolioWorkspaceReport: Decodable, Equatable, Sendable {
     premiumUnlocked ? profileReports : Array(profileReports.prefix(1))
   }
 
+  /// Counts shared notices whose verdict differs between at least two profiles.
+  public var divergentNoticeCount: Int {
+    guard profileReports.count > 1, summary.noticeCount > 0 else { return 0 }
+    return (0..<summary.noticeCount).reduce(into: 0) { count, index in
+      let verdicts = Set(profileReports.map { $0.results[index].verdict })
+      if verdicts.count > 1 {
+        count += 1
+      }
+    }
+  }
+
   private static func isSHA256(_ value: String) -> Bool {
     value.utf8.count == 64
       && value.utf8.allSatisfy { byte in
@@ -315,8 +326,37 @@ public struct QualificationResult: Codable, Equatable, Identifiable, Sendable {
     reasons.map(normalizedDisplayText)
   }
 
+  /// Reasons that caused a Watch or Reject, separated from routine positive checks.
+  public var displayVerdictDrivers: [String] {
+    displayReasons.filter { !Self.isSupportingCheck($0) }
+  }
+
+  /// Positive checks that support the verdict but do not need to obscure its drivers.
+  public var displaySupportingChecks: [String] {
+    displayReasons.filter(Self.isSupportingCheck)
+  }
+
   public var displayUnknowns: [String] {
     unknowns.map(normalizedDisplayText)
+  }
+
+  private static func isSupportingCheck(_ value: String) -> Bool {
+    if [
+      "Notice type is competition.",
+      "Notice title is supplied.",
+      "Buyer metadata is supplied.",
+      "A syntactically valid HTTPS source URL is supplied.",
+    ].contains(value) {
+      return true
+    }
+    if value.hasPrefix("Exact CPV match: ") || value.hasPrefix("Country match: ") {
+      return true
+    }
+    if value.hasPrefix("Submission deadline leaves ") && value.contains(" meeting the ") {
+      return true
+    }
+    return value.hasPrefix("Submission deadline timestamp meets the ")
+      || value.hasPrefix("Submission deadline timestamp is beyond the ")
   }
 
   fileprivate var noticeSignature: NoticeSignature {

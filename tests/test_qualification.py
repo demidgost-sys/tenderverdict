@@ -106,7 +106,8 @@ class QualificationTests(unittest.TestCase):
                 self.assertEqual(result.verdict, Verdict.REJECT)
                 self.assertEqual(
                     result.human_next_step,
-                    "Stop review unless the notice metadata is corrected.",
+                    "Do not proceed for this profile. If the source metadata changes, "
+                    "correct the input and run again.",
                 )
 
     def test_hard_stop_takes_precedence_over_unknowns(self) -> None:

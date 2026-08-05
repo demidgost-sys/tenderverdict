@@ -250,16 +250,20 @@ the `supplier_profiles_plus` entitlement as active.
 The native UI loads a bundled synthetic portfolio and also includes a Profile Builder for one to
 five named profiles. A selected workspace is strictly normalized by the Python core before use.
 A selected CSV or JSON notice file is fully validated once, then the app shows its format, total
-record count, the first five normalized records, and full-file missing-field counts before a run.
-The app preserves the previous report after a failed run. Free atomically exports a deterministic,
-ASCII-safe schema-3 report for the first profile; an active entitlement additionally enables the
-exact complete portfolio JSON export.
+record count, the first five normalized records, visible warning summary, and full-file
+missing-field counts before a run. The synthetic Free profile intentionally shows one Open, one
+Watch, and one Reject. The app visibly distinguishes bundled demo, current selected-input, and
+retained previous reports; Free atomically exports a deterministic, ASCII-safe schema-3 report for
+the first profile, while an active entitlement additionally enables the exact complete portfolio
+JSON export. A previous valid report remains exportable after failure, but its action is explicitly
+labelled as previous.
 
 The Free review queue supports verdict, text, buyer, and deadline-presence filters with bounded
-progressive disclosure. Premium applies text, buyer, and deadline-presence filters to the
-cross-profile matrix; selecting a cell resolves the result by stable profile and notice identities
-and opens its reasons, unknowns, human next step, and safe supplied-source link. Profiles are never
-scored or ranked.
+progressive disclosure, full reset, and separate verdict-driver, confirmation, and passed-check
+groups. Premium applies text, buyer, and deadline-presence filters to the cross-profile matrix;
+selecting a cell resolves the result by stable profile and notice identities and opens its evidence,
+human next step, and safe supplied-source link. The locked preview exposes only a disagreement count,
+not gated report details. Profiles are never scored or ranked.
 
 Remembering selected inputs is explicit opt-in. It stores only two macOS security-scoped file
 bookmarks; it does not store tender data, a generated report, the review point, or a RevenueCat
@@ -283,9 +287,10 @@ TENDERVERDICT_WORKTREE="$PWD" \
 
 The native checks require no API key and the smoke test makes no RevenueCat request. They cover
 strict workspace and import-preview decoding, full report preservation, ordered shared-notice
-validation, large review filtering with stable-ID lookup, the Free/Premium projection, Test Store
-configuration and terminal accessibility outcomes, deterministic bytes, and the real private core
-bridge. The offline Python suite also exercises strict normalization, CSV/JSON preview,
+validation, strict review-point grammar, reason grouping, disagreement counts, large review
+filtering with stable-ID lookup, the Free/Premium projection, Test Store configuration and terminal
+accessibility outcomes, deterministic bytes, and the real private core bridge. The offline Python
+suite also exercises strict normalization, CSV/JSON preview,
 missing-field counts, limits, deterministic ASCII-safe output, exit code `2`, the offline boundary,
 and release-scanner regressions. Exact current totals belong in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).

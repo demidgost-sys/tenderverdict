@@ -81,6 +81,10 @@ puts proof of the working experience ahead of an exhaustive feature tour.
     step, and safe source without relying on a filtered array offset.
 12. RevenueCat terminal states map to VoiceOver announcements and recovery focus, while contrast and
     transparency treatments adapt to system accessibility settings.
+13. Demo/current/previous report state is explicit, retained exports are honestly labelled, and the
+    first synthetic Free profile demonstrates all three verdicts instead of looking incomplete.
+14. Native explanation disclosure prioritizes verdict drivers, while a locked disagreement count
+    communicates Premium value without exposing the gated reports or inventing a score.
 
 ### Next product work before calling the app release-ready
 

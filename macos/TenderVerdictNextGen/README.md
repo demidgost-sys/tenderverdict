@@ -8,18 +8,21 @@ the current host architecture; the audited Apple Silicon artifact is `arm64`, no
 
 ## Implemented product flow
 
-- launches with a bundled three-profile synthetic portfolio;
+- launches with a bundled three-profile synthetic portfolio whose Free profile shows one Open, one
+  Watch, and one Reject;
 - builds, reorders, removes, resets, validates, and saves one to five profiles without hand-editing
   JSON;
 - strictly normalizes a chosen workspace v1 JSON through the canonical Python parser before use;
 - fully validates chosen CSV/JSON notices, then previews the source format, total count, first five
   normalized records, and full-file gaps for type, title, buyer, CPV, country, deadline, and source;
-- accepts an explicit date or whole-second timezone-aware RFC 3339 review point;
+- accepts an explicit date or whole-second timezone-aware RFC 3339 review point, validates it
+  inline, and provides a local-calendar **Use today** action;
 - runs the private deterministic Python bridge without a shell and with a 30-second boundary;
-- keeps the previous valid report visible when a new run fails;
+- distinguishes bundled demo, current selected-input, and retained previous report state; a failed
+  run keeps previous bytes visible and makes previous export wording explicit;
 - exposes the complete first-profile result as a Free review queue with verdict, text, buyer, and
-  deadline-presence filters, progressive **Show more**, human next steps, expandable reasoning,
-  unknowns, and safe supplied-source links;
+  deadline-presence filters, full reset, progressive **Show more**, human next steps, separate
+  verdict-driver/confirmation/passed-check groups, and safe supplied-source links;
 - exports a deterministic schema-3 first-profile report in Free and the exact combined JSON bytes
   atomically only while Premium is active;
 - optionally remembers only the two selected-file security-scoped bookmarks, never file contents,
@@ -30,6 +33,8 @@ the current host architecture; the audited Apple Silicon artifact is `arm64`, no
   restores, refreshes `CustomerInfo`, and projects access through the entitlement;
 - searches and filters the Premium comparison, resolves every cell by stable profile/result IDs,
   and opens complete per-cell reasoning without score, ranking, or an automatic recommendation;
+- previews only the number of shared notices with different profile verdicts while Premium is
+  locked, without exposing gated report detail;
 - announces terminal Premium outcomes to VoiceOver when available, restores focus after an
   explicit purchase/retry/restore action, and adapts cards for Increase Contrast and Reduce
   Transparency;
@@ -59,8 +64,9 @@ TENDERVERDICT_WORKTREE="$PWD" \
 `TenderVerdictNextGenChecks` covers portfolio projection, complete schema-3 Free export, full result
 preservation, empty inputs, nested totals, result-summary consistency, shared notice digest and
 order, strict workspace and import-preview contracts, large filtered-result identity stability,
-safe source links, exact RevenueCat dashboard identifiers, Debug/Release Test Store boundaries,
-terminal accessibility outcomes, selected-file execution, and byte determinism. Run it in both
+review-point validation, reason grouping, disagreement counts, safe source links, exact RevenueCat
+dashboard identifiers, Debug/Release Test Store boundaries, terminal accessibility outcomes,
+selected-file execution, and byte determinism. Run it in both
 configurations: Debug accepts a well-shaped Test Store key, while Release must make configuration
 unavailable before any SDK call. The smoke test invokes the real private Python bridge without
 launching a window or configuring RevenueCat.

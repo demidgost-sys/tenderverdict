@@ -80,6 +80,14 @@ identifiers and may change interfaces during the alpha period.
 - Extended CI and the self-contained builder with Swift formatting plus configuration-specific
   Debug and Release contract checks, and recorded the full Python project version separately from
   the numeric bundle version.
+- Clarified synthetic/current/previous report state, added strict inline review-point recovery and a
+  **Use today** action, reset complete filter state across reports, exposed import warnings without
+  hover, separated verdict drivers from passed checks, and made retained-report export wording
+  explicit.
+- Aligned the Profile Builder examples with the shipped workspace, repaired its compact-height
+  footer, made field errors specific, and revised the synthetic portfolio and Reject next step so
+  the Free demo shows one Open, one Watch, and one Reject without implying valid mismatches are bad
+  metadata.
 
 ## [0.2.0a1] - 2026-08-04
 

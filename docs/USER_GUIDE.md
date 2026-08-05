@@ -14,23 +14,30 @@ queue. Choose the surface that matches the job:
 ## Next Gen first run
 
 1. Launch the app. The bundled three-profile synthetic example runs locally and shows the first
-   profile in the Free section.
+   profile in the Free section with one Open, one Watch, and one Reject. The **Bundled demo
+   report** banner keeps synthetic evidence distinct from a selected-input run.
 2. To create your own workspace, select **Build profiles…**. Add, remove, or reorder one to five
    profiles, then use **Validate & Save As…**. The app first checks the fields, then asks the
    canonical Python parser to normalize and validate the complete workspace before saving it.
    Alternatively, choose an existing workspace v1 JSON file; it passes through the same parser.
 3. Choose normalized notices in CSV or JSON. The complete file is validated before it becomes
-   runnable. Confirm the displayed format, total count, first five normalized records, and
-   full-file missing-field counts.
+   runnable. Confirm the displayed format, total count, first five normalized records, visible
+   metadata-warning summary, and full-file missing-field counts.
 4. Enter a review point as `YYYY-MM-DD` or the supported whole-second RFC 3339 form
-   (`YYYY-MM-DDTHH:MM:SSZ` or an explicit UTC offset, without fractional seconds), then select
-   **Run portfolio**. A successful result updates the source label, review point, summary, and Free
-   profile. A failed analysis does not discard the previous valid result.
+   (`YYYY-MM-DDTHH:MM:SSZ` or an explicit UTC offset, without fractional seconds), or select **Use
+   today**. Invalid calendar values are explained inline before the core runs. Select **Run
+   portfolio**. A successful result updates the source label, review point, summary, and Free
+   profile. Choosing another accepted input, changing the review point, or starting a rerun labels
+   the last result **Previous report kept for reference** until a successful result replaces it. A
+   failed analysis does not discard those previous valid bytes.
 5. Narrow the Free queue by verdict, text, buyer, or whether a deadline was supplied. Use
-   **Show more** to reveal the next bounded group, expand **Reasons and unknowns**, and open a
+   **Show more** to reveal the next bounded group, expand **Why this verdict**, and inspect verdict
+   drivers, items needing confirmation, and routine checks separately. **Clear filters** resets the
+   verdict filter too, and loading a different report resets the complete filter state. Open a
    syntactically safe supplied HTTPS source when the official notice needs inspection.
 6. Select **Export JSON…**. Free saves a deterministic ASCII-safe schema-3 report for the first
-   profile. Active Premium access saves the exact complete portfolio bytes.
+   profile. Active Premium access saves the exact complete portfolio bytes. A retained older result
+   stays exportable by design, but the action and Save panel explicitly say **previous**.
 7. Optional: enable **Remember these two file selections on this Mac**. This persists only the two
    security-scoped bookmarks. Relaunch validates the restored selections but never analyzes them
    automatically. Disable the toggle to forget the bookmarks.
@@ -38,7 +45,9 @@ queue. Choose the surface that matches the job:
    `test_` key. TenderVerdict does not store it. The release-configuration app disables key entry
    before the SDK can reject it. Use the exact expected offering/package/product or restore access;
    the cross-profile comparison, all profile summaries, and full portfolio export appear only while
-   `supplier_profiles_plus` is active. **Refresh offering** retries a recoverable network or
+   `supplier_profiles_plus` is active. Before purchase, the locked preview can disclose how many
+   shared notices produce different verdicts without exposing the gated reports. **Refresh
+   offering** retries a recoverable network or
    dashboard issue. If an already configured key/project is wrong, quit and reopen the Debug app to
    replace it because the RevenueCat SDK can be configured only once per process.
 
@@ -95,6 +104,10 @@ warnings, and the fixed canonical field list. An invalid suffix, malformed UTF-8
 unsupported value, duplicate notice identity, oversized file, or other schema failure leaves the
 previous selection and report intact and shows an actionable error.
 
+Warnings attached to the previewed records remain available on each row and are also collected
+under a visible **metadata warnings in preview** disclosure, so they are not discoverable only by
+pointer hover.
+
 ## Understanding the result
 
 - `open_documents`: configured metadata checks passed; open the official documents.
@@ -107,6 +120,12 @@ outcomes differ; it does not compute a winner. Search, buyer, and deadline filte
 the shared primary notice identities. Selecting a verdict cell resolves the matching result by its
 stable profile/result IDs—not by a filtered row offset—and opens the profile, notice metadata,
 reasons, unknowns, human next step, and safe source link.
+
+The native presentation groups the existing reason strings into **Verdict drivers**, **Needs
+confirmation**, and **Checks passed**. This grouping is derived presentation only: exported reason
+order, verdict semantics, schemas, and hashes remain unchanged. A Reject next step means the notice
+does not fit that profile under the recorded hard-stop evidence; it does not presume that valid
+source metadata is erroneous.
 
 ## Privacy and credentials
 
@@ -144,5 +163,6 @@ transaction controls and activated Restore; it is historical transaction evidenc
 settings QA for the current package.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains
-available. If Premium refresh fails, verify the RevenueCat entitlement, exact offering/package/
+available and visibly marked as previous; exporting it never silently presents it as current. If
+Premium refresh fails, verify the RevenueCat entitlement, exact offering/package/
 product, Test Store connection, and key, then retry or restore; relaunch to replace a configured key.
