@@ -102,8 +102,9 @@ and consistency checks.
   complete result detail.
 - Native reason presentation separates existing ordered strings into verdict drivers, unknowns that
   need confirmation, and routine passed checks. This does not rewrite the report or export schema.
-- The locked portfolio preview derives only a disagreement count across the already validated
-  shared notice order. It reveals no gated reason or profile-report content and creates no score.
+- The top-level Portfolio Signal and locked portfolio preview derive only a disagreement count
+  across the already validated shared notice order. They reveal no gated reason or profile-report
+  content and create no score. Native Free/Premium packaging copy is presentation-only.
 - A configured Debug app accepts only offering `supplier_profiles_plus`, package `$rc_monthly`, and
   product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, and
   refreshes access on launch. An unexpected dashboard shape stays locked.

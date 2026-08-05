@@ -88,6 +88,11 @@ identifiers and may change interfaces during the alpha period.
   footer, made field errors specific, and revised the synthetic portfolio and Reject next step so
   the Free demo shows one Open, one Watch, and one Reject without implying valid mismatches are bad
   metadata.
+- Reframed the Next Gen experience around one visible product loop: a Portfolio Signal shows how
+  many outcomes change across the shared feed, Free/Portfolio packaging is explicit before
+  purchase setup, and Test Store implementation detail no longer outranks the user value.
+- Aligned the native app, static HTML report, README, and Devpost draft around concrete human-owned
+  actions: open, verify, or skip, with reasons and a next step rather than an aggregate score.
 
 ## [0.2.0a1] - 2026-08-04
 

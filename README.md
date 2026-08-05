@@ -4,7 +4,7 @@
 
 <h1 align="center">TenderVerdict</h1>
 
-<p align="center"><strong>Explainable procurement metadata triage, run locally.</strong></p>
+<p align="center"><strong>See what to open, verify, or skip — locally and explainably.</strong></p>
 
 <p align="center">
   <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status for main"></a>
@@ -32,6 +32,11 @@ public-procurement **notice metadata**. The published developer alpha contains a
 library, and an unsigned local desktop preview. You supply a company profile and structured notices;
 TenderVerdict applies narrow, deterministic rules and produces a review queue with reasons,
 unresolved fields, and a human next step.
+
+The Portfolio Workspace idea is equally narrow: **one tender feed can produce different supplier
+decisions**. The current competition source evaluates the same notices independently for up to five
+profiles and makes those differences visible without creating a score, ranking, or automatic bid
+recommendation.
 
 It does not read full procurement documents or decide whether you should bid.
 
@@ -143,7 +148,7 @@ Use only synthetic, public, or fully de-identified material.
 <summary><strong>View the complete synthetic HTML report</strong></summary>
 
 <p align="center">
-  <img src="demo/screenshot.png" width="900" alt="Synthetic TenderVerdict report with one open_documents result, one watch result, and one reject result.">
+  <img src="demo/screenshot.png" width="900" alt="TenderVerdict decision queue with one open, one watch, and one reject result, plus the first notice card.">
 </p>
 
 The report is generated from fictional data committed to this repository. Reproduce it with:
@@ -238,8 +243,13 @@ JSON instead of reimplementing qualification rules, preserves the first profile 
 single-analysis surface, and reveals all one to five profile reports only when RevenueCat reports
 the `supplier_profiles_plus` entitlement as active.
 
+Its core loop is designed to be understood in one glance: **one feed, different supplier
+decisions**. A Portfolio Signal shows how many outcomes change between profiles; Free keeps one
+complete review with reasons and JSON, while Premium reveals every profile, the comparison, and the
+full portfolio export.
+
 <p align="center">
-  <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS Portfolio Workspace showing local inputs, the free single-profile result, and a locked RevenueCat Premium section.">
+  <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS showing a Portfolio Signal, local inputs, a complete free supplier review, and the RevenueCat-backed Portfolio Workspace.">
 </p>
 
 > [!NOTE]

@@ -5,8 +5,12 @@
 
 ## Tagline
 
-Explainable local tender triage across every supplier profile, with a RevenueCat-powered Portfolio
-Workspace.
+One tender feed. Different supplier decisions — locally, explainably, and RevenueCat-powered.
+
+## The idea in one sentence
+
+TenderVerdict shows a supplier what to open, verify, or skip from notice metadata; Portfolio
+Workspace then reveals where the same notice changes outcome across up to five supplier profiles.
 
 ## Inspiration
 
@@ -24,7 +28,15 @@ TenderVerdict reads normalized tender-notice metadata and applies deterministic 
 geography, deadline lead time, notice type, and missing fields. Each notice becomes
 `open_documents`, `watch`, or `reject`, with reasons, unknowns, and a concrete human next step.
 
-The native macOS journey now starts before analysis:
+The core loop is deliberately small:
+
+1. Load one normalized notice feed and one to five supplier profiles.
+2. Review the complete first profile for free, including every verdict, reason, source link, human
+   next step, and deterministic JSON export.
+3. Use RevenueCat Premium to reveal which outcomes change across the other profiles, compare them,
+   and inspect the exact evidence behind each difference.
+
+The native macOS journey supports that loop without asking users to edit contracts by hand:
 
 - Profile Builder creates, reorders, validates, and saves one to five named profiles without manual
   JSON editing.
@@ -42,6 +54,9 @@ The native macOS journey now starts before analysis:
 
 TenderVerdict never adds a cross-profile score, ranking, legal conclusion, automatic bid, or
 entitlement-dependent qualification result.
+
+The packaging is explicit in the product: **Free** is one complete supplier review with reasons and
+JSON; **Portfolio** is up to five profiles, the disagreement map, and the full portfolio export.
 
 ## How we built it
 
@@ -121,8 +136,9 @@ all final submission fields still need owner verification.
 ## What we learned
 
 Entitlement-backed UI is strongest when billing state and domain logic stay separate. A useful free
-workflow makes the Premium value proposition clearer, not weaker. Import transparency and stable
-identity matter as much as visual polish when people must defend a decision later.
+workflow makes the Premium value proposition clearer, not weaker. Most importantly, the winning
+product sentence should also be the visible product loop: one feed, different supplier decisions,
+with evidence a human can defend.
 
 ## What is next
 

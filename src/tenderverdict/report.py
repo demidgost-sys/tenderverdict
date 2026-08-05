@@ -472,15 +472,15 @@ def render_html(
       <div class="brand-line">
         <span class="brand-mark" aria-hidden="true">TV</span><span>TenderVerdict</span>
       </div>
-      <h1>Qualification report</h1>
+      <h1>What to open, verify, or skip.</h1>
       <p class="lede">
-        Deterministic metadata review for {company}. Review point:
+        Explainable metadata triage for {company}, evaluated locally at
         <time datetime="{as_of.isoformat()}">{as_of.isoformat()}</time>.
       </p>
     </header>
     <section class="summary" aria-label="Verdict summary">
       <div class="summary-copy">
-        <strong>Review outcomes</strong><span>{len(results)} notices assessed</span>
+        <strong>Decision queue</strong><span>{len(results)} notices for human review</span>
       </div>
       <div class="metric open">
         <strong>{counts[Verdict.OPEN_DOCUMENTS]}</strong><span>Open documents</span>
@@ -535,10 +535,10 @@ def _render_result_html(result: QualificationResult) -> str:
           <dt>Source</dt><dd class="source-cell">{source}</dd>
         </dl>
         <div class="evidence-grid">
-          <section class="evidence"><h3>Reasons</h3><ul>{reasons}</ul></section>
-          <section class="evidence"><h3>Unknowns</h3><ul>{unknowns}</ul></section>
+          <section class="evidence"><h3>Verdict drivers</h3><ul>{reasons}</ul></section>
+          <section class="evidence"><h3>Needs confirmation</h3><ul>{unknowns}</ul></section>
         </div>
-        <p class="next-step"><strong>Human next step</strong><span>{next_step}</span></p>
+        <p class="next-step"><strong>Next human step</strong><span>{next_step}</span></p>
       </article>
 """
 

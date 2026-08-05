@@ -220,8 +220,8 @@ final class AppModel: ObservableObject {
 
   var syntheticButtonTitle: String {
     sourceDescription == "Synthetic example" && report != nil && !reportIsPrevious
-      ? "Reload synthetic example"
-      : "Load synthetic example"
+      ? "Reload guided example"
+      : "Try guided example"
   }
 
   func start() {
@@ -583,6 +583,7 @@ struct ContentView: View {
     VStack(alignment: .leading, spacing: 28) {
       header
       sourceStatus
+      portfolioSignal
       PortfolioInputSection(model: model)
       freeAnalysis
       PremiumWorkspaceSection(report: model.report, controller: model.revenueCat)
@@ -615,12 +616,12 @@ struct ContentView: View {
         Text("TenderVerdict")
           .font(.subheadline.weight(.semibold))
           .foregroundStyle(.indigo)
-        Text("Tender intelligence for every supplier profile.")
+        Text("One tender feed. Different supplier decisions.")
           .font(.largeTitle.bold())
           .fixedSize(horizontal: false, vertical: true)
         Text(
-          "Run one explainable notice review across a named supplier portfolio, "
-            + "with the first profile always available for free."
+          "Turn procurement metadata into an explainable queue of what to open, verify, or skip, "
+            + "then compare the same notices across up to five profiles."
         )
         .font(.title3)
         .foregroundStyle(.secondary)
@@ -633,15 +634,15 @@ struct ContentView: View {
   private var sourceStatus: some View {
     ViewThatFits(in: .horizontal) {
       HStack(spacing: 0) {
-        StatusLabel(title: "Local analysis", systemImage: "lock.shield")
+        StatusLabel(title: "Runs on this Mac", systemImage: "lock.shield")
         statusDivider
-        StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
+        StatusLabel(title: "Reasons included", systemImage: "checkmark.seal")
         statusDivider
         StatusLabel(title: "RevenueCat Premium", systemImage: "shippingbox")
       }
       VStack(alignment: .leading, spacing: 8) {
-        StatusLabel(title: "Local analysis", systemImage: "lock.shield")
-        StatusLabel(title: "Schema verified", systemImage: "checkmark.seal")
+        StatusLabel(title: "Runs on this Mac", systemImage: "lock.shield")
+        StatusLabel(title: "Reasons included", systemImage: "checkmark.seal")
         StatusLabel(title: "RevenueCat Premium", systemImage: "shippingbox")
       }
     }
@@ -660,11 +661,66 @@ struct ContentView: View {
   }
 
   @ViewBuilder
+  private var portfolioSignal: some View {
+    if let report = model.report {
+      PremiumCard(tint: .indigo) {
+        VStack(alignment: .leading, spacing: 16) {
+          NoticeCardContent(
+            title: "One feed. Different supplier decisions.",
+            detail:
+              portfolioDifferenceSummary(report)
+              + " Every result keeps its own reasons and human next step.",
+            systemImage: "arrow.triangle.branch",
+            tint: .indigo
+          )
+          ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+              PortfolioSignalMetric(
+                value: report.summary.noticeCount,
+                title: "Shared notices",
+                systemImage: "doc.on.doc"
+              )
+              PortfolioSignalMetric(
+                value: report.summary.profileCount,
+                title: "Supplier profiles",
+                systemImage: "person.2"
+              )
+              PortfolioSignalMetric(
+                value: report.divergentNoticeCount,
+                title: "Changed outcomes",
+                systemImage: "arrow.triangle.branch"
+              )
+            }
+            VStack(alignment: .leading, spacing: 10) {
+              PortfolioSignalMetric(
+                value: report.summary.noticeCount,
+                title: "Shared notices",
+                systemImage: "doc.on.doc"
+              )
+              PortfolioSignalMetric(
+                value: report.summary.profileCount,
+                title: "Supplier profiles",
+                systemImage: "person.2"
+              )
+              PortfolioSignalMetric(
+                value: report.divergentNoticeCount,
+                title: "Changed outcomes",
+                systemImage: "arrow.triangle.branch"
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @ViewBuilder
   private var freeAnalysis: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
-        title: "Single-profile analysis",
-        detail: "The first named profile and the existing verdict workflow remain free."
+        title: "Your first supplier review",
+        detail:
+          "Every verdict, reason, source link, and JSON export stays available for profile one."
       )
       if let report = model.report,
         let primary = report.visibleProfileReports(premiumUnlocked: false).first
@@ -731,8 +787,9 @@ struct PortfolioInputSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
-        title: "Portfolio inputs",
-        detail: "Choose local files once, then run the same bounded notice set for every profile."
+        title: "Run a local portfolio review",
+        detail:
+          "Choose profiles and one normalized notice feed. Every profile uses the same review point."
       )
       PremiumCard(tint: .indigo) {
         VStack(alignment: .leading, spacing: 16) {
@@ -955,7 +1012,8 @@ struct PremiumWorkspaceSection: View {
     VStack(alignment: .leading, spacing: 12) {
       SectionHeading(
         title: "Portfolio Workspace",
-        detail: "Reveal up to five independent profile reports through one RevenueCat entitlement."
+        detail:
+          "See where the same notice changes outcome across supplier profiles, then inspect why."
       )
       premiumContent
     }
@@ -1015,16 +1073,19 @@ struct PremiumWorkspaceSection: View {
   private var testStoreUnavailableCard: some View {
     PremiumCard(tint: .indigo) {
       VStack(alignment: .leading, spacing: 16) {
+        portfolioValueHeader
+        accessPlanSummary
+        portfolioPreview
+        Divider()
         NoticeCardContent(
-          title: "Test Store is disabled in this build",
+          title: "Evaluation purchase is unavailable in Release",
           detail:
-            "RevenueCat protects Release builds from Test Store keys. "
-            + "Use the separately packaged Debug evaluation build for purchase and restore evidence.",
+            "Use the separately packaged Debug evaluation build to test RevenueCat purchase "
+            + "and restore. Release never accepts a Test Store key.",
           systemImage: "lock.shield",
           tint: .indigo
         )
-        portfolioPreview
-        Text("No RevenueCat key can be entered or configured in this release-configuration app.")
+        Text("No RevenueCat key can be entered or configured in this Release app.")
           .font(.caption)
           .foregroundStyle(.secondary)
       }
@@ -1034,6 +1095,10 @@ struct PremiumWorkspaceSection: View {
   private func configurationCard(title: String, detail: String) -> some View {
     PremiumCard(tint: .indigo) {
       VStack(alignment: .leading, spacing: 16) {
+        portfolioValueHeader
+        accessPlanSummary
+        portfolioPreview
+        Divider()
         NoticeCardContent(
           title: title,
           detail: detail,
@@ -1044,7 +1109,6 @@ struct PremiumWorkspaceSection: View {
           HStack(spacing: 10) { configurationControls }
           VStack(alignment: .leading, spacing: 10) { configurationControls }
         }
-        portfolioPreview
         Text("Entitlement: \(RevenueCatAccessController.entitlementIdentifier)")
           .font(.caption.monospaced())
           .foregroundStyle(.tertiary)
@@ -1073,13 +1137,16 @@ struct PremiumWorkspaceSection: View {
   private func actionableLockedCard(title: String, detail: String) -> some View {
     PremiumCard(tint: .indigo) {
       VStack(alignment: .leading, spacing: 16) {
+        portfolioValueHeader
+        accessPlanSummary
+        portfolioPreview
+        Divider()
         NoticeCardContent(
           title: title,
           detail: detail,
           systemImage: "lock",
           tint: .indigo
         )
-        portfolioPreview
         ViewThatFits(in: .horizontal) {
           HStack(spacing: 10) { lockedActions }
           VStack(alignment: .leading, spacing: 10) { lockedActions }
@@ -1094,7 +1161,7 @@ struct PremiumWorkspaceSection: View {
       pendingUserAction = true
       Task { await controller.purchaseCurrentPackage() }
     } label: {
-      Label("Run Test Store purchase", systemImage: "cart")
+      Label("Unlock with Test Store", systemImage: "cart")
     }
     .buttonStyle(.borderedProminent)
     .disabled(!controller.canPurchase)
@@ -1162,8 +1229,10 @@ struct PremiumWorkspaceSection: View {
     if let report {
       VStack(alignment: .leading, spacing: 12) {
         NoticeCard(
-          title: "Portfolio Workspace unlocked",
-          detail: "RevenueCat reports an active supplier_profiles_plus entitlement.",
+          title: "Portfolio comparison ready",
+          detail:
+            "RevenueCat confirmed access. Every profile, changed outcome, and the full "
+            + "portfolio export are now available.",
           systemImage: "checkmark.seal.fill",
           tint: .green
         )
@@ -1196,21 +1265,17 @@ struct PremiumWorkspaceSection: View {
     VStack(alignment: .leading, spacing: 10) {
       if let report {
         Label(
-          "\(report.summary.profileCount) named profiles · "
+          "\(report.summary.profileCount) supplier profiles · "
             + "\(report.summary.noticeCount) shared notices",
           systemImage: "person.2"
         )
         if report.summary.profileCount > 1, report.summary.noticeCount > 0 {
           Label(
-            "\(report.divergentNoticeCount) of \(report.summary.noticeCount) notices "
-              + "produce different profile outcomes",
+            portfolioDifferenceSummary(report),
             systemImage: "arrow.triangle.branch"
           )
           .foregroundStyle(.secondary)
-          .accessibilityLabel(
-            "\(report.divergentNoticeCount) of \(report.summary.noticeCount) notices "
-              + "have different verdicts between profiles"
-          )
+          .accessibilityLabel(portfolioDifferenceSummary(report))
         }
         VStack(spacing: 0) {
           ForEach(Array(report.profileReports.enumerated()), id: \.element.id) { item in
@@ -1225,6 +1290,65 @@ struct PremiumWorkspaceSection: View {
       }
     }
     .font(.subheadline.weight(.medium))
+  }
+
+  private var portfolioValueHeader: some View {
+    NoticeCardContent(
+      title: "Compare the same opportunity across every supplier profile",
+      detail:
+        "Find changed outcomes without hiding the complete first-profile review behind a paywall.",
+      systemImage: "square.grid.3x3.square",
+      tint: .indigo
+    )
+  }
+
+  private var accessPlanSummary: some View {
+    ViewThatFits(in: .horizontal) {
+      HStack(alignment: .top, spacing: 18) {
+        accessPlan(
+          title: "Free",
+          detail: "1 complete profile · reasons · JSON",
+          systemImage: "checkmark.circle.fill"
+        )
+        Divider().frame(height: 48)
+        accessPlan(
+          title: "Portfolio",
+          detail: "Up to 5 profiles · comparison · portfolio JSON",
+          systemImage: "person.2.fill"
+        )
+      }
+      VStack(alignment: .leading, spacing: 12) {
+        accessPlan(
+          title: "Free",
+          detail: "1 complete profile · reasons · JSON",
+          systemImage: "checkmark.circle.fill"
+        )
+        Divider()
+        accessPlan(
+          title: "Portfolio",
+          detail: "Up to 5 profiles · comparison · portfolio JSON",
+          systemImage: "person.2.fill"
+        )
+      }
+    }
+  }
+
+  private func accessPlan(title: String, detail: String, systemImage: String) -> some View {
+    HStack(alignment: .top, spacing: 10) {
+      Image(systemName: systemImage)
+        .foregroundStyle(.indigo)
+        .frame(width: 18)
+        .accessibilityHidden(true)
+      VStack(alignment: .leading, spacing: 3) {
+        Text(title).font(.subheadline.weight(.semibold))
+        Text(detail)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .accessibilityElement(children: .combine)
   }
 }
 
@@ -2034,7 +2158,9 @@ struct NoticeCardContent: View {
         .accessibilityHidden(true)
       VStack(alignment: .leading, spacing: 5) {
         Text(title).font(.headline)
-        Text(detail).foregroundStyle(.secondary)
+        Text(detail)
+          .foregroundStyle(.secondary)
+          .fixedSize(horizontal: false, vertical: true)
       }
     }
     .accessibilityElement(children: .combine)
@@ -2081,4 +2207,50 @@ struct StatusLabel: View {
       .font(.caption.weight(.medium))
       .lineLimit(1)
   }
+}
+
+struct PortfolioSignalMetric: View {
+  let value: Int
+  let title: String
+  let systemImage: String
+
+  var body: some View {
+    HStack(spacing: 10) {
+      Image(systemName: systemImage)
+        .foregroundStyle(.indigo)
+        .frame(width: 18)
+        .accessibilityHidden(true)
+      VStack(alignment: .leading, spacing: 1) {
+        Text("\(value)")
+          .font(.title3.monospacedDigit().weight(.bold))
+        Text(title)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+    }
+    .padding(.vertical, 8)
+    .padding(.horizontal, 12)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(
+      RoundedRectangle(cornerRadius: 12, style: .continuous)
+        .fill(Color.indigo.opacity(0.07))
+    )
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("\(title): \(value)")
+  }
+}
+
+private func portfolioDifferenceSummary(_ report: PortfolioWorkspaceReport) -> String {
+  if report.summary.noticeCount == 0 {
+    return "No notices were supplied; every profile is ready for the same bounded feed."
+  }
+  if report.summary.profileCount == 1 {
+    let noticeNoun = report.summary.noticeCount == 1 ? "notice" : "notices"
+    return "\(report.summary.noticeCount) shared \(noticeNoun) reviewed for profile one; "
+      + "add another profile to compare decisions."
+  }
+  let noticeNoun = report.summary.noticeCount == 1 ? "notice" : "notices"
+  let verb = report.divergentNoticeCount == 1 ? "changes" : "change"
+  return "\(report.divergentNoticeCount) of \(report.summary.noticeCount) shared "
+    + "\(noticeNoun) \(verb) verdict across profiles."
 }

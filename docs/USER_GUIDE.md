@@ -15,7 +15,9 @@ queue. Choose the surface that matches the job:
 
 1. Launch the app. The bundled three-profile synthetic example runs locally and shows the first
    profile in the Free section with one Open, one Watch, and one Reject. The **Bundled demo
-   report** banner keeps synthetic evidence distinct from a selected-input run.
+   report** banner keeps synthetic evidence distinct from a selected-input run. The **Portfolio
+   Signal** above the inputs states how many shared notices change verdict across profiles without
+   revealing the gated reports or ranking profiles.
 2. To create your own workspace, select **Build profiles…**. Add, remove, or reorder one to five
    profiles, then use **Validate & Save As…**. The app first checks the fields, then asks the
    canonical Python parser to normalize and validate the complete workspace before saving it.
@@ -41,7 +43,9 @@ queue. Choose the surface that matches the job:
 7. Optional: enable **Remember these two file selections on this Mac**. This persists only the two
    security-scoped bookmarks. Relaunch validates the restored selections but never analyzes them
    automatically. Disable the toggle to forget the bookmarks.
-8. For the Shipaton Test Store demo, use the separately packaged Debug app and paste a RevenueCat
+8. The Premium card compares the packaging before asking for a purchase: Free includes one complete
+   profile with reasons and JSON; Portfolio includes up to five profiles, the shared comparison,
+   and the full portfolio JSON. For the Shipaton Test Store demo, use the separately packaged Debug app and paste a RevenueCat
    `test_` key. TenderVerdict does not store it. The release-configuration app disables key entry
    before the SDK can reject it. Use the exact expected offering/package/product or restore access;
    the cross-profile comparison, all profile summaries, and full portfolio export appear only while
