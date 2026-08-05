@@ -3,6 +3,7 @@ import Foundation
 @preconcurrency import RevenueCat
 
 public enum TestStoreConfigurationStatus: Equatable, Sendable {
+  case unavailableInRelease
   case missing
   case rejected
   case accepted
@@ -11,7 +12,18 @@ public enum TestStoreConfigurationStatus: Equatable, Sendable {
 public enum RevenueCatTestStoreConfiguration {
   public static let environmentName = "REVENUECAT_TEST_STORE_API_KEY"
 
+  public static var isAvailableInCurrentBuild: Bool {
+    #if DEBUG
+      true
+    #else
+      false
+    #endif
+  }
+
   public static func status(in environment: [String: String]) -> TestStoreConfigurationStatus {
+    guard isAvailableInCurrentBuild else {
+      return .unavailableInRelease
+    }
     guard environment[environmentName] != nil else {
       return .missing
     }
@@ -19,6 +31,9 @@ public enum RevenueCatTestStoreConfiguration {
   }
 
   static func apiKey(in environment: [String: String]) -> String? {
+    guard isAvailableInCurrentBuild else {
+      return nil
+    }
     guard let rawValue = environment[environmentName] else {
       return nil
     }
@@ -35,6 +50,7 @@ public enum RevenueCatTestStoreConfiguration {
 }
 
 public enum PremiumAccessState: Equatable, Sendable {
+  case testStoreUnavailableInRelease
   case configurationMissing
   case configurationRejected
   case loading
@@ -53,6 +69,14 @@ public enum PremiumAccessState: Equatable, Sendable {
 
   public var terminalAccessibilityOutcome: PremiumAccessAccessibilityOutcome? {
     switch self {
+    case .testStoreUnavailableInRelease:
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "RevenueCat Test Store is unavailable in this release-configuration build. "
+          + "Use a Debug evaluation build for Test Store evidence.",
+        recoveryActions: [],
+        focusTarget: nil
+      )
     case .configurationMissing:
       return PremiumAccessAccessibilityOutcome(
         announcement: "RevenueCat Test Store is not connected. Enter a Test Store API key.",
@@ -62,7 +86,8 @@ public enum PremiumAccessState: Equatable, Sendable {
     case .configurationRejected:
       return PremiumAccessAccessibilityOutcome(
         announcement:
-          "RevenueCat Test Store key rejected. Enter a key beginning with test underscore.",
+          "RevenueCat Test Store key rejected. Use a key beginning with test underscore, "
+          + "between 12 and 512 bytes, without spaces or control characters.",
         recoveryActions: [.connectTestStore],
         focusTarget: .testStoreAPIKey
       )
@@ -72,8 +97,8 @@ public enum PremiumAccessState: Equatable, Sendable {
       if price == nil {
         return PremiumAccessAccessibilityOutcome(
           announcement:
-            "Premium access is locked. No current Test Store package is available. "
-            + "Restore access or refresh the offering.",
+            "Premium access is locked. The expected Test Store offering, monthly package, "
+            + "or product is unavailable. Restore access or refresh the offering.",
           recoveryActions: [.restore, .refreshOffering],
           focusTarget: .restore
         )
@@ -96,7 +121,7 @@ public enum PremiumAccessState: Equatable, Sendable {
         return PremiumAccessAccessibilityOutcome(
           announcement:
             "Test Store purchase cancelled. Premium access remains locked. "
-            + "Restore access or refresh the offering.",
+            + "The expected package is unavailable; restore access or refresh the offering.",
           recoveryActions: [.restore, .refreshOffering],
           focusTarget: .restore
         )
@@ -137,7 +162,7 @@ public enum PremiumAccessFocusTarget: Hashable, Sendable {
 public struct PremiumAccessAccessibilityOutcome: Equatable, Sendable {
   public let announcement: String
   public let recoveryActions: [PremiumAccessRecoveryAction]
-  public let focusTarget: PremiumAccessFocusTarget
+  public let focusTarget: PremiumAccessFocusTarget?
 
   public var primaryRecoveryAction: PremiumAccessRecoveryAction? {
     recoveryActions.first
@@ -146,7 +171,7 @@ public struct PremiumAccessAccessibilityOutcome: Equatable, Sendable {
   public init(
     announcement: String,
     recoveryActions: [PremiumAccessRecoveryAction],
-    focusTarget: PremiumAccessFocusTarget
+    focusTarget: PremiumAccessFocusTarget?
   ) {
     self.announcement = announcement
     self.recoveryActions = recoveryActions
@@ -156,7 +181,10 @@ public struct PremiumAccessAccessibilityOutcome: Equatable, Sendable {
 
 @MainActor
 public final class RevenueCatAccessController: ObservableObject {
-  public static let entitlementIdentifier = "supplier_profiles_plus"
+  public nonisolated static let entitlementIdentifier = "supplier_profiles_plus"
+  public nonisolated static let offeringIdentifier = "supplier_profiles_plus"
+  public nonisolated static let packageIdentifier = "$rc_monthly"
+  public nonisolated static let productIdentifier = "supplier_profiles_plus_monthly"
 
   @Published public private(set) var state: PremiumAccessState
 
@@ -167,6 +195,8 @@ public final class RevenueCatAccessController: ObservableObject {
   public init(environment: [String: String] = ProcessInfo.processInfo.environment) {
     apiKey = RevenueCatTestStoreConfiguration.apiKey(in: environment)
     switch RevenueCatTestStoreConfiguration.status(in: environment) {
+    case .unavailableInRelease:
+      state = .testStoreUnavailableInRelease
     case .missing:
       state = .configurationMissing
     case .rejected:
@@ -184,7 +214,22 @@ public final class RevenueCatAccessController: ObservableObject {
     didConfigure && !state.isBusy
   }
 
+  public nonisolated static func isExpectedPackage(
+    offeringIdentifier: String,
+    packageIdentifier: String,
+    productIdentifier: String
+  ) -> Bool {
+    offeringIdentifier == Self.offeringIdentifier
+      && packageIdentifier == Self.packageIdentifier
+      && productIdentifier == Self.productIdentifier
+  }
+
   public func configure(testStoreAPIKey: String) async {
+    guard RevenueCatTestStoreConfiguration.isAvailableInCurrentBuild else {
+      apiKey = nil
+      state = .testStoreUnavailableInRelease
+      return
+    }
     guard !didConfigure else {
       await refreshConfiguredAccess()
       return
@@ -203,6 +248,11 @@ public final class RevenueCatAccessController: ObservableObject {
   }
 
   public func start() async {
+    guard RevenueCatTestStoreConfiguration.isAvailableInCurrentBuild else {
+      apiKey = nil
+      state = .testStoreUnavailableInRelease
+      return
+    }
     guard let apiKey else {
       return
     }
@@ -275,7 +325,15 @@ public final class RevenueCatAccessController: ObservableObject {
         return
       }
       let offerings = try await Purchases.shared.offerings()
-      currentPackage = offerings.current?.availablePackages.first
+      currentPackage = offerings.current.flatMap { offering in
+        offering.availablePackages.first { package in
+          Self.isExpectedPackage(
+            offeringIdentifier: offering.identifier,
+            packageIdentifier: package.identifier,
+            productIdentifier: package.storeProduct.productIdentifier
+          )
+        }
+      }
       state = .locked(price: currentPackage?.localizedPriceString)
     } catch {
       state = .failed

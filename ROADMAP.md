@@ -4,10 +4,9 @@ This roadmap records the intended evaluation sequence for TenderVerdict. It is n
 dates, support, compatibility, or continued development. A milestone advances only after its
 documented evidence gates pass.
 
-The current measured snapshot and the reconciliation with earlier plans live in
-[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). As of 2026-08-05, 20 of 22 local Shipaton
-implementation milestones are complete and 8 of 12 final-submission gates are ready. The counts
-are a progress ledger, not a probability of winning or a public-release claim.
+The current measured snapshot, exact completion counts, and reconciliation with earlier plans live
+in [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). Those counts are a progress ledger, not a
+probability of winning or a public-release claim.
 
 ## Current state
 
@@ -82,7 +81,8 @@ deliberately not simulated by CI.
 Feedback remains opt-in through public GitHub issues using synthetic, public, or fully de-identified
 examples. The `v0.2.0-alpha.1` desktop evaluation is tracked in
 [issue #9](https://github.com/demidgost-sys/tenderverdict/issues/9). TenderVerdict does not collect
-telemetry or contact prospective users automatically.
+first-party product telemetry or contact prospective users automatically. A configured RevenueCat
+Debug evaluation still performs the SDK's normal Test Store operations.
 
 Continue desktop work only if the evaluation produces at least:
 
@@ -121,10 +121,9 @@ The remaining order is:
 4. only after owner approval, prepare the public demo and complete the final evidence and
    logged-out-link audit.
 
-The pre-final pushed baseline is `67bb5557806279a7dcd6dfa1fcc467c7c41043d7`. The current candidate
-adds the builder, import preview, continuity, filters, drill-down, and accessibility hardening and
-passes its own complete local source, package, security, and asset gate. Draft PR #12 remains the
-authoritative pushed-revision CI record.
+Draft PR #12 is the authoritative pushed-revision CI record. The exact audited implementation
+revision, artifact provenance, suite totals, and current gate result are maintained in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md), not duplicated here.
 
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.

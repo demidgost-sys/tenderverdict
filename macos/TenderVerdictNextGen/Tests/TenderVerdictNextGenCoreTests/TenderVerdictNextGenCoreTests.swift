@@ -14,9 +14,10 @@ enum CheckFailure: Error, LocalizedError {
 
 @main
 enum TenderVerdictNextGenChecks {
-  static func main() throws {
+  static func main() async throws {
     try checkPortfolioContractPreservesFreeAndPremiumSurfaces()
     try checkPortfolioContractPreservesResultDetails()
+    try checkDisplayTextMakesControlsVisible()
     try checkPortfolioContractAcceptsEmptyNoticeSet()
     try checkPortfolioContractRejectsInconsistentProfileCount()
     try checkPortfolioContractRejectsDifferentNoticeDigests()
@@ -28,26 +29,57 @@ enum TenderVerdictNextGenChecks {
     try checkReviewQueryAndStableResultLookup()
     try checkLargeReviewQueryPreservesStableIdentities()
     try checkPremiumAccessibilityOutcomes()
-    try checkTestStoreConfigurationFailsClosed()
+    try await checkTestStoreConfigurationFailsClosed()
     try checkProcessAdapterPreservesDeterministicBytes()
-    print("NEXT_GEN_CHECKS_OK checks=15")
+    print("NEXT_GEN_CHECKS_OK checks=16")
   }
 
   private static func checkPortfolioContractPreservesFreeAndPremiumSurfaces() throws {
-    let report = try PortfolioWorkspaceReport.decode(makeReportData(profileCount: 3))
+    let firstProfileName = "München\u{7f} Services"
+    let report = try PortfolioWorkspaceReport.decode(
+      makeReportData(profileCount: 3, firstProfileName: firstProfileName)
+    )
 
     try require(report.schemaVersion == 1, "workspace schema was not preserved")
     try require(report.summary.profileCount == 3, "profile count was not preserved")
     try require(report.summary.noticeCount == 3, "notice count was not preserved")
     try require(
       report.visibleProfileReports(premiumUnlocked: false).map(\.profile.name),
-      equals: ["Profile 1"],
+      equals: [firstProfileName],
       "free projection exposed more than one profile"
     )
     try require(
       report.visibleProfileReports(premiumUnlocked: true).map(\.profile.name),
-      equals: ["Profile 1", "Profile 2", "Profile 3"],
+      equals: [firstProfileName, "Profile 2", "Profile 3"],
       "premium projection did not preserve profile order"
+    )
+
+    let firstFreeExport = try report.profileReports[0].deterministicJSONData()
+    let secondFreeExport = try report.profileReports[0].deterministicJSONData()
+    try require(firstFreeExport == secondFreeExport, "free export bytes were not deterministic")
+    try require(
+      firstFreeExport.allSatisfy { $0 < 0x80 },
+      "free export was not ASCII-safe"
+    )
+    try require(!firstFreeExport.contains(0x7f), "free export contained raw DEL")
+    let exported = try requireDictionary(firstFreeExport, "free export was not a JSON object")
+    try require(exported["schema_version"] as? Int == 3, "free export changed report schema")
+    try require(exported["profile_reports"] == nil, "free export exposed the portfolio envelope")
+    let exportedProfile = exported["profile"] as? [String: Any]
+    try require(
+      exportedProfile?["name"] as? String == firstProfileName,
+      "free export changed the first profile"
+    )
+    let exportedProvenance = exported["provenance"] as? [String: Any]
+    let exportedGenerator = exportedProvenance?["generator"] as? [String: Any]
+    try require(
+      exportedGenerator?["name"] as? String == "TenderVerdict"
+        && exportedGenerator?["version"] as? String == "0.2.0a1"
+        && exportedProvenance?["source_kind"] as? String == "ted_api"
+        && exportedProvenance?["ted_query"] as? String == "fixture query"
+        && exportedProvenance?["retrieved_at"] as? String == "2026-08-02T10:00:00Z"
+        && exportedProvenance?["lot_policy"] as? String == "verified_lots",
+      "free export dropped schema-3 provenance"
     )
   }
 
@@ -65,9 +97,48 @@ enum TenderVerdictNextGenChecks {
     try require(result.verdict == .openDocuments, "verdict changed")
     try require(result.reasons.count == 2, "reasons changed")
     try require(result.unknowns.isEmpty, "unknowns changed")
+    try require(result.safeSourceURL != nil, "safe source URL was rejected")
     try require(
       result.humanNextStep == "Open and review the official procurement documents.",
       "human next step changed"
+    )
+
+    for sourceURL in [
+      "https://procurement.example/white space",
+      "https://procurement.example/line\nbreak",
+      "https://procurement.example/tab\tvalue",
+      "https://procurement.example/control\u{1}",
+      "https://procurement.example/del\u{7f}value",
+      "https://procurement.example/bidi\u{202e}value",
+    ] {
+      let unsafe = try PortfolioWorkspaceReport.decode(
+        makeReportData(profileCount: 1, firstSourceURL: sourceURL)
+      )
+      let unsafeResult = try requireFirst(
+        unsafe.profileReports[0].results,
+        "unsafe URL fixture omitted its result"
+      )
+      try require(unsafeResult.safeSourceURL == nil, "unsafe URL became an active link")
+    }
+  }
+
+  private static func checkDisplayTextMakesControlsVisible() throws {
+    try require(
+      normalizedDisplayText(" A\r\n\tB\u{1}\u{7f}\u{85}\u{202e}C ")
+        == "A B\\u0001\\u007f\\u0085\\u202eC",
+      "display normalization did not expose control and bidi characters"
+    )
+    try require(
+      normalizedDisplayText("München 👩🏽‍💻") == "München 👩🏽\\u200d💻",
+      "display normalization did not preserve ordinary Unicode or expose joiner formatting"
+    )
+
+    let report = try PortfolioWorkspaceReport.decode(
+      makeReportData(profileCount: 1, firstProfileName: "München\u{7f} Services")
+    )
+    try require(
+      report.profileReports[0].profile.displayName == "München\\u007f Services",
+      "profile display text exposed a raw DEL character"
     )
   }
 
@@ -326,29 +397,71 @@ enum TenderVerdictNextGenChecks {
     )
   }
 
-  private static func checkTestStoreConfigurationFailsClosed() throws {
+  private static func checkTestStoreConfigurationFailsClosed() async throws {
+    let syntheticTestStoreKey = "test_" + "public_fixture"
     try require(
-      RevenueCatTestStoreConfiguration.status(in: [:]) == .missing,
-      "missing Test Store key did not fail closed"
+      RevenueCatAccessController.isExpectedPackage(
+        offeringIdentifier: "supplier_profiles_plus",
+        packageIdentifier: "$rc_monthly",
+        productIdentifier: "supplier_profiles_plus_monthly"
+      ),
+      "documented RevenueCat package contract was rejected"
     )
     try require(
-      RevenueCatTestStoreConfiguration.status(
-        in: [RevenueCatTestStoreConfiguration.environmentName: ""]
-      ) == .rejected,
-      "empty Test Store key was accepted"
+      !RevenueCatAccessController.isExpectedPackage(
+        offeringIdentifier: "supplier_profiles_plus",
+        packageIdentifier: "$rc_annual",
+        productIdentifier: "supplier_profiles_plus_annual"
+      ),
+      "unexpected RevenueCat package was accepted"
     )
-    try require(
-      RevenueCatTestStoreConfiguration.status(
-        in: [RevenueCatTestStoreConfiguration.environmentName: "appl_public_fixture"]
-      ) == .rejected,
-      "non-Test Store key was accepted"
-    )
-    try require(
-      RevenueCatTestStoreConfiguration.status(
-        in: [RevenueCatTestStoreConfiguration.environmentName: "test_public_fixture"]
-      ) == .accepted,
-      "synthetic Test Store-shaped key was rejected"
-    )
+    #if DEBUG
+      try require(
+        RevenueCatTestStoreConfiguration.status(in: [:]) == .missing,
+        "missing Test Store key did not fail closed"
+      )
+      try require(
+        RevenueCatTestStoreConfiguration.status(
+          in: [RevenueCatTestStoreConfiguration.environmentName: ""]
+        ) == .rejected,
+        "empty Test Store key was accepted"
+      )
+      try require(
+        RevenueCatTestStoreConfiguration.status(
+          in: [RevenueCatTestStoreConfiguration.environmentName: "appl_public_fixture"]
+        ) == .rejected,
+        "non-Test Store key was accepted"
+      )
+      try require(
+        RevenueCatTestStoreConfiguration.status(
+          in: [RevenueCatTestStoreConfiguration.environmentName: syntheticTestStoreKey]
+        ) == .accepted,
+        "synthetic Test Store-shaped key was rejected in Debug"
+      )
+    #else
+      for environment in [
+        [:],
+        [RevenueCatTestStoreConfiguration.environmentName: syntheticTestStoreKey],
+        [RevenueCatTestStoreConfiguration.environmentName: "appl_public_fixture"],
+      ] {
+        try require(
+          RevenueCatTestStoreConfiguration.status(in: environment) == .unavailableInRelease,
+          "Release build exposed RevenueCat configuration"
+        )
+      }
+      let controller = await RevenueCatAccessController(
+        environment: [
+          RevenueCatTestStoreConfiguration.environmentName: syntheticTestStoreKey
+        ]
+      )
+      await controller.configure(testStoreAPIKey: syntheticTestStoreKey)
+      await controller.start()
+      let finalState = await controller.state
+      try require(
+        finalState == .testStoreUnavailableInRelease,
+        "Release controller reached RevenueCat configuration"
+      )
+    #endif
   }
 
   private static func checkPremiumAccessibilityOutcomes() throws {
@@ -366,6 +479,16 @@ enum TenderVerdictNextGenChecks {
     try require(
       PremiumAccessState.loading.terminalAccessibilityOutcome == nil,
       "loading state emitted a terminal accessibility outcome"
+    )
+    guard
+      let unavailable = PremiumAccessState.testStoreUnavailableInRelease
+        .terminalAccessibilityOutcome
+    else {
+      throw CheckFailure.failed("Release Test Store state omitted accessibility outcome")
+    }
+    try require(
+      unavailable.primaryRecoveryAction == nil && unavailable.focusTarget == nil,
+      "Release Test Store state exposed an unavailable recovery control"
     )
     for (state, primaryAction, focusTarget) in cases {
       guard let outcome = state.terminalAccessibilityOutcome else {
@@ -482,6 +605,15 @@ enum TenderVerdictNextGenChecks {
     }
     return value
   }
+
+  private static func requireDictionary(_ data: Data, _ message: String) throws
+    -> [String: Any]
+  {
+    guard let value = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+      throw CheckFailure.failed(message)
+    }
+    return value
+  }
 }
 
 private func makeNoticePreviewData(
@@ -550,6 +682,8 @@ private func makeLargeReportData(profileCount: Int, noticeCount: Int) throws -> 
     return [
       "schema_version": 3,
       "provenance": [
+        "generator": ["name": "TenderVerdict", "version": "0.2.0a1"],
+        "source_kind": "local_json",
         "profile_sha256": String(repeating: String(profileIndex), count: 64),
         "notices_sha256": sharedNoticeDigest,
       ],
@@ -590,12 +724,17 @@ private func makeReportData(
   invalidNestedTotal: Bool = false,
   reverseSecondResults: Bool = false,
   mismatchSecondSummary: Bool = false,
-  noticeCount: Int = 3
+  noticeCount: Int = 3,
+  firstProfileName: String? = nil,
+  firstSourceURL: String? = nil
 ) throws -> Data {
   let sharedNoticeDigest = String(repeating: "a", count: 64)
   let reports: [[String: Any]] = (1...profileCount).map { index in
     let noticeDigest = index == 2 ? secondNoticeDigest ?? sharedNoticeDigest : sharedNoticeDigest
-    var results = noticeCount == 0 ? [] : makeResults()
+    var results =
+      noticeCount == 0
+      ? []
+      : makeResults(firstSourceURL: index == 1 ? firstSourceURL : nil)
     if index == 2 && reverseSecondResults {
       results.reverse()
     }
@@ -613,12 +752,17 @@ private func makeReportData(
     return [
       "schema_version": 3,
       "provenance": [
+        "generator": ["name": "TenderVerdict", "version": "0.2.0a1"],
+        "source_kind": "ted_api",
         "profile_sha256": String(repeating: String(index), count: 64),
         "notices_sha256": noticeDigest,
+        "ted_query": "fixture query",
+        "retrieved_at": "2026-08-02T10:00:00Z",
+        "lot_policy": "verified_lots",
       ],
       "profile": [
         "schema_version": 1,
-        "name": "Profile \(index)",
+        "name": index == 1 ? firstProfileName ?? "Profile 1" : "Profile \(index)",
         "cpv_codes": ["72260000"],
         "countries": ["AUT"],
         "minimum_days_to_deadline": 14,
@@ -641,7 +785,7 @@ private func makeReportData(
   return try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
 }
 
-private func makeResults() -> [[String: Any]] {
+private func makeResults(firstSourceURL: String? = nil) -> [[String: Any]] {
   [
     [
       "publication_number": "SYN-OPEN-001",
@@ -651,7 +795,7 @@ private func makeResults() -> [[String: Any]] {
       "deadline": "2026-09-15",
       "deadline_at": NSNull(),
       "publication_date": "2026-08-01",
-      "source_url": "https://procurement.example/notices/SYN-OPEN-001",
+      "source_url": firstSourceURL ?? "https://procurement.example/notices/SYN-OPEN-001",
       "verdict": "open_documents",
       "reasons": ["Exact CPV match.", "Country match."],
       "unknowns": [],

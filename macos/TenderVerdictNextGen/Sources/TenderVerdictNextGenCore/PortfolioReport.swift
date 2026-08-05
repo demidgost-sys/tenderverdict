@@ -1,5 +1,30 @@
 import Foundation
 
+/// Mirrors Python's `normalize_display_text`: preserve evidence while making control and
+/// bidirectional-formatting characters visible before rendering untrusted report text.
+public func normalizedDisplayText(_ value: String) -> String {
+  var rendered = ""
+  rendered.reserveCapacity(value.utf8.count)
+
+  for scalar in value.unicodeScalars {
+    let codepoint = scalar.value
+    if codepoint == 0x09 || codepoint == 0x0a || codepoint == 0x0d {
+      rendered.append(" ")
+    } else if codepoint < 0x20 || (0x7f...0x9f).contains(codepoint)
+      || scalar.properties.generalCategory == .format
+    {
+      rendered +=
+        codepoint <= 0xffff
+        ? String(format: "\\u%04x", codepoint)
+        : String(format: "\\U%08x", codepoint)
+    } else {
+      rendered.unicodeScalars.append(scalar)
+    }
+  }
+
+  return rendered.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+}
+
 public enum PortfolioContractError: Error, Equatable, LocalizedError {
   case invalidWorkspaceEnvelope
   case invalidProfileReport
@@ -85,6 +110,9 @@ public struct PortfolioWorkspaceReport: Decodable, Equatable, Sendable {
 
       guard Self.isSHA256(report.provenance.profileSHA256),
         Self.isSHA256(report.provenance.noticesSHA256),
+        report.provenance.generator.name == "TenderVerdict",
+        !report.provenance.generator.version.isEmpty,
+        !report.provenance.sourceKind.isEmpty,
         profileDigests.insert(report.provenance.profileSHA256).inserted
       else {
         throw PortfolioContractError.invalidProvenance
@@ -128,7 +156,7 @@ public struct PortfolioWorkspaceSummary: Decodable, Equatable, Sendable {
   }
 }
 
-public struct ProfileReport: Decodable, Equatable, Identifiable, Sendable {
+public struct ProfileReport: Codable, Equatable, Identifiable, Sendable {
   public let schemaVersion: Int
   public let provenance: ReportProvenance
   public let profile: SupplierProfile
@@ -171,15 +199,23 @@ public struct ProfileReport: Decodable, Equatable, Identifiable, Sendable {
         && identities.insert(result.id).inserted
     }
   }
+
+  public func deterministicJSONData() throws -> Data {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+    let encoded = try encoder.encode(self)
+    let json = String(decoding: encoded, as: UTF8.self)
+    return Data((asciiSafeJSON(json) + "\n").utf8)
+  }
 }
 
-public enum QualificationVerdict: String, Decodable, Equatable, CaseIterable, Sendable {
+public enum QualificationVerdict: String, Codable, Equatable, CaseIterable, Sendable {
   case openDocuments = "open_documents"
   case watch
   case reject
 }
 
-public struct QualificationResult: Decodable, Equatable, Identifiable, Sendable {
+public struct QualificationResult: Codable, Equatable, Identifiable, Sendable {
   public let publicationNumber: String
   public let lotID: String?
   public let title: String?
@@ -212,6 +248,77 @@ public struct QualificationResult: Decodable, Equatable, Identifiable, Sendable 
     case humanNextStep = "human_next_step"
   }
 
+  public func encode(to encoder: Encoder) throws {
+    var values = encoder.container(keyedBy: CodingKeys.self)
+    try values.encode(publicationNumber, forKey: .publicationNumber)
+    try values.encode(lotID, forKey: .lotID)
+    try values.encode(title, forKey: .title)
+    try values.encode(buyer, forKey: .buyer)
+    try values.encode(deadline, forKey: .deadline)
+    try values.encode(deadlineAt, forKey: .deadlineAt)
+    try values.encode(publicationDate, forKey: .publicationDate)
+    try values.encode(sourceURL, forKey: .sourceURL)
+    try values.encode(verdict, forKey: .verdict)
+    try values.encode(reasons, forKey: .reasons)
+    try values.encode(unknowns, forKey: .unknowns)
+    try values.encode(humanNextStep, forKey: .humanNextStep)
+  }
+
+  public var safeSourceURL: URL? {
+    guard let sourceURL,
+      !sourceURL.unicodeScalars.contains(where: { scalar in
+        CharacterSet.whitespacesAndNewlines.contains(scalar)
+          || CharacterSet.controlCharacters.contains(scalar)
+          || scalar.properties.generalCategory == .format
+      }),
+      let components = URLComponents(string: sourceURL),
+      components.scheme?.lowercased() == "https",
+      let host = components.host,
+      !host.isEmpty,
+      components.user == nil,
+      components.password == nil,
+      components.fragment == nil,
+      let url = components.url
+    else {
+      return nil
+    }
+    return url
+  }
+
+  public var displayTitle: String {
+    let value = normalizedDisplayText(title ?? "")
+    return value.isEmpty ? "Untitled notice" : value
+  }
+
+  public var displayBuyer: String {
+    let value = normalizedDisplayText(buyer ?? "")
+    return value.isEmpty ? "Buyer not supplied" : value
+  }
+
+  public var displayDeadline: String {
+    normalizedDisplayText(deadlineAt ?? deadline ?? "Deadline not supplied")
+  }
+
+  public var displayReference: String {
+    let publication = normalizedDisplayText(publicationNumber)
+    guard let lotID, !lotID.isEmpty else {
+      return publication
+    }
+    return "\(publication) / \(normalizedDisplayText(lotID))"
+  }
+
+  public var displayHumanNextStep: String {
+    normalizedDisplayText(humanNextStep)
+  }
+
+  public var displayReasons: [String] {
+    reasons.map(normalizedDisplayText)
+  }
+
+  public var displayUnknowns: [String] {
+    unknowns.map(normalizedDisplayText)
+  }
+
   fileprivate var noticeSignature: NoticeSignature {
     NoticeSignature(
       identity: id,
@@ -235,14 +342,29 @@ private struct NoticeSignature: Equatable {
   let sourceURL: String?
 }
 
-public struct ReportProvenance: Decodable, Equatable, Sendable {
+public struct ReportProvenance: Codable, Equatable, Sendable {
+  public let generator: ReportGenerator
+  public let sourceKind: String
   public let profileSHA256: String
   public let noticesSHA256: String
+  public let tedQuery: String?
+  public let retrievedAt: String?
+  public let lotPolicy: String?
 
   enum CodingKeys: String, CodingKey {
+    case generator
+    case sourceKind = "source_kind"
     case profileSHA256 = "profile_sha256"
     case noticesSHA256 = "notices_sha256"
+    case tedQuery = "ted_query"
+    case retrievedAt = "retrieved_at"
+    case lotPolicy = "lot_policy"
   }
+}
+
+public struct ReportGenerator: Codable, Equatable, Sendable {
+  public let name: String
+  public let version: String
 }
 
 public struct SupplierProfile: Codable, Equatable, Sendable {
@@ -256,6 +378,8 @@ public struct SupplierProfile: Codable, Equatable, Sendable {
   public let cpvCodes: [String]
   public let countries: [String]
   public let minimumDaysToDeadline: Int
+
+  public var displayName: String { normalizedDisplayText(name) }
 
   public init(
     name: String,
@@ -349,7 +473,7 @@ public struct SupplierProfile: Codable, Equatable, Sendable {
   }
 }
 
-public struct ProfileReportSummary: Decodable, Equatable, Sendable {
+public struct ProfileReportSummary: Codable, Equatable, Sendable {
   public let total: Int
   public let openDocuments: Int
   public let watch: Int
@@ -374,4 +498,23 @@ public struct ProfileReportSummary: Decodable, Equatable, Sendable {
     }
     return reject == total - openDocuments - watch
   }
+}
+
+private func asciiSafeJSON(_ value: String) -> String {
+  var result = ""
+  result.reserveCapacity(value.utf8.count)
+  for scalar in value.unicodeScalars {
+    switch scalar.value {
+    case 0...0x7e:
+      result.unicodeScalars.append(scalar)
+    case 0x7f...0xffff:
+      result += String(format: "\\u%04x", scalar.value)
+    default:
+      let offset = scalar.value - 0x10000
+      let high = 0xd800 + (offset >> 10)
+      let low = 0xdc00 + (offset & 0x3ff)
+      result += String(format: "\\u%04x\\u%04x", high, low)
+    }
+  }
+  return result
 }

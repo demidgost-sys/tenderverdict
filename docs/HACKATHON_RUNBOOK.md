@@ -196,11 +196,13 @@ Never use a fake entitlement state as evidence.
 - [ ] Exact private Devpost fields are inspected after joining; required claims and assets agree
   with the final repository state.
 - [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
-- [x] A fresh Release package from the current source passes checksum creation, signature,
-  embedded-core contract/determinism, and worktree-independent smoke checks.
+- [ ] The release-configuration artifact named in project status passes checksum creation,
+  signature, embedded-core contract/determinism, configuration-specific native checks, and
+  worktree-independent smoke checks.
 - [ ] A fresh Debug package is generated from the final revision for the hands-on Test Store pass.
-- [x] The current candidate passes all 15 native checks, 122 Python tests, Ruff, Mypy, Swift format,
-  source smoke, package smoke, public-tree, security, asset, and diff checks locally.
+- [x] The current candidate passes the complete source/package gate recorded in
+  [project status](PROJECT_STATUS.md), including Python, Debug/Release native, formatting, typing,
+  public-tree, security, asset, and diff checks.
 - [ ] The exact final submitted revision passes its pushed PR CI checks.
 - [ ] Test Store success, cancel, failure, retry, relaunch, restore, and dashboard evidence is
   refreshed on the final Debug package.

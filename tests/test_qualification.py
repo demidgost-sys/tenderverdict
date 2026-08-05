@@ -195,6 +195,8 @@ class SourceUrlTests(unittest.TestCase):
             "https://user:password@procurement.example/notices/SYN-001",
             "https://procurement.example/notices/SYN-001#fragment",
             "https://procurement.example/a b",
+            "https://procurement.example/control\x7fvalue",
+            "https://procurement.example/bidi\u202evalue",
             "https://procurement.example:bad/notices/SYN-001",
             "",
         )

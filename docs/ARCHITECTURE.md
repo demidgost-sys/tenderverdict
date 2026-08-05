@@ -26,9 +26,9 @@ flowchart LR
 | `tenderverdict fetch-ted` | Explicit bounded metadata retrieval from TED | Yes, only when invoked |
 | Tk desktop | Existing single-profile input, review, and HTML/Markdown/JSON export | None |
 | `tools/next_gen_core_launcher.py` | Private app bridge for `portfolio`, strict workspace normalization, and bounded notice preview | None |
-| `macos/TenderVerdictNextGen` | Profile Builder, import preview, local continuity, Free/Premium review, and RevenueCat states | Only the RevenueCat SDK after a Test Store key is supplied |
+| `macos/TenderVerdictNextGen` | Profile Builder, import preview, local continuity, Free/Premium review, and RevenueCat states | RevenueCat only in an explicitly configured Debug evaluation; Release refuses Test Store configuration before the SDK |
 | `TenderVerdictCore` | PyInstaller-frozen copy of the private launcher embedded in the `.app` | None; public CLI, TED, and Tk modules are excluded |
-| `tools/build_next_gen.py` | Release Swift build, embedded-core build, bundle assembly, ad-hoc signing, smoke test, zip, checksum | May resolve the exactly pinned Swift package; the produced app and smoke test are offline |
+| `tools/build_next_gen.py` | Configuration-specific Swift build, embedded-core build, bundle assembly, ad-hoc signing, native checks, smoke test, zip, checksum | May resolve the exactly pinned Swift package; the produced app and smoke test are offline |
 
 ## Qualification flow
 
@@ -40,8 +40,9 @@ flowchart LR
 4. Each run is serialized as the complete existing schema-3 report. The portfolio envelope adds
    only `profile_count` and the shared input `notice_count`.
 5. Canonical profile hashes differ by profile; the notice-file hash is identical across reports.
-6. JSON serialization is ASCII-safe, sorted, deterministic, and atomically written when a target is
-   selected.
+6. Python report JSON is ASCII-safe and deterministic through stable construction order; canonical
+   digest encoding and the native Free schema-3 projection sort keys. CLI file output is atomic
+   when a target is selected.
 
 There is deliberately no aggregate verdict total, score, ranking, confidence, or recommended
 profile.
@@ -89,19 +90,22 @@ and consistency checks.
 ## Free and Premium contract
 
 - Free presentation calls `visibleProfileReports(premiumUnlocked: false)` and exposes only the
-  first profile report, including its complete review queue and deterministic export.
+  first profile report, including its complete review queue and a deterministic ASCII-safe schema-3
+  export.
 - Premium presentation requires RevenueCat `CustomerInfo` to report the
   `supplier_profiles_plus` entitlement as active, then adds a notice-by-profile comparison and all
-  profile summaries without ranking or scoring them.
+  profile summaries plus the exact complete portfolio JSON export, without ranking or scoring.
 - Free review uses verdict, text, buyer, and deadline-presence filters with progressive disclosure.
   Premium applies text, buyer, and deadline filters to the shared notice identities. Matrix cells
   resolve a profile/result pair by stable IDs, never by the current filtered offset, before opening
   complete result detail.
-- The app loads the current offering, runs the selected Test Store package, handles cancellation,
-  restores purchases, and refreshes access on launch.
-- Missing configuration makes no RevenueCat request. Non-`test_` keys are rejected before SDK
-  configuration. A key pasted into the app is held only for that process and is not persisted by
-  TenderVerdict.
+- A configured Debug app accepts only offering `supplier_profiles_plus`, package `$rc_monthly`, and
+  product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, and
+  refreshes access on launch. An unexpected dashboard shape stays locked.
+- Missing Debug configuration makes no RevenueCat request. Non-`test_` keys are rejected before
+  SDK configuration. A key pasted into the Debug app is held only for that process and is not
+  persisted by TenderVerdict. Release builds expose no key field and refuse Test Store
+  configuration before any RevenueCat SDK call.
 
 The Shipaton Manager confirmed that the Test Store path is sufficient and that macOS has no
 judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
@@ -122,28 +126,34 @@ VoiceOver is enabled and a visible app window exists, the app posts the terminal
 restores focus only after an explicit user action, avoiding launch-time focus theft. Native cards
 also respond to Increase Contrast and Reduce Transparency, while verdict meaning always remains in
 text as well as color.
+Input-derived profile, notice, buyer, reason, unknown, next-step, warning, path, and status text is
+normalized at presentation time so C0, DEL/C1, and Unicode format controls are visible rather than
+able to reorder or conceal evidence. Raw report bytes and deterministic exports are not rewritten.
 
 ## Failure and privacy boundaries
 
-- Invalid input never replaces the previous valid UI result or an existing CLI output file.
-- The packaged core contains no TED adapter, Tk UI, production RevenueCat key, user data, telemetry,
-  or account system.
+- Invalid CLI output never replaces an existing file. The Next Gen app preserves its last valid
+  report/export after a failed run; the legacy Tk desktop instead clears results when the selected
+  local input changes and then validates the new input.
+- The packaged core contains no TED adapter, Tk UI, production RevenueCat key, user data,
+  first-party telemetry, or account system.
 - Local profile and notice data are sent only to the embedded child process. They are not sent to
   RevenueCat.
 - RevenueCat receives its normal SDK identifiers and Test Store operations only after the evaluator
-  explicitly supplies a Test Store key. Its normal SDK customer state is distinct from
-  TenderVerdict's session-only API-key field and offline input path.
+  explicitly supplies a Test Store key to a Debug evaluation build. Its normal SDK customer state
+  is distinct from TenderVerdict's session-only API-key field and offline input path. Release
+  evaluation builds cannot enter or configure that key.
 - The app bundle is ad-hoc signed and not notarized. It remains an evaluation artifact.
 
 ## Verification layers
 
 | Layer | Evidence |
 |---|---|
-| Python behavior | 122 offline tests, including six private-launcher contract tests and three release-scanner regressions |
+| Python behavior | Complete offline suite covering the CLI, model, report, desktop, bridge, security, and distribution contracts; current totals live in [project status](PROJECT_STATUS.md) |
 | Public tree | Exact allow-list, bounded binary validation, conservative content scan |
-| Swift contract | 15 standalone result, schema, provenance, input-preview, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
+| Swift contract | Standalone Debug and Release result, schema, provenance, display-safety, input-preview, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
 | Source bridge | Headless synthetic smoke through the private launcher; no RevenueCat configuration |
-| Packaged bridge | Current Release `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect deterministic; ad-hoc signature verified |
+| Packaged bridge | Builder-enforced `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect determinism; ad-hoc signature and manifest verification |
 | UX | Source implementation includes Profile Builder, import preview, filters, detail, focus, contrast, and transparency handling; refreshed screenshot/settings QA remains separate |
 | RevenueCat transaction | Packaged Debug Test Store cancel, failure, purchase, refresh, relaunch, restore, and dashboard evidence; not a real payment |
 

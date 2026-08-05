@@ -29,7 +29,8 @@ control to run an unsigned artifact.
 1. Enter a supplier name, CPV codes, countries, and a minimum lead time.
 2. Choose a local normalized notices CSV or JSON file, save an editable CSV example, or use the
    bundled synthetic demo.
-3. Enter an explicit review date or RFC 3339 instant with a UTC offset.
+3. Enter an explicit review date or the supported whole-second RFC 3339 form with a UTC offset;
+   fractional seconds are not accepted.
 4. Filter by verdict, sort the queue by a column heading, inspect reasons and unknowns, and copy a
    selected result as plain text when useful.
 5. Export a complete HTML, Markdown, or JSON report to a location you choose.

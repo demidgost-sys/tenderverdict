@@ -37,9 +37,9 @@ Builder, canonical import preview, strict Swift/Python contracts, exact official
 fail-closed RevenueCat access, opt-in bookmark-only continuity, embedded offline runtime,
 reproducible Release and Debug `.app` builders, actionable Free review, stable Premium comparison
 drill-down, competition assets, and local Test Store evidence. No usable key, customer identifier,
-or account screenshot is retained. The pre-final pushed baseline `67bb555` has 18 green PR checks.
-The current candidate has a green complete local gate, refreshed icon/portrait assets, and a fresh
-Release package built on the SSD on 2026-08-05. Post-change asynchronous VoiceOver outcomes, a
+or account screenshot is retained. Draft PR #12 is the authoritative pushed-revision check record;
+the exact audited revision, local-gate totals, and current SSD package live in
+[project status](PROJECT_STATUS.md). Post-change asynchronous VoiceOver outcomes, a
 fresh final Debug transaction pass, public video, academic-email verification, private Devpost
 audit, and submission remain open.
 
@@ -51,7 +51,7 @@ audit, and submission remain open.
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
 | Student and academic email | `owner_attested_required` | Active enrollment and the exact Devpost email are entrant-specific and were not verified by this code audit. | `OWNER_CHECK` |
-| Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Baseline `67bb555` has 18 green PR checks; the current candidate passes its complete local gate and the linked draft PR is the authoritative pushed-revision check record. | `PUBLIC_DRAFT_READY` |
+| Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Project status names the exact audited revision and gate result; draft PR #12 is the authoritative pushed-revision check record. | `PUBLIC_DRAFT_READY` |
 | Supported platform | `official_rule` + `manual_evidence` | macOS is explicitly allowed by the rules and FAQ. Shipaton Manager Jaewoong Eum also confirmed that macOS is eligible and has no judging disadvantage. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_rule` + `repository_evidence` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements; the repository pins 5.83.0 and the local flow exercised those outcomes. | `CONFIRMED_TECHNICALLY` |
@@ -111,11 +111,12 @@ tenderverdict portfolio \
   --output portfolio-report.json
 ```
 
-The current local suite contains 122 offline tests, including 6 private-launcher contract tests and
-3 release-scanner regressions. The current candidate also passes public-tree, conservative content,
-format, type, native-contract, source-smoke, asset, signature, embedded-core, and package-smoke
-gates. Pushed CI must still match the exact final submitted revision. Portfolio Workspace is public
-Apache-2.0 code and is not an anti-tamper or payment-enforcement boundary.
+The complete current totals and local result are recorded in [project status](PROJECT_STATUS.md).
+The gate covers offline Python behavior, the private launcher, release-scanner regressions,
+public-tree, conservative content, format, type, Debug/Release native contracts, source smoke,
+assets, signature, embedded core, and package smoke. Pushed CI must still match the exact final
+submitted revision. Portfolio Workspace is public Apache-2.0 code and is not an anti-tamper or
+payment-enforcement boundary.
 
 ## RevenueCat feasibility history
 
@@ -159,8 +160,9 @@ The repository now contains `macos/TenderVerdictNextGen`, an unreleased macOS Sw
   `c69a23f56c63bdfe96096fa64a1c65334d2592db`;
 - current-offering, package purchase, restore, cancellation, error, and
   `supplier_profiles_plus` entitlement code paths through the official SDK;
-- a configuration boundary that accepts only a locally supplied `test_` key, makes no RevenueCat
-  request when it is absent, and commits no usable key;
+- a Debug-only configuration boundary that accepts only a locally supplied `test_` key, requires
+  the exact offering/package/product identifiers, makes no RevenueCat request when configuration is
+  absent, and commits no usable key; Release refuses configuration before any SDK call;
 - native workspace/notices selection, explicit review point, local run, preserved prior result on
   error, Free text/buyer/deadline-presence/verdict filtering and reasoning review, safe
   supplied-source links, and atomic deterministic JSON export;
@@ -173,20 +175,22 @@ The repository now contains `macos/TenderVerdictNextGen`, an unreleased macOS Sw
   30-second execution boundary, and validates workspace/import/report schema, counts,
   result arrays, verdict totals, unique identities, profile order, the ordered shared notice set,
   shared notice digest, and distinct profile digests before presentation;
-- an in-app process-only secure field for Test Store configuration in addition to the optional
+- a Debug-only in-app process secure field for Test Store configuration in addition to the optional
   local environment variable;
 - terminal RevenueCat state mapping, AppKit-backed VoiceOver announcements, recovery-focus mapping,
   and increased-contrast/reduced-transparency-aware presentation;
-- fifteen standalone native contract checks, including pure RevenueCat terminal accessibility
-  outcomes, plus source and packaged end-to-end smoke paths;
+- standalone Debug and Release native contract checks, including schema-3 Free export isolation,
+  visible control/bidi text, exact RevenueCat identifiers, and pure terminal accessibility outcomes,
+  plus source and packaged end-to-end smoke paths;
 - a reproducible builder that embeds Python, fixtures, licenses, Swift package resources, and build
   provenance, applies an ad-hoc signature, verifies it, and creates a checksum-paired archive;
 - a 1024×1024 icon and a 1179×2556 pre-transaction screenshot generated from reviewed source.
 
-The current 2026-08-05 Release builder pass ran on the SSD and produced the `.app`, `.zip`, and
-SHA-256 file. It executed embedded `normalize-workspace` and `inspect-notices` twice and confirmed
-their contracts and byte determinism, verified the ad-hoc signature, and passed a
-worktree-independent app smoke test. This closes the fresh packaged-build gate; it does not replace
+The clean release-configuration builder pass from the remediated revision is pending. To close the
+scoped package gate it must run configuration-specific native checks, execute embedded
+`normalize-workspace` and `inspect-notices` twice with byte-identical output, verify the ad-hoc
+signature, pass worktree-independent app smoke, and produce `.app`, `.zip`, and SHA-256 files on the
+SSD. [Project status](PROJECT_STATUS.md) owns the current artifact result. This gate does not replace
 interactive final-Debug Test Store or manual accessibility evidence.
 
 The local Command Line Tools build, interactive app, self-contained packaging, and screenshot
@@ -198,9 +202,10 @@ ran them through the embedded core, exported JSON, and matched the CLI output by
 invalid review point produced exit status 2 while preserving the previous valid report. Missing
 configuration and an `appl_` fixture both stayed fail-closed. See [UX_AUDIT.md](UX_AUDIT.md).
 
-The Test Store evidence pass used the separately packaged Debug app because RevenueCat deliberately
-rejects Test Store keys in Release builds. The key was pasted only into the process-local secure
-field and was not logged, captured, bundled, or committed. The current offering loaded with a
+The Test Store evidence pass used the separately packaged Debug app because the SDK does not support
+Test Store configuration in Release; TenderVerdict now blocks that path before the SDK. The key was
+pasted only into the process-local secure field and was not logged, captured, bundled, or committed.
+The current offering loaded with a
 localized `0,99 $` monthly package. Cancellation kept the app locked; simulated failure produced a
 retry state and remained locked; success activated `supplier_profiles_plus` and revealed all three
 profile reports. Relaunch required re-entering the process-local key and then recovered the same
@@ -278,10 +283,9 @@ Source: [public Devpost forum reply](https://revenuecat-shipaton-2026.devpost.co
   2026-08-05; Test Store is enough for Next Gen**.
 - Account registration email confirmation: **not completed; the observed verification messages
   contained a literal `{link}` placeholder, and the owner directed work to continue without it**.
-- Current UX Release package: **built on the SSD on 2026-08-05; `.app`, `.zip`, SHA-256, embedded
-  bridge determinism/contracts, ad-hoc signature, and worktree-independent smoke verified**.
-- Public implementation branch and CI: **baseline `67bb555` is pushed and green; the current
-  candidate passes the refreshed-asset and complete local gate, while draft PR #12 remains the
-  authoritative pushed-revision CI record**.
+- Current UX release-configuration package: **the exact SSD path, revision, manifest, and complete
+  verification result are recorded in project status; this is not a notarized public release**.
+- Public implementation branch and CI: **project status names the audited revision and local gate;
+  draft PR #12 remains the authoritative pushed-revision CI record**.
 - Submission gate: **open on student/academic-email confirmation, private Devpost audit, public
   sub-two-minute video, final Debug accessibility evidence, and final logged-out URL checks**.

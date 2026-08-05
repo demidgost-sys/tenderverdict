@@ -20,8 +20,9 @@ synthetic data only.
 
 - Build the exact final revision with `--configuration debug`; Test Store purchases do not run in
   the ordinary Release package.
-- Record only after the full verification emits `NEXT_GEN_CHECKS_OK checks=15` on that final
-  revision.
+- Record only after the full verification emits its `NEXT_GEN_CHECKS_OK` completion marker in both
+  Debug and Release on that final revision; use [project status](PROJECT_STATUS.md) for the expected
+  current total.
 - Prepare the selected synthetic files and a valid `test_` key before capture. Connect the offering
   without showing the key, terminal, account email, or RevenueCat dashboard secrets.
 - Keep the RevenueCat purchase sheet and resulting entitlement state in one continuous segment.

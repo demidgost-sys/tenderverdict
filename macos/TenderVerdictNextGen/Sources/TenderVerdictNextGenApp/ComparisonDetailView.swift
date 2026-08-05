@@ -34,15 +34,15 @@ struct ComparisonDetailView: View {
           VStack(alignment: .leading, spacing: 20) {
             header(profile: profile, result: result)
             Divider()
-            detailGroup(title: "Recommended next step", values: [result.humanNextStep])
-            detailGroup(title: "Reasons", values: result.reasons)
+            detailGroup(title: "Recommended next step", values: [result.displayHumanNextStep])
+            detailGroup(title: "Reasons", values: result.displayReasons)
             detailGroup(
               title: "Unknowns",
               values: result.unknowns.isEmpty
                 ? ["None from the supplied metadata."]
-                : result.unknowns
+                : result.displayUnknowns
             )
-            if let sourceURL = safeSourceURL(result.sourceURL) {
+            if let sourceURL = result.safeSourceURL {
               Link(destination: sourceURL) {
                 Label("Open supplied HTTPS source", systemImage: "arrow.up.right.square")
               }
@@ -74,10 +74,10 @@ struct ComparisonDetailView: View {
 
   private func header(profile: ProfileReport, result: QualificationResult) -> some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text(profile.profile.name)
+      Text(profile.profile.displayName)
         .font(.subheadline.weight(.semibold))
         .foregroundStyle(.indigo)
-      Text(displayTitle(result))
+      Text(result.displayTitle)
         .font(.title2.weight(.semibold))
         .fixedSize(horizontal: false, vertical: true)
       ViewThatFits(in: .horizontal) {
@@ -90,9 +90,9 @@ struct ComparisonDetailView: View {
   @ViewBuilder
   private func headerMetadata(_ result: QualificationResult) -> some View {
     VerdictBadge(verdict: result.verdict)
-    Label(referenceLabel(result), systemImage: "number")
-    Label(displayBuyer(result), systemImage: "building.2")
-    Label(result.deadlineAt ?? result.deadline ?? "Deadline not supplied", systemImage: "calendar")
+    Label(result.displayReference, systemImage: "number")
+    Label(result.displayBuyer, systemImage: "building.2")
+    Label(result.displayDeadline, systemImage: "calendar")
   }
 
   private func detailGroup(title: String, values: [String]) -> some View {
@@ -113,33 +113,4 @@ struct ComparisonDetailView: View {
     }
   }
 
-  private func displayTitle(_ result: QualificationResult) -> String {
-    let value = result.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return value.isEmpty ? "Untitled notice" : value
-  }
-
-  private func displayBuyer(_ result: QualificationResult) -> String {
-    let value = result.buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return value.isEmpty ? "Buyer not supplied" : value
-  }
-
-  private func referenceLabel(_ result: QualificationResult) -> String {
-    guard let lotID = result.lotID, !lotID.isEmpty else {
-      return result.publicationNumber
-    }
-    return "\(result.publicationNumber) / \(lotID)"
-  }
-
-  private func safeSourceURL(_ value: String?) -> URL? {
-    guard let value, let url = URL(string: value),
-      url.scheme?.lowercased() == "https",
-      url.host != nil,
-      url.user == nil,
-      url.password == nil,
-      url.fragment == nil
-    else {
-      return nil
-    }
-    return url
-  }
 }

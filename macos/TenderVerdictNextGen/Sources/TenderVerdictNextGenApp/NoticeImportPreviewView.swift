@@ -63,18 +63,18 @@ struct NoticeImportPreviewView: View {
   private func previewRow(_ record: NoticeImportRecord) -> some View {
     HStack(alignment: .top, spacing: 12) {
       VStack(alignment: .leading, spacing: 4) {
-        Text(displayTitle(record))
+        Text(record.displayTitle)
           .font(.subheadline.weight(.semibold))
           .lineLimit(2)
-        Text(referenceLabel(record))
+        Text(record.displayReference)
           .font(.caption.monospaced())
           .foregroundStyle(.tertiary)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       VStack(alignment: .trailing, spacing: 4) {
-        Text(displayBuyer(record))
+        Text(record.displayBuyer)
           .lineLimit(1)
-        Text(record.deadlineAt ?? record.deadline ?? "No deadline")
+        Text(record.displayDeadline)
           .foregroundStyle(.secondary)
       }
       .font(.caption)
@@ -82,8 +82,8 @@ struct NoticeImportPreviewView: View {
       if !record.metadataWarnings.isEmpty {
         Image(systemName: "exclamationmark.triangle.fill")
           .foregroundStyle(.orange)
-          .help(record.metadataWarnings.joined(separator: "\n"))
-          .accessibilityLabel(record.metadataWarnings.joined(separator: ". "))
+          .help(record.displayMetadataWarnings.joined(separator: "\n"))
+          .accessibilityLabel(record.displayMetadataWarnings.joined(separator: ". "))
       }
     }
     .padding(.vertical, 9)
@@ -131,20 +131,4 @@ struct NoticeImportPreviewView: View {
     }
   }
 
-  private func displayTitle(_ record: NoticeImportRecord) -> String {
-    let title = record.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return title.isEmpty ? "Untitled notice" : title
-  }
-
-  private func displayBuyer(_ record: NoticeImportRecord) -> String {
-    let buyer = record.buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return buyer.isEmpty ? "Buyer not supplied" : buyer
-  }
-
-  private func referenceLabel(_ record: NoticeImportRecord) -> String {
-    guard let lotID = record.lotID, !lotID.isEmpty else {
-      return record.publicationNumber
-    }
-    return "\(record.publicationNumber) / \(lotID)"
-  }
 }

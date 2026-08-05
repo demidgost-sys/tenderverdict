@@ -49,6 +49,10 @@ identifiers and may change interfaces during the alpha period.
   searchable Premium comparison and stable-ID reasoning drill-down for each profile/notice cell.
 - Added deterministic RevenueCat terminal-state announcements, user-initiated recovery focus,
   increased-contrast styling, reduced-transparency treatment, and a 125-notice native stress case.
+- Added a layered documentation system with a repository agent guide, canonical developer map,
+  documentation-governance contract, and dated code-to-document technical audit.
+- Added native presentation-time escaping for C0, DEL/C1, and Unicode formatting controls without
+  changing the underlying report or export evidence.
 
 ### Changed
 
@@ -67,6 +71,15 @@ identifiers and may change interfaces during the alpha period.
   have now confirmed that Test Store is sufficient for Next Gen and that macOS is eligible without
   a platform disadvantage; public video, student-account verification, private-form inspection,
   final accessibility evidence, and submission remain gated.
+- Made RevenueCat Test Store configuration Debug-only and fail-closed in Release before any SDK
+  call; exact offering, package, and product identifiers must match before purchase.
+- Corrected the Free export boundary to emit only the first complete schema-3 report while Premium
+  preserves the exact portfolio bytes and complete provenance.
+- Aligned Python and Swift safe-source URL rejection, preserved full schema-3 provenance in native
+  encoding, and enforced final stdout/stderr caps after child-process exit.
+- Extended CI and the self-contained builder with Swift formatting plus configuration-specific
+  Debug and Release contract checks, and recorded the full Python project version separately from
+  the numeric bundle version.
 
 ## [0.2.0a1] - 2026-08-04
 

@@ -190,7 +190,7 @@ final class AppModel: ObservableObject {
   }
 
   var canExport: Bool {
-    reportData != nil && !isLoading
+    report != nil && reportData != nil && !isLoading
   }
 
   var workspaceName: String {
@@ -343,20 +343,31 @@ final class AppModel: ObservableObject {
   }
 
   func exportReport() {
-    guard let reportData else {
+    guard let report, let reportData, let primary = report.profileReports.first else {
       return
     }
+    let premiumUnlocked = revenueCat.state.isUnlocked
     let panel = NSSavePanel()
-    panel.title = "Export deterministic portfolio report"
+    panel.title =
+      premiumUnlocked
+      ? "Export deterministic portfolio report"
+      : "Export deterministic single-profile report"
     panel.prompt = "Export JSON"
     panel.allowedContentTypes = [.json]
     panel.canCreateDirectories = true
-    panel.nameFieldStringValue = "tenderverdict-portfolio-report.json"
+    panel.nameFieldStringValue =
+      premiumUnlocked
+      ? "tenderverdict-portfolio-report.json"
+      : "tenderverdict-profile-report.json"
     guard panel.runModal() == .OK, let url = panel.url else {
       return
     }
     do {
-      try reportData.write(to: url, options: [.atomic])
+      let exportData =
+        premiumUnlocked
+        ? reportData
+        : try primary.deterministicJSONData()
+      try exportData.write(to: url, options: [.atomic])
       statusMessage = "Exported \(url.lastPathComponent)."
       loadError = nil
     } catch {
@@ -725,14 +736,14 @@ struct PortfolioInputSection: View {
             .foregroundStyle(.secondary)
             .accessibilityElement(children: .combine)
           } else if let error = model.inputError ?? model.loadError {
-            Label(error, systemImage: "exclamationmark.triangle.fill")
+            Label(normalizedDisplayText(error), systemImage: "exclamationmark.triangle.fill")
               .foregroundStyle(.orange)
               .fixedSize(horizontal: false, vertical: true)
-              .accessibilityLabel("Analysis error: \(error)")
+              .accessibilityLabel("Analysis error: \(normalizedDisplayText(error))")
           } else if let status = model.statusMessage {
-            Label(status, systemImage: "checkmark.circle.fill")
+            Label(normalizedDisplayText(status), systemImage: "checkmark.circle.fill")
               .foregroundStyle(.secondary)
-              .accessibilityLabel("Analysis status: \(status)")
+              .accessibilityLabel("Analysis status: \(normalizedDisplayText(status))")
           }
         }
       }
@@ -814,12 +825,12 @@ struct PortfolioInputSection: View {
     Label(title, systemImage: systemImage)
       .font(.subheadline.weight(.semibold))
       .frame(width: 128, alignment: .leading)
-    Text(value)
+    Text(normalizedDisplayText(value))
       .foregroundStyle(.secondary)
       .lineLimit(1)
       .truncationMode(.middle)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .accessibilityLabel("\(title): \(value)")
+      .accessibilityLabel("\(title): \(normalizedDisplayText(value))")
     Button(buttonTitle, action: action)
       .buttonStyle(.bordered)
       .controlSize(.large)
@@ -856,6 +867,8 @@ struct PremiumWorkspaceSection: View {
   @ViewBuilder
   private var premiumContent: some View {
     switch controller.state {
+    case .testStoreUnavailableInRelease:
+      testStoreUnavailableCard
     case .configurationMissing:
       configurationCard(
         title: "Connect a RevenueCat Test Store project",
@@ -864,7 +877,9 @@ struct PremiumWorkspaceSection: View {
     case .configurationRejected:
       configurationCard(
         title: "That key was rejected",
-        detail: "Only a non-empty RevenueCat Test Store key beginning with test_ is accepted."
+        detail:
+          "Use a 12–512 byte RevenueCat Test Store key beginning with test_, "
+          + "without spaces or control characters."
       )
     case .loading:
       LoadingCard(label: "Checking Premium access…")
@@ -874,7 +889,8 @@ struct PremiumWorkspaceSection: View {
         detail: price.map { value in
           "Current Test Store package: \(value). No real charge is made."
         }
-          ?? "No current RevenueCat package is available for this Test Store project."
+          ?? "The expected supplier_profiles_plus / $rc_monthly / "
+          + "supplier_profiles_plus_monthly package is unavailable."
       )
     case .cancelled(let price):
       actionableLockedCard(
@@ -888,6 +904,25 @@ struct PremiumWorkspaceSection: View {
       failedCard
     case .unlocked:
       unlockedWorkspace
+    }
+  }
+
+  private var testStoreUnavailableCard: some View {
+    PremiumCard(tint: .indigo) {
+      VStack(alignment: .leading, spacing: 16) {
+        NoticeCardContent(
+          title: "Test Store is disabled in this build",
+          detail:
+            "RevenueCat protects Release builds from Test Store keys. "
+            + "Use the separately packaged Debug evaluation build for purchase and restore evidence.",
+          systemImage: "lock.shield",
+          tint: .indigo
+        )
+        portfolioPreview
+        Text("No RevenueCat key can be entered or configured in this release-configuration app.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
     }
   }
 
@@ -986,7 +1021,9 @@ struct PremiumWorkspaceSection: View {
       VStack(alignment: .leading, spacing: 14) {
         NoticeCardContent(
           title: "Premium status could not be refreshed",
-          detail: "Check the Test Store offering, entitlement, and connection, then retry.",
+          detail:
+            "Check the expected Test Store offering, package, product, entitlement, and connection, "
+            + "then retry. Quit and reopen the Debug app to replace an already configured key.",
           systemImage: "exclamationmark.arrow.triangle.2.circlepath",
           tint: .orange
         )
@@ -1088,7 +1125,7 @@ struct ProfilePreviewRow: View {
         .foregroundStyle(isFree ? Color.green : Color.secondary)
         .frame(width: 18)
         .accessibilityHidden(true)
-      Text(profile.profile.name)
+      Text(profile.profile.displayName)
         .lineLimit(1)
         .truncationMode(.tail)
       Spacer()
@@ -1099,7 +1136,7 @@ struct ProfilePreviewRow: View {
     .padding(.vertical, 8)
     .accessibilityElement(children: .combine)
     .accessibilityLabel(
-      "\(profile.profile.name), \(accessDescription)"
+      "\(profile.profile.displayName), \(accessDescription)"
     )
   }
 }
@@ -1264,7 +1301,7 @@ struct ReviewQueue: View {
     Picker("Buyer", selection: $buyerText) {
       Text("All buyers").tag("")
       ForEach(availableBuyers, id: \.self) { buyer in
-        Text(buyer).tag(buyer)
+        Text(normalizedDisplayText(buyer)).tag(buyer)
       }
     }
     .pickerStyle(.menu)
@@ -1315,7 +1352,7 @@ struct QualificationResultCard: View {
           Text(result.displayTitle)
             .font(.headline)
             .fixedSize(horizontal: false, vertical: true)
-          Text(result.referenceLabel)
+          Text(result.displayReference)
             .font(.caption.monospaced())
             .foregroundStyle(.tertiary)
         }
@@ -1336,19 +1373,19 @@ struct QualificationResultCard: View {
         Image(systemName: "arrow.turn.down.right")
           .foregroundStyle(result.verdict.tint)
           .accessibilityHidden(true)
-        Text(result.humanNextStep)
+        Text(result.displayHumanNextStep)
           .font(.subheadline.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
       }
 
       DisclosureGroup("Reasons and unknowns", isExpanded: $detailsVisible) {
         VStack(alignment: .leading, spacing: 12) {
-          explanationGroup(title: "Reasons", values: result.reasons)
+          explanationGroup(title: "Reasons", values: result.displayReasons)
           explanationGroup(
             title: "Unknowns",
             values: result.unknowns.isEmpty
               ? ["None from the supplied metadata."]
-              : result.unknowns
+              : result.displayUnknowns
           )
           if let sourceURL = result.safeSourceURL {
             Link(destination: sourceURL) {
@@ -1461,7 +1498,7 @@ struct PortfolioComparison: View {
                   .foregroundStyle(.secondary)
                   .frame(width: 224, alignment: .leading)
                 ForEach(report.profileReports) { profile in
-                  Text(profile.profile.name)
+                  Text(profile.profile.displayName)
                     .font(.caption.weight(.semibold))
                     .lineLimit(2)
                     .frame(width: 126, alignment: .leading)
@@ -1507,7 +1544,7 @@ struct PortfolioComparison: View {
     Picker("Buyer", selection: $buyerText) {
       Text("All buyers").tag("")
       ForEach(availableBuyers, id: \.self) { buyer in
-        Text(buyer).tag(buyer)
+        Text(normalizedDisplayText(buyer)).tag(buyer)
       }
     }
     .pickerStyle(.menu)
@@ -1559,7 +1596,7 @@ private struct ComparisonGridRow: View {
         Text(notice.displayTitle)
           .font(.subheadline.weight(.medium))
           .lineLimit(2)
-        Text(notice.referenceLabel)
+        Text(notice.displayReference)
           .font(.caption2.monospaced())
           .foregroundStyle(.tertiary)
       }
@@ -1574,7 +1611,7 @@ private struct ComparisonGridRow: View {
       ForEach(report.profileReports) { profile in
         if let result = report.result(profileID: profile.id, resultID: notice.id) {
           ComparisonVerdictCell(
-            profileName: profile.profile.name,
+            profileName: profile.profile.displayName,
             noticeTitle: notice.displayTitle,
             result: result
           ) {
@@ -1685,42 +1722,6 @@ extension QualificationVerdict {
   }
 }
 
-extension QualificationResult {
-  fileprivate var displayTitle: String {
-    let value = title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return value.isEmpty ? "Untitled notice" : value
-  }
-
-  fileprivate var displayBuyer: String {
-    let value = buyer?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return value.isEmpty ? "Buyer not supplied" : value
-  }
-
-  fileprivate var displayDeadline: String {
-    deadlineAt ?? deadline ?? "Deadline not supplied"
-  }
-
-  fileprivate var referenceLabel: String {
-    guard let lotID, !lotID.isEmpty else {
-      return publicationNumber
-    }
-    return "\(publicationNumber) / \(lotID)"
-  }
-
-  fileprivate var safeSourceURL: URL? {
-    guard let sourceURL, let value = URL(string: sourceURL),
-      value.scheme?.lowercased() == "https",
-      value.host != nil,
-      value.user == nil,
-      value.password == nil,
-      value.fragment == nil
-    else {
-      return nil
-    }
-    return value
-  }
-}
-
 struct ProfileCard: View {
   let report: ProfileReport
   @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -1756,14 +1757,14 @@ struct ProfileCard: View {
     }
     .accessibilityElement(children: .combine)
     .accessibilityLabel(
-      "\(report.profile.name), \(report.summary.openDocuments) open, "
+      "\(report.profile.displayName), \(report.summary.openDocuments) open, "
         + "\(report.summary.watch) watch, \(report.summary.reject) reject"
     )
   }
 
   private var profileTitle: some View {
     VStack(alignment: .leading, spacing: 5) {
-      Text(report.profile.name)
+      Text(report.profile.displayName)
         .font(.headline)
         .lineLimit(2)
       Text("\(report.summary.total) notices · schema \(report.schemaVersion)")

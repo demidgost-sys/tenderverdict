@@ -55,7 +55,7 @@ def _copy_swift_resources(bin_path: Path, resources: Path) -> None:
         shutil.copytree(bundle, resources / bundle.name)
 
 
-def _write_info_plist(path: Path, version: str) -> None:
+def _write_info_plist(path: Path, bundle_version: str, project_version: str) -> None:
     payload = {
         "CFBundleDisplayName": "TenderVerdict Next Gen",
         "CFBundleExecutable": APP_NAME,
@@ -64,8 +64,9 @@ def _write_info_plist(path: Path, version: str) -> None:
         "CFBundleInfoDictionaryVersion": "6.0",
         "CFBundleName": "TenderVerdict Next Gen",
         "CFBundlePackageType": "APPL",
-        "CFBundleShortVersionString": version,
-        "CFBundleVersion": version,
+        "CFBundleShortVersionString": bundle_version,
+        "CFBundleVersion": bundle_version,
+        "CFBundleGetInfoString": f"TenderVerdict Next Gen {project_version} evaluation build",
         "LSApplicationCategoryType": "public.app-category.business",
         "LSMinimumSystemVersion": "13.0",
         "NSHighResolutionCapable": True,
@@ -85,6 +86,7 @@ def _write_build_info(path: Path, version: str, configuration: str) -> None:
         f"source_revision={revision}",
         f"source_dirty={str(bool(status)).lower()}",
         f"build_configuration={configuration}",
+        f"test_store_enabled={str(configuration == 'debug').lower()}",
         "revenuecat_sdk=5.83.0",
         "entitlement=supplier_profiles_plus",
         "qualification_runtime=embedded-offline-python",
@@ -156,7 +158,8 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
         raise BuildError("the Next Gen application bundle can only be built on macOS")
 
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    version = metadata["project"]["version"].split("a", 1)[0]
+    project_version = metadata["project"]["version"]
+    bundle_version = project_version.split("a", 1)[0]
     output_dir = args.output_dir.resolve()
     build_root = args.build_root.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -205,6 +208,15 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
         swift_executable = swift_bin_path / APP_NAME
         if not swift_executable.is_file():
             raise BuildError(f"Swift executable is missing: {swift_executable}")
+        swift_checks = swift_bin_path / f"{APP_NAME}Checks"
+        if not swift_checks.is_file():
+            raise BuildError(f"Swift contract checks are missing: {swift_checks}")
+        check_environment = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
+            "TENDERVERDICT_WORKTREE": str(ROOT),
+        }
+        _run([str(swift_checks)], env=check_environment)
 
         pyinstaller_environment = os.environ.copy()
         pyinstaller_environment["PYINSTALLER_CONFIG_DIR"] = str(build_root / "pyinstaller-cache")
@@ -243,9 +255,9 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
         shutil.copy2(ROOT / "NOTICE", resources)
         shutil.copy2(ROOT / "packaging" / "THIRD_PARTY_NOTICES.md", resources)
         _copy_swift_resources(swift_bin_path, resources)
-        _write_info_plist(contents / "Info.plist", version)
+        _write_info_plist(contents / "Info.plist", bundle_version, project_version)
         (contents / "PkgInfo").write_bytes(b"APPL????")
-        _write_build_info(resources / "BUILD_INFO.txt", version, args.configuration)
+        _write_build_info(resources / "BUILD_INFO.txt", project_version, args.configuration)
 
         _run(["codesign", "--force", "--deep", "--sign", "-", str(app)])
         _run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(app)])

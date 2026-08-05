@@ -113,6 +113,32 @@ public struct NoticeImportRecord: Decodable, Equatable, Identifiable, Sendable {
     normalizedNoticeIdentity(publicationNumber: publicationNumber, lotID: lotID)
   }
 
+  public var displayTitle: String {
+    let value = normalizedDisplayText(title ?? "")
+    return value.isEmpty ? "Untitled notice" : value
+  }
+
+  public var displayBuyer: String {
+    let value = normalizedDisplayText(buyer ?? "")
+    return value.isEmpty ? "Buyer not supplied" : value
+  }
+
+  public var displayDeadline: String {
+    normalizedDisplayText(deadlineAt ?? deadline ?? "No deadline")
+  }
+
+  public var displayReference: String {
+    let publication = normalizedDisplayText(publicationNumber)
+    guard let lotID, !lotID.isEmpty else {
+      return publication
+    }
+    return "\(publication) / \(normalizedDisplayText(lotID))"
+  }
+
+  public var displayMetadataWarnings: [String] {
+    metadataWarnings.map(normalizedDisplayText)
+  }
+
   public init(from decoder: Decoder) throws {
     let values = try strictContainer(
       from: decoder,

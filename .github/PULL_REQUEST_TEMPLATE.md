@@ -19,5 +19,15 @@ Describe the narrow problem and the change that addresses it.
 - [ ] `mypy`
 - [ ] `python -m build --no-isolation`
 
-If desktop packaging changed, list the affected native targets and the completed manual or visual
-checks below.
+## Documentation impact
+
+- [ ] The owning contract/status/evidence page was updated, or this change has no documentation impact.
+- [ ] Mutable counts and revision claims live in `docs/PROJECT_STATUS.md` rather than being copied.
+- [ ] New public files are linked from `docs/README.md` when appropriate and are in the allow-list.
+
+If Next Gen code, packaging, or assets changed:
+
+- [ ] `swift format lint --recursive --strict macos/TenderVerdictNextGen`
+- [ ] `swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks`
+- [ ] `swift run -c release --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks`
+- [ ] Source smoke and applicable packaged/manual/visual checks are listed below.

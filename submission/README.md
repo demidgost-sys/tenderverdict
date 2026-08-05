@@ -22,13 +22,16 @@ and terminal RevenueCat accessibility announcements/focus recovery. The current 
 shows that complete locked pre-transaction surface. The dated unlocked and VoiceOver evidence
 captures still predate the newest UX and remain baseline evidence only.
 
-A fresh 2026-08-05 Release package from the current source passed embedded-core determinism and
-contract checks, signature verification, and worktree-independent smoke, and produced an `.app`,
-zip, and checksum. The current portrait/icon asset gate also passes. A fresh final-revision Debug
-Test Store and asynchronous accessibility pass remains separate manual evidence.
+A clean release-configuration package from the remediated revision is pending. It must pass
+configuration-specific native checks, embedded-core determinism and contracts, signature
+verification, and worktree-independent smoke before its `.app`, zip, and checksum become current
+evidence. Exact provenance lives in [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md). The
+current portrait/icon asset gate passes; a fresh final-revision Debug Test Store and asynchronous
+accessibility pass remains separate manual evidence.
 
-The final candidate must emit `NEXT_GEN_CHECKS_OK checks=15`; the suite now includes pure Premium
-announcement, recovery-action, and focus-state outcomes in addition to the portfolio/input checks.
+The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
+is recorded only in project status. The suite includes display safety, schema-3 Free export
+isolation, exact RevenueCat identifiers, and pure Premium announcement/recovery/focus outcomes.
 
 ## Organizer proof
 

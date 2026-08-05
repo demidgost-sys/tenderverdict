@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
+from unicodedata import category
 from urllib.parse import urlsplit
 
 from .models import Notice, Profile, QualificationResult, Verdict
@@ -252,7 +253,9 @@ def is_verifiable_source_url(value: str) -> bool:
     or endorsed the source.
     """
 
-    if not value or any(character.isspace() or ord(character) < 32 for character in value):
+    if not value or any(
+        character.isspace() or category(character) in {"Cc", "Cf"} for character in value
+    ):
         return False
     try:
         parsed = urlsplit(value)

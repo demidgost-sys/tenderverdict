@@ -7,6 +7,7 @@
 .github/workflows/ci.yml
 .github/workflows/desktop.yml
 .gitignore
+AGENTS.md
 CHANGELOG.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
@@ -24,10 +25,13 @@ demo/screenshot.png
 docs/ARCHITECTURE.md
 docs/COMPETITION_SCORECARD.md
 docs/DEMO_SCRIPT.md
+docs/DEVELOPMENT.md
+docs/DOCUMENTATION.md
 docs/HACKATHON_RUNBOOK.md
 docs/PROJECT_STATUS.md
 docs/README.md
 docs/SHIPATON_EVIDENCE.md
+docs/TECHNICAL_AUDIT.md
 docs/USER_GUIDE.md
 docs/UX_AUDIT.md
 docs/assets/tenderverdict-banner.svg

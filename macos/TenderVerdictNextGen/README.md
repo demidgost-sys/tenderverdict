@@ -3,7 +3,8 @@
 This unreleased SwiftUI app is the native Shipaton Next Gen surface. It consumes the canonical
 Python Portfolio Workspace report, preserves the first profile as the Free experience, and reveals
 the complete one-to-five-profile workspace only for an active RevenueCat
-`supplier_profiles_plus` entitlement.
+`supplier_profiles_plus` entitlement. The target requires macOS 13 or newer. The local builder emits
+the current host architecture; the audited Apple Silicon artifact is `arm64`, not a universal app.
 
 ## Implemented product flow
 
@@ -13,18 +14,20 @@ the complete one-to-five-profile workspace only for an active RevenueCat
 - strictly normalizes a chosen workspace v1 JSON through the canonical Python parser before use;
 - fully validates chosen CSV/JSON notices, then previews the source format, total count, first five
   normalized records, and full-file gaps for type, title, buyer, CPV, country, deadline, and source;
-- accepts an explicit date or timezone-aware RFC 3339 review point;
+- accepts an explicit date or whole-second timezone-aware RFC 3339 review point;
 - runs the private deterministic Python bridge without a shell and with a 30-second boundary;
 - keeps the previous valid report visible when a new run fails;
 - exposes the complete first-profile result as a Free review queue with verdict, text, buyer, and
   deadline-presence filters, progressive **Show more**, human next steps, expandable reasoning,
   unknowns, and safe supplied-source links;
-- exports the exact combined JSON bytes atomically;
+- exports a deterministic schema-3 first-profile report in Free and the exact combined JSON bytes
+  atomically only while Premium is active;
 - optionally remembers only the two selected-file security-scoped bookmarks, never file contents,
   reports, review dates, or a RevenueCat key, and never runs remembered inputs automatically;
-- accepts a `test_` RevenueCat key in a process-only secure field;
-- loads the current offering, runs a Test Store purchase, handles cancellation, restores, refreshes
-  `CustomerInfo`, and projects access through `supplier_profiles_plus`;
+- accepts a `test_` RevenueCat key in a process-only secure field in Debug builds only;
+- loads only the expected `supplier_profiles_plus` offering, `$rc_monthly` package, and
+  `supplier_profiles_plus_monthly` product; then runs a Test Store purchase, handles cancellation,
+  restores, refreshes `CustomerInfo`, and projects access through the entitlement;
 - searches and filters the Premium comparison, resolves every cell by stable profile/result IDs,
   and opens complete per-cell reasoning without score, ranking, or an automatic recommendation;
 - announces terminal Premium outcomes to VoiceOver when available, restores focus after an
@@ -44,6 +47,7 @@ From the repository root on macOS with Swift 6 and Python 3.11+:
 ```bash
 swift build --package-path macos/TenderVerdictNextGen
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift run -c release --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
 TENDERVERDICT_WORKTREE="$PWD" \
   swift run --package-path macos/TenderVerdictNextGen \
   TenderVerdictNextGen --smoke-test
@@ -52,14 +56,17 @@ TENDERVERDICT_WORKTREE="$PWD" \
   TenderVerdictNextGen
 ```
 
-`TenderVerdictNextGenChecks` runs 15 standalone checks for portfolio projection, full result
+`TenderVerdictNextGenChecks` covers portfolio projection, complete schema-3 Free export, full result
 preservation, empty inputs, nested totals, result-summary consistency, shared notice digest and
 order, strict workspace and import-preview contracts, large filtered-result identity stability,
-Test Store key boundaries, terminal accessibility outcomes, selected-file execution, and byte
-determinism. The smoke test invokes the real private Python bridge without launching a window or
-configuring RevenueCat.
+safe source links, exact RevenueCat dashboard identifiers, Debug/Release Test Store boundaries,
+terminal accessibility outcomes, selected-file execution, and byte determinism. Run it in both
+configurations: Debug accepts a well-shaped Test Store key, while Release must make configuration
+unavailable before any SDK call. The smoke test invokes the real private Python bridge without
+launching a window or configuring RevenueCat.
 
-The Python suite currently has 122 tests in total. Six directly exercise the private launcher:
+The Python suite directly exercises the private launcher; current totals are maintained in
+[project status](../../docs/PROJECT_STATUS.md):
 
 ```bash
 PYTHONPATH=src python3 -m unittest tests.test_next_gen_core_launcher -v
@@ -96,7 +103,8 @@ Outputs appear under `dist/next-gen/`. The `.app` contains:
 - synthetic fixtures, Apache-2.0 license, notice, third-party notices, icon, and build provenance.
 
 The builder ad-hoc signs the bundle, verifies the signature, launches the app executable from `/`
-with no worktree, confirms the embedded-core smoke test, and writes a zip plus SHA-256 checksum.
+with no worktree, runs configuration-specific native checks, confirms the embedded-core smoke test,
+and writes a zip plus SHA-256 checksum.
 Full Xcode is not required for this source/package workflow; Apple Developer ID signing,
 notarization, and App Store distribution are not provided.
 
@@ -130,14 +138,16 @@ The Manager also confirmed that macOS is accepted without a judging disadvantage
 
 For the accepted Test Store path:
 
-1. create `supplier_profiles_plus` in a RevenueCat Test Store project;
-2. attach a Test Store product to one package in the current offering;
-3. paste the public Test Store `test_` key into the secure field for that launch;
+1. create entitlement and current offering `supplier_profiles_plus`;
+2. attach product `supplier_profiles_plus_monthly` to package `$rc_monthly`;
+3. build the Debug evaluation app and paste the public Test Store `test_` key into the secure field
+   for that launch;
 4. verify offering, cancel, failure, success, relaunch/refresh, and restore states on the packaged
    app.
 
-RevenueCat intentionally rejects a Test Store key in a Release build. Build the local transaction
-evidence app with the same reproducible packager in Debug configuration:
+RevenueCat intentionally terminates a Release build that reaches SDK configuration with a Test Store
+key. TenderVerdict therefore removes the key field and rejects configuration locally in Release.
+Build the local transaction-evidence app with the same reproducible packager in Debug configuration:
 
 ```bash
 .venv-build/bin/python tools/build_next_gen.py \
@@ -146,25 +156,25 @@ evidence app with the same reproducible packager in Debug configuration:
   --build-root build/next-gen-debug
 ```
 
-The normal builder default remains `release`; never submit a Test Store key inside either bundle.
+The normal builder default remains `release`; it is an offline-analysis evaluation artifact, not a
+Premium transaction build. Never submit a Test Store key inside either bundle. If a Debug process
+was configured with the wrong key, quit and reopen it before entering a replacement because the SDK
+can be configured only once per process.
 
 The environment variable `REVENUECAT_TEST_STORE_API_KEY` remains available for controlled local
 automation. Never commit, log, screenshot, or publish a usable key.
 
 ## Evidence boundary
 
-Verified for the current source and Release package: 122 Python tests including six
-private-launcher tests, 15 native contract checks, source compilation, strict workspace
-normalization, CSV/JSON import preview, large-result filtering with stable-ID lookup, source smoke
-execution, deterministic byte equality, invalid-input retention, missing-key state, and
-non-Test-key rejection. The self-contained `.app`
-also passed repeated embedded normalize/inspect contract and byte-determinism checks, ad-hoc
-signature verification, and a worktree-independent smoke run from `/`; `.app`, zip, and SHA-256
-outputs were created on the external build volume.
+The remediated source passes its configuration-specific native contract checks, including Release
+Test Store fail-closed behavior, schema-3 Free export isolation, safe-link parity, exact dashboard
+identifiers, and the existing bridge contracts. A fresh self-contained artifact must still be built
+after the audit commit before package provenance, signature, checksum, and smoke evidence can be
+called current; see [project status](../../docs/PROJECT_STATUS.md) for the live result.
 
 A previous Debug Test Store pass covered offering, cancellation, failure, purchase, entitlement
 activation, relaunch refresh, restore, and VoiceOver activation of Restore. It remains historical
-transaction evidence and is not a real payment or fresh visual QA for the current Release package.
+transaction evidence and is not a real payment or fresh visual QA for the remediated package.
 
 Implemented but still requiring hands-on verification after the rebuild: terminal VoiceOver
 announcements across every purchase outcome, focus recovery, Increase Contrast, Reduce

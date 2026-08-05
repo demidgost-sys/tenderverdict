@@ -3,7 +3,8 @@
 - Audit date: 2026-08-05
 - App surface: SwiftUI macOS app, default 1020×900 window
 - Data boundary: local workspace JSON plus normalized CSV/JSON notices
-- RevenueCat boundary: process-local Test Store key; no usable key retained in the app or repo
+- RevenueCat boundary: process-local Debug-only Test Store key; Release refuses configuration
+  before the SDK; no usable key retained in the app or repo
 
 ## Verification vocabulary
 
@@ -24,10 +25,12 @@ analysis, opt into safe file-selection continuity, filter larger result sets, an
 Premium comparison cell to the exact profile/notice reasoning. The first complete analysis and
 deterministic export remain free.
 
-The native suite now contains 15 checks, including a pure terminal RevenueCat accessibility-outcome
-check, and a fresh worktree-independent Release package passes on the current app source. The final
-15-check execution and complete 122-test Python suite pass on the current candidate. The prior packaged Debug
-baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
+The native suite now covers pure terminal RevenueCat accessibility outcomes in both Debug and
+Release, and the complete Python/source gate passes on the current candidate. It also verifies that
+untrusted control and bidirectional-formatting characters become visible in SwiftUI, that Free
+exports one complete schema-3 report, and that Release cannot reach Test Store SDK configuration.
+Exact totals and packaged provenance live in [project status](PROJECT_STATUS.md). The prior packaged
+Debug baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
 predates the newest UX changes. The current portrait asset has been regenerated and reviewed in
 light and dark appearance; a fresh Debug transaction build and manual VoiceOver checks for
 asynchronous purchase outcomes remain pending.
@@ -45,46 +48,46 @@ asynchronous purchase outcomes remain pending.
 | Stable large-list identity | Pass | Filters retain canonical result IDs; a filtered offset is never reused as a cross-profile lookup key. |
 | Premium comparison | Pass | Text, buyer, and deadline filters apply to the shared notice order; each cell is a native button with profile, notice, and verdict semantics. |
 | Comparison drill-down | Pass | A selected cell resolves by stable profile/result IDs and shows verdict, buyer, deadline, next step, reasons, unknowns, and only a safe supplied HTTPS source. |
-| RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. It does not modify qualification bytes, add rankings, or create a local entitlement toggle. |
+| Untrusted display text | Pass | C0, DEL/C1, and Unicode format controls are visibly escaped in native text and accessibility labels; source evidence and deterministic export bytes are preserved. |
+| RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. Free exports the first complete schema-3 report; Premium exports the exact portfolio bytes. Neither path modifies qualification bytes, adds rankings, or creates a local entitlement toggle. |
+| RevenueCat configuration | Pass | Debug accepts only a well-shaped process-local Test Store key and an exact offering/package/product match. Release exposes no key field and refuses configuration before any SDK call. |
 | Async recovery model | Pass | Every terminal Premium state has explicit announcement text, recovery actions, and a useful focus target. Focus restoration occurs only after a user-triggered connect/purchase/restore/refresh action. |
 | Responsive layout | Pass | Fixed hero typography was replaced by semantic `largeTitle`; input, action, RevenueCat, metadata, filter, and detail rows use horizontal-to-vertical `ViewThatFits` fallbacks. |
 | Contrast/transparency response | Pass | Semantic card boundaries strengthen under Increase Contrast; decorative shadows/surfaces are reduced when Reduce Transparency is enabled. Textual state never relies on color alone. |
 
 ## Native contract checks (`automated`, current candidate passed)
 
-The final verification command is:
+The configuration-specific verification commands are:
 
 ```bash
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
-# expected: NEXT_GEN_CHECKS_OK checks=15
+swift run -c release --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+# expected from both: NEXT_GEN_CHECKS_OK (exact current total is in PROJECT_STATUS.md)
 ```
 
-The 15 checks cover:
+The checks cover:
 
-1. Free/Premium portfolio projection.
-2. Complete notice-level result preservation.
-3. Empty notice sets.
-4. Profile-count consistency.
-5. Shared notice digest consistency.
-6. Shared notice ordering.
-7. Nested verdict totals.
-8. Result/summary consistency.
-9. Strict, bounded, deterministic workspace documents.
-10. Strict notice import-preview decoding.
-11. Search/buyer/deadline filters and stable lookup.
-12. Stable identities across a synthetic 125-notice result set.
-13. Terminal Premium announcement, recovery-action, and focus outcomes.
-14. Fail-closed Test Store configuration.
-15. Process-adapter deterministic byte preservation.
+- Free/Premium projection and schema-3 Free export isolation;
+- complete notice-level result and provenance preservation;
+- visible display normalization for control and bidi-formatting characters;
+- empty notice sets, profile counts, shared digests, and ordered shared metadata;
+- nested verdict totals and result/summary consistency;
+- strict, bounded, deterministic workspace and notice-preview documents;
+- search/buyer/deadline filters, structured identities, and stable lookup across a synthetic
+  125-notice result set;
+- terminal Premium announcement, recovery-action, and focus outcomes;
+- exact RevenueCat offering/package/product matching and Debug/Release fail-closed behavior;
+- process-adapter deterministic byte preservation and size caps.
 
 These checks validate contracts and pure state. They do not claim AppKit rendering quality, an
 actual RevenueCat transaction, or VoiceOver speech.
 
-The current 2026-08-05 Release packaging run also passed the embedded normalization and import
-preview contracts twice with byte-identical output, ad-hoc signature verification, and app smoke
-from outside the worktree. It produced the `.app`, zip, and SHA-256 companion on regenerable SSD
-paths. Release is the no-key distributable and cannot substitute for the pending Debug Test Store
-pass.
+The clean release-configuration package from the remediated revision is pending. It must pass
+configuration-specific native checks, embedded normalization and import-preview contracts twice
+with byte-identical output, ad-hoc signature verification, and app smoke from outside the worktree,
+then produce the `.app`, zip, and SHA-256 companion on a regenerable SSD path. Release is the no-key
+evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact current
+provenance lives in [project status](PROJECT_STATUS.md).
 
 ## Packaged baseline (`manual`, 2026-08-04)
 
@@ -129,7 +132,9 @@ Accessibility-relevant code outcomes include distinct labels for secure configur
 actions, disabled-state preservation, combined profile summaries, native disclosures and links,
 stable focus targets after Premium actions, VoiceOver announcements only when VoiceOver and a
 visible app window are present, flexible row layouts, and Increased Contrast/Reduced Transparency
-adaptation. Announcement content contains no key, customer identifier, or tender data.
+adaptation. Input-derived control and bidi-formatting characters are rendered visibly rather than
+allowed to reorder evidence. Announcement content contains no key, customer identifier, or tender
+data.
 
 ## Still required (`pending`)
 

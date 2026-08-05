@@ -260,14 +260,18 @@ public struct TenderVerdictProcess: Sendable {
 
     try standardOutput.synchronize()
     try standardError.synchronize()
+    let finalOutputBytes = try fileSize(at: standardOutputURL)
+    let finalErrorBytes = try fileSize(at: standardErrorURL)
+    guard finalOutputBytes <= maximumOutputBytes,
+      finalErrorBytes <= Self.maximumErrorBytes
+    else {
+      throw TenderVerdictProcessError.oversizedOutput
+    }
     guard process.terminationStatus == 0 else {
       let errorData = try Data(contentsOf: standardErrorURL)
       let detail = String(decoding: errorData.prefix(4_000), as: UTF8.self)
         .trimmingCharacters(in: .whitespacesAndNewlines)
       throw TenderVerdictProcessError.commandFailed(process.terminationStatus, detail)
-    }
-    guard try fileSize(at: standardOutputURL) <= maximumOutputBytes else {
-      throw TenderVerdictProcessError.oversizedOutput
     }
     return try Data(contentsOf: standardOutputURL, options: [.mappedIfSafe])
   }

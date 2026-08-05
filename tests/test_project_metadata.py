@@ -134,6 +134,10 @@ class ProjectMetadataTests(unittest.TestCase):
             "/submission",
             metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
         )
+        self.assertIn(
+            "/AGENTS.md",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
 
         core_spec = (ROOT / "packaging" / "TenderVerdictNextGenCore.spec").read_text(
             encoding="utf-8"
@@ -149,16 +153,38 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn("api_key_included=false", next_gen_builder)
         self.assertIn('choices=("debug", "release")', next_gen_builder)
         self.assertIn('f"build_configuration={configuration}"', next_gen_builder)
+        self.assertIn(
+            "f\"test_store_enabled={str(configuration == 'debug').lower()}\"",
+            next_gen_builder,
+        )
+        self.assertIn('project_version = metadata["project"]["version"]', next_gen_builder)
+        self.assertIn('swift_checks = swift_bin_path / f"{APP_NAME}Checks"', next_gen_builder)
+        self.assertIn(
+            "swift format lint --recursive --strict macos/TenderVerdictNextGen",
+            workflow,
+        )
+        self.assertIn(
+            "swift run -c release --package-path macos/TenderVerdictNextGen",
+            workflow,
+        )
 
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
         local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
+        html_fragment = re.compile(r'href="#([^"]+)"')
+        heading = re.compile(r"^#{1,6}\s+(.+?)\s*$", re.MULTILINE)
+
+        def heading_slug(value: str) -> str:
+            plain = value.replace("`", "").lower()
+            plain = re.sub(r"[^\w\- ]", "", plain)
+            return re.sub(r" +", "-", plain.strip())
 
         for relative in allowlist:
             if not relative.endswith(".md"):
                 continue
             document = ROOT / relative
-            for raw_target in local_link.findall(document.read_text(encoding="utf-8")):
+            content = document.read_text(encoding="utf-8")
+            for raw_target in local_link.findall(content):
                 target = raw_target.strip().strip("<>")
                 if target.startswith(("#", "https://", "http://", "mailto:")):
                     continue
@@ -168,6 +194,28 @@ class ProjectMetadataTests(unittest.TestCase):
                     resolved.exists(),
                     f"{relative} contains a broken local link: {raw_target}",
                 )
+
+            fragments = {heading_slug(value) for value in heading.findall(content)}
+            for fragment in html_fragment.findall(content):
+                self.assertIn(
+                    fragment,
+                    fragments,
+                    f"{relative} contains a broken local fragment: #{fragment}",
+                )
+
+        documentation_index = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
+        for required in ("DEVELOPMENT.md", "DOCUMENTATION.md", "TECHNICAL_AUDIT.md"):
+            self.assertIn(required, documentation_index)
+
+        agent_guide = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for required in (
+            "docs/README.md",
+            "docs/PROJECT_STATUS.md",
+            "docs/ARCHITECTURE.md",
+            "docs/DEVELOPMENT.md",
+            "docs/DOCUMENTATION.md",
+        ):
+            self.assertIn(required, agent_guide)
 
 
 if __name__ == "__main__":

@@ -26,7 +26,8 @@ boundaries:
 - no runtime dependency unless the issue establishes a clear need;
 - offline tests and reproducible synthetic examples.
 
-Run the local checks before proposing a patch:
+Run the complete source gate in the [developer guide](docs/DEVELOPMENT.md) before proposing a patch.
+That page owns the exact cross-language command matrix. The minimum Python/distribution subset is:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: --no-deps \
@@ -43,11 +44,13 @@ python -m build --no-isolation
 ```
 
 On macOS, changes under `macos/TenderVerdictNextGen`, `submission`, or the embedded runtime also
-require:
+require both Debug and Release native contracts plus the applicable source/package/manual gates:
 
 ```bash
 swift build --package-path macos/TenderVerdictNextGen
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift run -c release --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift format lint --recursive --strict macos/TenderVerdictNextGen
 TENDERVERDICT_WORKTREE="$PWD" \
   swift run --package-path macos/TenderVerdictNextGen \
   TenderVerdictNextGen --smoke-test

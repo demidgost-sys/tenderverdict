@@ -120,13 +120,10 @@ not pretend that private form fields have been verified. Publicly documented des
 video, icon, screenshot, platform, and eligibility requirements are already tracked in the
 [runbook](HACKATHON_RUNBOOK.md).
 
-The previous gate set passed on pushed baseline `67bb555`; the current candidate has 122 Python
-tests, 15 native checks, and green source smoke. Its 2026-08-05 SSD Release build produced the
-`.app`, `.zip`, and SHA-256 file; twice verified embedded normalization/inspection byte determinism
-and contracts; verified the ad-hoc signature; and passed worktree-independent app smoke. The
-refreshed assets and complete local suite also pass. A fresh final-Debug transaction run,
-interactive packaged UX, and manual accessibility outcomes still must be verified rather than
-treated as inherited evidence.
+The exact audited revision, current suite totals, pushed CI result, and SSD artifact provenance live
+in [project status](PROJECT_STATUS.md). A fresh final-Debug transaction run, interactive packaged
+UX, and manual accessibility outcomes still must be verified rather than treated as inherited
+evidence.
 
 ## Owner inputs — later, not required for this implementation pass
 

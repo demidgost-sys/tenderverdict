@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
-  <a href="#desktop-preview">Desktop preview</a> ·
+  <a href="#desktop-developer-alpha">Desktop preview</a> ·
   <a href="#example-output">Example output</a> ·
   <a href="#portfolio-workspace-json">Portfolio Workspace</a> ·
   <a href="#next-gen-macos-app">Next Gen macOS</a> ·
@@ -57,10 +57,12 @@ It does not read full procurement documents or decide whether you should bid.
 | macOS archives | CI-tested; arm64 flow completed hands-on | Opt-in evaluation only |
 | Windows x64 archive | Native CI and frozen smoke test passed; no hands-on run yet | Experimental opt-in evaluation |
 | Portfolio Workspace CLI | Unreleased source feature | Current source checkout only |
-| Next Gen SwiftUI app | Unreleased competition feature; current Release package and embedded bridge verified locally | Current competition source checkout |
+| Next Gen SwiftUI app | Unreleased competition feature; self-contained evaluation packaging and embedded bridge verified locally | Current competition source checkout |
 
-There is no trusted one-click installer, hosted service, account system, telemetry, or automatic
-update channel. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and evaluation thresholds.
+There is no trusted one-click installer, hosted service, account system, TenderVerdict first-party
+telemetry, or automatic update channel. A configured RevenueCat Debug flow still uses the SDK's
+normal identifiers and network behavior. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and
+evaluation thresholds.
 
 Current completion and final-submission gate counts are maintained in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). They are evidence checklists, not a winning
@@ -249,8 +251,9 @@ The native UI loads a bundled synthetic portfolio and also includes a Profile Bu
 five named profiles. A selected workspace is strictly normalized by the Python core before use.
 A selected CSV or JSON notice file is fully validated once, then the app shows its format, total
 record count, the first five normalized records, and full-file missing-field counts before a run.
-The app preserves the previous report after a failed run and atomically exports its exact
-deterministic JSON bytes.
+The app preserves the previous report after a failed run. Free atomically exports a deterministic,
+ASCII-safe schema-3 report for the first profile; an active entitlement additionally enables the
+exact complete portfolio JSON export.
 
 The Free review queue supports verdict, text, buyer, and deadline-presence filters with bounded
 progressive disclosure. Premium applies text, buyer, and deadline-presence filters to the
@@ -261,11 +264,13 @@ scored or ranked.
 Remembering selected inputs is explicit opt-in. It stores only two macOS security-scoped file
 bookmarks; it does not store tender data, a generated report, the review point, or a RevenueCat
 key, and remembered inputs are never analyzed automatically. The Swift package pins the
-official RevenueCat Apple SDK to `5.83.0` and contains current-offering, Test Store purchase,
-restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed: no key is committed, a
-missing key makes no RevenueCat request, a pasted key is not persisted, and any key that does not
-begin with `test_` is rejected before SDK configuration. The open-source CLI remains accessible and
-is not presented as a tamper-resistant payment boundary.
+official RevenueCat Apple SDK to `5.83.0` and contains exact-offering/package/product, Test Store
+purchase, restore, and `CustomerInfo` entitlement paths. Configuration is fail-closed: no key is
+committed, a missing key makes no RevenueCat request, and a pasted key is not persisted. Test Store
+configuration is compile-gated unavailable in the release-configuration evaluation artifact before
+any SDK call because the SDK intentionally forbids Test Store keys there; the separately packaged Debug app owns transaction
+evidence. The open-source CLI remains accessible and is not presented as a tamper-resistant payment
+boundary.
 
 Build and verify the source on macOS from the repository root:
 
@@ -276,14 +281,14 @@ TENDERVERDICT_WORKTREE="$PWD" \
   swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen --smoke-test
 ```
 
-The 15 native checks require no API key and the smoke test makes no RevenueCat request. They cover
+The native checks require no API key and the smoke test makes no RevenueCat request. They cover
 strict workspace and import-preview decoding, full report preservation, ordered shared-notice
 validation, large review filtering with stable-ID lookup, the Free/Premium projection, Test Store
 configuration and terminal accessibility outcomes, deterministic bytes, and the real private core
-bridge. The Python suite currently contains 122 tests in total, including six launcher-specific
-tests for strict normalization, CSV/JSON preview, missing-field counts, limits, deterministic
-ASCII-safe output, exit code `2`, and the offline boundary, plus three release-scanner regression
-tests.
+bridge. The offline Python suite also exercises strict normalization, CSV/JSON preview,
+missing-field counts, limits, deterministic ASCII-safe output, exit code `2`, the offline boundary,
+and release-scanner regressions. Exact current totals belong in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
 
 Build a self-contained, ad-hoc-signed `.app` with a private embedded Python runtime limited to
 portfolio execution, workspace normalization, and notice inspection:
@@ -296,11 +301,12 @@ python3 -m venv .venv-build
 .venv-build/bin/python tools/build_next_gen.py
 ```
 
-The builder verifies the bundle and its embedded-runtime smoke test, then writes a zip and SHA-256
-checksum under `dist/next-gen/`. The ordinary Release artifact contains no key and is not itself
-transaction evidence. The current Release build has passed ad-hoc signature verification,
-worktree-independent smoke execution, and repeated deterministic embedded workspace-normalization
-and notice-preview checks; its `.app`, zip, and checksum were created on the external build volume.
+The builder verifies configuration-specific native contracts, the bundle, and its embedded-runtime
+smoke test, then writes a zip and SHA-256 checksum under `dist/next-gen/`. The ordinary
+release-configuration evaluation artifact contains no key and is not itself transaction evidence.
+The pre-audit artifact passed its integrity and smoke checks but is superseded; the exact clean
+remediation artifact and provenance are tracked in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
 A previous reproducible Debug artifact completed a local RevenueCat Test Store offering, cancel,
 failure, purchase, entitlement refresh, relaunch, and restore pass; that is test evidence, not a
 real payment. The current icon and portrait screenshot were regenerated and structure-checked; the
@@ -327,13 +333,19 @@ lot-level rows may share it when each has a unique official `lot_id`. `lot_id`, 
 `publication_date` are optional, so the shorter v0.1 header remains accepted. Do not mix a
 notice-level row and lot-level rows for the same publication.
 
-Use `deadline` for a `YYYY-MM-DD` calendar date, or leave it empty and use `deadline_at` for an
-RFC 3339 timestamp with an explicit UTC offset. Supplying both is an error. `--as-of` accepts the
-same date-or-timestamp distinction. A date-only review point becomes `watch` when an exact
+A supplied `notice_type` is normalized for case and whitespace. The competition values are
+`competition`, `competition notice`, `contract notice`, `cn-social`, and `cn-standard`. A missing
+value becomes `watch`; any other supplied value produces a deterministic `reject` verdict.
+
+Use `deadline` for a `YYYY-MM-DD` calendar date, or leave it empty and use `deadline_at` for the
+supported whole-second RFC 3339 form (`YYYY-MM-DDTHH:MM:SSZ` or an explicit UTC offset; no
+fractional seconds). Supplying both is an error. `--as-of` accepts the same date-or-timestamp
+distinction. A date-only review point becomes `watch` when an exact
 timestamp falls on a boundary that cannot be resolved without a review instant.
 Use `|` inside `cpv_codes` or `countries` when a row has multiple values, for example
-`72260000|72261000` or `AUT|DEU`. Comma-, semicolon-, and tab-separated files are accepted; the
-bundled example uses commas. CSV is treated as data, never as executable spreadsheet content.
+`72260000|72261000` or `AUT|DEU`. Files ending in `.csv` may use comma, semicolon, or tab delimiters;
+the bundled example uses commas. A `.tsv` suffix is not accepted. CSV is treated as data, never as
+executable spreadsheet content.
 
 A notices file may contain at most 1,000 records and 10 MiB. Text fields and value lists also have
 explicit bounds. A valid header-only CSV and an empty JSON array both produce a zero-notice report;
@@ -399,15 +411,15 @@ swift build --package-path macos/TenderVerdictNextGen
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
 ```
 
-The functional test suite is offline; TED behaviour is tested with mocked HTTP responses.
-The current expected summaries are `Ran 122 tests` and `NEXT_GEN_CHECKS_OK checks=15`; six of the
-Python tests target the private Next Gen launcher directly. Re-run them rather than copying these
-counts into release evidence without current command output.
+The functional test suite is offline; TED behaviour is tested with mocked HTTP responses. The
+complete command matrix, packaging gate, and change-impact map live in the
+[`developer guide`](docs/DEVELOPMENT.md). Re-run the checks rather than copying an older count into
+release evidence without current command output.
 Reproducible bug reports and research feedback are welcome through
 [`GitHub Issues`](https://github.com/demidgost-sys/tenderverdict/issues). There is no guaranteed
 support or response time during the alpha period.
 
-Read [`ROADMAP.md`](ROADMAP.md), [`CONTRIBUTING.md`](CONTRIBUTING.md),
+Read [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md), [`ROADMAP.md`](ROADMAP.md), [`CONTRIBUTING.md`](CONTRIBUTING.md),
 [`SECURITY.md`](SECURITY.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) before contributing.
 
 ## Deutsch

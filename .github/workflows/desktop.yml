@@ -270,12 +270,20 @@ jobs:
           python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-desktop-build.txt
           python -m pip check
 
+      - name: Lint Swift source
+        run: swift format lint --recursive --strict macos/TenderVerdictNextGen
+
       - name: Build exact Swift package
         run: swift build --package-path macos/TenderVerdictNextGen
 
       - name: Run native contract checks
         run: >-
           swift run --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGenChecks
+
+      - name: Run Release-mode native contract checks
+        run: >-
+          swift run -c release --package-path macos/TenderVerdictNextGen
           TenderVerdictNextGenChecks
 
       - name: Smoke-test the Python portfolio adapter

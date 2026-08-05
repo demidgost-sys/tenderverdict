@@ -22,20 +22,25 @@ queue. Choose the surface that matches the job:
 3. Choose normalized notices in CSV or JSON. The complete file is validated before it becomes
    runnable. Confirm the displayed format, total count, first five normalized records, and
    full-file missing-field counts.
-4. Enter a review point as `YYYY-MM-DD` or a timezone-aware RFC 3339 instant, then select
+4. Enter a review point as `YYYY-MM-DD` or the supported whole-second RFC 3339 form
+   (`YYYY-MM-DDTHH:MM:SSZ` or an explicit UTC offset, without fractional seconds), then select
    **Run portfolio**. A successful result updates the source label, review point, summary, and Free
    profile. A failed analysis does not discard the previous valid result.
 5. Narrow the Free queue by verdict, text, buyer, or whether a deadline was supplied. Use
    **Show more** to reveal the next bounded group, expand **Reasons and unknowns**, and open a
    syntactically safe supplied HTTPS source when the official notice needs inspection.
-6. Select **Export JSON…** to save the exact deterministic portfolio bytes.
+6. Select **Export JSON…**. Free saves a deterministic ASCII-safe schema-3 report for the first
+   profile. Active Premium access saves the exact complete portfolio bytes.
 7. Optional: enable **Remember these two file selections on this Mac**. This persists only the two
    security-scoped bookmarks. Relaunch validates the restored selections but never analyzes them
    automatically. Disable the toggle to forget the bookmarks.
-8. For the Shipaton Test Store demo, paste a RevenueCat `test_` key. TenderVerdict does not store
-   it. Use the current Test Store package or restore access; the cross-profile comparison and all
-   profile summaries appear only while `supplier_profiles_plus` is active. **Refresh offering**
-   retries offering and entitlement state after a recoverable connection or configuration issue.
+8. For the Shipaton Test Store demo, use the separately packaged Debug app and paste a RevenueCat
+   `test_` key. TenderVerdict does not store it. The release-configuration app disables key entry
+   before the SDK can reject it. Use the exact expected offering/package/product or restore access;
+   the cross-profile comparison, all profile summaries, and full portfolio export appear only while
+   `supplier_profiles_plus` is active. **Refresh offering** retries a recoverable network or
+   dashboard issue. If an already configured key/project is wrong, quit and reopen the Debug app to
+   replace it because the RevenueCat SDK can be configured only once per process.
 
 The Shipaton Manager confirmed both that a Test Store purchase is sufficient for judging and that
 a macOS entry has no judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
@@ -73,6 +78,10 @@ competition integration boundary, not encryption or DRM.
 Notice format and limits are documented in the root [README](../README.md). A notice file can hold
 at most 1,000 records and 10 MiB. Treat every report as a metadata review aid, then inspect the
 current official notice and procurement documents.
+
+Supported competition `notice_type` values are `competition`, `competition notice`,
+`contract notice`, `cn-social`, and `cn-standard` after case/whitespace normalization. A missing
+type becomes `watch`; another supplied type becomes `reject`.
 
 ## Notice import preview
 
@@ -127,12 +136,12 @@ recovery targets; focus returns to purchase, retry, restore, or the key field on
 user action, not an automatic launch refresh. Cards adapt their borders/fills for Increase Contrast
 and remove decorative transparency/shadows when Reduce Transparency is active.
 
-Those paths are implemented and the current Release package passes its embedded-core and signature
-checks, but it still needs a hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency,
+Those paths are implemented, but the remediated package still needs a fresh embedded-core/signature
+check and a hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency,
 and large text before submission. A previous Debug Test Store pass confirmed that VoiceOver exposed
 the transaction controls and activated Restore; it is historical transaction evidence, not fresh
 settings QA for the current package.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains
-available. If Premium refresh fails, verify the RevenueCat entitlement, current offering, Test
-Store connection, and key, then retry or restore.
+available. If Premium refresh fails, verify the RevenueCat entitlement, exact offering/package/
+product, Test Store connection, and key, then retry or restore; relaunch to replace a configured key.

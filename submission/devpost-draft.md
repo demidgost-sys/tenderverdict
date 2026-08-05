@@ -51,15 +51,17 @@ entitlement-dependent qualification result.
   the public Apache-2.0 CLI remains a normal open-source interface rather than a payment boundary.
 - SwiftUI macOS app that decodes canonical reports and rejects inconsistent profile counts, totals,
   provenance, shared notices, or ordering before presentation.
-- Official RevenueCat Apple SDK `5.83.0`, pinned exactly with Swift Package Manager, using the
-  current offering, Test Store purchase, `CustomerInfo` entitlement state, refresh, and restore.
-- Fail-closed secure-key handling: only a process-local `test_` key is accepted, never committed or
-  persisted by the app.
+- Official RevenueCat Apple SDK `5.83.0`, pinned exactly with Swift Package Manager, using offering
+  `supplier_profiles_plus`, package `$rc_monthly`, product `supplier_profiles_plus_monthly`, Test
+  Store purchase, `CustomerInfo` entitlement state, refresh, and restore.
+- Fail-closed secure-key handling: only a process-local Debug `test_` key is accepted, never
+  committed or persisted; Release refuses Test Store configuration before any SDK call.
 - Self-contained ad-hoc-signed `.app` builder with embedded offline Python runtime, licenses,
   fixtures, worktree-independent smoke test, archive, and checksum.
-- Fifteen native contract checks, including a synthetic 125-notice filtering case with stable
-  identities and pure Premium accessibility outcomes, plus Python regression, type/lint, security,
-  public-tree, package, and CI gates.
+- Configuration-specific native contract checks, including visible control/bidi text, schema-3
+  Free export isolation, exact RevenueCat identifiers, a synthetic 125-notice filtering case with
+  stable identities, and pure Premium accessibility outcomes, plus Python regression, type/lint,
+  security, public-tree, package, and CI gates.
 - Accessibility-specific terminal state mapping, VoiceOver announcement routing, user-action focus
   recovery, flexible large-text layouts, and Increase Contrast/Reduce Transparency adaptations.
 
@@ -89,11 +91,11 @@ instead of reusing a filtered array offset.
 - RevenueCat missing/invalid configuration fails closed; there is no local Premium toggle.
 - A packaged Debug baseline completed Test Store cancellation, failure, retry, success, entitlement
   unlock, relaunch refresh, restore, and dashboard readback without retaining a key or customer ID.
-- A fresh current-source Release package passed embedded-core byte determinism and contract checks,
-  ad-hoc signature verification, and worktree-independent app smoke, producing the `.app`, zip, and
-  checksum.
-- The current candidate passes all 15 native contract checks and the 122-test Python suite; CI on
-  the exact submitted revision remains an explicit final gate.
+- The self-contained builder requires configuration-specific native checks, embedded-core byte
+  determinism and contracts, ad-hoc signature verification, worktree-independent app smoke, and a
+  checksum-paired archive; project status owns the current clean artifact result.
+- The current candidate passes the complete local gate recorded in project status; CI on the exact
+  submitted revision remains an explicit final gate.
 - Shipaton Manager Perttu confirmed in writing that the Test Store-only purchase path is acceptable
   for Next Gen, and Shipaton confirmed macOS eligibility without a platform-only disadvantage.
 
@@ -105,7 +107,7 @@ instead of reusing a filtered array offset.
 | Is it a functioning product? | Local files, strict Profile Builder, import preview, canonical run, filtered review, exact reasoning, comparison drill-down, and atomic export form one end-to-end macOS workflow. |
 | Is RevenueCat substantive? | The current offering, purchase result, `CustomerInfo`, entitlement, refresh, relaunch recovery, and `restorePurchases()` determine access to the multi-profile workspace. |
 | Does monetization fit the product? | Single-profile work remains useful and free; Premium saves repeated cross-profile review while preserving identical qualification bytes. |
-| Is the implementation trustworthy? | Bounded offline contracts, deterministic output, provenance, stable identities, strict decoding, safe links, no stored key, and 15 native checks make failure modes visible. |
+| Is the implementation trustworthy? | Bounded offline contracts, deterministic output, provenance, stable identities, strict decoding, visible control/bidi text, safe links, no stored key, and Debug/Release checks make failure modes visible. |
 | Is the experience considered? | Native builder/preview, opt-in continuity, large-list filters, evidence drill-down, recovery focus, announcements, contrast/transparency response, and a sub-1:50 demo path address real workflow friction. |
 
 ## Eligibility evidence
