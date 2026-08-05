@@ -29,19 +29,22 @@ each verdict, separates verdict drivers from passed checks, and keeps stale expo
 The winning-pass hierarchy now states the job in one sentence, surfaces a bounded Portfolio Signal
 before the file controls, and explains the complete Free profile versus Portfolio value before the
 technical RevenueCat build state. The static report uses the same open/verify/skip and human-owned
-next-step vocabulary.
+next-step vocabulary. The native Export menu now turns the accepted report into either deterministic
+JSON or a self-contained human-review HTML brief: Free receives the complete first profile and
+Premium receives every profile in source order.
 
 The native suite now covers pure terminal RevenueCat accessibility outcomes in both Debug and
 Release, and the complete Python/source gate passes on the current candidate. It also verifies that
 untrusted control and bidirectional-formatting characters become visible in SwiftUI, that Free
-exports one complete schema-3 report, and that Release cannot reach Test Store SDK configuration.
-Exact totals and packaged provenance live in [project status](PROJECT_STATUS.md). The prior packaged
+exports one complete schema-3 report and a gated review brief, and that Release cannot reach Test
+Store SDK configuration. Exact totals and packaged provenance live in
+[project status](PROJECT_STATUS.md). The prior packaged
 Debug baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
 predates the newest UX changes. The current portrait asset has been regenerated and reviewed in
-light and dark appearance. The current Release package was also launched outside the worktree and
-its compact Profile Builder plus specific invalid-CPV recovery were inspected manually; a fresh
-Debug transaction build and manual VoiceOver checks for asynchronous purchase outcomes remain
-pending.
+light and dark appearance. The current Release package rendered both native appearances and both
+review-brief projections outside the worktree; the previous Release package remains the latest
+hands-on compact Profile Builder and invalid-CPV recovery pass. A fresh Debug transaction build and
+manual VoiceOver checks for asynchronous purchase outcomes remain pending.
 
 ## Current source audit (`code_verified`)
 
@@ -60,7 +63,8 @@ pending.
 | Premium comparison | Pass | Text, buyer, and deadline filters apply to the shared notice order; each cell is a native button with profile, notice, and verdict semantics; locked state reveals only the bounded disagreement count. |
 | Comparison drill-down | Pass | A selected cell resolves by stable profile/result IDs and shows verdict, buyer, deadline, next step, reasons, unknowns, and only a safe supplied HTTPS source. |
 | Untrusted display text | Pass | C0, DEL/C1, and Unicode format controls are visibly escaped in native text and accessibility labels; source evidence and deterministic export bytes are preserved. |
-| RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. Free exports the first complete schema-3 report; Premium exports the exact portfolio bytes. Neither path modifies qualification bytes, adds rankings, or creates a local entitlement toggle. |
+| Review brief export | Pass | The native Export menu offers deterministic JSON and self-contained HTML. Free HTML contains only the complete first profile; Premium HTML contains every profile in original order. The renderer adds no script, remote asset, telemetry, combined verdict, ranking, or new qualification rule; text is normalized/escaped and only validated HTTPS sources become links. |
+| RevenueCat projection | Pass | `supplier_profiles_plus` changes only native visibility. Free exports the first complete schema-3 report and first-profile brief; Premium exports the exact portfolio bytes and all-profile brief. Neither path modifies qualification bytes, adds rankings, or creates a local entitlement toggle. |
 | RevenueCat configuration | Pass | Debug accepts only a well-shaped process-local Test Store key and an exact offering/package/product match. Release exposes no key field and refuses configuration before any SDK call. |
 | Async recovery model | Pass | Every terminal Premium state has explicit announcement text, recovery actions, and a useful focus target. Focus restoration occurs only after a user-triggered connect/purchase/restore/refresh action. |
 | Responsive layout | Pass | Fixed hero typography uses semantic `largeTitle`; input, action, RevenueCat, metadata, filter, and detail rows use horizontal-to-vertical fallbacks; Profile Builder keeps message and action areas separate so its footer does not create a vertical spacer gap. |
@@ -83,6 +87,8 @@ The checks cover:
 - visible display normalization for control and bidi-formatting characters;
 - strict review-point validation and deterministic **Use today** calendar semantics;
 - verdict-driver/supporting-check separation and cross-profile disagreement counts;
+- deterministic HTML-brief bytes, Free/Premium content isolation, profile/notice order, empty-state
+  rendering, HTML/control escaping, restrictive CSP, and safe-link rejection;
 - empty notice sets, profile counts, shared digests, and ordered shared metadata;
 - nested verdict totals and result/summary consistency;
 - strict, bounded, deterministic workspace and notice-preview documents;
@@ -98,15 +104,32 @@ actual RevenueCat transaction, or VoiceOver speech.
 The clean release-configuration package named in project status passed
 configuration-specific native checks, embedded normalization and import-preview contracts twice
 with byte-identical output, ad-hoc signature verification, and app smoke from outside the worktree.
-It produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release is
-the no-key evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact
+It also rendered the Free and Premium HTML projections plus both native appearances from `/`, then
+produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release is the
+no-key evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact
 current provenance lives in [project status](PROJECT_STATUS.md).
 
-## Current Release package (`manual`, 2026-08-05)
+## Current review-brief pass (`automated` + visual inspection, 2026-08-05)
 
-The exact clean Release artifact named in project status was launched outside the worktree after the
-polish commit. This is current visual and interaction evidence, but not Test Store evidence because
-Release intentionally cannot accept a RevenueCat key.
+The exact clean Release artifact named in project status was exercised through headless paths that
+use the same renderer as the app's Export menu. This is current packaged rendering evidence, not a
+claim that the Save panel or Test Store transaction was exercised hands-on.
+
+| Step | Current outcome |
+|---|---|
+| Native hierarchy | Packaged light and dark 1179×2556 renders show the compact **Export…** menu in the existing action row and explicitly include the review brief in the complete Free-profile promise. |
+| HTML design continuity | The packaged Premium bytes matched the locally opened brief that was compared beside the current static schema-3 report. It preserves the same system typography, indigo accent, semantic outcome colors, card geometry, dark appearance, responsive structure, and human-next-step emphasis. |
+| Free boundary | The packaged Free renderer emitted one complete profile and omitted the other profile names/details while explaining that its bounded disagreement count belongs to the full workspace. |
+| Premium boundary | The packaged Premium renderer emitted all three synthetic profiles and their shared notices in source order, with independent per-profile counts only. |
+| Safety and determinism | Repeated bytes are deterministic; injected markup is escaped; control/bidi characters remain visible; an unsafe URL never becomes a link; empty notices have an explicit state; no score, ranking, or automatic recommendation appears. |
+| Process boundary | Rendering ran from `/` against the embedded core. No key, Test Store call, user file, or external destination was used. |
+
+## Previous Release package (`manual`, 2026-08-05)
+
+The exact clean `682c040` Release artifact was launched outside the worktree after the earlier
+polish commit. This remains valid interaction evidence for unchanged flows, but it is not the
+current artifact and not Test Store evidence because Release intentionally cannot accept a
+RevenueCat key.
 
 | Step | Current outcome |
 |---|---|
@@ -156,7 +179,7 @@ reason disclosure. The hierarchy is now:
 5. opt into file-bookmark continuity only if useful;
 6. understand the complete Free versus Portfolio boundary before any purchase state;
 7. unlock/filter the shared comparison and open exact cell reasoning;
-8. export deterministic JSON with current/previous state made explicit.
+8. export a deterministic human-review brief or JSON with current/previous state made explicit.
 
 Accessibility-relevant code outcomes include distinct labels for secure configuration and file
 actions, disabled-state preservation, combined profile summaries, native disclosures and links,
@@ -168,8 +191,9 @@ data.
 
 ## Still required (`pending`)
 
-1. Build a fresh Debug `.app` from the exact final revision and repeat the selected-file and Test
-   Store flow. Re-run the already-passing Release build only if the source changes afterward.
+1. Build a fresh Debug `.app` from the exact final revision and repeat the selected-file, both
+   Save-panel export choices, and Test Store flow. Re-run the already-passing Release build only if
+   the source changes afterward.
 2. Manually inspect the remaining large-text, Increase Contrast, and Reduce Transparency states.
    The current light/dark portrait has already been regenerated and reviewed; regenerate it again
    only if later visual source changes are made.
