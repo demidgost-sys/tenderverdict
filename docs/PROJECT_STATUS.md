@@ -3,11 +3,12 @@
 - Snapshot date: **2026-08-05**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Audit baseline: `79186da7e83e40284cca9f34d658f6e2a0e1b335` (**superseded**)
-- Remediated product revision: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
-- Current candidate: **clean product revision, fresh SSD package, complete local gate, and product-
-  revision PR checks green**
+- Pushed remediation baseline: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
+- Current polished product revision: `58945e46af0dee0f88eb0eb92a218d0847e436d0`
+- Current candidate: **clean local product revision, fresh SSD package, complete local gate, and
+  current-revision PR checks pending push**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
-- Competition-branch state: **not released and not submitted to Devpost**
+- Competition-branch state: **current polish is local; not released and not submitted to Devpost**
 
 This is the canonical progress ledger for the competition branch. It records what was built, why
 it matters, what evidence exists, and what remains. Detailed technical contracts stay in the
@@ -28,7 +29,7 @@ Two readiness numbers are intentionally kept separate:
 | Readiness lens | Completed | Meaning |
 |---|---:|---|
 | Local Shipaton implementation | **20 / 22 milestones (91%)** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, and comparison drill-down are implemented; post-change accessibility QA and user validation remain |
-| Final submission | **8 / 12 gates (67%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, draft text, and product-revision CI exist; entrant, private-form, video, and final-link gates remain |
+| Final submission | **7 / 12 gates (58%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, and draft text exist; current-revision push/CI, entrant, private-form, video, and final-link gates remain |
 | Public product release | **Not ready** | The app is an ad-hoc-signed competition prototype without notarization, a trusted installer, production billing, or demonstrated external workflow fit |
 
 These percentages count the explicit equal-weight milestones below. They are not a probability of
@@ -61,30 +62,30 @@ keeping the published open-source CLI honest and useful.
 |---|---|---|
 | Existing product | Single-profile CLI, library, Tk desktop, deterministic reports, TED metadata adapter, and `v0.2.0-alpha.1` remain available | Existing release plus regression suite |
 | Portfolio core | Workspace schema v1, one to five profiles, strict validation, shared notice input, schema-3 nested reports, deterministic schema-1 aggregate JSON, stdout, and atomic output | Python models, workflow, CLI, fixtures, and tests |
-| Native application | SwiftUI app loads local workspace/notices, accepts an explicit review point, runs the canonical embedded core, preserves the last valid report after failure, makes control/bidi metadata visible, and exports entitlement-appropriate deterministic JSON | Source build, Debug/Release native checks, packaged smoke, and hands-on flow |
-| Workspace authoring | Native Profile Builder creates, renames, reorders, validates, and saves one to five complete profiles; the strict Python normalizer remains the canonical acceptance boundary | Strict Swift workspace codec, private core normalizer, launcher tests, and source smoke |
-| Notice import | CSV or JSON selection produces a bounded normalized preview, record count, canonical fields, and missing-field diagnostics before analysis | Private `inspect-notices` launcher contract, strict Swift decoder, and launcher/native checks |
-| Free experience | Complete first-profile review queue with text, buyer, deadline-presence, and verdict filters; progressive reasons/unknowns; empty state; safe supplied-source links; and one complete schema-3 export | Native query/export checks, source smoke, and existing accessibility inspection |
-| Premium experience | Entitlement-backed access to all one to five profile reports, a searchable comparison matrix, and stable notice/profile reasoning drill-down | Stable-identity projection checks and Test Store unlock evidence |
+| Native application | SwiftUI app loads local workspace/notices, validates an explicit review point, runs the canonical embedded core, preserves the last valid report after failure, distinguishes bundled/current/previous results, makes control/bidi metadata visible, and exports entitlement-appropriate deterministic JSON | Source build, Debug/Release native checks, packaged smoke, and hands-on flow |
+| Workspace authoring | Native Profile Builder creates, renames, reorders, validates, and saves one to five complete profiles; compact layouts retain their actions and field errors are specific; the strict Python normalizer remains the canonical acceptance boundary | Strict Swift workspace codec, private core normalizer, launcher tests, source smoke, and current-package compact-sheet inspection |
+| Notice import | CSV or JSON selection produces a bounded normalized preview, record count, canonical fields, visible warnings, and missing-field diagnostics before analysis | Private `inspect-notices` launcher contract, strict Swift decoder, and launcher/native checks |
+| Free experience | Complete first-profile review queue with text, buyer, deadline-presence, and verdict filters; grouped verdict drivers/checks; complete filter reset; empty state; safe supplied-source links; and one complete schema-3 export | Native query/export checks, source smoke, and existing accessibility inspection |
+| Premium experience | Entitlement-backed access to all one to five profile reports, a searchable comparison matrix, stable notice/profile reasoning drill-down, and a locked-state disagreement preview that discloses no gated reasoning | Stable-identity projection/disagreement checks and Test Store unlock evidence |
 | RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, entitlement refresh, relaunch, and restore are implemented | Configuration-specific native checks plus historical packaged Debug Test Store/dashboard evidence |
 | Secret boundary | No key committed or bundled; only process-local Debug `test_` configuration is accepted; Release exposes no key field and refuses configuration before any SDK call | Source review, scans, and Debug/Release native checks |
 | Local continuity | File continuity is explicit opt-in and stores only two security-scoped bookmarks; Forget clears them, report data and review points are not persisted, and reopening never auto-runs analysis | Source review and native checks |
 | Accessibility | Terminal RevenueCat states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Pure mapping/display checks and green source build; actual post-change async purchase outcome QA remains open |
-| Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke, zip, SHA-256, and manifest | Fresh Release-configuration artifact from exact clean revision `24b760a` on the SSD; details below |
-| Presentation | Exact icon and portrait screenshot, genuine unlocked and VoiceOver evidence, Devpost draft, runbook, demo script, architecture, user guide, scorecard, and UX audit | `submission/` and `docs/` |
-| Quality | 122 Python tests including 6 private-launcher and 3 release-scanner tests; 16 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | Complete local and packaged gate plus the green product-revision check record on draft PR #12 |
+| Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke, zip, SHA-256, and manifest | Fresh Release-configuration artifact from exact clean revision `58945e4` on the SSD; details below |
+| Presentation | Exact icon, refreshed light/dark-reviewed portrait screenshot, current static report screenshot, genuine unlocked and VoiceOver evidence, Devpost draft, runbook, demo script, architecture, user guide, scorecard, and UX audit | `submission/`, `demo/`, and `docs/` |
+| Quality | 122 Python tests including 6 private-launcher and 3 release-scanner tests; 18 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | Complete local and packaged gate for `58945e4`; pushed remediation baseline remains green on draft PR #12, while current polish awaits push/CI |
 
 ## Current clean evaluation artifact
 
 | Fact | Evidence |
 |---|---|
-| Product revision | `24b760a671efc9c2c2d54dc6cf4607ed730a293f` |
-| Artifact directory | `/Volumes/DemidMathSSD/MachineCaches/TenderVerdictShipaton/next-gen-artifacts-24b760a/` |
-| App / archive | `TenderVerdictNextGen.app` (53 MiB) / `TenderVerdictNextGen-macos.zip` (18 MiB) |
-| Archive SHA-256 | `5571eec61086a258364e5912dc3e0a92d6411597dadc4a9e4231c3ce6e17e7df` |
+| Product revision | `58945e46af0dee0f88eb0eb92a218d0847e436d0` |
+| Artifact directory | `/Volumes/DemidMathSSD/MachineCaches/TenderVerdictShipaton/next-gen-artifacts-58945e4/` |
+| App / archive | `TenderVerdictNextGen.app` (53 MiB) / `TenderVerdictNextGen-macos.zip` (19 MiB) |
+| Archive SHA-256 | `b0510f525f5f1762d2fdb0c525d1b5072d874f9672beab44b5841f2c14c4a18b` |
 | Manifest | `version=0.2.0a1`, `source_dirty=false`, `build_configuration=release`, `test_store_enabled=false`, RevenueCat `5.83.0`, `api_key_included=false`, `notarized=false` |
 | Platform / trust | macOS 13+, arm64 host build, ad-hoc signature, no Team ID, not a universal or notarized app |
-| Builder evidence | Release-native checks, embedded workspace/notice contracts twice with byte-identical output, signature verification, worktree-independent smoke, checksum verification, and ZIP integrity passed |
+| Builder evidence | 18 Release-native checks, embedded workspace/notice contracts twice with byte-identical output, signature verification, worktree-independent smoke, checksum verification, ZIP integrity, and current-package Profile Builder inspection passed |
 
 This package is the current self-contained no-key evaluation artifact. It is not Test Store
 transaction evidence; that requires a separate Debug package and process-local key. The ignored
@@ -112,7 +113,7 @@ repository `dist/` directory may still contain older output and must not be sele
 | 16 | Free review queue, verdict filters, disclosure, human next steps, and empty state are implemented | `DONE` |
 | 17 | Premium comparison, safe source links, HTML polish, and offering recovery are implemented | `DONE` |
 | 18 | Submission assets and the public documentation package are generated and validated | `DONE` |
-| 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — `24b760a` has the complete local/package evidence above and green draft-PR checks |
+| 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — `24b760a` remains the pushed green remediation baseline; current `58945e4` separately has the complete local/package evidence above and awaits push/CI |
 | 20 | VoiceOver asynchronous outcomes plus Increase Contrast, Reduce Transparency, and large-text variants | `PARTIAL` — implementation and pure checks are present; actual post-change purchase/cancel/failure announcement QA remains |
 | 21 | Three opt-in workflow sessions and two evidence-backed product changes | `OPEN` |
 | 22 | Native profile builder/editor for one to five complete profiles | `DONE` |
@@ -131,15 +132,16 @@ production API key, hosted backend, or App Store release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY_CURRENT_REVISION` — product revision `24b760a` is pushed and green; draft PR #12 remains the live record for documentation follow-ups |
+| 7 | Current pushed implementation revision passes all required CI checks | `PENDING_PUSH_CI` — `24b760a` is the green pushed baseline, but current polished product revision `58945e4` is still local |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `OWNER_GATE` |
 | 10 | Exact private Devpost fields are inspected after joining and signing in | `OWNER_GATE` |
 | 11 | Public captioned macOS demo under two minutes is published | `OPEN_LATER` |
 | 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `FINAL_GATE` |
 
-**Result: 8 of 12 submission gates ready.** The missing video is deliberately outside the current
-product-development pass, but it remains necessary before final submission.
+**Result: 7 of 12 submission gates ready.** Current-revision push/CI is the only newly reopened
+technical gate. The missing video is deliberately outside the current product-development pass, but
+it remains necessary before final submission.
 
 ## Reconciliation with the previous plans
 
@@ -151,7 +153,7 @@ product-development pass, but it remains necessary before final submission.
 | Self-contained packaging and submission assets | `COMPLETE` |
 | Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE` |
 | Judge-facing review queue, comparison matrix, safe links, and visual QA | `COMPLETE` |
-| Clean implementation commit and full PR CI | `COMPLETE` — exact product revision `24b760a` is packaged and green; later documentation-only head checks remain visible on draft PR #12 |
+| Clean implementation commit and full PR CI | `COMPLETE_BASELINE_CURRENT_LOCAL` — `24b760a` is packaged, pushed, and green; polished product revision `58945e4` is clean, packaged, and locally gated but not yet pushed |
 | Advanced macOS accessibility variants | `IMPLEMENTED_PENDING_MANUAL_QA` — terminal-state mapping, VoiceOver announcements, focus recovery, increased contrast, and reduced transparency are implemented; actual post-change async Test Store outcomes remain |
 | Native Profile Builder | `COMPLETE` — creates, renames, reorders, validates, and saves one to five full profiles |
 | Import wizard | `COMPLETE_BOUNDED` — normalized preview, canonical fields, and missing-field guidance exist; arbitrary user-defined column mapping is intentionally excluded |
@@ -164,12 +166,16 @@ product-development pass, but it remains necessary before final submission.
 
 Verified:
 
-- remediated product revision `24b760a` is public and its required PR checks passed; the linked
-  draft PR is the authoritative live record for documentation follow-ups;
-- that source passes 122 Python tests, 16 native checks in both Debug and Release, Ruff,
-  Mypy, Swift format, public-tree, security, source-smoke, asset, distribution, and diff gates;
+- pushed remediation baseline `24b760a` is public and its required PR checks passed; the linked draft
+  PR is the authoritative live CI record;
+- current polished product revision `58945e4` passes 122 Python tests, 18 native checks in both Debug
+  and Release, Ruff, Mypy, Swift format, public-tree, security, source-smoke, asset, distribution,
+  and diff gates locally;
 - its clean SSD package records `source_dirty=false`, disables Test Store in Release, passes the
   embedded-core/signature/checksum/ZIP/worktree-independent smoke gates, and is arm64/ad-hoc signed;
+- that current package was launched outside the worktree; its main state and compact Profile Builder
+  were inspected, and malformed CPV input produced a specific visible validation error without
+  hiding the footer actions;
 - Test Store purchase and restore changed the real entitlement-backed UI;
 - Shipaton Manager Perttu Lähteenlahti confirmed on 2026-08-05 that Test Store is enough for the
   Next Gen category;
@@ -193,13 +199,16 @@ Not verified and therefore not claimable:
 
 ## Next implementation order
 
-1. Build a fresh final-revision Debug app and exercise actual Test Store purchase, cancel, failure,
-   refresh, and restore outcomes with VoiceOver, Increase Contrast, Reduce Transparency, and a
-   large-text setting; record pass/fail without retaining a key or customer identifier.
-2. Run three opt-in workflow sessions with public, synthetic, or fully de-identified notices and
+1. Push the current product/documentation commits when publication is explicitly requested and wait
+   for every required draft-PR check to pass on that exact head.
+2. Build a Debug app from that exact product revision and exercise actual Test Store purchase,
+   cancel, failure, refresh, and restore outcomes with VoiceOver, Increase Contrast, Reduce
+   Transparency, and a large-text setting; record pass/fail without retaining a key or customer
+   identifier.
+3. Run three opt-in workflow sessions with public, synthetic, or fully de-identified notices and
    document only evidence-backed adjustments.
-3. Confirm the entrant student/email gate and inspect the private Devpost fields.
-4. Only then finish the public demo and final logged-out repository/video/submission checks.
+4. Confirm the entrant student/email gate and inspect the private Devpost fields.
+5. Only then finish the public demo and final logged-out repository/video/submission checks.
 
 Cross-profile ranking, automatic bidding, confidential-document ingestion, hosted accounts,
 analytics, production billing, and a verdict-engine rewrite remain outside the plan because they

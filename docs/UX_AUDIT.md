@@ -34,8 +34,10 @@ exports one complete schema-3 report, and that Release cannot reach Test Store S
 Exact totals and packaged provenance live in [project status](PROJECT_STATUS.md). The prior packaged
 Debug baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
 predates the newest UX changes. The current portrait asset has been regenerated and reviewed in
-light and dark appearance; a fresh Debug transaction build and manual VoiceOver checks for
-asynchronous purchase outcomes remain pending.
+light and dark appearance. The current Release package was also launched outside the worktree and
+its compact Profile Builder plus specific invalid-CPV recovery were inspected manually; a fresh
+Debug transaction build and manual VoiceOver checks for asynchronous purchase outcomes remain
+pending.
 
 ## Current source audit (`code_verified`)
 
@@ -95,6 +97,19 @@ with byte-identical output, ad-hoc signature verification, and app smoke from ou
 It produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release is
 the no-key evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact
 current provenance lives in [project status](PROJECT_STATUS.md).
+
+## Current Release package (`manual`, 2026-08-05)
+
+The exact clean Release artifact named in project status was launched outside the worktree after the
+polish commit. This is current visual and interaction evidence, but not Test Store evidence because
+Release intentionally cannot accept a RevenueCat key.
+
+| Step | Current outcome |
+|---|---|
+| Main report state | Bundled demo context, one Open / one Watch / one Reject, and the bounded two-of-three disagreement preview were visible. |
+| Compact Profile Builder | At a 680×714 sheet size, profile fields, status text, and footer actions remained visible without the former spacer gap. |
+| Field recovery | Entering CPV `7226` and choosing **Validate** produced the specific eight-digit error in the profile card and footer. |
+| Exit | The packaged app closed normally after inspection; no Test Store key or user data was entered. |
 
 ## Packaged baseline (`manual`, 2026-08-04)
 
