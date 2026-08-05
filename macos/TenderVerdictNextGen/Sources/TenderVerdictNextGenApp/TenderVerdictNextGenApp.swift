@@ -1531,6 +1531,11 @@ struct ReviewQueue: View {
     filter != .all || !searchText.isEmpty || !buyerText.isEmpty || deadlinePresence != .any
   }
 
+  private var filteredResultCountLabel: String {
+    let count = filteredResults.count
+    return "\(count) \(count == 1 ? "result" : "results")"
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
       ViewThatFits(in: .horizontal) {
@@ -1563,18 +1568,12 @@ struct ReviewQueue: View {
           tint: .gray
         )
       } else if visibleResults.isEmpty {
-        VStack(alignment: .leading, spacing: 10) {
-          NoticeCard(
-            title: "No results in this view",
-            detail: "Adjust the search, buyer, deadline, or verdict filters to continue.",
-            systemImage: "line.3.horizontal.decrease.circle",
-            tint: .gray
-          )
-          if hasActiveFilters {
-            Button("Clear all filters") { clearFilters() }
-              .buttonStyle(.bordered)
-          }
-        }
+        NoticeCard(
+          title: "No results in this view",
+          detail: "Adjust the search, buyer, deadline, or verdict filters to continue.",
+          systemImage: "line.3.horizontal.decrease.circle",
+          tint: .gray
+        )
       } else {
         LazyVStack(spacing: 10) {
           ForEach(visibleResults) { result in
@@ -1654,7 +1653,7 @@ struct ReviewQueue: View {
     .pickerStyle(.menu)
     .frame(maxWidth: 220)
 
-    Text("\(filteredResults.count) results")
+    Text(filteredResultCountLabel)
       .font(.caption.monospacedDigit())
       .foregroundStyle(.secondary)
 

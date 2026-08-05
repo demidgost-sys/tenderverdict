@@ -168,6 +168,21 @@ class ProjectMetadataTests(unittest.TestCase):
             workflow,
         )
 
+    def test_next_gen_review_queue_copy_and_reset_are_unambiguous(self) -> None:
+        app_source = (
+            ROOT
+            / "macos"
+            / "TenderVerdictNextGen"
+            / "Sources"
+            / "TenderVerdictNextGenApp"
+            / "TenderVerdictNextGenApp.swift"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("Text(filteredResultCountLabel)", app_source)
+        self.assertIn('count == 1 ? "result" : "results"', app_source)
+        self.assertNotIn('Button("Clear all filters")', app_source)
+        self.assertEqual(app_source.count('Button("Clear filters")'), 2)
+
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
         local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
