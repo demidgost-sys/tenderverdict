@@ -31,7 +31,8 @@ before the file controls, and explains the complete Free profile versus Portfoli
 technical RevenueCat build state. The static report uses the same open/verify/skip and human-owned
 next-step vocabulary. The native Export menu now turns the accepted report into either deterministic
 JSON or a self-contained human-review HTML brief: Free receives the complete first profile and
-Premium receives every profile in source order.
+Premium receives every profile in source order. A final filter-feedback micro-pass also corrects
+the one-result label and removes a duplicate reset action from the no-match state.
 
 The native suite now covers pure terminal RevenueCat accessibility outcomes in both Debug and
 Release, and the complete Python/source gate passes on the current candidate. It also verifies that
@@ -123,6 +124,22 @@ claim that the Save panel or Test Store transaction was exercised hands-on.
 | Premium boundary | The packaged Premium renderer emitted all three synthetic profiles and their shared notices in source order, with independent per-profile counts only. |
 | Safety and determinism | Repeated bytes are deterministic; injected markup is escaped; control/bidi characters remain visible; an unsafe URL never becomes a link; empty notices have an explicit state; no score, ranking, or automatic recommendation appears. |
 | Process boundary | Rendering ran from `/` against the embedded core. No key, Test Store call, user file, or external destination was used. |
+
+## Current filter-feedback micro-pass (`manual` + `automated`, 2026-08-05)
+
+The exact clean `69eed54` Release package was compared with the previous clean `e6efc9d` package at
+the default 1020×900 window using only the bundled synthetic report. These are reproducible
+maintainer observations, not independent user-research sessions.
+
+| Reproduction | Observed before | Current outcome |
+|---|---|---|
+| Select the single-result **Watch** verdict filter | The visible and accessibility text said `1 results`. | The current package says `1 result`; zero and plural counts retain `results`. |
+| Search for `zzzzz` to produce no matches | The same state exposed both **Clear filters** and **Clear all filters**. | One stable **Clear filters** action remains beside the count, followed by the explanatory empty-state card. |
+
+The Python metadata guard now checks the singular/plural source contract and rejects a second
+`Clear all filters` action. The full source gate, Release builder, checksum verification, light/dark
+render, and hands-on accessibility-tree comparison passed for `69eed54`. The three opt-in external
+workflow sessions remain open and are not implied by this micro-pass.
 
 ## Previous Release package (`manual`, 2026-08-05)
 
