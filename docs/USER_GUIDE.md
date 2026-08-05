@@ -169,12 +169,13 @@ recovery targets; focus returns to purchase, retry, restore, or the key field on
 user action, not an automatic launch refresh. Cards adapt their borders/fills for Increase Contrast
 and remove decorative transparency/shadows when Reduce Transparency is active.
 
-Those paths are implemented, and the clean release-configuration package named in project status
-passed its embedded-core, signature, checksum, ZIP, and worktree-independent smoke checks. A
-hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency, and large text is still
-required before submission. A previous Debug Test Store pass confirmed that VoiceOver exposed the
-transaction controls and activated Restore; it is historical transaction evidence, not fresh
-settings QA for the current package.
+Those paths are implemented, and the clean packages named in project status passed their embedded-
+core, signature, checksum, ZIP, and worktree-independent smoke checks. The fresh `3cf20ed` Debug
+pass covered keyboard order, Increase Contrast, Reduce Transparency, large-text rendering, and the
+current purchase/cancel/failure/retry/restore/relaunch states. VoiceOver was deliberately excluded
+to keep that pass silent. The previous Debug baseline remains the latest evidence that VoiceOver
+exposed the transaction controls and activated Restore; current spoken announcements/focus still
+require a dedicated pass before submission.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains
 available and visibly marked as previous; exporting it never silently presents it as current. If

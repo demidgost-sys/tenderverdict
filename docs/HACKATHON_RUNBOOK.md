@@ -41,9 +41,10 @@ Sources rechecked on 2026-08-05:
 - [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
 - [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-The owner has joined with the qualifying student profile, but the private project-creation form has
-not been opened and audited. Do not invent its fields: inspect them only while the owner is signed
-in, and do not submit without a separate final action.
+The owner has joined with the qualifying student profile. Project creation was opened but stopped
+at visual reCAPTCHA before a draft or private fields existed. Do not invent its fields: after the
+owner completes that visual challenge, inspect them while signed in and do not submit without a
+separate final action.
 
 ## Current product proof
 
@@ -94,8 +95,9 @@ without a worktree, archives it, and writes a checksum. The bundle is not notari
 The fresh 2026-08-05 Release build from the current source passed embedded workspace normalization
 and notice inspection twice with byte-identical output, contract decoding, ad-hoc signature
 verification, and a worktree-independent app smoke test. The `.app`, zip, and SHA-256 companion
-were created on regenerable SSD build/output paths. A fresh Debug transaction build is still
-required because Release intentionally rejects Test Store transactions.
+were created on regenerable SSD build/output paths. A separate clean Debug artifact from
+`3cf20ed0d1607b7feb943109f72c1c528df55e5b` was then built on the SSD for transaction evidence;
+Release intentionally continues to reject Test Store transactions.
 
 After any native source or asset change, regenerate all three outputs rather than presenting the
 older bundle as the current candidate. If build scratch must live on a separate volume, use the
@@ -159,11 +161,14 @@ Restore access invoked `restorePurchases()`; and RevenueCat showed the sandbox s
 key and anonymous customer identifier were not retained. VoiceOver exposed and activated Restore,
 and was switched off again after the pass.
 
-That baseline proves the RevenueCat architecture, but native UX changed afterward. Before using it
-as final-revision proof, create a fresh packaged Debug build and repeat the sequence. The code now
-maps terminal access states to accessibility announcements and restores focus after user-triggered
-actions; manual VoiceOver verification of asynchronous success, cancellation, and failure remains
-pending.
+The fresh `3cf20ed` Debug package repeated the current offering, cancellation, simulated failure,
+retry, valid purchase, immediate restore, and relaunch refresh outcomes. Its manifest records a
+clean Debug source revision, Test Store enabled, RevenueCat `5.83.0`, and no bundled key. The key was
+cleared after the run. A later restore after the accelerated Test Store subscription expired
+correctly returned locked; immediate restore remained unlocked. The current pass also covered
+keyboard navigation, Increase Contrast, Reduce Transparency, and a temporary large-text renderer
+override that was reverted immediately. It did not re-open the dashboard and did not run VoiceOver.
+Manual VoiceOver verification of asynchronous success, cancellation, and failure remains pending.
 
 ## Submission assets
 
@@ -203,16 +208,18 @@ Never use a fake entitlement state as evidence.
 - [x] The release-configuration artifact named in project status passes checksum creation,
   signature, embedded-core contract/determinism, configuration-specific native checks, and
   worktree-independent smoke checks.
-- [ ] A fresh Debug package is generated from the final revision for the hands-on Test Store pass.
+- [x] A fresh Debug package is generated from the final product revision for the hands-on Test Store pass.
 - [x] The current candidate passes the complete source/package gate recorded in
   [project status](PROJECT_STATUS.md), including Python, Debug/Release native, formatting, typing,
   public-tree, security, asset, and diff checks.
 - [ ] The exact final submitted revision passes its pushed PR CI checks.
-- [ ] Test Store success, cancel, failure, retry, relaunch, restore, and dashboard evidence is
-  refreshed on the final Debug package.
+- [x] Test Store success, cancel, failure, retry, relaunch, and immediate restore are refreshed on
+  the final product Debug package.
+- [ ] RevenueCat dashboard readback is refreshed for the same final evidence take; the existing
+  dashboard proof remains the dated 2026-08-04 baseline.
 - [ ] VoiceOver announces asynchronous success, cancellation, and failure and restores useful focus.
-- [ ] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
-  light/dark and the regenerated portrait screenshot already pass visual review.
+- [x] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
+  light/dark and the regenerated portrait screenshot also pass visual review.
 - [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.
 - [x] Icon is exactly 1024×1024.
 - [x] At least one current screenshot is exactly 1179×2556 and has no device frame.

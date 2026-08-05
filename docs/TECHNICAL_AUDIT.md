@@ -69,9 +69,10 @@ gaps without changing report schemas or qualification ownership:
 | Locked Premium named profiles but did not demonstrate why comparison matters | Upgrade value depended on explanation rather than product evidence | A bounded count shows how many shared notices differ across profiles while keeping gated reports hidden and adding no score |
 
 Native checks cover the pure review-point, reason-grouping, disagreement-count, and deterministic
-fixture contracts. Light/dark portrait inspection covers the generated first-run view; interactive
-settings, final packaged Profile Builder, and asynchronous RevenueCat accessibility remain the
-manual evidence boundary described below.
+fixture contracts. Light/dark portrait inspection covers the generated first-run view. The fresh
+`3cf20ed` Debug pass covers keyboard navigation, current Test Store outcomes, Increase Contrast,
+Reduce Transparency, and bounded large text; final packaged Profile Builder and VoiceOver speech/
+focus remain the manual evidence boundary described below.
 
 ## Contract reconciliation
 
@@ -117,7 +118,7 @@ the root on-ramp, documentation links, CI/native gates, and public-tree membersh
 | Next Gen source | Remediated competition candidate with coherent Free/Premium and Debug/Release contracts |
 | Current SSD `.app` | Self-contained release-configuration artifact named in project status; manifest/checksum/signature/ZIP/smoke verified, ad-hoc signed, not notarized, and not transaction evidence |
 | External macOS product release | **Not ready**: no Developer ID/notarization, supported installer/update path, production billing decision, or external workflow validation |
-| Final Shipaton submission | **Not ready**: final Debug transaction/accessibility evidence and remaining owner/submission gates are open |
+| Final Shipaton submission | **Not ready**: VoiceOver, independent-user, private Devpost, video, and final-link gates are open |
 
 “All checks green” means the scoped repository/package gate passed for the named revision. It does
 not mean the app is publicly released, the manual evidence is current, or the Devpost form is
@@ -125,15 +126,14 @@ submitted.
 
 ## Residual risks and next evidence
 
-1. Build a fresh Debug app from the eventual final product revision and manually exercise Test
-   Store success, cancellation, failure, retry, refresh, relaunch, and restore with VoiceOver.
-2. Inspect large text, Increase Contrast, and Reduce Transparency on that same final UX revision.
-3. Run three opt-in supplier/procurement sessions with synthetic, public, or fully de-identified
+1. When sound is allowed, manually exercise Test Store success, cancellation, failure, retry, and
+   restore with VoiceOver and verify spoken announcements plus recovery focus.
+2. Run three opt-in supplier/procurement sessions with synthetic, public, or fully de-identified
    inputs and make only evidence-backed product changes.
-4. Confirm entrant student/email state and inspect the private Devpost fields in the owner's
-   account.
-5. Re-run local, packaged, and pushed CI gates after any product, dependency, or asset change.
-6. Treat signing/notarization, trusted distribution, production billing, and public support as
+3. Complete the visual reCAPTCHA manually and inspect the private Devpost project fields without
+   submitting.
+4. Re-run local, packaged, and pushed CI gates after any product, dependency, or asset change.
+5. Treat signing/notarization, trusted distribution, production billing, and public support as
    separate decisions rather than promoting the competition artifact by wording alone.
 
 ## Re-audit triggers

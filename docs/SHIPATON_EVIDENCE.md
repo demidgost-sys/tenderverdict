@@ -38,10 +38,10 @@ fail-closed RevenueCat access, opt-in bookmark-only continuity, embedded offline
 reproducible Release and Debug `.app` builders, actionable Free review, stable Premium comparison
 drill-down, competition assets, and local Test Store evidence. No usable key, customer identifier,
 or account screenshot is retained. Draft PR #12 is the authoritative pushed-revision check record;
-the exact audited revision, local-gate totals, and current SSD package live in
-[project status](PROJECT_STATUS.md). Post-change asynchronous VoiceOver outcomes, a
-fresh final Debug transaction pass, public video, academic-email verification, private Devpost
-audit, and submission remain open.
+the exact audited revision, local-gate totals, and current SSD packages live in
+[project status](PROJECT_STATUS.md). A fresh final-product Debug transaction/settings pass is now
+recorded. Post-change asynchronous VoiceOver outcomes, three independent workflow sessions, the
+public video, private Devpost project audit, and submission remain open.
 
 ## Requirement matrix
 
@@ -212,7 +212,11 @@ retry state and remained locked; success activated `supplier_profiles_plus` and 
 profile reports. Relaunch required re-entering the process-local key and then recovered the same
 active entitlement without a second purchase. `restorePurchases()` preserved unlocked access, and
 the RevenueCat dashboard showed the corresponding sandbox subscription. The anonymous customer
-identifier was deliberately not recorded.
+identifier was deliberately not recorded. The exact clean `3cf20ed` Debug package repeated the
+offering, cancellation, simulated failure, retry, valid purchase, immediate restore, and relaunch
+refresh paths on 2026-08-05. A later restore after accelerated Test Store expiry correctly returned
+locked. The current pass did not repeat dashboard readback, so that evidence remains dated
+2026-08-04 rather than being upgraded to final-current proof.
 
 In the previously packaged baseline, VoiceOver exposed distinct names and states for the
 inputs, review point, demo, export, and restore controls. Keyboard focus followed the logical order
@@ -220,28 +224,26 @@ and skipped the disabled Run button. Restore was activated through the VoiceOver
 entitlement remained active. VoiceOver was switched off again after the pass. Supplemental local
 artifacts are stored in `submission/evidence/`; neither image contains a key or customer identifier.
 
-The current UX worktree adds deterministic terminal-state announcements and recovery-focus mapping
-plus increased-contrast and reduced-transparency styling. Pure mapping checks and source smoke are
-green. Actual purchase, cancel, failure, refresh, and restore announcements in a freshly packaged
-build have not yet been manually re-exercised and must not be claimed as complete.
+The current source adds deterministic terminal-state announcements and recovery-focus mapping plus
+increased-contrast and reduced-transparency styling. Pure mapping checks and source smoke are green.
+Keyboard order, Increase Contrast, Reduce Transparency, and a temporary large-text render passed on
+the clean `3cf20ed` package without retaining the test-only source override. VoiceOver was
+explicitly excluded to keep the pass silent, so spoken purchase/cancel/failure/restore announcements
+must not be claimed as hands-on complete.
 
 ## Remaining evidence path
 
 The organizer gate is closed with a positive answer. The remaining minimum is:
 
-1. run the complete Python, native, public-tree, security, package, and deterministic smoke gate on
-   the final source revision;
-2. use the fresh self-contained Release app for the interactive local-file, import-preview, Profile
-   Builder, review, drill-down, export, and failure-retention pass; refresh and inspect the
-   icon/screenshot because the visible UI changed;
-3. manually exercise actual Test Store purchase, cancel, failure, refresh, and restore announcements
-   with VoiceOver plus Increase Contrast, Reduce Transparency, and a large-text setting;
-4. run three opt-in workflow sessions and document only evidence-backed product changes;
-5. inspect the exact private Devpost fields after the owner signs in and joins;
-6. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
+1. when sound is allowed again, manually exercise actual Test Store purchase, cancel, failure,
+   retry, and restore announcements with VoiceOver and verify recovery focus;
+2. run three opt-in workflow sessions and document only evidence-backed product changes;
+3. solve the visual reCAPTCHA manually and inspect the exact private Devpost project fields without
+   submitting;
+4. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
    verified duration below two minutes;
-7. confirm active-student status and complete Devpost with the qualifying academic email;
-8. verify the final public repository and video while logged out, and then complete the Devpost
+5. refresh the dashboard screenshot/evidence during the final continuous Test Store take;
+6. verify the final public repository and video while logged out, and then complete the Devpost
    submission without claiming a real payment or App Store transaction.
 
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted

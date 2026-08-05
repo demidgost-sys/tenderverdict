@@ -325,11 +325,12 @@ release-configuration evaluation artifact contains no key and is not itself tran
 The pre-audit artifact is superseded. The clean remediation artifact named in project status passed
 its configuration-specific, integrity, and smoke checks; exact provenance is tracked in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
-A previous reproducible Debug artifact completed a local RevenueCat Test Store offering, cancel,
-failure, purchase, entitlement refresh, relaunch, and restore pass; that is test evidence, not a
-real payment. The current icon and portrait screenshot were regenerated and structure-checked; the
-portrait was also visually reviewed in light and dark appearance. Final-package large-text,
-contrast/transparency, and asynchronous VoiceOver outcomes remain manual evidence gates.
+A fresh clean Debug artifact from evidence revision `3cf20ed` completed the local RevenueCat Test
+Store offering, cancel, simulated failure, retry, purchase, immediate restore, and relaunch refresh
+pass; that is test evidence, not a real payment. The current icon and portrait screenshot were
+regenerated and structure-checked; the portrait was also visually reviewed in light and dark
+appearance. Keyboard order, large-text rendering, Increase Contrast, and Reduce Transparency were
+checked silently. Asynchronous VoiceOver speech/focus remains a manual evidence gate.
 
 The Shipaton Manager has confirmed that a Test Store integration is sufficient for judging and
 that a macOS app is accepted without a judging disadvantage:

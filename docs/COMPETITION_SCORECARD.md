@@ -28,9 +28,9 @@ The Next Gen criteria are paraphrased below from the
 | RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised, and the Shipaton Manager confirmed Test Store is enough for Next Gen | `VERIFIED_TEST_STORE`, `ORGANIZER_CONFIRMED` |
 | Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, and public documentation | `STRONG_WITH_OPEN_FINAL_QA` |
 
-The remaining weakness is not missing feature volume, Test Store eligibility, or package
-reproducibility. It is external proof that the narrow workflow is genuinely useful, plus the
-fresh final-Debug Test Store and interactive accessibility evidence pass on the final UX revision.
+The remaining weakness is not missing feature volume, Test Store eligibility, package
+reproducibility, or the silent final-product Debug/settings pass. It is external proof that the
+narrow workflow is genuinely useful, plus VoiceOver evidence on the final UX revision.
 
 ## Category decision
 
@@ -120,7 +120,7 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 
 | Priority | Improvement | Current state | Why it matters | Acceptance evidence |
 |---|---|---|---|---|
-| P1 | Complete accessibility evidence pass | `IMPLEMENTED_PENDING_MANUAL_QA` | Converts deterministic terminal-state handling into verified real-flow usability | Fresh packaged purchase/cancel/failure/refresh/restore announcements plus Increase Contrast, Reduce Transparency, and large-text checks |
+| P1 | Complete accessibility evidence pass | `PARTIAL_MANUAL_QA` | Converts deterministic terminal-state handling into verified real-flow usability | Keyboard, purchase/cancel/failure/retry/refresh/restore, Increase Contrast, Reduce Transparency, and large-text checks passed; VoiceOver speech/focus remains |
 | P1 | Real-user workflow pass | `OPEN` | Tests whether verdict wording and comparison actually reduce review work | Three opt-in sessions and two documented workflow changes using public, synthetic, or de-identified data |
 | P1 | Native profile builder and editor | `IMPLEMENTED` | Removes hand-authored workspace JSON while preserving the strict canonical contract | Source checks and fresh Release embedded codec/normalizer determinism are green; interactive packaged UI pass remains |
 | P1 | Local workspace continuity | `IMPLEMENTED_OPT_IN` | Makes repeated supplier review feel like a product without creating an account | Only two security-scoped bookmarks persist; Forget clears them; no content/report/key/review point or auto-run |
@@ -156,15 +156,14 @@ video, icon, screenshot, platform, and eligibility requirements are already trac
 [runbook](HACKATHON_RUNBOOK.md).
 
 The exact audited revision, current suite totals, pushed CI result, and SSD artifact provenance live
-in [project status](PROJECT_STATUS.md). A fresh final-Debug transaction run, interactive packaged
-UX, and manual accessibility outcomes still must be verified rather than treated as inherited
-evidence.
+in [project status](PROJECT_STATUS.md). The fresh final-product Debug transaction and silent settings
+pass are current; VoiceOver and independent-user outcomes still must be verified rather than
+treated as inherited evidence.
 
 ## Owner inputs — later, not required for this implementation pass
 
 When the local product and QA pass is complete, the owner will need to provide or confirm:
 
-1. the qualifying academic email and current student-status confirmation inside Devpost;
-2. access to the joined Devpost project so its exact private fields can be audited;
-3. three opt-in workflow testers or permission to use already identified volunteers;
-4. final approval of the exact commit and public claims before any release or submission action.
+1. manual completion of the visual Devpost reCAPTCHA so the private project fields can be audited;
+2. three opt-in workflow testers or permission to use already identified volunteers;
+3. final approval of the exact commit and public claims before any release or submission action.

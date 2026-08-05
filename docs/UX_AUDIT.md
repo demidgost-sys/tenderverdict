@@ -39,13 +39,15 @@ Release, and the complete Python/source gate passes on the current candidate. It
 untrusted control and bidirectional-formatting characters become visible in SwiftUI, that Free
 exports one complete schema-3 report and a gated review brief, and that Release cannot reach Test
 Store SDK configuration. Exact totals and packaged provenance live in
-[project status](PROJECT_STATUS.md). The prior packaged
-Debug baseline still provides genuine RevenueCat Test Store and VoiceOver Restore evidence, but it
-predates the newest UX changes. The current portrait asset has been regenerated and reviewed in
-light and dark appearance. The current Release package rendered both native appearances and both
-review-brief projections outside the worktree; the previous Release package remains the latest
-hands-on compact Profile Builder and invalid-CPV recovery pass. A fresh Debug transaction build and
-manual VoiceOver checks for asynchronous purchase outcomes remain pending.
+[project status](PROJECT_STATUS.md). The fresh `3cf20ed` packaged Debug build now provides current
+cancellation, failure, retry, purchase, immediate restore, relaunch refresh, keyboard, contrast,
+transparency, and temporary large-text evidence. The prior packaged Debug baseline remains the
+latest VoiceOver Restore and dashboard readback evidence. The current portrait asset has been
+regenerated and reviewed in light and dark appearance. The current Release package rendered both
+native appearances and both review-brief projections outside the worktree; the previous Release
+package remains the latest
+hands-on compact Profile Builder and invalid-CPV recovery pass. Manual VoiceOver checks for
+asynchronous purchase outcomes remain pending by explicit owner choice.
 
 ## Current source audit (`code_verified`)
 
@@ -106,8 +108,8 @@ The clean release-configuration package named in project status passed
 configuration-specific native checks, embedded normalization and import-preview contracts twice
 with byte-identical output, ad-hoc signature verification, and app smoke from outside the worktree.
 It also rendered the Free and Premium HTML projections plus both native appearances from `/`, then
-produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release is the
-no-key evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact
+produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release remains
+the no-key evaluation artifact; the separate fresh Debug Test Store pass is recorded below. Exact
 current provenance lives in [project status](PROJECT_STATUS.md).
 
 ## Current review-brief pass (`automated` + visual inspection, 2026-08-05)
@@ -159,6 +161,29 @@ independent user-research session or final accessibility evidence.
 The metadata regression tests pin the headline, reject `RevenueCat-powered` in the app and
 canonical draft, require all brief sections and aliases, and resolve every public Markdown link.
 The packaged smoke, signature, ZIP, and checksum checks passed without a key or user data.
+
+## Fresh silent Debug and settings pass (`manual`, 2026-08-05)
+
+The exact clean `3cf20ed0d1607b7feb943109f72c1c528df55e5b` Debug artifact named in
+[project status](PROJECT_STATUS.md) was exercised without sound. VoiceOver was not launched.
+
+| Step | Current outcome |
+|---|---|
+| Artifact integrity | Manifest records `source_dirty=false`, Debug configuration, Test Store enabled, RevenueCat `5.83.0`, no bundled key, ad-hoc signing, and no notarization. Builder smoke, 19 Debug checks, checksum, and ZIP integrity passed. |
+| Keyboard navigation | With macOS Keyboard Navigation temporarily enabled, Tab traversed workspace, builder, notices, review point, reload/export/continuity, verdict filters, search, buyer/deadline filters, secure key field, and recovery controls in logical order; disabled controls were skipped. Arrow plus Space changed and restored the verdict filter. |
+| Increase Contrast | Stronger semantic borders and opaque card boundaries appeared without clipping, overlap, or loss of textual verdict labels. |
+| Reduce Transparency | Surfaces remained legible and structurally stable; the setting was restored after inspection. |
+| Large text | Full Xcode Dynamic Type overrides were unavailable on this Command Line Tools host. A one-line test-only `.environment(\.dynamicTypeSize, .accessibility3)` override was applied only to the headless screenshot renderer, visually inspected at 1179×2556, and immediately reverted. The headline wrapped, filters adapted from segmented controls to a menu, and no clipping or overlap appeared. No product source change was retained. |
+| Test Store cancellation | The native Test Store sheet returned the explicit cancelled state; access stayed locked and purchase/restore/refresh remained available. |
+| Simulated failure and retry | **Test failed purchase** produced the explicit failed state; Retry returned to the current offering and localized `0,99 $` package. |
+| Purchase and entitlement | **Test valid purchase** activated `supplier_profiles_plus` and revealed the three-profile comparison and full Portfolio export path. |
+| Restore and expiry | Immediate `restorePurchases()` kept access unlocked. A later restore after Test Store's accelerated subscription expiry correctly returned locked; this was not recorded as a restore failure. |
+| Relaunch refresh | Quitting and reopening removed the process-local key. Re-entering it recovered the still-active entitlement without a second purchase. |
+| Cleanup | App and System Settings were closed or returned to their original state; Keyboard Navigation, Increase Contrast, and Reduce Transparency were off; preferred reading size was restored; the key was cleared from the clipboard and never written to the repository. |
+
+This pass verifies visible state and interaction without claiming spoken announcements. It made no
+functional product change and created no real payment, App Store transaction, production customer,
+or retained key/customer identifier.
 
 ## Previous Release package (`manual`, 2026-08-05)
 
@@ -227,17 +252,14 @@ data.
 
 ## Still required (`pending`)
 
-1. Build a fresh Debug `.app` from the exact final revision and repeat the selected-file, both
-   Save-panel export choices, and Test Store flow. Re-run the already-passing Release build only if
-   the source changes afterward.
-2. Manually inspect the remaining large-text, Increase Contrast, and Reduce Transparency states.
-   The current light/dark portrait has already been regenerated and reviewed; regenerate it again
-   only if later visual source changes are made.
-3. With VoiceOver enabled, manually exercise Test Store purchase success, cancellation, failure,
+1. With VoiceOver enabled, manually exercise Test Store purchase success, cancellation, failure,
    retry, and restore. Confirm each asynchronous announcement is spoken once and focus lands on the
    documented recovery control.
-4. Preserve dated evidence without an API key, customer identifier, account email, or unrelated
+2. Repeat the selected-file and both Save-panel export choices only if the native source changes or
+   they are needed in the final continuous video take.
+3. Preserve dated evidence without an API key, customer identifier, account email, or unrelated
    desktop content.
 
-Until those steps pass, describe announcement routing and visual adaptation as implemented and
-automated-contract-checked, not as fully hands-on verified on the final package.
+Until VoiceOver passes, describe announcement routing as implemented and automated-contract-checked,
+not as spoken hands-on verified. Contrast, transparency, keyboard order, and the bounded large-text
+render may be described as hands-on checked on `3cf20ed`.

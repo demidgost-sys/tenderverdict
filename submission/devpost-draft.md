@@ -142,10 +142,11 @@ with evidence a human can defend.
 
 ## What is next
 
-Build the exact final Release and Debug packages, refresh the current portrait and unlocked visual
-evidence, manually verify VoiceOver announcements for asynchronous success/cancellation/failure,
-confirm academic eligibility, publish the captioned sub-1:50 demo, run CI on the submitted commit,
-and verify the repository/video/final entry while logged out.
+Keep the exact final Release and current Debug evidence aligned, refresh the dashboard/unlocked
+visual during the final take, manually verify VoiceOver announcements for asynchronous success/
+cancellation/failure, complete the private project draft after visual reCAPTCHA, publish the
+captioned sub-1:50 demo, run CI on the submitted commit, and verify the repository/video/final entry
+while logged out.
 
 ## Links
 

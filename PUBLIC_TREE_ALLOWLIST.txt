@@ -93,6 +93,7 @@ submission/evidence/README.md
 submission/evidence/unlocked-test-store-2026-08-04.png
 submission/evidence/voiceover-restore-2026-08-04.png
 submission/icon-1024.png
+submission/linkedin-user-testing-draft.md
 submission/screenshot-1179x2556.png
 tests/test_cli.py
 tests/test_desktop.py

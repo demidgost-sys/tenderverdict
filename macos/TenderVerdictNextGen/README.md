@@ -193,12 +193,14 @@ contracts. Its fresh self-contained release-configuration artifact passed packag
 signature, checksum, ZIP, and smoke verification; see
 [project status](../../docs/PROJECT_STATUS.md) for the exact live result.
 
-A previous Debug Test Store pass covered offering, cancellation, failure, purchase, entitlement
-activation, relaunch refresh, restore, and VoiceOver activation of Restore. It remains historical
-transaction evidence and is not a real payment or fresh visual QA for the remediated package.
+A fresh clean Debug Test Store pass on evidence revision `3cf20ed` covered offering, cancellation,
+simulated failure, retry, purchase, entitlement activation, immediate restore, and relaunch refresh.
+It is not a real payment. The earlier baseline remains the latest VoiceOver Restore and RevenueCat
+dashboard readback evidence.
 
-Implemented but still requiring hands-on verification after the rebuild: terminal VoiceOver
-announcements across every purchase outcome, focus recovery, Increase Contrast, Reduce
-Transparency, large-text behavior, the private Devpost form, and the final public submission. See
+Keyboard order, Increase Contrast, Reduce Transparency, and a temporary `.accessibility3`
+screenshot-renderer pass were checked on that package without retaining a source change. Still
+requiring hands-on verification: terminal VoiceOver announcements/focus across purchase outcomes,
+the private Devpost form, and the final public submission. See
 [the evidence record](../../docs/SHIPATON_EVIDENCE.md) and
 [hackathon runbook](../../docs/HACKATHON_RUNBOOK.md).
