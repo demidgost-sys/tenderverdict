@@ -71,10 +71,14 @@ Run the smallest relevant test while editing, then the complete gate before hand
 PYTHONPATH=src python3 -m unittest tests.test_workflow -v
 PYTHONPATH=src python3 -m unittest tests.test_next_gen_core_launcher -v
 swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen \
+  --render-review-brief /tmp/tenderverdict-review-brief.html --premium
 ```
 
 The native check executable validates pure contracts and process behavior. It is not proof of a
-rendered accessibility experience or an actual Test Store transaction.
+rendered accessibility experience or an actual Test Store transaction. The headless brief command
+uses the in-app renderer and is intended for local visual review; omit `--premium` to inspect the
+Free first-profile projection.
 
 ## Complete source gate
 
@@ -153,6 +157,7 @@ an artifact, or evidence.
 | Public CLI or exit behavior | CLI/end-to-end tests, `README.md`, user guide, changelog |
 | Private native bridge | Launcher tests, Swift process checks, packaged-core spec, architecture, builder smoke |
 | Free/Premium projection | Native contract checks, RevenueCat state model, architecture, user guide, UX audit |
+| Native report presentation or export | Gating/escaping/determinism checks, architecture, user guide, UX audit, hands-on Save-panel and rendered-output review |
 | Persistence or privacy | Native checks, `SECURITY.md`, architecture, user guide, manual recovery check |
 | Native visual or accessibility behavior | Source smoke, native checks, UX audit, regenerated submission asset when appearance changed, manual settings pass |
 | Dependency or package pin | Lock/resolution files, metadata tests, license/notices, clean build and security scan |

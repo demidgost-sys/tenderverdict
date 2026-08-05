@@ -106,10 +106,14 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 15. The opening hierarchy now leads with a Portfolio Signal: one feed, the number of supplier
     profiles, the shared notice count, and the bounded count of outcomes that change by profile.
 16. Free/Premium packaging is stated before the technical Test Store status: Free is one complete
-    profile with reasons and JSON; Portfolio is up to five profiles, comparison, and full portfolio
-    JSON. The purchase control now names the value being unlocked.
+    profile with reasons, a review brief, and JSON; Portfolio is up to five profiles, comparison,
+    a complete portfolio brief, and full portfolio JSON. The purchase control now names the value
+    being unlocked.
 17. The native app, static HTML report, README, and Devpost draft use one concrete vocabulary:
     open, verify, or skip; one feed; different supplier decisions; human-owned next steps.
+18. The Export menu now provides a self-contained HTML human-review brief as well as JSON. It
+    preserves source order and the entitlement boundary, activates only verified HTTPS links, and
+    adds no cross-profile score, ranking, or recommendation.
 
 ### Next product work before calling the app release-ready
 
@@ -122,7 +126,7 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 | P2 | Notice search and buyer/deadline filters | `IMPLEMENTED` | Keeps realistic files navigable without changing qualification semantics | Pure review-query checks and stable identities are green; final large-file hands-on pass remains |
 | P2 | Profile-focused drill-down | `IMPLEMENTED` | Lets a user move from comparison to evidence without losing context | A matrix cell opens the exact stable profile/notice reasons, unknowns, next step, and safe source |
 | P2 | Guided notice import | `IMPLEMENTED_BOUNDED` | Reveals source quality before a run without adding a fragile mapping language | Deterministic CSV/JSON preview, canonical fields, warnings, and missing-field counts |
-| P2 | Shareable human review brief | `EVIDENCE_GATED` | A concise HTML/Markdown handoff could make the result easier to use with a colleague | Implement only if workflow sessions show that JSON plus source links are insufficient |
+| P2 | Shareable human review brief | `IMPLEMENTED_BOUNDED` | Turns the accepted report into a concise colleague-facing handoff without changing qualification semantics | Deterministic self-contained HTML, Free/Premium projection, escaping, safe-link, no-ranking, and visual checks pass; external workflow usefulness still needs validation |
 | P3 | Local review notes and decision history | `POST_HACKATHON` | Could turn triage into a repeated team workflow, but it adds persistence, migration, and privacy scope | Design only after real users define what must be recorded and retained |
 | P3 | Saved local export presets | `DEFERRED` | Current atomic Save panel is adequate; a preset does not close a judging or trust gap | Reconsider only if opt-in sessions repeatedly identify export destination friction |
 

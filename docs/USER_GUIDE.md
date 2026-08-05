@@ -9,7 +9,7 @@ queue. Choose the surface that matches the job:
 | `tenderverdict qualify` | One supplier profile | Schema-3 JSON, Markdown, or HTML |
 | Tk desktop | Interactive single-profile review | JSON, Markdown, or HTML |
 | `tenderverdict portfolio` | Automation across one to five profiles | Portfolio schema-1 JSON |
-| TenderVerdict Next Gen | Native macOS Portfolio Workspace demo | Free first profile, RevenueCat-backed Premium portfolio, JSON export |
+| TenderVerdict Next Gen | Native macOS Portfolio Workspace demo | Free first profile, RevenueCat-backed Premium portfolio, HTML review brief or JSON |
 
 ## Next Gen first run
 
@@ -37,15 +37,19 @@ queue. Choose the surface that matches the job:
    drivers, items needing confirmation, and routine checks separately. **Clear filters** resets the
    verdict filter too, and loading a different report resets the complete filter state. Open a
    syntactically safe supplied HTTPS source when the official notice needs inspection.
-6. Select **Export JSON…**. Free saves a deterministic ASCII-safe schema-3 report for the first
-   profile. Active Premium access saves the exact complete portfolio bytes. A retained older result
-   stays exportable by design, but the action and Save panel explicitly say **previous**.
+6. Open **Export…** and choose the handoff you need. **Export review brief…** saves a deterministic,
+   self-contained HTML file with verdict drivers, confirmation items, safe source links, and each
+   next human step. Free includes the complete first profile only; active Premium includes every
+   profile in source order. **Export JSON…** saves the deterministic ASCII-safe schema-3 first
+   profile in Free or the exact complete portfolio bytes in Premium. A retained older result stays
+   exportable by design, but the menu and Save panel explicitly say **previous**.
 7. Optional: enable **Remember these two file selections on this Mac**. This persists only the two
    security-scoped bookmarks. Relaunch validates the restored selections but never analyzes them
    automatically. Disable the toggle to forget the bookmarks.
 8. The Premium card compares the packaging before asking for a purchase: Free includes one complete
-   profile with reasons and JSON; Portfolio includes up to five profiles, the shared comparison,
-   and the full portfolio JSON. For the Shipaton Test Store demo, use the separately packaged Debug app and paste a RevenueCat
+   profile with reasons, its review brief, and JSON; Portfolio includes up to five profiles, the
+   shared comparison, the complete portfolio brief, and full portfolio JSON. For the Shipaton Test
+   Store demo, use the separately packaged Debug app and paste a RevenueCat
    `test_` key. TenderVerdict does not store it. The release-configuration app disables key entry
    before the SDK can reject it. Use the exact expected offering/package/product or restore access;
    the cross-profile comparison, all profile summaries, and full portfolio export appear only while
@@ -130,6 +134,12 @@ confirmation**, and **Checks passed**. This grouping is derived presentation onl
 order, verdict semantics, schemas, and hashes remain unchanged. A Reject next step means the notice
 does not fit that profile under the recorded hard-stop evidence; it does not presume that valid
 source metadata is erroneous.
+
+The HTML review brief is another presentation of the accepted report, not a new report schema. It
+contains no scripts, remote assets, telemetry, combined verdict totals, ranking, or automatic
+recommendation. A restrictive content-security policy is embedded in the file, untrusted display
+text is escaped after control-character normalization, and only syntactically safe HTTPS source
+URLs become links. It remains a metadata handoff that requires human review.
 
 ## Privacy and credentials
 

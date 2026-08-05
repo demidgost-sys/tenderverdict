@@ -9,6 +9,14 @@ struct TenderVerdictNextGenApp: App {
   @StateObject private var model: AppModel
 
   init() {
+    if let flag = CommandLine.arguments.firstIndex(of: "--render-review-brief"),
+      CommandLine.arguments.indices.contains(flag + 1)
+    {
+      Self.renderReviewBrief(
+        at: CommandLine.arguments[flag + 1],
+        premiumUnlocked: CommandLine.arguments.contains("--premium")
+      )
+    }
     if let flag = CommandLine.arguments.firstIndex(of: "--render-submission-screenshot"),
       CommandLine.arguments.indices.contains(flag + 1)
     {
@@ -52,6 +60,33 @@ struct TenderVerdictNextGenApp: App {
     } catch {
       let message = (error as? LocalizedError)?.errorDescription ?? "unknown error"
       FileHandle.standardError.write(Data("NEXT_GEN_SMOKE_FAIL: \(message)\n".utf8))
+      Darwin.exit(EXIT_FAILURE)
+    }
+  }
+
+  private static func renderReviewBrief(
+    at path: String,
+    premiumUnlocked: Bool
+  ) -> Never {
+    do {
+      let execution = try TenderVerdictProcess().loadSyntheticPortfolioSynchronously()
+      let brief = try execution.report.shareableReviewBriefHTMLData(
+        premiumUnlocked: premiumUnlocked
+      )
+      let output = URL(fileURLWithPath: path).standardizedFileURL
+      try FileManager.default.createDirectory(
+        at: output.deletingLastPathComponent(),
+        withIntermediateDirectories: true
+      )
+      try brief.write(to: output, options: [.atomic])
+      let scope = premiumUnlocked ? "portfolio" : "first_profile"
+      print(
+        "NEXT_GEN_BRIEF_OK scope=\(scope) bytes=\(brief.count) output=\(output.path)"
+      )
+      Darwin.exit(EXIT_SUCCESS)
+    } catch {
+      let message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+      FileHandle.standardError.write(Data("NEXT_GEN_BRIEF_FAIL: \(message)\n".utf8))
       Darwin.exit(EXIT_FAILURE)
     }
   }
@@ -214,8 +249,8 @@ final class AppModel: ObservableObject {
     ReviewPointInputValidator.validationMessage(for: asOf)
   }
 
-  var exportButtonTitle: String {
-    reportIsPrevious ? "Export previous JSON…" : "Export JSON…"
+  var exportMenuTitle: String {
+    reportIsPrevious ? "Export previous…" : "Export…"
   }
 
   var syntheticButtonTitle: String {
@@ -409,6 +444,44 @@ final class AppModel: ObservableObject {
       loadError = nil
     } catch {
       loadError = Self.message(for: error, fallback: "The report could not be exported.")
+    }
+  }
+
+  func exportReviewBrief() {
+    guard let report else {
+      return
+    }
+    let premiumUnlocked = revenueCat.state.isUnlocked
+    let panel = NSSavePanel()
+    panel.title =
+      reportIsPrevious
+      ? "Export previous human review brief"
+      : "Export human review brief"
+    panel.prompt = "Export Brief"
+    panel.allowedContentTypes = [.html]
+    panel.canCreateDirectories = true
+    panel.nameFieldStringValue =
+      premiumUnlocked
+      ? "tenderverdict-portfolio-review-brief.html"
+      : "tenderverdict-profile-review-brief.html"
+    guard panel.runModal() == .OK, let url = panel.url else {
+      return
+    }
+    do {
+      let brief = try report.shareableReviewBriefHTMLData(
+        premiumUnlocked: premiumUnlocked
+      )
+      try brief.write(to: url, options: [.atomic])
+      statusMessage =
+        reportIsPrevious
+        ? "Exported the previous review brief as \(url.lastPathComponent)."
+        : "Exported \(url.lastPathComponent)."
+      loadError = nil
+    } catch {
+      loadError = Self.message(
+        for: error,
+        fallback: "The review brief could not be exported."
+      )
     }
   }
 
@@ -720,7 +793,7 @@ struct ContentView: View {
       SectionHeading(
         title: "Your first supplier review",
         detail:
-          "Every verdict, reason, source link, and JSON export stays available for profile one."
+          "Every verdict, reason, source link, review brief, and JSON export stays available for profile one."
       )
       if let report = model.report,
         let primary = report.visibleProfileReports(premiumUnlocked: false).first
@@ -936,12 +1009,22 @@ struct PortfolioInputSection: View {
 
     Spacer()
 
-    Button {
-      model.exportReport()
+    Menu {
+      Button {
+        model.exportReviewBrief()
+      } label: {
+        Label("Export review brief…", systemImage: "doc.richtext")
+      }
+      Button {
+        model.exportReport()
+      } label: {
+        Label("Export JSON…", systemImage: "curlybraces")
+      }
     } label: {
-      Label(model.exportButtonTitle, systemImage: "square.and.arrow.down")
+      Label(model.exportMenuTitle, systemImage: "square.and.arrow.down")
         .lineLimit(1)
     }
+    .menuStyle(.button)
     .buttonStyle(.bordered)
     .controlSize(.large)
     .disabled(!model.canExport)

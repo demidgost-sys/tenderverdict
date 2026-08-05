@@ -232,8 +232,8 @@ summary reports only the profile count and the shared input notice count; it doe
 or combine their verdict totals. Profile and notice input order are preserved. Nested provenance
 contains a separate canonical profile digest for each normalized profile and the same notice-file
 digest for every profile. The command writes JSON atomically when `--output` is supplied and prints
-the same JSON to stdout when it is omitted; it intentionally has no Markdown or HTML portfolio
-format yet.
+the same JSON to stdout when it is omitted. The public CLI intentionally has no Markdown or HTML
+portfolio format; the native app can render that validated JSON as a shareable human-review brief.
 
 ### Next Gen macOS app
 
@@ -245,8 +245,8 @@ the `supplier_profiles_plus` entitlement as active.
 
 Its core loop is designed to be understood in one glance: **one feed, different supplier
 decisions**. A Portfolio Signal shows how many outcomes change between profiles; Free keeps one
-complete review with reasons and JSON, while Premium reveals every profile, the comparison, and the
-full portfolio export.
+complete review with reasons, a shareable brief, and JSON, while Premium reveals every profile, the
+comparison, and the complete portfolio brief and JSON export.
 
 <p align="center">
   <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS showing a Portfolio Signal, local inputs, a complete free supplier review, and the RevenueCat-backed Portfolio Workspace.">
@@ -265,8 +265,10 @@ missing-field counts before a run. The synthetic Free profile intentionally show
 Watch, and one Reject. The app visibly distinguishes bundled demo, current selected-input, and
 retained previous reports; Free atomically exports a deterministic, ASCII-safe schema-3 report for
 the first profile, while an active entitlement additionally enables the exact complete portfolio
-JSON export. A previous valid report remains exportable after failure, but its action is explicitly
-labelled as previous.
+JSON export. The same Export menu creates a deterministic self-contained HTML review brief: Free
+includes only the complete first profile, and Premium includes every profile in source order. A
+previous valid report remains exportable after failure, but its action is explicitly labelled as
+previous.
 
 The Free review queue supports verdict, text, buyer, and deadline-presence filters with bounded
 progressive disclosure, full reset, and separate verdict-driver, confirmation, and passed-check
@@ -299,8 +301,9 @@ The native checks require no API key and the smoke test makes no RevenueCat requ
 strict workspace and import-preview decoding, full report preservation, ordered shared-notice
 validation, strict review-point grammar, reason grouping, disagreement counts, large review
 filtering with stable-ID lookup, the Free/Premium projection, Test Store configuration and terminal
-accessibility outcomes, deterministic bytes, and the real private core bridge. The offline Python
-suite also exercises strict normalization, CSV/JSON preview,
+accessibility outcomes, deterministic JSON and HTML-brief bytes, gated brief content and escaping,
+and the real private core bridge. The offline Python suite also exercises strict normalization,
+CSV/JSON preview,
 missing-field counts, limits, deterministic ASCII-safe output, exit code `2`, the offline boundary,
 and release-scanner regressions. Exact current totals belong in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).

@@ -25,6 +25,9 @@ the current host architecture; the audited Apple Silicon artifact is `arm64`, no
   verdict-driver/confirmation/passed-check groups, and safe supplied-source links;
 - exports a deterministic schema-3 first-profile report in Free and the exact combined JSON bytes
   atomically only while Premium is active;
+- exports a deterministic self-contained HTML review brief from the same accepted report: Free
+  includes the complete first profile, Premium includes every profile in source order, and neither
+  path adds scripts, remote assets, ranking, or new qualification logic;
 - optionally remembers only the two selected-file security-scoped bookmarks, never file contents,
   reports, review dates, or a RevenueCat key, and never runs remembered inputs automatically;
 - accepts a `test_` RevenueCat key in a process-only secure field in Debug builds only;
@@ -64,12 +67,23 @@ TENDERVERDICT_WORKTREE="$PWD" \
 `TenderVerdictNextGenChecks` covers portfolio projection, complete schema-3 Free export, full result
 preservation, empty inputs, nested totals, result-summary consistency, shared notice digest and
 order, strict workspace and import-preview contracts, large filtered-result identity stability,
-review-point validation, reason grouping, disagreement counts, safe source links, exact RevenueCat
-dashboard identifiers, Debug/Release Test Store boundaries, terminal accessibility outcomes,
-selected-file execution, and byte determinism. Run it in both
+review-point validation, reason grouping, disagreement counts, safe source links, review-brief
+gating/escaping/determinism, exact RevenueCat dashboard identifiers, Debug/Release Test Store
+boundaries, terminal accessibility outcomes, selected-file execution, and byte determinism. Run it
+in both
 configurations: Debug accepts a well-shaped Test Store key, while Release must make configuration
 unavailable before any SDK call. The smoke test invokes the real private Python bridge without
 launching a window or configuring RevenueCat.
+
+For a deterministic visual check of the synthetic brief without opening a Save panel:
+
+```bash
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGen \
+  --render-review-brief /tmp/tenderverdict-review-brief.html --premium
+```
+
+Omit `--premium` to render the Free first-profile projection. This developer flag uses the same
+renderer as the in-app **Export review brief…** action.
 
 The Python suite directly exercises the private launcher; current totals are maintained in
 [project status](../../docs/PROJECT_STATUS.md):

@@ -53,6 +53,9 @@ identifiers and may change interfaces during the alpha period.
   documentation-governance contract, and dated code-to-document technical audit.
 - Added native presentation-time escaping for C0, DEL/C1, and Unicode formatting controls without
   changing the underlying report or export evidence.
+- Added deterministic self-contained HTML human-review briefs to the native Export menu. Free
+  includes the complete first profile and Premium includes every profile in source order, with
+  strict escaping, safe HTTPS links, atomic writes, and no cross-profile ranking.
 
 ### Changed
 

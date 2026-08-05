@@ -17,6 +17,7 @@ enum TenderVerdictNextGenChecks {
   static func main() async throws {
     try checkPortfolioContractPreservesFreeAndPremiumSurfaces()
     try checkPortfolioContractPreservesResultDetails()
+    try checkShareableReviewBriefRespectsAccessAndEscapesContent()
     try checkDisplayTextMakesControlsVisible()
     try checkVerdictPresentationHelpers()
     try checkReviewPointValidation()
@@ -33,7 +34,7 @@ enum TenderVerdictNextGenChecks {
     try checkPremiumAccessibilityOutcomes()
     try await checkTestStoreConfigurationFailsClosed()
     try checkProcessAdapterPreservesDeterministicBytes()
-    print("NEXT_GEN_CHECKS_OK checks=18")
+    print("NEXT_GEN_CHECKS_OK checks=19")
   }
 
   private static func checkPortfolioContractPreservesFreeAndPremiumSurfaces() throws {
@@ -122,6 +123,110 @@ enum TenderVerdictNextGenChecks {
       )
       try require(unsafeResult.safeSourceURL == nil, "unsafe URL became an active link")
     }
+  }
+
+  private static func checkShareableReviewBriefRespectsAccessAndEscapesContent() throws {
+    let firstProfileName = "Profile <script>alert(\"x\")</script>\n\u{202e}"
+    let report = try PortfolioWorkspaceReport.decode(
+      makeReportData(profileCount: 3, firstProfileName: firstProfileName)
+    )
+
+    let freeBrief = try report.shareableReviewBriefHTMLData(premiumUnlocked: false)
+    let repeatedFreeBrief = try report.shareableReviewBriefHTMLData(premiumUnlocked: false)
+    let premiumBrief = try report.shareableReviewBriefHTMLData(premiumUnlocked: true)
+    let freeHTML = String(decoding: freeBrief, as: UTF8.self)
+    let premiumHTML = String(decoding: premiumBrief, as: UTF8.self)
+
+    try require(freeBrief == repeatedFreeBrief, "review brief bytes were not deterministic")
+    try require(freeBrief.last == 0x0a, "review brief did not end with one newline")
+    try require(freeHTML.hasPrefix("<!doctype html>"), "review brief omitted its doctype")
+    try require(
+      freeHTML.contains("default-src 'none'; style-src 'unsafe-inline'"),
+      "review brief omitted its restrictive content security policy"
+    )
+    try require(
+      freeHTML.contains("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; \\u202e"),
+      "review brief did not escape or expose unsafe profile display text"
+    )
+    try require(
+      !freeHTML.lowercased().contains("<script"),
+      "review brief allowed injected script markup"
+    )
+    try require(freeHTML.contains("First profile review"), "free brief did not label its scope")
+    try require(
+      freeHTML.contains("Application maintenance services")
+        && freeHTML.contains("Software support services")
+        && freeHTML.contains("Software implementation services"),
+      "free brief omitted first-profile notices"
+    )
+    guard let openNotice = freeHTML.range(of: "Application maintenance services"),
+      let watchNotice = freeHTML.range(of: "Software support services"),
+      let rejectNotice = freeHTML.range(of: "Software implementation services")
+    else {
+      throw CheckFailure.failed("free brief omitted ordered notice content")
+    }
+    try require(
+      openNotice.lowerBound < watchNotice.lowerBound
+        && watchNotice.lowerBound < rejectNotice.lowerBound,
+      "review brief changed notice order"
+    )
+    try require(
+      !freeHTML.contains("Profile 2") && !freeHTML.contains("Profile 3"),
+      "free brief exposed gated profile content"
+    )
+    try require(
+      freeHTML.contains(
+        "href=\"https://procurement.example/notices/SYN-OPEN-001\""
+      ),
+      "review brief omitted a validated HTTPS source link"
+    )
+    try require(
+      premiumHTML.contains("Complete portfolio review"),
+      "premium brief did not label its complete scope"
+    )
+    guard let secondProfile = premiumHTML.range(of: "Profile 2"),
+      let thirdProfile = premiumHTML.range(of: "Profile 3")
+    else {
+      throw CheckFailure.failed("premium brief omitted profile content")
+    }
+    try require(
+      secondProfile.lowerBound < thirdProfile.lowerBound,
+      "premium brief changed profile order"
+    )
+    for forbidden in ["score", "ranking", "recommendation"] {
+      try require(
+        !premiumHTML.lowercased().contains(forbidden),
+        "review brief added forbidden cross-profile language: \(forbidden)"
+      )
+    }
+
+    let unsafeReport = try PortfolioWorkspaceReport.decode(
+      makeReportData(
+        profileCount: 1,
+        firstSourceURL: "https://procurement.example/line\nbreak"
+      )
+    )
+    let unsafeHTML = String(
+      decoding: try unsafeReport.shareableReviewBriefHTMLData(premiumUnlocked: false),
+      as: UTF8.self
+    )
+    try require(
+      unsafeHTML.contains("No verified HTTPS link supplied")
+        && !unsafeHTML.contains("https://procurement.example/line"),
+      "review brief exposed an unsafe source URL"
+    )
+
+    let emptyReport = try PortfolioWorkspaceReport.decode(
+      makeReportData(profileCount: 2, noticeCount: 0)
+    )
+    let emptyHTML = String(
+      decoding: try emptyReport.shareableReviewBriefHTMLData(premiumUnlocked: true),
+      as: UTF8.self
+    )
+    try require(
+      emptyHTML.contains("No notices were included at this review point."),
+      "review brief omitted its empty-notice state"
+    )
   }
 
   private static func checkDisplayTextMakesControlsVisible() throws {

@@ -92,10 +92,11 @@ and consistency checks.
 
 - Free presentation calls `visibleProfileReports(premiumUnlocked: false)` and exposes only the
   first profile report, including its complete review queue and a deterministic ASCII-safe schema-3
-  export.
+  export. Its HTML review brief is a deterministic presentation of that same first report.
 - Premium presentation requires RevenueCat `CustomerInfo` to report the
   `supplier_profiles_plus` entitlement as active, then adds a notice-by-profile comparison and all
-  profile summaries plus the exact complete portfolio JSON export, without ranking or scoring.
+  profile summaries plus the exact complete portfolio JSON export and an all-profile HTML review
+  brief, without ranking or scoring.
 - Free review uses verdict, text, buyer, and deadline-presence filters with progressive disclosure.
   Premium applies text, buyer, and deadline filters to the shared notice identities. Matrix cells
   resolve a profile/result pair by stable IDs, never by the current filtered offset, before opening
@@ -105,6 +106,12 @@ and consistency checks.
 - The top-level Portfolio Signal and locked portfolio preview derive only a disagreement count
   across the already validated shared notice order. They reveal no gated reason or profile-report
   content and create no score. Native Free/Premium packaging copy is presentation-only.
+- `ShareableReviewBrief` renders only already validated profile reports in original profile and
+  notice order. It is a self-contained static HTML projection with inline CSS, no scripts, remote
+  assets, telemetry, combined verdict totals, or new qualification logic. Display text is
+  control-normalized and HTML-escaped; only `safeSourceURL` values become links. Output is capped at
+  64 MiB and written atomically by the app, so a rendering or write failure cannot replace an
+  existing brief.
 - A configured Debug app accepts only offering `supplier_profiles_plus`, package `$rc_monthly`, and
   product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, and
   refreshes access on launch. An unexpected dashboard shape stays locked.
