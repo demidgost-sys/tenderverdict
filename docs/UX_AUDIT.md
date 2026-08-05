@@ -26,6 +26,10 @@ Premium comparison cell to the exact profile/notice reasoning. The first complet
 deterministic export remain free. The latest polish pass also makes demo/current/previous report
 state explicit, validates the review point inline, gives the synthetic Free profile one example of
 each verdict, separates verdict drivers from passed checks, and keeps stale export wording honest.
+The winning-pass hierarchy now states the job in one sentence, surfaces a bounded Portfolio Signal
+before the file controls, and explains the complete Free profile versus Portfolio value before the
+technical RevenueCat build state. The static report uses the same open/verify/skip and human-owned
+next-step vocabulary.
 
 The native suite now covers pure terminal RevenueCat accessibility outcomes in both Debug and
 Release, and the complete Python/source gate passes on the current candidate. It also verifies that
@@ -106,9 +110,13 @@ Release intentionally cannot accept a RevenueCat key.
 
 | Step | Current outcome |
 |---|---|
-| Main report state | Bundled demo context, one Open / one Watch / one Reject, and the bounded two-of-three disagreement preview were visible. |
+| Opening hierarchy | The exact clean `682c040` package opened with “One tender feed. Different supplier decisions,” then showed 3 shared notices, 3 supplier profiles, and 2 changed outcomes before any file controls. |
+| Main report state | Bundled demo context, one Open / one Watch / one Reject, the complete Free-profile promise, and the bounded two-of-three disagreement preview were visible. |
+| Review queue | Search, buyer/deadline filters, all three verdict controls, notice cards, and human next steps remained legible at the default 1020×900 window. |
+| Premium value | Free and Portfolio contents appeared before the Release/Test Store limitation; all three profiles and the disagreement count stayed visible without gated reasoning. |
 | Compact Profile Builder | At a 680×714 sheet size, profile fields, status text, and footer actions remained visible without the former spacer gap. |
 | Field recovery | Entering CPV `7226` and choosing **Validate** produced the specific eight-digit error in the profile card and footer. |
+| Light/dark portrait | The exact 1179×2556 submission render was regenerated, metadata-stripped, and visually inspected in both appearances; the Portfolio Signal wraps without truncation. |
 | Exit | The packaged app closed normally after inspection; no Test Store key or user data was entered. |
 
 ## Packaged baseline (`manual`, 2026-08-04)
@@ -141,13 +149,13 @@ The visual language remains intentionally native: one indigo product accent, sem
 colors plus text labels, 18–20 pt card radii, restrained depth, native controls, and progressive
 reason disclosure. The hierarchy is now:
 
-1. build or choose a validated workspace;
-2. choose notices and inspect the import preview;
-3. choose an explicit review point, resolve any inline format error, and run locally;
+1. understand the job and the current shared-notice/profile disagreement signal;
+2. build or choose a validated workspace;
+3. choose notices, inspect the import preview, set a review point, and run locally;
 4. search/filter the complete free first-profile review queue;
 5. opt into file-bookmark continuity only if useful;
-6. understand or unlock Premium;
-7. filter the shared comparison and open exact cell reasoning;
+6. understand the complete Free versus Portfolio boundary before any purchase state;
+7. unlock/filter the shared comparison and open exact cell reasoning;
 8. export deterministic JSON with current/previous state made explicit.
 
 Accessibility-relevant code outcomes include distinct labels for secure configuration and file
