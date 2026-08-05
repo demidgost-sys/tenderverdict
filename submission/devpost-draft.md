@@ -5,12 +5,12 @@
 
 ## Tagline
 
-One tender feed. Different supplier decisions — locally, explainably, and RevenueCat-powered.
+One tender feed. A clear next step for every supplier profile.
 
 ## The idea in one sentence
 
-TenderVerdict shows a supplier what to open, verify, or skip from notice metadata; Portfolio
-Workspace then reveals where the same notice changes outcome across up to five supplier profiles.
+TenderVerdict compares public tender notices across up to five supplier profiles and explains what
+to open, verify, or skip — before a team spends hours in the documents.
 
 ## Inspiration
 

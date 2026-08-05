@@ -6,7 +6,7 @@ synthetic data only.
 
 | Time | Screen action | Narration |
 |---|---|---|
-| 0:00–0:08 | Show the TenderVerdict hero and Portfolio Signal with three profiles, three notices, and two changed outcomes. | One tender feed can mean different decisions for different supplier profiles. TenderVerdict shows what to open, verify, or skip, with reasons a human can defend. |
+| 0:00–0:08 | Show the TenderVerdict hero and Portfolio Signal with three profiles, three notices, and two changed outcomes. | One tender feed. A clear next step for every supplier profile. TenderVerdict shows what to open, verify, or skip, with reasons a human can defend. |
 | 0:08–0:22 | Open **Build profiles…**; show names, CPVs, countries, lead time, ordering, and **Validate & Save As…**; close without changing the prepared fixture. | The native Profile Builder creates one to five named profiles and validates every value through the canonical bundled rules—no hand-edited JSON required. |
 | 0:22–0:36 | Choose the committed workspace and notices. Pause on the import preview and its metadata-gap badges, leave bookmark continuity visibly optional, then run. | Before analysis, the import preview shows the file type, total notices, sample records, and missing metadata. Remembering only the two file bookmarks is explicit opt-in; no report, review date, or key is stored. |
 | 0:36–0:52 | In the always-free first report, show the one Open / one Watch / one Reject summary, search or choose buyer/deadline/verdict filters, expand **Why this verdict**, and point to Export JSON. | The first complete analysis and deterministic export stay free. The UI separates verdict drivers, confirmation items, and passed checks without changing the report. |

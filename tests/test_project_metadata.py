@@ -183,6 +183,51 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertNotIn('Button("Clear all filters")', app_source)
         self.assertEqual(app_source.count('Button("Clear filters")'), 2)
 
+    def test_next_gen_headline_leads_with_user_value(self) -> None:
+        app_source = (
+            ROOT
+            / "macos"
+            / "TenderVerdictNextGen"
+            / "Sources"
+            / "TenderVerdictNextGenApp"
+            / "TenderVerdictNextGenApp.swift"
+        ).read_text(encoding="utf-8")
+        devpost = (ROOT / "submission" / "devpost-draft.md").read_text(encoding="utf-8")
+        headline = "One tender feed. A clear next step for every supplier profile."
+
+        self.assertIn(f'Text("{headline}")', app_source)
+        self.assertIn(f"## Tagline\n\n{headline}\n", devpost)
+        self.assertNotIn("RevenueCat-powered", app_source)
+        self.assertNotIn("RevenueCat-powered", devpost)
+
+    def test_original_hackathon_brief_paths_route_to_canonical_documents(self) -> None:
+        overview = (ROOT / "HACKATHON.md").read_text(encoding="utf-8")
+        demo_entry = (ROOT / "docs" / "SHIPATON_DEMO_SCRIPT.md").read_text(encoding="utf-8")
+        devpost_entry = (ROOT / "docs" / "DEVPOST_DRAFT.md").read_text(encoding="utf-8")
+        metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+        for heading in (
+            "## Problem",
+            "## User",
+            "## Solution",
+            "## RevenueCat's role",
+            "## Architecture",
+            "## Privacy and IP boundaries",
+            "## Run and verify",
+            "## Limitations and evidence boundary",
+        ):
+            self.assertIn(heading, overview)
+        self.assertIn("not measured with a reliable active-time timer", overview)
+        self.assertIn("[DEMO_SCRIPT.md](DEMO_SCRIPT.md)", demo_entry)
+        self.assertIn(
+            "[submission/devpost-draft.md](../submission/devpost-draft.md)",
+            devpost_entry,
+        )
+        self.assertIn(
+            "/HACKATHON.md",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
+
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
         local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")

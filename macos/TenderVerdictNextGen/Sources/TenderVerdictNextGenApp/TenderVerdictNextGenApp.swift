@@ -689,12 +689,12 @@ struct ContentView: View {
         Text("TenderVerdict")
           .font(.subheadline.weight(.semibold))
           .foregroundStyle(.indigo)
-        Text("One tender feed. Different supplier decisions.")
+        Text("One tender feed. A clear next step for every supplier profile.")
           .font(.largeTitle.bold())
           .fixedSize(horizontal: false, vertical: true)
         Text(
-          "Turn procurement metadata into an explainable queue of what to open, verify, or skip, "
-            + "then compare the same notices across up to five profiles."
+          "TenderVerdict compares public tender notices across up to five supplier profiles and "
+            + "explains what to open, verify, or skip — before a team spends hours in the documents."
         )
         .font(.title3)
         .foregroundStyle(.secondary)

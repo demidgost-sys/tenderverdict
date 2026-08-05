@@ -96,6 +96,8 @@ identifiers and may change interfaces during the alpha period.
   purchase setup, and Test Store implementation detail no longer outranks the user value.
 - Aligned the native app, static HTML report, README, and Devpost draft around concrete human-owned
   actions: open, verify, or skip, with reasons and a next step rather than an aggregate score.
+- Replaced the sponsor-led `RevenueCat-powered` submission tagline with a user-facing promise: one
+  tender feed and a clear next step for every supplier profile.
 
 ## [0.2.0a1] - 2026-08-04
 

@@ -59,6 +59,7 @@ include = [
   "/CONTRIBUTING.md",
   "/DATA_SOURCES.md",
   "/DESKTOP.md",
+  "/HACKATHON.md",
   "/LICENSE",
   "/LIMITATIONS.md",
   "/NOTICE",

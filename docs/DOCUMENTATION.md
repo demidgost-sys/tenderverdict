@@ -11,12 +11,16 @@ mutable competition state does not leak into durable product contracts.
 | Durable contract | Define behavior, trust boundaries, limitations, and user concepts | `ARCHITECTURE.md`, `USER_GUIDE.md`, `LIMITATIONS.md`, `SECURITY.md`, `DATA_SOURCES.md` |
 | Engineering | Map ownership, commands, change impact, and contribution workflow | `DEVELOPMENT.md`, `AGENTS.md`, `CONTRIBUTING.md` |
 | Current state | Record what is verified now, exact counts, open gates, and the latest audit | `PROJECT_STATUS.md`, `TECHNICAL_AUDIT.md`, `UX_AUDIT.md` |
-| Competition evidence | Separate official facts, repository evidence, manual evidence, and owner-only gates | `SHIPATON_EVIDENCE.md`, `COMPETITION_SCORECARD.md` |
+| Competition evidence | Orient reviewers and separate official facts, repository evidence, manual evidence, and owner-only gates | `HACKATHON.md`, `SHIPATON_EVIDENCE.md`, `COMPETITION_SCORECARD.md` |
 | Operations | Reproduce packaging, Test Store evidence, assets, demo, and submission checks | `HACKATHON_RUNBOOK.md`, `DEMO_SCRIPT.md`, `submission/` |
 | Future | Order evidence-backed follow-on work without presenting it as delivered | `ROADMAP.md` |
 
 The [documentation map](README.md) routes readers across these layers. A layer may summarize another
 one, but it must link to the owner instead of becoming a second mutable ledger.
+
+`docs/SHIPATON_DEMO_SCRIPT.md` and `docs/DEVPOST_DRAFT.md` are compatibility entry points required
+by the original competition brief. They route to `DEMO_SCRIPT.md` and
+`submission/devpost-draft.md`; do not copy the canonical content into the aliases.
 
 ## Authority rules
 

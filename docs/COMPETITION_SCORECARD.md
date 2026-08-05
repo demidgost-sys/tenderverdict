@@ -109,8 +109,9 @@ puts proof of the working experience ahead of an exhaustive feature tour.
     profile with reasons, a review brief, and JSON; Portfolio is up to five profiles, comparison,
     a complete portfolio brief, and full portfolio JSON. The purchase control now names the value
     being unlocked.
-17. The native app, static HTML report, README, and Devpost draft use one concrete vocabulary:
-    open, verify, or skip; one feed; different supplier decisions; human-owned next steps.
+17. The native app, README, demo script, and Devpost draft now lead with one user-facing promise:
+    one tender feed and a clear next step for every supplier profile. The product vocabulary stays
+    concrete: open, verify, or skip, with human-owned next steps.
 18. The Export menu now provides a self-contained HTML human-review brief as well as JSON. It
     preserves source order and the entitlement boundary, activates only verified HTTPS links, and
     adds no cross-profile score, ranking, or recommendation.

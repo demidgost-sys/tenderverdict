@@ -33,10 +33,10 @@ library, and an unsigned local desktop preview. You supply a company profile and
 TenderVerdict applies narrow, deterministic rules and produces a review queue with reasons,
 unresolved fields, and a human next step.
 
-The Portfolio Workspace idea is equally narrow: **one tender feed can produce different supplier
-decisions**. The current competition source evaluates the same notices independently for up to five
-profiles and makes those differences visible without creating a score, ranking, or automatic bid
-recommendation.
+The Portfolio Workspace idea is equally narrow: **one tender feed, with a clear next step for every
+supplier profile**. The current competition source evaluates the same notices independently for up
+to five profiles and explains what to open, verify, or skip without creating a score, ranking, or
+automatic bid recommendation.
 
 It does not read full procurement documents or decide whether you should bid.
 

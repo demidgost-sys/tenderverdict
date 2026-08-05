@@ -13,7 +13,8 @@ Shipaton Next Gen work.
 | Change code | [Developer guide](DEVELOPMENT.md) | [Architecture](ARCHITECTURE.md), [contributing](../CONTRIBUTING.md) |
 | Hand work to another agent | [Repository agent guide](../AGENTS.md) | [Project status](PROJECT_STATUS.md), [latest audit](TECHNICAL_AUDIT.md) |
 | Understand what is actually ready | [Project status](PROJECT_STATUS.md) | [Technical audit](TECHNICAL_AUDIT.md), [UX audit](UX_AUDIT.md) |
-| Prepare the competition entry | [Hackathon runbook](HACKATHON_RUNBOOK.md) | [Evidence](SHIPATON_EVIDENCE.md), [submission assets](../submission/README.md) |
+| Understand the competition project | [Hackathon overview](../HACKATHON.md) | [Evidence](SHIPATON_EVIDENCE.md), [project status](PROJECT_STATUS.md) |
+| Prepare the competition entry | [Hackathon runbook](HACKATHON_RUNBOOK.md) | [Demo script](SHIPATON_DEMO_SCRIPT.md), [Devpost draft](DEVPOST_DRAFT.md), [submission assets](../submission/README.md) |
 | Review future work | [Roadmap](../ROADMAP.md) | [Competition scorecard](COMPETITION_SCORECARD.md) |
 
 ## Documentation layers
@@ -24,13 +25,18 @@ Shipaton Next Gen work.
 | Durable contracts | [Architecture](ARCHITECTURE.md), [user guide](USER_GUIDE.md), [limitations](../LIMITATIONS.md), [security](../SECURITY.md), [data sources](../DATA_SOURCES.md) | Behavior, trust, inputs, and boundaries |
 | Engineering | [Developer guide](DEVELOPMENT.md), [agent guide](../AGENTS.md), [contributing](../CONTRIBUTING.md) | Repository map, gates, and change workflow |
 | Current evidence | [Project status](PROJECT_STATUS.md), [technical audit](TECHNICAL_AUDIT.md), [UX audit](UX_AUDIT.md) | Current totals, revision evidence, manual/automated split, and open gates |
-| Competition | [Shipaton evidence](SHIPATON_EVIDENCE.md), [scorecard](COMPETITION_SCORECARD.md), [runbook](HACKATHON_RUNBOOK.md), [demo script](DEMO_SCRIPT.md) | Rules, strategy, reproducible submission steps, and claims |
+| Competition | [Overview](../HACKATHON.md), [Shipaton evidence](SHIPATON_EVIDENCE.md), [scorecard](COMPETITION_SCORECARD.md), [runbook](HACKATHON_RUNBOOK.md), [demo script](DEMO_SCRIPT.md) | Stable pitch, rules, strategy, reproducible submission steps, and claims |
 | Submission package | [Asset inventory](../submission/README.md), [evidence inventory](../submission/evidence/README.md), [Devpost draft](../submission/devpost-draft.md) | Files and draft copy, not proof of submission |
 | History and future | [Changelog](../CHANGELOG.md), [roadmap](../ROADMAP.md) | Shipped changes and evidence-gated next work |
 
 Read [documentation governance](DOCUMENTATION.md) for source-of-truth ownership, evidence labels,
 release terminology, and update triggers. Mutable suite totals, revision evidence, and readiness
 percentages belong in `PROJECT_STATUS.md`, not in every layer.
+
+The original brief's literal paths remain available as routing entry points:
+[HACKATHON.md](../HACKATHON.md), [SHIPATON_DEMO_SCRIPT.md](SHIPATON_DEMO_SCRIPT.md), and
+[DEVPOST_DRAFT.md](DEVPOST_DRAFT.md). Their linked canonical documents remain the only editable
+owners of mutable operations, timing, and submission copy.
 
 ## Stable public contracts
 
