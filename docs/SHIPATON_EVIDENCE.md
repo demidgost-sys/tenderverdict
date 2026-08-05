@@ -186,12 +186,13 @@ The repository now contains `macos/TenderVerdictNextGen`, an unreleased macOS Sw
   provenance, applies an ad-hoc signature, verifies it, and creates a checksum-paired archive;
 - a 1024×1024 icon and a 1179×2556 pre-transaction screenshot generated from reviewed source.
 
-The clean release-configuration builder pass from the remediated revision is pending. To close the
-scoped package gate it must run configuration-specific native checks, execute embedded
-`normalize-workspace` and `inspect-notices` twice with byte-identical output, verify the ad-hoc
-signature, pass worktree-independent app smoke, and produce `.app`, `.zip`, and SHA-256 files on the
-SSD. [Project status](PROJECT_STATUS.md) owns the current artifact result. This gate does not replace
-interactive final-Debug Test Store or manual accessibility evidence.
+The clean release-configuration builder pass named in project status ran on the SSD. It passed
+configuration-specific native checks, executed embedded `normalize-workspace` and
+`inspect-notices` twice with byte-identical output, verified the ad-hoc signature, passed
+worktree-independent app smoke, and produced verified `.app`, `.zip`, and SHA-256 files.
+[Project status](PROJECT_STATUS.md) owns the exact path, manifest, checksum, and sizes. This closes
+the scoped package gate; it does not replace interactive final-Debug Test Store or manual
+accessibility evidence.
 
 The local Command Line Tools build, interactive app, self-contained packaging, and screenshot
 generation now succeed. Full Xcode is not a prerequisite for this competition workflow. It may be

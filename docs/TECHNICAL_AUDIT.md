@@ -95,7 +95,7 @@ the root on-ramp, documentation links, CI/native gates, and public-tree membersh
 | Published Python/Tk `v0.2.0-alpha.1` | Existing immutable developer prerelease; experimental and unsigned |
 | Portfolio Workspace source | Implemented, deterministic, tested, and appropriate for source evaluation; not part of the published tag |
 | Next Gen source | Remediated competition candidate with coherent Free/Premium and Debug/Release contracts |
-| Current SSD `.app` | **Pending rebuild** from the remediated product commit; the `79186da` artifact is superseded |
+| Current SSD `.app` | Self-contained release-configuration artifact named in project status; manifest/checksum/signature/ZIP/smoke verified, ad-hoc signed, not notarized, and not transaction evidence |
 | External macOS product release | **Not ready**: no Developer ID/notarization, supported installer/update path, production billing decision, or external workflow validation |
 | Final Shipaton submission | **Not ready**: final Debug transaction/accessibility evidence and remaining owner/submission gates are open |
 

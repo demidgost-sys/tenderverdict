@@ -136,10 +136,11 @@ recovery targets; focus returns to purchase, retry, restore, or the key field on
 user action, not an automatic launch refresh. Cards adapt their borders/fills for Increase Contrast
 and remove decorative transparency/shadows when Reduce Transparency is active.
 
-Those paths are implemented, but the remediated package still needs a fresh embedded-core/signature
-check and a hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency,
-and large text before submission. A previous Debug Test Store pass confirmed that VoiceOver exposed
-the transaction controls and activated Restore; it is historical transaction evidence, not fresh
+Those paths are implemented, and the clean release-configuration package named in project status
+passed its embedded-core, signature, checksum, ZIP, and worktree-independent smoke checks. A
+hands-on pass with VoiceOver, Increase Contrast, Reduce Transparency, and large text is still
+required before submission. A previous Debug Test Store pass confirmed that VoiceOver exposed the
+transaction controls and activated Restore; it is historical transaction evidence, not fresh
 settings QA for the current package.
 
 If a run fails, correct the displayed input error and run again. The last valid report remains

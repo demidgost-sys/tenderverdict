@@ -82,12 +82,12 @@ The checks cover:
 These checks validate contracts and pure state. They do not claim AppKit rendering quality, an
 actual RevenueCat transaction, or VoiceOver speech.
 
-The clean release-configuration package from the remediated revision is pending. It must pass
+The clean release-configuration package named in project status passed
 configuration-specific native checks, embedded normalization and import-preview contracts twice
-with byte-identical output, ad-hoc signature verification, and app smoke from outside the worktree,
-then produce the `.app`, zip, and SHA-256 companion on a regenerable SSD path. Release is the no-key
-evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact current
-provenance lives in [project status](PROJECT_STATUS.md).
+with byte-identical output, ad-hoc signature verification, and app smoke from outside the worktree.
+It produced the `.app`, zip, and verified SHA-256 companion on a regenerable SSD path. Release is
+the no-key evaluation artifact and cannot substitute for the pending Debug Test Store pass. Exact
+current provenance lives in [project status](PROJECT_STATUS.md).
 
 ## Packaged baseline (`manual`, 2026-08-04)
 

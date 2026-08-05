@@ -304,8 +304,8 @@ python3 -m venv .venv-build
 The builder verifies configuration-specific native contracts, the bundle, and its embedded-runtime
 smoke test, then writes a zip and SHA-256 checksum under `dist/next-gen/`. The ordinary
 release-configuration evaluation artifact contains no key and is not itself transaction evidence.
-The pre-audit artifact passed its integrity and smoke checks but is superseded; the exact clean
-remediation artifact and provenance are tracked in
+The pre-audit artifact is superseded. The clean remediation artifact named in project status passed
+its configuration-specific, integrity, and smoke checks; exact provenance is tracked in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
 A previous reproducible Debug artifact completed a local RevenueCat Test Store offering, cancel,
 failure, purchase, entitlement refresh, relaunch, and restore pass; that is test evidence, not a

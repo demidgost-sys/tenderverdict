@@ -8,9 +8,8 @@ This scorecard converts the public judging criteria and recurring winner pattern
 decisions. It does not predict a result, claim private judge preferences, or replace the controlling
 [evidence record](SHIPATON_EVIDENCE.md).
 
-The measurable progress ledger is maintained separately in
-[PROJECT_STATUS.md](PROJECT_STATUS.md): 20 of 22 local implementation milestones are complete and
-8 of 12 final-submission gates are ready. This scorecard explains quality and strategic fit; the
+The measurable progress ledger and exact current totals are maintained separately in
+[PROJECT_STATUS.md](PROJECT_STATUS.md). This scorecard explains quality and strategic fit; the
 ledger prevents those judgments from being confused with verified completion.
 
 ## Public judges and judging contract

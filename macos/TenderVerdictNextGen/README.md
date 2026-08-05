@@ -166,11 +166,12 @@ automation. Never commit, log, screenshot, or publish a usable key.
 
 ## Evidence boundary
 
-The remediated source passes its configuration-specific native contract checks, including Release
-Test Store fail-closed behavior, schema-3 Free export isolation, safe-link parity, exact dashboard
-identifiers, and the existing bridge contracts. A fresh self-contained artifact must still be built
-after the audit commit before package provenance, signature, checksum, and smoke evidence can be
-called current; see [project status](../../docs/PROJECT_STATUS.md) for the live result.
+The remediated product revision named in project status passes configuration-specific native
+contract checks, including Release Test Store fail-closed behavior, schema-3 Free export isolation,
+visible control/bidi text, safe-link parity, exact dashboard identifiers, and the existing bridge
+contracts. Its fresh self-contained release-configuration artifact passed package provenance,
+signature, checksum, ZIP, and smoke verification; see
+[project status](../../docs/PROJECT_STATUS.md) for the exact live result.
 
 A previous Debug Test Store pass covered offering, cancellation, failure, purchase, entitlement
 activation, relaunch refresh, restore, and VoiceOver activation of Restore. It remains historical

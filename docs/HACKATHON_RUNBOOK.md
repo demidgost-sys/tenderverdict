@@ -61,10 +61,12 @@ Python contracts:
 6. Unlock the full comparison through `supplier_profiles_plus`, then open any comparison cell to
    inspect that exact profile/notice verdict, reasons, unknowns, next step, and safe HTTPS source.
 
-The native contract suite now contains 15 checks, including strict/deterministic workspace
-documents, import previews, large-list filtering with stable identities, process-byte equality,
-pure terminal RevenueCat announcement/recovery/focus outcomes, fail-closed configuration, and the
-existing portfolio/provenance invariants.
+The native contract suite covers strict/deterministic workspace documents, schema-3 Free export,
+visible control/bidi text, import previews, large-list filtering with stable identities,
+process-byte equality, pure terminal RevenueCat announcement/recovery/focus outcomes, exact
+dashboard identifiers, Debug/Release fail-closed configuration, and the existing
+portfolio/provenance invariants. Exact current totals live in
+[project status](PROJECT_STATUS.md).
 
 ## Reproducible local build
 
@@ -196,7 +198,7 @@ Never use a fake entitlement state as evidence.
 - [ ] Exact private Devpost fields are inspected after joining; required claims and assets agree
   with the final repository state.
 - [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
-- [ ] The release-configuration artifact named in project status passes checksum creation,
+- [x] The release-configuration artifact named in project status passes checksum creation,
   signature, embedded-core contract/determinism, configuration-specific native checks, and
   worktree-independent smoke checks.
 - [ ] A fresh Debug package is generated from the final revision for the hands-on Test Store pass.
