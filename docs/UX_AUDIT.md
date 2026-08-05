@@ -141,6 +141,25 @@ The Python metadata guard now checks the singular/plural source contract and rej
 render, and hands-on accessibility-tree comparison passed for `69eed54`. The three opt-in external
 workflow sessions remain open and are not implied by this micro-pass.
 
+## Current headline and brief-path pass (`automated` + visual inspection, 2026-08-05)
+
+The exact clean `34f1002` Release package and its source renderer produced byte-identical light and
+dark 1179×2556 images. This pass checks copy hierarchy and artifact integrity; it is not an
+independent user-research session or final accessibility evidence.
+
+| Review point | Current outcome |
+|---|---|
+| User promise | The app and canonical Devpost draft now lead with “One tender feed. A clear next step for every supplier profile.” The sponsor-led `RevenueCat-powered` phrase no longer appears in either surface. |
+| Supporting sentence | The same concise sentence explains the audience, up-to-five-profile scope, open/verify/skip action, and saved document-review time without claiming automatic bidding. |
+| Light and dark layout | The headline wraps to two balanced lines; the supporting sentence, status row, Portfolio Signal, inputs, and complete Free queue remain visible without clipping or overlap. |
+| Portrait asset | The committed image remains exactly 1179×2556, contains only allowed PNG chunks, and is below the public-tree size cap after lossless recompression. |
+| Required brief paths | `HACKATHON.md`, `docs/SHIPATON_DEMO_SCRIPT.md`, and `docs/DEVPOST_DRAFT.md` exist in the public tree. The two compatibility files route to their canonical script and submission draft instead of duplicating mutable content. |
+| Time claim | `HACKATHON.md` states that no reliable active-time timer exists, so the initial 25-hour target must not be presented as proven. |
+
+The metadata regression tests pin the headline, reject `RevenueCat-powered` in the app and
+canonical draft, require all brief sections and aliases, and resolve every public Markdown link.
+The packaged smoke, signature, ZIP, and checksum checks passed without a key or user data.
+
 ## Previous Release package (`manual`, 2026-08-05)
 
 The exact clean `682c040` Release artifact was launched outside the worktree after the earlier

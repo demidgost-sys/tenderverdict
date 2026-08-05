@@ -50,7 +50,7 @@ audit, and submission remain open.
 | Submission window | `official_rule` | The controlling Official Rules state July 31, 2026 at 08:00 PDT through September 30, 2026 at 23:45 PDT. The FAQ rounds the opening to August 1; this document uses the Rules. | `CONFIRMED` |
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
-| Student and academic email | `owner_attested_required` | Active enrollment and the exact Devpost email are entrant-specific and were not verified by this code audit. | `OWNER_CHECK` |
+| Student and academic email | `owner_attested` | On 2026-08-05, the entrant confirmed current-student status, TU Graz affiliation, July 2028 graduation, and use of a TU Graz academic-domain email in Devpost. No address is published here. | `CONFIRMED_BY_OWNER` |
 | Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Project status names the exact audited revision and gate result; draft PR #12 is the authoritative pushed-revision check record. | `PUBLIC_DRAFT_READY` |
 | Supported platform | `official_rule` + `manual_evidence` | macOS is explicitly allowed by the rules and FAQ. Shipaton Manager Jaewoong Eum also confirmed that macOS is eligible and has no judging disadvantage. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
@@ -247,9 +247,10 @@ The organizer gate is closed with a positive answer. The remaining minimum is:
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted
 backend, account system, telemetry, and a rewrite of the verdict engine remain out of scope.
 
-The previous active-hour estimate is no longer treated as an authoritative ledger: the Portfolio
-Workspace, native application, packaging, interactive Test Store setup, transaction evidence, and
-local submission assets are complete, while the public video and final submission gates remain.
+The initial target of no more than 25 active hours is not treated as proven: no reliable timer
+ledger was maintained while the Portfolio Workspace, native application, packaging, interactive
+Test Store setup, transaction evidence, and local submission assets were completed. The public
+video and final submission gates remain.
 Remaining work must be re-estimated from a verified timer state before claiming compliance with any
 owner-imposed active-hour cap.
 

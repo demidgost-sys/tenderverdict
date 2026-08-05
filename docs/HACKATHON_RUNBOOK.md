@@ -41,8 +41,9 @@ Sources rechecked on 2026-08-05:
 - [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
 - [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-The unauthenticated Devpost project page still requires registration before exposing project
-editing. Do not invent private form fields: inspect them only after the owner joins and signs in.
+The owner has joined with the qualifying student profile, but the private project-creation form has
+not been opened and audited. Do not invent its fields: inspect them only while the owner is signed
+in, and do not submit without a separate final action.
 
 ## Current product proof
 
@@ -194,7 +195,8 @@ Never use a fake entitlement state as evidence.
 
 - [x] Shipaton Manager Perttu confirmed the Test Store-only purchase path on 2026-08-05.
 - [x] Shipaton confirmed that macOS is eligible and carries no platform-only disadvantage.
-- [ ] Devpost participation uses the qualifying academic email and student status is current.
+- [x] Devpost participation uses a TU Graz academic-domain email and the owner confirmed current
+  student status, TU Graz affiliation, and July 2028 graduation on 2026-08-05.
 - [ ] Exact private Devpost fields are inspected after joining; required claims and assets agree
   with the final repository state.
 - [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
