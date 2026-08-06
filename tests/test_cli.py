@@ -259,6 +259,85 @@ class CliTests(unittest.TestCase):
             self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
             self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
 
+    def test_portfolio_json_stdout_is_combined_and_offline(self) -> None:
+        stdout = io.StringIO()
+        with (
+            patch("socket.socket.connect", side_effect=AssertionError("network forbidden")),
+            contextlib.redirect_stdout(stdout),
+        ):
+            exit_code = main(
+                [
+                    "portfolio",
+                    "--workspace",
+                    str(EXAMPLES / "portfolio-workspace.json"),
+                    "--notices",
+                    str(EXAMPLES / "notices.json"),
+                    "--as-of",
+                    "2026-08-02",
+                ]
+            )
+
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["kind"], "portfolio_workspace_report")
+        self.assertEqual(payload["summary"], {"profile_count": 3, "notice_count": 3})
+        self.assertEqual(len(payload["profile_reports"]), 3)
+        self.assertTrue(all(report["schema_version"] == 3 for report in payload["profile_reports"]))
+
+    def test_portfolio_writes_json_atomically(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "portfolio-report.json"
+            exit_code = main(
+                [
+                    "portfolio",
+                    "--workspace",
+                    str(EXAMPLES / "portfolio-workspace.json"),
+                    "--notices",
+                    str(EXAMPLES / "notices.csv"),
+                    "--as-of",
+                    "2026-08-02",
+                    "--output",
+                    str(output),
+                ]
+            )
+
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(payload["summary"]["profile_count"], 3)
+            self.assertEqual(list(Path(directory).glob(f".{output.name}.*.tmp")), [])
+
+    def test_invalid_workspace_does_not_replace_existing_portfolio_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workspace = root / "workspace.json"
+            output = root / "portfolio-report.json"
+            workspace.write_text(
+                json.dumps({"schema_version": 1, "profiles": []}),
+                encoding="utf-8",
+            )
+            output.write_text("keep-me\n", encoding="utf-8")
+            stderr = io.StringIO()
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main(
+                    [
+                        "portfolio",
+                        "--workspace",
+                        str(workspace),
+                        "--notices",
+                        str(EXAMPLES / "notices.json"),
+                        "--as-of",
+                        "2026-08-02",
+                        "--output",
+                        str(output),
+                    ]
+                )
+
+            self.assertEqual(exit_code, 2)
+            self.assertIn("at least 1 profile", stderr.getvalue())
+            self.assertEqual(output.read_text(encoding="utf-8"), "keep-me\n")
+            self.assertEqual(list(root.glob(f".{output.name}.*.tmp")), [])
+
     def test_failed_fetch_does_not_replace_existing_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "notices.json"

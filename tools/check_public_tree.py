@@ -15,7 +15,21 @@ MAX_SCREENSHOT_BYTES = 500 * 1024
 SCREENSHOT_PATH = "demo/screenshot.png"
 ICNS_PATH = "packaging/tenderverdict-icon.icns"
 ICO_PATH = "packaging/tenderverdict-icon.ico"
-BINARY_ASSET_PATHS = frozenset({SCREENSHOT_PATH, ICNS_PATH, ICO_PATH})
+SUBMISSION_ICON_PATH = "submission/icon-1024.png"
+SUBMISSION_SCREENSHOT_PATH = "submission/screenshot-1179x2556.png"
+UNLOCKED_EVIDENCE_PATH = "submission/evidence/unlocked-test-store-2026-08-04.png"
+VOICEOVER_EVIDENCE_PATH = "submission/evidence/voiceover-restore-2026-08-04.png"
+EVIDENCE_SCREENSHOT_PATHS = frozenset({UNLOCKED_EVIDENCE_PATH, VOICEOVER_EVIDENCE_PATH})
+BINARY_ASSET_PATHS = frozenset(
+    {
+        SCREENSHOT_PATH,
+        ICNS_PATH,
+        ICO_PATH,
+        SUBMISSION_ICON_PATH,
+        SUBMISSION_SCREENSHOT_PATH,
+        *EVIDENCE_SCREENSHOT_PATHS,
+    }
+)
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 FORBIDDEN_PNG_CHUNKS = {b"eXIf", b"tEXt", b"iTXt", b"zTXt"}
 ALLOWED_PNG_CHUNKS = {b"IHDR", b"IDAT", b"IEND"}
@@ -196,6 +210,27 @@ def _validate_screenshot(path: Path) -> None:
     _validate_png_payload(payload, SCREENSHOT_PATH)
 
 
+def _validate_submission_icon(path: Path) -> None:
+    payload = path.read_bytes()
+    dimensions = _validate_png_payload(payload, SUBMISSION_ICON_PATH)
+    if dimensions != (1024, 1024):
+        raise TreeError(f"{SUBMISSION_ICON_PATH} must be exactly 1024x1024, got {dimensions}")
+
+
+def _validate_submission_screenshot(path: Path) -> None:
+    payload = path.read_bytes()
+    dimensions = _validate_png_payload(payload, SUBMISSION_SCREENSHOT_PATH)
+    if dimensions != (1179, 2556):
+        raise TreeError(f"{SUBMISSION_SCREENSHOT_PATH} must be exactly 1179x2556, got {dimensions}")
+
+
+def _validate_evidence_screenshot(path: Path, relative: str) -> None:
+    payload = path.read_bytes()
+    dimensions = _validate_png_payload(payload, relative)
+    if dimensions != (1020, 754):
+        raise TreeError(f"{relative} must be exactly 1020x754, got {dimensions}")
+
+
 def _validate_icns(path: Path) -> None:
     payload = path.read_bytes()
     if len(payload) < 16 or payload[:4] != b"icns":
@@ -326,6 +361,12 @@ def validate_tree(root: Path, *, sdist: bool = False) -> list[str]:
             raise TreeError(f"file exceeds 1 MiB: {relative} ({size} bytes)")
         if relative == SCREENSHOT_PATH:
             _validate_screenshot(path)
+        elif relative == SUBMISSION_ICON_PATH:
+            _validate_submission_icon(path)
+        elif relative == SUBMISSION_SCREENSHOT_PATH:
+            _validate_submission_screenshot(path)
+        elif relative in EVIDENCE_SCREENSHOT_PATHS:
+            _validate_evidence_screenshot(path, relative)
         elif relative == ICNS_PATH:
             _validate_icns(path)
         elif relative == ICO_PATH:

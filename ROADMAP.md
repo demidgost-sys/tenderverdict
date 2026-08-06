@@ -4,6 +4,10 @@ This roadmap records the intended evaluation sequence for TenderVerdict. It is n
 dates, support, compatibility, or continued development. A milestone advances only after its
 documented evidence gates pass.
 
+The current measured snapshot, exact completion counts, and reconciliation with earlier plans live
+in [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). Those counts are a progress ledger, not a
+probability of winning or a public-release claim.
+
 ## Current state
 
 | Surface | State | Intended user |
@@ -11,7 +15,9 @@ documented evidence gates pass.
 | `v0.1.0-alpha.1` | Published, immutable CLI developer alpha | Python-capable evaluator |
 | `v0.2.0-alpha.1` | Desktop developer alpha with CLI, library, and local UI | Technical evaluator |
 | Native desktop archives | Unsigned prerelease archives with checksums and build manifests | Opt-in evaluation only |
-| Hosted service, accounts, payments, analytics | Not implemented | Nobody |
+| Portfolio Workspace in current source | Offline JSON CLI for one to five profiles | Technical evaluator |
+| Next Gen SwiftUI app in current source | Source-buildable and self-contained packaged macOS UI with pinned RevenueCat SDK | Competition prototype evaluator |
+| Hosted service, accounts, production payments, analytics | Not implemented | Nobody |
 
 The current product contract remains narrow: local, deterministic pre-qualification of supplied
 public-procurement notice metadata. It does not read full tender documents, provide legal advice,
@@ -22,6 +28,27 @@ support, verified eForms XML expansion for multi-lot TED results, result filteri
 hash-locked Python build dependencies, and a first-run handoff inside native archives. The release
 remains an evaluation build, not evidence that platform usability or procurement-workflow fit has
 been established.
+
+Current source also contains the RevenueCat-independent Portfolio Workspace foundation. It reuses
+the canonical profile and qualification rules, evaluates one notice set independently for up to
+five profiles, and emits JSON with one schema-3 report per profile. It is not included in the
+published `v0.2.0-alpha.1` tag and is not exposed by the Tk desktop.
+
+The competition branch additionally contains an unreleased SwiftUI app that consumes this JSON,
+links the official `purchases-ios` `5.83.0` package, keeps one profile visible in free mode, and
+maps the `supplier_profiles_plus` entitlement to the complete workspace. It now includes a native
+one-to-five-profile builder, bounded CSV/JSON import preview, opt-in bookmark-only continuity,
+large-list review filters, and stable comparison drill-down. Source and packaged smoke tests,
+strict bridge contracts, native checks, local analysis, deterministic export, and invalid-input
+retention pass locally. The reproducible builder produces an embedded-runtime, ad-hoc-signed app
+and checksum-paired archive and verifies the private normalize/import commands inside the frozen
+runtime. Exact-size icon and pre-transaction screenshot assets are also present. A separate
+reproducible Debug artifact completed the configured RevenueCat Test Store offering, cancellation,
+failure, retry, purchase, entitlement unlock, relaunch refresh, restore, and VoiceOver restore
+path. No key is committed or bundled; this is not a real payment. A Shipaton Manager has now
+confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
+eligible without a platform disadvantage. Entrant student/email eligibility is owner-confirmed and
+tracked in project status; a public video has not been established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -54,7 +81,8 @@ deliberately not simulated by CI.
 Feedback remains opt-in through public GitHub issues using synthetic, public, or fully de-identified
 examples. The `v0.2.0-alpha.1` desktop evaluation is tracked in
 [issue #9](https://github.com/demidgost-sys/tenderverdict/issues/9). TenderVerdict does not collect
-telemetry or contact prospective users automatically.
+first-party product telemetry or contact prospective users automatically. A configured RevenueCat
+Debug evaluation still performs the SDK's normal Test Store operations.
 
 Continue desktop work only if the evaluation produces at least:
 
@@ -72,18 +100,49 @@ either three independent successful packaged desktop installations, including at
 macOS, or one explicit opt-in request for a Developer ID-signed and notarized macOS build.
 Maintainer runs and CI jobs do not count toward this threshold.
 
-## Candidate follow-on work
+## Shipaton Next Gen branch
+
+The competition branch has a narrower conditional path documented in
+[`docs/SHIPATON_EVIDENCE.md`](docs/SHIPATON_EVIDENCE.md). The Portfolio Workspace core, native app,
+self-contained packaging, local submission assets, and hands-on Test Store transaction evidence are
+implemented. The organizer gate is closed: a
+[Shipaton Manager confirmed that Test Store is enough for Next Gen](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient),
+and a separate
+[Manager response confirms macOS eligibility without disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
+
+The remaining order is:
+
+1. inspect the exact private Devpost fields after the owner completes visual reCAPTCHA;
+2. prepare the public demo on the exact final candidate;
+3. after owner approval, complete the final pushed-CI, evidence, and
+   logged-out-link audit.
+
+Optional follow-ups, excluded from Next Gen readiness, are a hands-on VoiceOver announcement/focus
+pass, independent opt-in workflow validation, and a refreshed RevenueCat dashboard capture.
+
+Draft PR #12 is the authoritative pushed-revision CI record. The exact audited implementation
+revision, artifact provenance, suite totals, and current gate result are maintained in
+[`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md), not duplicated here.
+
+No App Store release, real payment, hosted backend, account system, or production API key belongs
+to this conditional Next Gen implementation.
+
+## Optional candidate follow-on work
 
 Priorities are ordered by evidence value rather than feature count:
 
-1. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
+1. Complete a later packaged VoiceOver pass and preserve only evidence that cannot expose a Test
+   Store key or customer identifier.
+2. If product validation becomes useful, run the Next Gen app with opt-in procurement or supplier
+   users and document only concrete evidence-backed workflow changes using public, synthetic, or
+   fully de-identified data.
+3. Revisit builder defaults, import guidance, and comparison wording only if later evidence shows a
+   repeated point of friction; the current bounded competition implementation is complete.
+4. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
    Windows x64 machine; repeat the accessibility portion with NVDA.
-2. Repeat the packaged flow on macOS with VoiceOver and record which controls are exposed.
-3. Obtain three independent opt-in runs and two concrete procurement-workflow observations using
-   synthetic, public, or fully de-identified data.
-4. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
-5. Consider an updater or desktop TED action only after a signed distribution and privacy design
+5. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.
+6. Consider an updater or desktop TED action only after a signed distribution and privacy design
    exist; until then the desktop remains local-only and updates remain manual.
 
-Automatic bidding, bidder scoring, legal conclusions, confidential-document ingestion, accounts,
-hosted execution, payments, and analytics are outside the current roadmap.
+Automatic bidding, bidder or profile scoring, legal conclusions, confidential-document ingestion,
+accounts, hosted execution, production payments, and analytics are outside the current roadmap.

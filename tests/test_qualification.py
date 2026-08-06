@@ -106,7 +106,8 @@ class QualificationTests(unittest.TestCase):
                 self.assertEqual(result.verdict, Verdict.REJECT)
                 self.assertEqual(
                     result.human_next_step,
-                    "Stop review unless the notice metadata is corrected.",
+                    "Do not proceed for this profile. If the source metadata changes, "
+                    "correct the input and run again.",
                 )
 
     def test_hard_stop_takes_precedence_over_unknowns(self) -> None:
@@ -195,6 +196,8 @@ class SourceUrlTests(unittest.TestCase):
             "https://user:password@procurement.example/notices/SYN-001",
             "https://procurement.example/notices/SYN-001#fragment",
             "https://procurement.example/a b",
+            "https://procurement.example/control\x7fvalue",
+            "https://procurement.example/bidi\u202evalue",
             "https://procurement.example:bad/notices/SYN-001",
             "",
         )

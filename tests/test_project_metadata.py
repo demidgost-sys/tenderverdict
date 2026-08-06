@@ -107,15 +107,144 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn('tools/security_scan.py --root "${sdist_root}" --sdist', workflow)
         self.assertNotIn('rm "${sdist_root}/PKG-INFO"', workflow)
 
+    def test_next_gen_sdk_pin_and_ci_are_explicit(self) -> None:
+        package_root = ROOT / "macos" / "TenderVerdictNextGen"
+        package = (package_root / "Package.swift").read_text(encoding="utf-8")
+        resolved = json.loads((package_root / "Package.resolved").read_text(encoding="utf-8"))
+        workflow = (ROOT / ".github" / "workflows" / "desktop.yml").read_text(encoding="utf-8")
+        metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+        self.assertIn('exact: "5.83.0"', package)
+        self.assertEqual(len(resolved["pins"]), 1)
+        pin = resolved["pins"][0]
+        self.assertEqual(pin["identity"], "purchases-ios")
+        self.assertEqual(pin["state"]["version"], "5.83.0")
+        self.assertEqual(
+            pin["state"]["revision"],
+            "c69a23f56c63bdfe96096fa64a1c65334d2592db",
+        )
+        self.assertIn("swift build --package-path macos/TenderVerdictNextGen", workflow)
+        self.assertIn("TenderVerdictNextGenChecks", workflow)
+        self.assertIn("TenderVerdictNextGen --smoke-test", workflow)
+        self.assertIn("python tools/build_next_gen.py", workflow)
+        self.assertIn("TenderVerdictNextGen-macos-${{ github.sha }}", workflow)
+        self.assertNotIn("REVENUECAT_TEST_STORE_API_KEY", workflow)
+        self.assertIn("/macos", metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"])
+        self.assertIn(
+            "/submission",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
+        self.assertIn(
+            "/AGENTS.md",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
+
+        core_spec = (ROOT / "packaging" / "TenderVerdictNextGenCore.spec").read_text(
+            encoding="utf-8"
+        )
+        next_gen_builder = (ROOT / "tools" / "build_next_gen.py").read_text(encoding="utf-8")
+        self.assertIn('"tenderverdict.ted"', core_spec)
+        self.assertIn("console=True", core_spec)
+        self.assertIn("--smoke-test", next_gen_builder)
+        self.assertIn('"normalize-workspace"', next_gen_builder)
+        self.assertIn('"inspect-notices"', next_gen_builder)
+        self.assertIn("_verify_embedded_core", next_gen_builder)
+        self.assertIn('"codesign", "--verify"', next_gen_builder)
+        self.assertIn("api_key_included=false", next_gen_builder)
+        self.assertIn('choices=("debug", "release")', next_gen_builder)
+        self.assertIn('f"build_configuration={configuration}"', next_gen_builder)
+        self.assertIn(
+            "f\"test_store_enabled={str(configuration == 'debug').lower()}\"",
+            next_gen_builder,
+        )
+        self.assertIn('project_version = metadata["project"]["version"]', next_gen_builder)
+        self.assertIn('swift_checks = swift_bin_path / f"{APP_NAME}Checks"', next_gen_builder)
+        self.assertIn(
+            "swift format lint --recursive --strict macos/TenderVerdictNextGen",
+            workflow,
+        )
+        self.assertIn(
+            "swift run -c release --package-path macos/TenderVerdictNextGen",
+            workflow,
+        )
+
+    def test_next_gen_review_queue_copy_and_reset_are_unambiguous(self) -> None:
+        app_source = (
+            ROOT
+            / "macos"
+            / "TenderVerdictNextGen"
+            / "Sources"
+            / "TenderVerdictNextGenApp"
+            / "TenderVerdictNextGenApp.swift"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("Text(filteredResultCountLabel)", app_source)
+        self.assertIn('count == 1 ? "result" : "results"', app_source)
+        self.assertNotIn('Button("Clear all filters")', app_source)
+        self.assertEqual(app_source.count('Button("Clear filters")'), 2)
+
+    def test_next_gen_headline_leads_with_user_value(self) -> None:
+        app_source = (
+            ROOT
+            / "macos"
+            / "TenderVerdictNextGen"
+            / "Sources"
+            / "TenderVerdictNextGenApp"
+            / "TenderVerdictNextGenApp.swift"
+        ).read_text(encoding="utf-8")
+        devpost = (ROOT / "submission" / "devpost-draft.md").read_text(encoding="utf-8")
+        headline = "One tender feed. A clear next step for every supplier profile."
+
+        self.assertIn(f'Text("{headline}")', app_source)
+        self.assertIn(f"## Tagline\n\n{headline}\n", devpost)
+        self.assertNotIn("RevenueCat-powered", app_source)
+        self.assertNotIn("RevenueCat-powered", devpost)
+
+    def test_original_hackathon_brief_paths_route_to_canonical_documents(self) -> None:
+        overview = (ROOT / "HACKATHON.md").read_text(encoding="utf-8")
+        demo_entry = (ROOT / "docs" / "SHIPATON_DEMO_SCRIPT.md").read_text(encoding="utf-8")
+        devpost_entry = (ROOT / "docs" / "DEVPOST_DRAFT.md").read_text(encoding="utf-8")
+        metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+        for heading in (
+            "## Problem",
+            "## User",
+            "## Solution",
+            "## RevenueCat's role",
+            "## Architecture",
+            "## Privacy and IP boundaries",
+            "## Run and verify",
+            "## Limitations and evidence boundary",
+        ):
+            self.assertIn(heading, overview)
+        self.assertIn("not measured with a reliable active-time timer", overview)
+        self.assertIn("[DEMO_SCRIPT.md](DEMO_SCRIPT.md)", demo_entry)
+        self.assertIn(
+            "[submission/devpost-draft.md](../submission/devpost-draft.md)",
+            devpost_entry,
+        )
+        self.assertIn(
+            "/HACKATHON.md",
+            metadata["tool"]["hatch"]["build"]["targets"]["sdist"]["include"],
+        )
+
     def test_local_markdown_links_resolve_inside_the_public_tree(self) -> None:
         allowlist = (ROOT / "PUBLIC_TREE_ALLOWLIST.txt").read_text(encoding="utf-8").splitlines()
         local_link = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
+        html_fragment = re.compile(r'href="#([^"]+)"')
+        heading = re.compile(r"^#{1,6}\s+(.+?)\s*$", re.MULTILINE)
+
+        def heading_slug(value: str) -> str:
+            plain = value.replace("`", "").lower()
+            plain = re.sub(r"[^\w\- ]", "", plain)
+            return re.sub(r" +", "-", plain.strip())
 
         for relative in allowlist:
             if not relative.endswith(".md"):
                 continue
             document = ROOT / relative
-            for raw_target in local_link.findall(document.read_text(encoding="utf-8")):
+            content = document.read_text(encoding="utf-8")
+            for raw_target in local_link.findall(content):
                 target = raw_target.strip().strip("<>")
                 if target.startswith(("#", "https://", "http://", "mailto:")):
                     continue
@@ -125,6 +254,28 @@ class ProjectMetadataTests(unittest.TestCase):
                     resolved.exists(),
                     f"{relative} contains a broken local link: {raw_target}",
                 )
+
+            fragments = {heading_slug(value) for value in heading.findall(content)}
+            for fragment in html_fragment.findall(content):
+                self.assertIn(
+                    fragment,
+                    fragments,
+                    f"{relative} contains a broken local fragment: #{fragment}",
+                )
+
+        documentation_index = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
+        for required in ("DEVELOPMENT.md", "DOCUMENTATION.md", "TECHNICAL_AUDIT.md"):
+            self.assertIn(required, documentation_index)
+
+        agent_guide = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for required in (
+            "docs/README.md",
+            "docs/PROJECT_STATUS.md",
+            "docs/ARCHITECTURE.md",
+            "docs/DEVELOPMENT.md",
+            "docs/DOCUMENTATION.md",
+        ):
+            self.assertIn(required, agent_guide)
 
 
 if __name__ == "__main__":

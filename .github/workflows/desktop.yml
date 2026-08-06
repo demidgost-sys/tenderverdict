@@ -249,10 +249,89 @@ jobs:
           retention-days: 7
           compression-level: 0
 
+  next-gen:
+    name: Validate Next Gen macOS source
+    needs: validate
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up exact Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.6"
+
+      - name: Install pinned Next Gen packaging tools
+        run: |
+          python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements-desktop-build.txt
+          python -m pip check
+
+      - name: Lint Swift source
+        run: swift format lint --recursive --strict macos/TenderVerdictNextGen
+
+      - name: Build exact Swift package
+        run: swift build --package-path macos/TenderVerdictNextGen
+
+      - name: Run native contract checks
+        run: >-
+          swift run --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGenChecks
+
+      - name: Run Release-mode native contract checks
+        run: >-
+          swift run -c release --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGenChecks
+
+      - name: Smoke-test the Python portfolio adapter
+        env:
+          TENDERVERDICT_WORKTREE: ${{ github.workspace }}
+        run: >-
+          swift run --package-path macos/TenderVerdictNextGen
+          TenderVerdictNextGen --smoke-test
+
+      - name: Build and smoke-test self-contained Next Gen app
+        run: python tools/build_next_gen.py
+
+      - name: Verify Next Gen bundle and archive
+        shell: bash
+        run: |
+          app="dist/next-gen/TenderVerdictNextGen.app"
+          executable="$app/Contents/MacOS/TenderVerdictNextGen"
+          core="$app/Contents/Resources/TenderVerdictCore/TenderVerdictCore"
+          test -x "$executable"
+          test -x "$core"
+          test -s "$app/Contents/Resources/BUILD_INFO.txt"
+          test -s "$app/Contents/Resources/tenderverdict-icon.icns"
+          codesign --verify --deep --strict --verbose=4 "$app"
+          signature="$(codesign -dv --verbose=4 "$app" 2>&1)"
+          printf '%s\n' "$signature"
+          printf '%s\n' "$signature" | grep -q 'Signature=adhoc'
+          printf '%s\n' "$signature" | grep -q 'TeamIdentifier=not set'
+          cd dist/next-gen
+          shasum -a 256 -c TenderVerdictNextGen-macos.sha256
+
+      - name: Upload short-lived Next Gen app
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: TenderVerdictNextGen-macos-${{ github.sha }}
+          path: |
+            dist/next-gen/TenderVerdictNextGen-macos.zip
+            dist/next-gen/TenderVerdictNextGen-macos.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
   gate:
     name: Desktop gate
     if: always()
-    needs: [validate, build]
+    needs: [validate, build, next-gen]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -260,6 +339,8 @@ jobs:
         env:
           VALIDATE_RESULT: ${{ needs.validate.result }}
           BUILD_RESULT: ${{ needs.build.result }}
+          NEXT_GEN_RESULT: ${{ needs.next-gen.result }}
         run: |
           test "${VALIDATE_RESULT}" = "success"
           test "${BUILD_RESULT}" = "success"
+          test "${NEXT_GEN_RESULT}" = "success"

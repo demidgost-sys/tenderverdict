@@ -3,6 +3,7 @@
 from ._version import __version__
 from .models import (
     Notice,
+    PortfolioWorkspace,
     Profile,
     QualificationResult,
     SchemaValidationError,
@@ -12,6 +13,7 @@ from .qualification import qualify_notices
 
 __all__ = [
     "Notice",
+    "PortfolioWorkspace",
     "Profile",
     "QualificationResult",
     "SchemaValidationError",
