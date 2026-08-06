@@ -12,8 +12,8 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `icon-1024.png` | Ready | Exactly 1024×1024, extracted byte-for-byte from the reviewed ICNS 1024 px chunk |
 | `screenshot-1179x2556.png` | Ready current candidate | Exactly 1179×2556, regenerated from the current native UX, sanitized, and visually reviewed in light and dark appearance; repeat after later visual changes |
 | `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
-| `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements remain pending |
-| `linkedin-user-testing-draft.md` | Copy-ready, not published | Updated Shipaton product story plus a 10–15 minute call for three independent usability sessions |
+| `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
+| `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
 | Public video | Pending | Public YouTube/Vimeo, at or below 1:50 target and under the official two-minute limit, packaged macOS app |
 | `devpost-draft.md` | Ready with explicit placeholders | Product story and judging proof are drafted; do not publish or remove placeholders before final evidence exists |
 
@@ -28,8 +28,8 @@ configuration-specific native checks, embedded-core determinism and contracts, s
 checksum, ZIP integrity, and worktree-independent smoke. Its `.app`, zip, exact SHA-256, and
 manifest live in [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md). The portrait/icon asset gate
 also passes. A clean `3cf20ed` Debug artifact now covers the current Test Store runtime plus
-keyboard, contrast, transparency, and bounded large-text evidence. VoiceOver announcements remain
-the separate manual evidence gate.
+keyboard, contrast, transparency, and bounded large-text evidence. Hands-on VoiceOver
+announcements remain an optional accessibility follow-up rather than a submission gate.
 
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export

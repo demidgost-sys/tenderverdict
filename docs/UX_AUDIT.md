@@ -140,8 +140,9 @@ maintainer observations, not independent user-research sessions.
 
 The Python metadata guard now checks the singular/plural source contract and rejects a second
 `Clear all filters` action. The full source gate, Release builder, checksum verification, light/dark
-render, and hands-on accessibility-tree comparison passed for `69eed54`. The three opt-in external
-workflow sessions remain open and are not implied by this micro-pass.
+render, and hands-on accessibility-tree comparison passed for `69eed54`. No independent workflow
+session or user-value result is implied by this maintainer micro-pass; that validation is an
+optional future product activity.
 
 ## Current headline and brief-path pass (`automated` + visual inspection, 2026-08-05)
 
@@ -250,15 +251,17 @@ adaptation. Input-derived control and bidi-formatting characters are rendered vi
 allowed to reorder evidence. Announcement content contains no key, customer identifier, or tender
 data.
 
-## Still required (`pending`)
+## Optional future accessibility validation
 
 1. With VoiceOver enabled, manually exercise Test Store purchase success, cancellation, failure,
    retry, and restore. Confirm each asynchronous announcement is spoken once and focus lands on the
    documented recovery control.
 2. Repeat the selected-file and both Save-panel export choices only if the native source changes or
-   they are needed in the final continuous video take.
-3. Preserve dated evidence without an API key, customer identifier, account email, or unrelated
-   desktop content.
+   they are useful in a later continuous evidence take.
+
+Any later evidence must remain dated and must not contain an API key, customer identifier, account
+email, or unrelated desktop content. Independent workflow sessions are likewise optional future
+validation; no external-user outcome is currently claimed.
 
 Until VoiceOver passes, describe announcement routing as implemented and automated-contract-checked,
 not as spoken hands-on verified. Contrast, transparency, keyboard order, and the bounded large-text

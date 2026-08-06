@@ -142,11 +142,12 @@ with evidence a human can defend.
 
 ## What is next
 
-Keep the exact final Release and current Debug evidence aligned, refresh the dashboard/unlocked
-visual during the final take, manually verify VoiceOver announcements for asynchronous success/
-cancellation/failure, complete the private project draft after visual reCAPTCHA, publish the
-captioned sub-1:50 demo, run CI on the submitted commit, and verify the repository/video/final entry
-while logged out.
+Complete the private project draft after visual reCAPTCHA, keep the exact final Release and current
+Debug evidence aligned, publish the captioned sub-1:50 demo, run CI on the submitted commit, and
+verify the repository, video, and final entry while logged out. A later accessibility pass can
+manually verify VoiceOver announcements for asynchronous purchase outcomes; independent workflow
+sessions can test product fit. Neither optional follow-up is presented as a completed result or a
+Next Gen submission requirement.
 
 ## Links
 

@@ -330,7 +330,8 @@ Store offering, cancel, simulated failure, retry, purchase, immediate restore, a
 pass; that is test evidence, not a real payment. The current icon and portrait screenshot were
 regenerated and structure-checked; the portrait was also visually reviewed in light and dark
 appearance. Keyboard order, large-text rendering, Increase Contrast, and Reduce Transparency were
-checked silently. Asynchronous VoiceOver speech/focus remains a manual evidence gate.
+checked silently. Hands-on asynchronous VoiceOver speech/focus is an optional accessibility
+follow-up and is not a Next Gen submission gate.
 
 The Shipaton Manager has confirmed that a Test Store integration is sufficient for judging and
 that a macOS app is accepted without a judging disadvantage:

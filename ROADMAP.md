@@ -47,8 +47,8 @@ reproducible Debug artifact completed the configured RevenueCat Test Store offer
 failure, retry, purchase, entitlement unlock, relaunch refresh, restore, and VoiceOver restore
 path. No key is committed or bundled; this is not a real payment. A Shipaton Manager has now
 confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
-eligible without a platform disadvantage. A public video and entrant-account eligibility check
-have not been established.
+eligible without a platform disadvantage. Entrant student/email eligibility is owner-confirmed and
+tracked in project status; a public video has not been established.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -112,14 +112,13 @@ and a separate
 
 The remaining order is:
 
-1. build a fresh final-revision Debug app and manually verify asynchronous RevenueCat
-   announcements, Increase Contrast, Reduce Transparency, and large-text behavior without
-   embedding a usable key;
-2. run three opt-in workflow sessions and convert observed friction into bounded product changes;
-3. verify the entrant's student/email eligibility and inspect the exact private Devpost fields
-   after the owner joins and signs in;
-4. only after owner approval, prepare the public demo and complete the final evidence and
+1. inspect the exact private Devpost fields after the owner completes visual reCAPTCHA;
+2. prepare the public demo on the exact final candidate;
+3. after owner approval, complete the final pushed-CI, evidence, and
    logged-out-link audit.
+
+Optional follow-ups, excluded from Next Gen readiness, are a hands-on VoiceOver announcement/focus
+pass, independent opt-in workflow validation, and a refreshed RevenueCat dashboard capture.
 
 Draft PR #12 is the authoritative pushed-revision CI record. The exact audited implementation
 revision, artifact provenance, suite totals, and current gate result are maintained in
@@ -128,16 +127,17 @@ revision, artifact provenance, suite totals, and current gate result are maintai
 No App Store release, real payment, hosted backend, account system, or production API key belongs
 to this conditional Next Gen implementation.
 
-## Candidate follow-on work
+## Optional candidate follow-on work
 
 Priorities are ordered by evidence value rather than feature count:
 
-1. Complete the final packaged accessibility/settings pass and preserve only evidence that cannot
-   expose a Test Store key or customer identifier.
-2. Run the Next Gen app with three opt-in procurement or supplier users and document two concrete
-   workflow changes using public, synthetic, or fully de-identified data.
-3. Revisit builder defaults, import guidance, and comparison wording only when those sessions show
-   a repeated point of friction; the current bounded implementations are complete.
+1. Complete a later packaged VoiceOver pass and preserve only evidence that cannot expose a Test
+   Store key or customer identifier.
+2. If product validation becomes useful, run the Next Gen app with opt-in procurement or supplier
+   users and document only concrete evidence-backed workflow changes using public, synthetic, or
+   fully de-identified data.
+3. Revisit builder defaults, import guidance, and comparison wording only if later evidence shows a
+   repeated point of friction; the current bounded competition implementation is complete.
 4. Run the released archive through demo, CSV import, filtering, copy, and HTML export on a real
    Windows x64 machine; repeat the accessibility portion with NVDA.
 5. Decide whether demonstrated use justifies paid signing/notarization and a trusted installer.

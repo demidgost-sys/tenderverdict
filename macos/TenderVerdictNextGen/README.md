@@ -199,8 +199,9 @@ It is not a real payment. The earlier baseline remains the latest VoiceOver Rest
 dashboard readback evidence.
 
 Keyboard order, Increase Contrast, Reduce Transparency, and a temporary `.accessibility3`
-screenshot-renderer pass were checked on that package without retaining a source change. Still
-requiring hands-on verification: terminal VoiceOver announcements/focus across purchase outcomes,
-the private Devpost form, and the final public submission. See
+screenshot-renderer pass were checked on that package without retaining a source change. Terminal
+VoiceOver announcements/focus across purchase outcomes remain an optional accessibility follow-up;
+they are not a Next Gen submission gate. The private Devpost form and final public submission are
+still required. See
 [the evidence record](../../docs/SHIPATON_EVIDENCE.md) and
 [hackathon runbook](../../docs/HACKATHON_RUNBOOK.md).

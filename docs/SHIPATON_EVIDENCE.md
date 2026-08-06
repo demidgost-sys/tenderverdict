@@ -40,8 +40,9 @@ drill-down, competition assets, and local Test Store evidence. No usable key, cu
 or account screenshot is retained. Draft PR #12 is the authoritative pushed-revision check record;
 the exact audited revision, local-gate totals, and current SSD packages live in
 [project status](PROJECT_STATUS.md). A fresh final-product Debug transaction/settings pass is now
-recorded. Post-change asynchronous VoiceOver outcomes, three independent workflow sessions, the
-public video, private Devpost project audit, and submission remain open.
+recorded. The public video, private Devpost project audit, and submission remain open.
+Post-change asynchronous VoiceOver outcomes and independent workflow sessions have not been
+performed, but they are optional future evidence rather than Next Gen submission gates.
 
 ## Requirement matrix
 
@@ -233,18 +234,23 @@ must not be claimed as hands-on complete.
 
 ## Remaining evidence path
 
-The organizer gate is closed with a positive answer. The remaining minimum is:
+The organizer gate is closed with a positive answer. The required remaining submission path is:
 
-1. when sound is allowed again, manually exercise actual Test Store purchase, cancel, failure,
-   retry, and restore announcements with VoiceOver and verify recovery focus;
-2. run three opt-in workflow sessions and document only evidence-backed product changes;
-3. solve the visual reCAPTCHA manually and inspect the exact private Devpost project fields without
+1. solve the visual reCAPTCHA manually and inspect the exact private Devpost project fields without
    submitting;
-4. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
+2. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
    verified duration below two minutes;
-5. refresh the dashboard screenshot/evidence during the final continuous Test Store take;
-6. verify the final public repository and video while logged out, and then complete the Devpost
-   submission without claiming a real payment or App Store transaction.
+3. verify the exact final pushed CI, public repository, and video while logged out, and then
+   complete the Devpost submission without claiming a real payment or App Store transaction.
+
+Optional evidence improvements, excluded from competition readiness, are:
+
+- manually exercise actual Test Store purchase, cancel, failure, retry, and restore announcements
+  with VoiceOver and verify recovery focus when sound is appropriate;
+- run opt-in workflow sessions and document only evidence-backed product changes if future product
+  validation is useful;
+- refresh the dashboard screenshot during a later continuous Test Store take if stronger
+  supplemental RevenueCat evidence is useful.
 
 A direct Python-to-RevenueCat REST integration, custom fake SDK, production billing, hosted
 backend, account system, telemetry, and a rewrite of the verdict engine remain out of scope.

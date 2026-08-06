@@ -1,6 +1,6 @@
 # TenderVerdict project status and Shipaton readiness
 
-- Snapshot date: **2026-08-05**
+- Snapshot date: **2026-08-06**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Audit baseline: `79186da7e83e40284cca9f34d658f6e2a0e1b335` (**superseded**)
 - Pushed remediation baseline: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
@@ -26,16 +26,17 @@ RevenueCat Test Store flow, a self-contained app builder, a judge-facing Portfol
 review and comparison UX, entitlement-aware shareable HTML review briefs, submission assets, and
 reproducible quality gates without changing the existing three-verdict qualification semantics.
 
-Two readiness numbers are intentionally kept separate:
+Competition implementation and final-submission readiness are intentionally kept separate:
 
 | Readiness lens | Completed | Meaning |
 |---|---:|---|
-| Local Shipaton implementation | **20 / 22 milestones (91%)** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, and comparison drill-down are implemented; silent settings QA passed, while VoiceOver and independent user validation remain |
+| Local Shipaton implementation | **Complete for the declared competition scope** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, comparison drill-down, and silent settings QA are complete; VoiceOver and independent workflow validation are optional follow-ups |
 | Final submission | **9 / 12 gates (75%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, draft text, current-revision CI, and entrant verification exist; the project form, video, and final-link gates remain |
 | Public product release | **Not ready** | The app is an ad-hoc-signed competition prototype without notarization, a trusted installer, production billing, or demonstrated external workflow fit |
 
-These percentages count the explicit equal-weight milestones below. They are not a probability of
-winning, a quality score, or a substitute for the open eligibility and submission gates.
+Only the final-submission percentage counts explicit equal-weight gates. Optional VoiceOver and
+independent workflow validation do not reduce competition implementation readiness. None of these
+labels is a probability of winning, a quality score, or a public-release claim.
 
 ## Why the competition work matters
 
@@ -115,7 +116,7 @@ expire on an accelerated schedule: a later restore after expiry correctly return
 state, while an immediate restore preserved access. VoiceOver was never launched in this pass and
 system output remained muted.
 
-## Local implementation milestone ledger
+## Local implementation and optional-validation ledger
 
 | # | Milestone | State |
 |---:|---|---|
@@ -138,13 +139,14 @@ system output remained muted.
 | 17 | Premium comparison, safe source links, shareable HTML presentation, and offering recovery are implemented | `DONE` |
 | 18 | Submission assets and the public documentation package, including the original brief's literal entry-point filenames, are generated and validated | `DONE` |
 | 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — current product revision `34f1002` has the complete local/package evidence above; draft PR #12 records the branch checks |
-| 20 | VoiceOver asynchronous outcomes plus Increase Contrast, Reduce Transparency, and large-text variants | `PARTIAL` — keyboard, Increase Contrast, Reduce Transparency, and temporary large-text rendering passed on the fresh Debug revision; VoiceOver speech/focus remains deliberately deferred |
-| 21 | Three opt-in workflow sessions and two evidence-backed product changes | `PARTIAL` — two maintainer-observed filter micro-fixes are complete; three independent opt-in workflow sessions remain open |
+| 20 | VoiceOver asynchronous outcomes plus Increase Contrast, Reduce Transparency, and large-text variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard, Increase Contrast, Reduce Transparency, and temporary large-text rendering passed on the fresh Debug revision; hands-on VoiceOver speech/focus remains unverified and is not a submission gate |
+| 21 | Independent workflow sessions and evidence-backed product changes | `OPTIONAL_FUTURE_VALIDATION` — two maintainer-observed filter micro-fixes are complete; no external workflow session or user-value result is claimed or required for the current submission |
 | 22 | Native profile builder/editor for one to five complete profiles | `DONE` |
 
-**Result: 20 of 22 milestones complete.** Items 20–21 are the remaining local evidence work. The
-post-change accessibility pass uses Test Store only and does not require a real payment,
-production API key, hosted backend, or App Store release.
+**Result: the declared competition implementation scope is complete.** Items 20–21 are explicitly
+optional follow-ups and are excluded from readiness. Any later accessibility pass still uses Test
+Store only and does not require a real payment, production API key, hosted backend, or App Store
+release.
 
 ## Final submission gate ledger
 
@@ -156,7 +158,7 @@ production API key, hosted backend, or App Store release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is green on pushed evidence revision `3cf20ed`, which contains product revision `34f1002` |
+| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative current-branch CI record; product revision `34f1002` and hands-on evidence revision `3cf20ed` remain unchanged by later documentation-only commits |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
 | 10 | Exact private Devpost project fields are inspected after joining and signing in | `OPEN` — hackathon registration is complete, but project creation still stops before the private fields at visual reCAPTCHA; no project was created or submitted |
@@ -178,13 +180,13 @@ current product-development pass, but it remains necessary before final submissi
 | Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — fresh on packaged Debug revision `3cf20ed`; dashboard readback remains the dated baseline |
 | Judge-facing review queue, comparison matrix, shareable brief, safe links, and visual QA | `COMPLETE` |
 | Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — product revision `34f1002` is clean, packaged, pushed, and covered by the current green draft-PR head |
-| Advanced macOS accessibility variants | `PARTIAL_MANUAL_QA` — keyboard order, increased contrast, reduced transparency, and temporary large-text rendering passed; VoiceOver announcements/focus remain untested by explicit owner choice |
+| Advanced macOS accessibility variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard order, increased contrast, reduced transparency, and temporary large-text rendering passed; hands-on VoiceOver announcements/focus remain untested and are not a submission gate |
 | Native Profile Builder | `COMPLETE` — creates, renames, reorders, validates, and saves one to five full profiles |
 | Import wizard | `COMPLETE_BOUNDED` — normalized preview, canonical fields, and missing-field guidance exist; arbitrary user-defined column mapping is intentionally excluded |
 | Workspace continuity | `COMPLETE_OPT_IN` — only security-scoped workspace/notices bookmarks are remembered, Forget is explicit, and no report, key, file content, review point, or automatic run is persisted |
 | Matrix-cell reasoning drill-down | `COMPLETE` — stable result identity opens the matching profile/notice reasoning without relying on filtered offsets |
 | Search and buyer/deadline filters for large files | `COMPLETE` — review and comparison surfaces use pure bounded queries and stable identities |
-| Three real-user workflow sessions | `OPEN` |
+| Independent workflow validation | `OPTIONAL_FUTURE_VALIDATION` — no external-user outcome is claimed or required for the current competition entry |
 
 ## What is verified, and what must not be claimed
 
@@ -225,15 +227,22 @@ Not verified and therefore not claimable:
 - that TenderVerdict reads full procurement documents, provides legal advice, predicts outcomes,
   or decides whether to bid.
 
-## Next implementation order
+## Required submission order
 
-1. When sound is allowed again, exercise success, cancellation, failure, retry, and restore with
-   VoiceOver and confirm each spoken announcement and recovery focus exactly once.
-2. Run three opt-in workflow sessions with public, synthetic, or fully de-identified notices and
-   document only evidence-backed adjustments.
-3. Solve the visual Devpost reCAPTCHA manually, create the private project draft, and inspect its
+1. Solve the visual Devpost reCAPTCHA manually, create the private project draft, and inspect its
    exact fields without submitting it.
-4. Only then finish the public demo and final logged-out repository/video/submission checks.
+2. Finish the public demo on the exact final revision.
+3. Run the final pushed CI and logged-out repository/video/submission checks, then submit only
+   after explicit owner approval.
+
+## Optional future validation
+
+- When sound is appropriate, exercise success, cancellation, failure, retry, and restore with
+  VoiceOver and confirm each spoken announcement and recovery focus exactly once.
+- If future product validation is useful, run opt-in workflow sessions with public, synthetic, or
+  fully de-identified notices and document only evidence-backed adjustments.
+- Refresh the dashboard readback during a later continuous evidence take if stronger supplemental
+  RevenueCat evidence is useful.
 
 Cross-profile ranking, automatic bidding, confidential-document ingestion, hosted accounts,
 analytics, production billing, and a verdict-engine rewrite remain outside the plan because they

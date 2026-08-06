@@ -64,6 +64,7 @@ The current native source supports this bounded journey:
    comparison, then open a cell for exact profile/notice reasoning.
 
 The [UX audit](UX_AUDIT.md) separates source inspection, automated checks, dated hands-on evidence,
-the completed silent final-product Debug/settings pass, and pending VoiceOver work. Written organizer answers confirm the narrow
-Test Store-only path and macOS eligibility; the [evidence record](SHIPATON_EVIDENCE.md) owns those
-primary sources and the remaining personal/submission gates.
+the completed silent final-product Debug/settings pass, and optional future VoiceOver evidence.
+Written organizer answers confirm the narrow Test Store-only path and macOS eligibility; the
+[evidence record](SHIPATON_EVIDENCE.md) owns those primary sources and the remaining
+personal/submission gates.

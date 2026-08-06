@@ -26,11 +26,12 @@ The Next Gen criteria are paraphrased below from the
 | Problem and experience | A clear, useful, interesting, original answer to a real problem | One notice feed is evaluated differently for several supplier profiles; verdicts remain explainable and human-owned | `STRONG_CONCEPT` |
 | Working application | Meaningful progress toward a functioning app, with core behavior visible in the repository and demo | Offline Python core, self-contained macOS app, real local files, deterministic export, and native review UI run locally | `VERIFIED_LOCALLY` |
 | RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised, and the Shipaton Manager confirmed Test Store is enough for Next Gen | `VERIFIED_TEST_STORE`, `ORGANIZER_CONFIRMED` |
-| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, and public documentation | `STRONG_WITH_OPEN_FINAL_QA` |
+| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, and public documentation | `STRONG_WITH_OPEN_SUBMISSION_GATES` |
 
-The remaining weakness is not missing feature volume, Test Store eligibility, package
-reproducibility, or the silent final-product Debug/settings pass. It is external proof that the
-narrow workflow is genuinely useful, plus VoiceOver evidence on the final UX revision.
+The remaining required work is not feature volume, Test Store eligibility, package
+reproducibility, VoiceOver, or independent-user evidence. It is the private Devpost draft, public
+demo, exact-final-revision CI, and logged-out submission review. External workflow validation and a
+fresh VoiceOver pass could strengthen future product evidence but are not Next Gen requirements.
 
 ## Category decision
 
@@ -116,12 +117,12 @@ puts proof of the working experience ahead of an exhaustive feature tour.
     preserves source order and the entitlement boundary, activates only verified HTTPS links, and
     adds no cross-profile score, ranking, or recommendation.
 
-### Next product work before calling the app release-ready
+### Product status and optional follow-on evidence
 
 | Priority | Improvement | Current state | Why it matters | Acceptance evidence |
 |---|---|---|---|---|
-| P1 | Complete accessibility evidence pass | `PARTIAL_MANUAL_QA` | Converts deterministic terminal-state handling into verified real-flow usability | Keyboard, purchase/cancel/failure/retry/refresh/restore, Increase Contrast, Reduce Transparency, and large-text checks passed; VoiceOver speech/focus remains |
-| P1 | Real-user workflow pass | `OPEN` | Tests whether verdict wording and comparison actually reduce review work | Three opt-in sessions and two documented workflow changes using public, synthetic, or de-identified data |
+| Optional | Complete VoiceOver evidence pass | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` | Converts deterministic terminal-state handling into additional hands-on assistive-technology evidence | Keyboard, purchase/cancel/failure/retry/refresh/restore, Increase Contrast, Reduce Transparency, and large-text checks passed; spoken VoiceOver outcomes remain unverified |
+| Optional | Independent workflow validation | `OPTIONAL_FUTURE_VALIDATION` | Could test whether verdict wording and comparison reduce review work outside the synthetic scenario | Opt-in sessions and evidence-backed changes using public, synthetic, or de-identified data; no current user-value claim |
 | P1 | Native profile builder and editor | `IMPLEMENTED` | Removes hand-authored workspace JSON while preserving the strict canonical contract | Source checks and fresh Release embedded codec/normalizer determinism are green; interactive packaged UI pass remains |
 | P1 | Local workspace continuity | `IMPLEMENTED_OPT_IN` | Makes repeated supplier review feel like a product without creating an account | Only two security-scoped bookmarks persist; Forget clears them; no content/report/key/review point or auto-run |
 | P2 | Notice search and buyer/deadline filters | `IMPLEMENTED` | Keeps realistic files navigable without changing qualification semantics | Pure review-query checks and stable identities are green; final large-file hands-on pass remains |
@@ -132,8 +133,8 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 | P3 | Saved local export presets | `DEFERRED` | Current atomic Save panel is adequate; a preset does not close a judging or trust gap | Reconsider only if opt-in sessions repeatedly identify export destination friction |
 
 Do not add cross-profile ranking, bid automation, confidential-document ingestion, hosted accounts,
-analytics, or production billing merely to look larger. None fixes the current proof gap, and each
-would widen the trust and delivery surface.
+analytics, or production billing merely to look larger. None is required to close the remaining
+submission gates, and each would widen the trust and delivery surface.
 
 ## Release and submission gates
 
@@ -144,8 +145,7 @@ true:
 - a fresh self-contained app passes launch, local-file run, Profile Builder save, import preview,
   filtered review, comparison drill-down, source link, export, failure retention, and entitlement
   recovery checks;
-- actual Test Store terminal outcomes announce and restore focus correctly with VoiceOver, and the
-  final layout remains usable with Increase Contrast, Reduce Transparency, and large text;
+- the final layout remains usable with Increase Contrast, Reduce Transparency, and large text;
 - the student and academic-email requirement is confirmed in the entrant account;
 - exact private Devpost fields are inspected after the owner signs in and joins the hackathon;
 - public repository and final submission URLs are intentionally checked while logged out.
@@ -157,13 +157,12 @@ video, icon, screenshot, platform, and eligibility requirements are already trac
 
 The exact audited revision, current suite totals, pushed CI result, and SSD artifact provenance live
 in [project status](PROJECT_STATUS.md). The fresh final-product Debug transaction and silent settings
-pass are current; VoiceOver and independent-user outcomes still must be verified rather than
-treated as inherited evidence.
+pass are current. VoiceOver and independent-user outcomes remain optional and must not be claimed
+as verified unless a later dated pass establishes them.
 
 ## Owner inputs — later, not required for this implementation pass
 
 When the local product and QA pass is complete, the owner will need to provide or confirm:
 
 1. manual completion of the visual Devpost reCAPTCHA so the private project fields can be audited;
-2. three opt-in workflow testers or permission to use already identified volunteers;
-3. final approval of the exact commit and public claims before any release or submission action.
+2. final approval of the exact commit and public claims before any release or submission action.

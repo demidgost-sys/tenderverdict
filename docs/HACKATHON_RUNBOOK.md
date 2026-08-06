@@ -168,7 +168,8 @@ cleared after the run. A later restore after the accelerated Test Store subscrip
 correctly returned locked; immediate restore remained unlocked. The current pass also covered
 keyboard navigation, Increase Contrast, Reduce Transparency, and a temporary large-text renderer
 override that was reverted immediately. It did not re-open the dashboard and did not run VoiceOver.
-Manual VoiceOver verification of asynchronous success, cancellation, and failure remains pending.
+Manual VoiceOver verification of asynchronous success, cancellation, and failure remains
+unverified and is an optional accessibility follow-up, not a submission gate.
 
 ## Submission assets
 
@@ -215,9 +216,6 @@ Never use a fake entitlement state as evidence.
 - [ ] The exact final submitted revision passes its pushed PR CI checks.
 - [x] Test Store success, cancel, failure, retry, relaunch, and immediate restore are refreshed on
   the final product Debug package.
-- [ ] RevenueCat dashboard readback is refreshed for the same final evidence take; the existing
-  dashboard proof remains the dated 2026-08-04 baseline.
-- [ ] VoiceOver announces asynchronous success, cancellation, and failure and restores useful focus.
 - [x] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
   light/dark and the regenerated portrait screenshot also pass visual review.
 - [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.
@@ -225,3 +223,13 @@ Never use a fake entitlement state as evidence.
 - [x] At least one current screenshot is exactly 1179×2556 and has no device frame.
 - [x] Devpost draft contains no key, private data, unsupported payment claim, or fabricated result.
 - [ ] Repository URL, video URL, and final commit SHA are entered and checked in a logged-out view.
+
+## Optional evidence follow-ups
+
+- [ ] VoiceOver announces asynchronous success, cancellation, and failure and restores useful
+  focus. Until checked, describe the routing as implemented and contract-tested, not hands-on
+  spoken evidence.
+- [ ] RevenueCat dashboard readback is refreshed during a later continuous Test Store take; the
+  existing dashboard proof remains the dated 2026-08-04 baseline.
+- [ ] Independent opt-in workflow sessions are run only if future product validation is useful;
+  no user-value or adoption result is currently claimed.

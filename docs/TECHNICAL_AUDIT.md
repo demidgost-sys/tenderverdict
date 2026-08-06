@@ -1,12 +1,13 @@
 # Technical audit
 
-- Audit date: **2026-08-05**
+- Audit date: **2026-08-06**
 - Baseline inspected: `79186da7e83e40284cca9f34d658f6e2a0e1b335`
 - Remediated product revision and artifact: [project status](PROJECT_STATUS.md)
 - Branch: `hackathon/revenuecat-next-gen-2026`
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Scope: Python and Swift source, tests, documentation, Git/CI state, public-tree policy, security
-  boundaries, builder, and the existing SSD evaluation artifact
+  boundaries, builder, the existing SSD evaluation artifact, and a documentation-only readiness
+  reclassification against the official Next Gen requirements
 
 ## Outcome
 
@@ -23,6 +24,8 @@ Only the clean artifact named in project status is current remediation evidence.
 
 This audit does not replace a hands-on Debug Test Store pass, manual accessibility/settings QA,
 external user validation, entrant-account checks, notarization, or a verified Devpost submission.
+It records VoiceOver and independent workflow validation as optional follow-up evidence rather than
+silently treating unperformed work as complete or as an official submission requirement.
 
 ## Method
 
@@ -71,8 +74,9 @@ gaps without changing report schemas or qualification ownership:
 Native checks cover the pure review-point, reason-grouping, disagreement-count, and deterministic
 fixture contracts. Light/dark portrait inspection covers the generated first-run view. The fresh
 `3cf20ed` Debug pass covers keyboard navigation, current Test Store outcomes, Increase Contrast,
-Reduce Transparency, and bounded large text; final packaged Profile Builder and VoiceOver speech/
-focus remain the manual evidence boundary described below.
+Reduce Transparency, and bounded large text. The latest packaged Profile Builder evidence remains
+dated, while hands-on VoiceOver speech/focus is an optional accessibility follow-up described
+below.
 
 ## Contract reconciliation
 
@@ -118,7 +122,7 @@ the root on-ramp, documentation links, CI/native gates, and public-tree membersh
 | Next Gen source | Remediated competition candidate with coherent Free/Premium and Debug/Release contracts |
 | Current SSD `.app` | Self-contained release-configuration artifact named in project status; manifest/checksum/signature/ZIP/smoke verified, ad-hoc signed, not notarized, and not transaction evidence |
 | External macOS product release | **Not ready**: no Developer ID/notarization, supported installer/update path, production billing decision, or external workflow validation |
-| Final Shipaton submission | **Not ready**: VoiceOver, independent-user, private Devpost, video, and final-link gates are open |
+| Final Shipaton submission | **Not ready**: the private Devpost, public video, and final-link/submission gates are open; VoiceOver and independent-user evidence are optional follow-ups |
 
 “All checks green” means the scoped repository/package gate passed for the named revision. It does
 not mean the app is publicly released, the manual evidence is current, or the Devpost form is
@@ -126,15 +130,23 @@ submitted.
 
 ## Residual risks and next evidence
 
-1. When sound is allowed, manually exercise Test Store success, cancellation, failure, retry, and
-   restore with VoiceOver and verify spoken announcements plus recovery focus.
-2. Run three opt-in supplier/procurement sessions with synthetic, public, or fully de-identified
-   inputs and make only evidence-backed product changes.
-3. Complete the visual reCAPTCHA manually and inspect the private Devpost project fields without
+Required submission work:
+
+1. Complete the visual reCAPTCHA manually and inspect the private Devpost project fields without
    submitting.
-4. Re-run local, packaged, and pushed CI gates after any product, dependency, or asset change.
-5. Treat signing/notarization, trusted distribution, production billing, and public support as
-   separate decisions rather than promoting the competition artifact by wording alone.
+2. Produce the public demo from the exact final candidate.
+3. Re-run local and pushed CI gates, verify public repository/video links while logged out, and
+   complete the final submission only after explicit owner approval.
+
+Optional future evidence:
+
+- when sound is appropriate, manually exercise Test Store success, cancellation, failure, retry,
+  and restore with VoiceOver and verify spoken announcements plus recovery focus;
+- if future product validation is useful, run opt-in supplier/procurement sessions with synthetic,
+  public, or fully de-identified inputs and make only evidence-backed product changes;
+- treat signing/notarization, trusted distribution, production billing, and public support as
+  separate post-competition decisions rather than promoting the evaluation artifact by wording
+  alone.
 
 ## Re-audit triggers
 
