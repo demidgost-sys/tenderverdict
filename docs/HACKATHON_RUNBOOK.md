@@ -267,7 +267,7 @@ Never use a fake entitlement state as evidence.
 - [x] The current candidate passes the complete source/package gate recorded in
   [project status](PROJECT_STATUS.md), including Python, Debug/Release native, formatting, typing,
   public-tree, security, asset, and diff checks.
-- [ ] The exact final submitted revision passes its pushed PR CI checks.
+- [x] The current pushed candidate passes its exact-head PR CI checks.
 - [x] The exact clean `217c091` Debug package repeats missing/invalid key, offering, cancel,
   simulated failure, retry, Test Store success, immediate Restore, foreground, relaunch, natural
   accelerated-expiry locked/offering recovery, and makes no real payment.
@@ -276,11 +276,15 @@ Never use a fake entitlement state as evidence.
   changed.
 - [x] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
   light/dark and the regenerated portrait screenshot also pass visual review.
-- [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.
+- [x] The link-accessible YouTube demo is 1:49, shows the packaged macOS app, includes burned and
+  selectable English captions, and passes logged-out URL plus YouTube policy checks.
+- [ ] The owner completes one normal-speed watch/listen of the hosted demo.
 - [x] Icon is exactly 1024×1024.
 - [x] At least one current screenshot is exactly 1179×2556 and has no device frame.
 - [x] Devpost draft contains no key, private data, unsupported payment claim, or fabricated result.
-- [ ] Repository URL, video URL, and final commit SHA are entered and checked in a logged-out view.
+- [x] The current pushed SHA, public repository, and video URL are recorded and checked without
+  authenticated browser state.
+- [ ] The final submitted entry and submitted view are checked while logged out.
 
 ## Optional evidence follow-ups
 

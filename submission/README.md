@@ -14,10 +14,10 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
 | `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
 | `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
-| `video/` | Ready local production handoff | Exact 1:49 silent animatic, owner-recording kit, narration, captions, manifests, privacy/claim audit, contact sheet, and QA receipt; raw MP4/WAV stay ignored and are not public video assets |
+| `video/` | Ready local and hosted handoff | Exact 1:49 human-narrated master, silent animatic fallback, captions, manifests, privacy/claim audit, contact sheet, and QA receipts; raw MP4/WAV remain ignored |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
-| Public video | Pending | Public YouTube/Vimeo, at or below 1:50 target and under the official two-minute limit, packaged macOS app |
-| `devpost-draft.md` | Ready with explicit placeholders | Product story and judging proof are drafted; do not publish or remove placeholders before final evidence exists |
+| Link-accessible video | Ready; owner listen open | `https://www.youtube.com/watch?v=vJLY4uVAtUo`, 1:49, packaged macOS app, burned English captions plus matching YouTube SRT; logged-out oEmbed and policy checks pass |
+| `devpost-draft.md` | Ready with exact links | Product story, judging proof, competition branch, pushed candidate SHA, video URL, and video SHA-256 are recorded |
 
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
 continuity, review/comparison search and buyer/deadline filters, stable comparison-cell drill-down,
@@ -35,11 +35,10 @@ covers the current granted-entitlement refresh, Restore, foreground, relaunch, a
 accessibility-tree evidence. Hands-on VoiceOver announcements remain an optional accessibility
 follow-up rather than a submission gate.
 
-The video handoff in [`video/`](video/) is locally complete and remains fully silent. The owner has
-selected a self-recorded human voice; the marked script, teleprompter, take log, recording format,
-and metadata-only stem validator are prepared. The public-video gate remains pending until that
-voice is recorded, the complete file is reviewed at normal speed with sound, and an owner-authorized
-YouTube/Vimeo upload passes logged-out verification.
+The video handoff in [`video/`](video/) is locally complete. The final master uses only the owner's
+self-recorded voice, includes burned English captions, and has matching YouTube SRT captions.
+Metadata, visual privacy, YouTube policy, and logged-out link checks pass. The remaining video gate
+is the owner's one normal-speed watch/listen before final submission use.
 
 The authenticated Devpost field inventory and saved-draft readback are complete. Current readiness
 and the required store-release attestation conflict are tracked only in

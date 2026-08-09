@@ -106,13 +106,14 @@ outcomes, and evidence a person can defend.
 
 ## What is next
 
-The app is an ad-hoc-signed competition evaluation build, not a notarized consumer release. Before
-submission, add the owner-recorded captioned demo, replace every placeholder below, confirm the
-remaining private-form attestations, run CI on the exact final revision, and verify all public links
-while logged out. Publication and Devpost submission remain separate owner actions.
+The app is an ad-hoc-signed competition evaluation build, not a notarized consumer release. The
+owner-recorded captioned demo is now hosted with link access, its URL is saved in this Devpost
+draft, and the pushed candidate passes exact-head CI. Before submission, the owner still needs to
+watch/listen once at normal speed and the private-form attestation conflict needs a truthful path.
 
 ## Links
 
 - Competition source: `https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026`
-- Demo video: `[PUBLIC YOUTUBE OR VIMEO URL]`
-- Submitted revision: `[FULL COMMIT SHA]`
+- Demo video: `https://www.youtube.com/watch?v=vJLY4uVAtUo`
+- Pushed candidate revision: `8b35acb7b29a0380b873a8cd77236db9e5096b19`
+- Demo master SHA-256: `e1922cf6d910c5ef5589b72cdafe87f5d80422afad0f1d1d81e5e8cf767e60ab`

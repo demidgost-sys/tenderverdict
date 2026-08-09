@@ -1,6 +1,6 @@
 # Shipaton 2026 Next Gen evidence and implementation gate
 
-- Overall status: **GO — TEST STORE PATH ORGANIZER-CONFIRMED; PUBLIC VIDEO AND SUBMISSION GATES OPEN**
+- Overall status: **GO — TEST STORE PATH ORGANIZER-CONFIRMED; VIDEO LINK SAVED; OWNER LISTEN, FORM, AND SUBMISSION GATES OPEN**
 - RevenueCat-independent Portfolio Workspace: **IMPLEMENTED LOCALLY**
 - RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED AND TEST STORE-VERIFIED**
 - Repository evidence rechecked: **2026-08-09**
@@ -42,7 +42,9 @@ the exact audited revision, local-gate totals, and current local packages live i
 [project status](PROJECT_STATUS.md). A fresh final-product Debug transaction/settings pass,
 including current-revision RevenueCat Judge Access, is now recorded. The authenticated Devpost
 field inventory and saved-draft readback are complete, but a required store-release attestation has
-no truthful store-exempt Next Gen path. The recorded/public video and submission remain open.
+no truthful store-exempt Next Gen path. The 1:49 captioned YouTube demo is link-accessible, its
+English SRT is published, and its URL is saved in Devpost; the owner listening pass and final
+submission remain open.
 Post-change asynchronous VoiceOver outcomes and independent workflow sessions have not been
 performed, but they are optional future evidence rather than Next Gen submission gates.
 
@@ -59,7 +61,7 @@ performed, but they are optional future evidence rather than Next Gen submission
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_rule` + `repository_evidence` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements; the repository pins 5.83.0 and the local flow exercised those outcomes. | `CONFIRMED_TECHNICALLY` |
 | Test Store-only eligibility | `manual_evidence` | Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05: “Test Store is enough for the Next Gen category.” | `ORGANIZER_CONFIRMED` |
-| Required submission media | `official_rule` + `repository_evidence` | The 1024×1024 icon and honest pre-transaction 1179×2556 screenshot are structure-checked. A genuine current-revision 1020×754 Judge Access capture is recorded without a key or reviewer code. A public YouTube/Vimeo demo under two minutes remains. | `PARTIAL` |
+| Required submission media | `official_rule` + `repository_evidence` | The icon, frameless screenshot, and current Judge Access capture are checked. The 1:49 H.264/AAC YouTube demo is link-accessible, captioned in-picture and by matching English SRT, and saved in Devpost; metadata, visual privacy, YouTube policy, and logged-out URL checks pass. The owner normal-speed watch/listen remains. | `LINK_READY_OWNER_LISTEN_OPEN` |
 | Private Devpost form | `private_account_evidence` + `manual_evidence` | The exact field inventory and saved-draft readback are complete. A required store-release checkbox offers no No/Next Gen path, so a truthful field-specific correction or written organizer instruction is required before Additional info can be saved. | `BLOCKED_FORM_RULE_CONFLICT` |
 
 ## Official sources checked
@@ -260,11 +262,10 @@ form-attestation issue remains open. The required remaining submission path is:
 
 1. obtain a form correction or written field-specific organizer instruction; do not falsely attest
    to a store release;
-2. record a concise captioned demo from the exact final packaged app and publish it to YouTube or Vimeo with a
-   verified duration below two minutes;
-3. after an authorized push, verify exact-head CI plus the public repository, commit, video, and
-   entry while logged out;
-4. stop for explicit owner approval before accepting Terms or submitting, without claiming a real
+2. complete the owner's normal-speed watch/listen of the already hosted 1:49 captioned demo;
+3. preserve the completed exact-head CI and logged-out repository/video checks, then verify the
+   final entry and submitted view after the private form is truthfully resolved;
+4. review the applicable Terms before submitting, without claiming a real
    payment or App Store transaction.
 
 Optional evidence improvements, excluded from competition readiness, are:

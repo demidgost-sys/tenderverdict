@@ -78,8 +78,9 @@ committed.
 3. **Spoken accessibility evidence — optional:** run the VoiceOver sequence only when sound is
    acceptable.
 4. **Submission — blocked/open:** the private field inventory is complete, but its required
-   store-release attestation has no truthful Next Gen path. The final recorded/public video and
-   exact-head logged-out link review also remain.
+   store-release attestation has no truthful Next Gen path. The 1:49 captioned YouTube demo and
+   exact-head repository/video link checks are complete; the owner listening pass and submitted
+   view remain.
 
 ## Verdicts
 

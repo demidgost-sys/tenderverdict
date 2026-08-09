@@ -7,8 +7,8 @@
 - Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
 - Current hands-on evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
 - Current candidate: **clean committed product revision, fresh Release and Debug packages,
-  complete local gate, final silent Test Store/Judge Access evidence, and a captioned 1:49 local
-  review master awaiting the owner's normal-speed watch/listen before publication**
+  complete local gate, final silent Test Store/Judge Access evidence, and a link-accessible
+  captioned 1:49 YouTube demo awaiting the owner's normal-speed watch/listen**
 - Presentation state: **the competition branch contains the combined public-safe QA, judge-first
   README and Devpost story, refreshed gallery order, and exact metadata/visual-QA receipt for the
   human-narrated video without changing product behavior**
@@ -36,7 +36,7 @@ Competition implementation and final-submission readiness are intentionally kept
 | Readiness lens | Completed | Meaning |
 |---|---:|---|
 | Local Shipaton implementation | **Complete for the declared competition scope** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, comparison drill-down, and silent settings QA are complete; VoiceOver and independent workflow validation are optional follow-ups |
-| Final submission | **9 / 12 gates (75%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, draft text, pushed-revision CI, and entrant verification exist; the private field inventory is complete, but a required form attestation conflicts with the store-exempt Next Gen route, and the public video/final-link gates remain |
+| Final submission | **9 / 12 gates (75%)** | Public source, working app, RevenueCat evidence, organizer clarification, assets, draft text, pushed-revision CI, entrant verification, and a logged-out-checked video URL exist; the owner listen, required private-form resolution, and final submitted-view gates remain |
 | Public product release | **Not ready** | The app is an ad-hoc-signed competition prototype without notarization, a trusted installer, production billing, or demonstrated external workflow fit |
 
 Only the final-submission percentage counts explicit equal-weight gates. Optional VoiceOver and
@@ -84,7 +84,7 @@ keeping the published open-source CLI honest and useful.
 | Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
 | Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release and Debug artifacts from exact clean revision `cbe8b20`; details below |
 | Presentation | Judge-first README entry, exact icon, refreshed light/dark-reviewed portrait screenshot, current unlocked comparison evidence, concise human-facing Devpost copy, value-led silent-video close, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `README.md`, `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
-| Quality | 126 Python tests including 6 private-launcher, 3 release-scanner, and fail-closed notarization-option coverage; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The integrated presentation head has fresh local source/package evidence; draft PR #12 remains the authoritative pushed-head CI record |
+| Quality | 127 Python tests including 6 private-launcher, 4 release-scanner, fail-closed notarization-option coverage, and a bounded YouTube-host regression; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The integrated presentation head has fresh local source/package evidence; draft PR #12 remains the authoritative pushed-head CI record |
 
 ## Current clean evaluation artifact
 
@@ -168,12 +168,12 @@ release.
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
 | 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `BLOCKED_FORM_RULE_CONFLICT` — the authenticated field inventory and saved draft readback are complete, but the required store-release checkbox has no No/Next Gen path; a field-specific organizer correction or written instruction is pending |
-| 11 | Public captioned macOS demo under two minutes is published | `LOCAL_REVIEW_MASTER_READY / OWNER_LISTEN_AND_PUBLICATION_OPEN` — the exact 1:49 human-narrated master has burned English captions plus metadata and visual QA; one owner watch/listen and the public upload remain |
-| 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `FINAL_GATE` |
+| 11 | Public captioned macOS demo under two minutes is published | `LINK_ACCESSIBLE / OWNER_LISTEN_OPEN` — `https://www.youtube.com/watch?v=vJLY4uVAtUo` is a 1:49 human-narrated master with burned and selectable English captions; metadata, visual privacy, YouTube policy, and logged-out URL checks pass; one owner watch/listen remains |
+| 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `PARTIAL` — the pushed candidate, public repository, and video URL pass logged-out checks; the final submitted entry/view does not yet exist |
 
-**Result: 9 of 12 submission gates ready.** The remaining gates are a truthful resolution of the
-private-form conflict, publication of the reviewed local video, and the exact pushed-head
-logged-out link/submission review. A local review master does not close the public-link gate.
+**Result: 9 of 12 submission gates ready.** The remaining gates are the owner's normal-speed video
+review, a truthful resolution of the private-form conflict, and the final entry/submitted-view
+audit. A link-accessible upload does not replace the owner's listening pass.
 
 ## Reconciliation with the previous plans
 
@@ -228,7 +228,7 @@ Not verified and therefore not claimable:
 
 - that the required store-release attestation has a truthful Next Gen answer or that the final
   submitted view has been audited;
-- that a public video exists;
+- that the owner has completed the normal-speed watch/listen of the hosted video;
 - that actual post-change VoiceOver purchase/cancel/failure outcomes pass on a fresh final Debug
   package;
 - that the app is notarized, suitable for a public consumer release, or validated by external

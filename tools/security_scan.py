@@ -81,6 +81,7 @@ OFFICIAL_URL_HOSTS = {
     "www.revenuecat.com",
     "www.shipaton.com",
     "www.w3.org",
+    "www.youtube.com",
 }
 
 

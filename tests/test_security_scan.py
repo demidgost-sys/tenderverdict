@@ -11,6 +11,23 @@ from security_scan import _scan_text  # noqa: E402
 
 
 class SecurityScanTests(unittest.TestCase):
+    def test_final_demo_youtube_host_is_approved_without_weakening_other_hosts(self) -> None:
+        youtube_errors: list[str] = []
+        _scan_text(
+            "submission.md",
+            "https://www.youtube.com/watch?v=vJLY4uVAtUo",
+            youtube_errors,
+        )
+        self.assertEqual(youtube_errors, [])
+
+        other_errors: list[str] = []
+        unapproved_url = "https:" + "//example.net/demo"
+        _scan_text("submission.md", unapproved_url, other_errors)
+        self.assertEqual(
+            other_errors,
+            ["submission.md: unapproved external URL host: example.net"],
+        )
+
     def test_swift_closure_arguments_are_not_prices(self) -> None:
         errors: list[str] = []
         shorthand = chr(36)

@@ -64,7 +64,8 @@ renewals in [Test Store subscription renewals and expiration](https://www.revenu
 The later live expiry is recorded as server-timing variance, not as a product defect or a broader
 timing guarantee.
 
-No real payment, production purchase, grant/dashboard mutation, push, publication, or Devpost
-submission occurred. Remaining distribution blockers are the ad-hoc signature and absent
-notarization; final pushed CI, public video, and the owner-controlled Devpost submission remain
-separate external gates. VoiceOver behavior is deliberately not claimed by this silent receipt.
+No real payment, production purchase, or grant/dashboard mutation occurred in this receipt. A
+later final-integration pass pushed the public-safe evidence, completed exact-head CI, and created a
+link-accessible captioned YouTube demo saved in the Devpost draft. The owner listening pass, the
+truthful private-form resolution, and final Devpost submission remain separate gates. VoiceOver
+behavior is deliberately not claimed by this silent receipt.

@@ -48,7 +48,8 @@ failure, retry, purchase, entitlement unlock, relaunch refresh, restore, and Voi
 path. No key is committed or bundled; this is not a real payment. A Shipaton Manager has now
 confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
 eligible without a platform disadvantage. Entrant student/email eligibility is owner-confirmed and
-tracked in project status; a public video has not been established.
+tracked in project status. A 1:49 captioned YouTube demo is now link-accessible and saved in the
+Devpost draft; the owner's normal-speed watch/listen and final submission remain open.
 
 ## `v0.2.0-alpha.1` release contract
 
