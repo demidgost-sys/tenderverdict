@@ -1,6 +1,6 @@
-Procurement teams often review one tender feed for several supplier profiles. TenderVerdict turns each notice into a human next step: open, verify, or skip.
+Procurement teams often review one tender feed for several supplier profiles. TenderVerdict turns each notice into a human next step: open, watch, or skip.
 
-The workflow begins with committed synthetic profiles and normalized notice metadata. Files stay on this Mac. Before analysis, a preview shows counts, sample records, and metadata gaps.
+The workflow starts with synthetic supplier profiles and normalized notice metadata. Files stay on this Mac. Before analysis, a preview shows counts, sample records, and metadata gaps.
 
 One canonical engine evaluates the same notices and review date for every profile. It returns three verdicts: Open documents, Watch, or Reject, with visible reasons. A human decides what to do next.
 
@@ -8,8 +8,8 @@ Free is a complete first-profile workflow, not a disabled demo. It includes the 
 
 Portfolio Workspace applies the same feed to up to five independent supplier profiles. RevenueCat unlocks comparison and full portfolio export, but never changes a verdict, creates a score, or makes a bid recommendation.
 
-In the verified Test Store baseline, the Apple SDK loaded a development-only purchase sheet. RevenueCat CustomerInfo then activated supplier profiles plus. It was not an App Store payment. No real charge occurred.
+In the verified Test Store baseline, the Apple SDK loaded a development-only purchase sheet. CustomerInfo then confirmed the entitlement was active. It was not an App Store payment. No real charge occurred.
 
-For the current evaluation build, RevenueCat Judge Access grants the same entitlement without a purchase. Current refresh unlocked the screen. Restore access, foreground return, and a full process relaunch all preserved the CustomerInfo entitlement.
+For this evaluation build, RevenueCat Judge Access grants the entitlement without a purchase. A fresh check unlocked the screen. Restoring access, returning to the foreground, and a full relaunch all kept the workspace unlocked.
 
-Synthetic data. No usable key is stored. This is not production billing. TenderVerdict is open-source Apache two point zero software for macOS.
+Synthetic data. No usable key is stored. This is not production billing. TenderVerdict is open-source macOS software under Apache two point zero.

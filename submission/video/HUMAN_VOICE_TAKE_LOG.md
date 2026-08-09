@@ -1,12 +1,14 @@
 # Human voice take log
 
 - Session date: `________________`
+- Continuous session filename (if used): `________________`
 - Microphone/interface: `________________`
 - Room/location: `________________`
 - Recorder settings confirmed: `48 kHz / 24-bit / mono`
 - Room tone filename: `________________`
 
-Use `OK`, `pickup`, or a short fault note. Do not delete raw takes during the session.
+The owner may leave this log blank. During assembly, use `OK`, `pickup`, or a short fault note. Do
+not delete raw takes during or after the session.
 
 | Block | T01 | T02 | Pickup filename | Selected take | Notes |
 |---:|---|---|---|---|---|

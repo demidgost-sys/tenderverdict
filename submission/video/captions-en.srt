@@ -6,11 +6,11 @@ for several supplier profiles.
 2
 00:00:05,000 --> 00:00:10,000
 TenderVerdict turns each notice into a human
-next step: open, verify, or skip.
+next step: open, watch, or skip.
 
 3
 00:00:10,000 --> 00:00:16,000
-The workflow begins with committed synthetic profiles
+The workflow starts with synthetic supplier profiles
 and normalized notice metadata.
 
 4
@@ -55,8 +55,8 @@ loaded a development-only purchase sheet.
 
 12
 00:01:14,000 --> 00:01:18,500
-RevenueCat CustomerInfo then activated
-supplier profiles plus.
+CustomerInfo then confirmed
+the entitlement was active.
 
 13
 00:01:18,500 --> 00:01:23,000
@@ -65,13 +65,13 @@ No real charge occurred.
 
 14
 00:01:23,000 --> 00:01:31,000
-For the current evaluation build, RevenueCat Judge Access
-grants the same entitlement without a purchase.
+For this evaluation build, RevenueCat Judge Access
+grants the entitlement without a purchase.
 
 15
 00:01:31,000 --> 00:01:39,000
-Current refresh unlocked the screen. Restore access, foreground return,
-and a full process relaunch all preserved the CustomerInfo entitlement.
+A fresh check unlocked the screen. Restoring access, returning to the foreground,
+and a full relaunch all kept the workspace unlocked.
 
 16
 00:01:39,000 --> 00:01:44,000
@@ -80,5 +80,5 @@ This is not production billing.
 
 17
 00:01:44,000 --> 00:01:49,000
-TenderVerdict is open-source Apache two point zero
-software for macOS.
+TenderVerdict is open-source macOS software
+under Apache two point zero.

@@ -1,6 +1,6 @@
 # Silent rough-cut QA receipt
 
-- Checked at: `2026-08-09T13:31:43+00:00`
+- Checked at: `2026-08-09T14:59:47+00:00`
 - Timeline: `109.000 s` / `00:01:49.000`
 - Local artifact: `tenderverdict-silent-rough-cut-v1.mp4` (repository-relative; ignored/untracked)
 - Git/public-tree state: **ignored and untracked; never add to the allowlist**
