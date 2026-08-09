@@ -642,8 +642,31 @@ enum TenderVerdictNextGenChecks {
     let cutoff = RevenueCatJudgeAccess.expiresAt
     let beforeCutoff = cutoff.addingTimeInterval(-1)
     let afterCutoff = cutoff.addingTimeInterval(1)
+    let dayBeforeCutoff = cutoff.addingTimeInterval(-86_400)
+    guard let utc = TimeZone(secondsFromGMT: 0) else {
+      throw CheckFailure.failed("UTC time zone was unavailable")
+    }
     let knownDigest = "4e118a47833348f05045f3cf9146faf4ba095874cb1a922db81f99ae8384b3db"
     let judgeAppUserID = RevenueCatJudgeAccess.appUserID(forDigest: knownDigest)
+
+    try require(
+      RevenueCatJudgeAccess.expirationLabel(for: dayBeforeCutoff, timeZone: utc)
+        == "December 30, 2026",
+      "Judge Access copy ignored an earlier RevenueCat grant expiry"
+    )
+    try require(
+      RevenueCatJudgeAccess.expirationLabel(
+        for: cutoff.addingTimeInterval(3_600),
+        timeZone: utc
+      )
+        == RevenueCatJudgeAccess.expiryLabel,
+      "Judge Access copy exceeded the local campaign cutoff"
+    )
+    try require(
+      RevenueCatJudgeAccess.expirationLabel(for: nil, timeZone: utc)
+        == RevenueCatJudgeAccess.expiryLabel,
+      "Judge Access copy lost the documented fallback cutoff"
+    )
 
     try require(
       RevenueCatJudgeAccess.validate("not-a-judge-code", now: beforeCutoff) == .invalid,

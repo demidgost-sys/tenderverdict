@@ -198,6 +198,23 @@ public enum RevenueCatJudgeAccess {
   public static let expiresAt = Date(timeIntervalSince1970: 1_798_761_599)
   public static let expiryLabel = "December 31, 2026"
 
+  public static func expirationLabel(
+    for expirationDate: Date?,
+    timeZone: TimeZone = .current
+  ) -> String {
+    guard let expirationDate else {
+      return expiryLabel
+    }
+    let effectiveExpiration = min(expirationDate, expiresAt)
+    let formatter = DateFormatter()
+    formatter.calendar = Calendar(identifier: .gregorian)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = timeZone
+    formatter.dateStyle = .long
+    formatter.timeStyle = .none
+    return formatter.string(from: effectiveExpiration)
+  }
+
   private static let acceptedCodeDigests: Set<String> = [
     "0d6240bc8f3b8cd77a6457b5ce0330726077c60213e7c1373906051504108a26",
     "4e118a47833348f05045f3cf9146faf4ba095874cb1a922db81f99ae8384b3db",
@@ -287,10 +304,11 @@ public enum JudgeAccessActivationState: Equatable, Sendable {
         recoveryActions: [.activateJudgeAccess],
         focusTarget: .judgeAccessCode
       )
-    case .active:
+    case .active(let expiresAt):
       return PremiumAccessAccessibilityOutcome(
         announcement:
-          "RevenueCat Judge Access is active through \(RevenueCatJudgeAccess.expiryLabel). "
+          "RevenueCat Judge Access expires "
+          + "\(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)). "
           + "No purchase was made.",
         recoveryActions: [.restore],
         focusTarget: .restore

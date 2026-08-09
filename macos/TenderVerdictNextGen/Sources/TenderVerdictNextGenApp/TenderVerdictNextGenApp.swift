@@ -1455,9 +1455,10 @@ struct PremiumWorkspaceSection: View {
 
   private var unlockedAccessDetail: String {
     switch controller.accessSource {
-    case .judgeAccess:
+    case .judgeAccess(let expiresAt):
       return
-        "RevenueCat Judge Access is active through \(RevenueCatJudgeAccess.expiryLabel). "
+        "RevenueCat Judge Access expires "
+        + "\(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)). "
         + "No purchase was made. Every profile, changed outcome, and the full portfolio export "
         + "are available."
     case .testStore, .otherRevenueCat, .none:
