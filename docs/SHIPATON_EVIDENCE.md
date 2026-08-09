@@ -40,8 +40,9 @@ drill-down, competition assets, and local Test Store evidence. No usable key, cu
 or account screenshot is retained. Draft PR #12 is the authoritative pushed-revision check record;
 the exact audited revision, local-gate totals, and current local packages live in
 [project status](PROJECT_STATUS.md). A fresh final-product Debug transaction/settings pass,
-including current-revision RevenueCat Judge Access, is now recorded. The public video, private
-Devpost project audit, and submission remain open.
+including current-revision RevenueCat Judge Access, is now recorded. The authenticated Devpost
+field inventory and saved-draft readback are complete, but a required store-release attestation has
+no truthful store-exempt Next Gen path. The recorded/public video and submission remain open.
 Post-change asynchronous VoiceOver outcomes and independent workflow sessions have not been
 performed, but they are optional future evidence rather than Next Gen submission gates.
 
@@ -52,13 +53,14 @@ performed, but they are optional future evidence rather than Next Gen submission
 | Submission window | `official_rule` | The controlling Official Rules state July 31, 2026 at 08:00 PDT through September 30, 2026 at 23:45 PDT. The FAQ rounds the opening to August 1; this document uses the Rules. | `CONFIRMED` |
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
-| Student and academic email | `owner_attested` | On 2026-08-05, the entrant confirmed current-student status, TU Graz affiliation, July 2028 graduation, and use of a TU Graz academic-domain email in Devpost. No address is published here. | `CONFIRMED_BY_OWNER` |
+| Student and academic email | `private_account_evidence` | The entrant's current-student profile, TU Graz affiliation, July 2028 graduation, and academic-domain account value were verified in authenticated Devpost state. No address is published here. | `VERIFIED_IN_ACCOUNT` |
 | Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Project status names the exact audited revision and gate result; draft PR #12 is the authoritative pushed-revision check record. | `PUBLIC_DRAFT_READY` |
 | Supported platform | `official_rule` + `manual_evidence` | macOS is explicitly allowed by the rules and FAQ. Shipaton Manager Jaewoong Eum also confirmed that macOS is eligible and has no judging disadvantage. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_rule` + `repository_evidence` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements; the repository pins 5.83.0 and the local flow exercised those outcomes. | `CONFIRMED_TECHNICALLY` |
 | Test Store-only eligibility | `manual_evidence` | Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05: “Test Store is enough for the Next Gen category.” | `ORGANIZER_CONFIRMED` |
 | Required submission media | `official_rule` + `repository_evidence` | The 1024×1024 icon and honest pre-transaction 1179×2556 screenshot are structure-checked. A genuine current-revision 1020×754 Judge Access capture is recorded without a key or reviewer code. A public YouTube/Vimeo demo under two minutes remains. | `PARTIAL` |
+| Private Devpost form | `private_account_evidence` + `manual_evidence` | The exact field inventory and saved-draft readback are complete. A required store-release checkbox offers no No/Next Gen path, so a truthful field-specific correction or written organizer instruction is required before Additional info can be saved. | `BLOCKED_FORM_RULE_CONFLICT` |
 
 ## Official sources checked
 
@@ -229,6 +231,13 @@ made. The genuine 1020×754 screenshot is stored in `submission/evidence/` witho
 customer identifier, or key. This supplements rather than rewrites the earlier Test Store purchase
 evidence.
 
+The final silent `217c091` receipt then repeated the complete Test Store lifecycle on one clean
+Debug package, observed natural accelerated expiry and immediate locked/offering recovery, repeated
+Judge refresh/Restore/foreground/relaunch, and independently checked the unmodified checksummed
+archive bundle. The existing December 31 grant already exceeds the safe October 14 judging
+boundary and was left unchanged. No real payment, dashboard mutation, VoiceOver, or audio action is
+claimed. The public-safe matrix and archive SHA-256 are in `submission/evidence/README.md`.
+
 In the previously packaged baseline, VoiceOver exposed distinct names and states for the
 inputs, review point, demo, export, and restore controls. Keyboard focus followed the logical order
 and skipped the disabled Run button. Restore was activated through the VoiceOver command and the
@@ -246,14 +255,17 @@ spoken purchase/cancel/failure/restore announcements must not be claimed as hand
 
 ## Remaining evidence path
 
-The organizer gate is closed with a positive answer. The required remaining submission path is:
+The platform/Test Store organizer gates are closed with positive answers. The separate required
+form-attestation issue remains open. The required remaining submission path is:
 
-1. solve the visual reCAPTCHA manually and inspect the exact private Devpost project fields without
-   submitting;
-2. record a concise captioned demo from the packaged app and publish it to YouTube or Vimeo with a
+1. obtain a form correction or written field-specific organizer instruction; do not falsely attest
+   to a store release;
+2. record a concise captioned demo from the exact final packaged app and publish it to YouTube or Vimeo with a
    verified duration below two minutes;
-3. verify the exact final pushed CI, public repository, and video while logged out, and then
-   complete the Devpost submission without claiming a real payment or App Store transaction.
+3. after an authorized push, verify exact-head CI plus the public repository, commit, video, and
+   entry while logged out;
+4. stop for explicit owner approval before accepting Terms or submitting, without claiming a real
+   payment or App Store transaction.
 
 Optional evidence improvements, excluded from competition readiness, are:
 
@@ -297,19 +309,24 @@ Source: [public Devpost forum reply](https://revenuecat-shipaton-2026.devpost.co
 - RevenueCat API key committed, bundled, logged, or retained in evidence: **no**.
 - Test Store purchase: **performed successfully after separate cancel and failure scenarios; no
   real payment was made**.
-- Entitlement, refresh-without-relaunch, foreground, relaunch, and restore flow: **hands-on verified
-  in the exact `cbe8b20` packaged Debug app**.
+- Entitlement, foreground, relaunch, Restore, natural accelerated-expiry recovery, and Judge flow:
+  **hands-on verified in the exact clean `217c091` Debug package and its unmodified checksummed
+  archive bundle**.
 - Genuine current Judge Access unlocked capture: **recorded locally without a key, reviewer code,
   or customer identifier**.
+- Silent video-production package: **complete locally; not a final recorded or public demo**.
+- Devpost private field inventory and saved-draft readback: **complete; required store-release
+  attestation remains blocked by the missing truthful Next Gen path**.
 - Public demo video, store submission, or Devpost project submission: **not performed in this audit**.
-- Devpost organizer question: **answered publicly by Shipaton Manager Perttu Lähteenlahti on
+- Test Store organizer question: **answered publicly by Shipaton Manager Perttu Lähteenlahti on
   2026-08-05; Test Store is enough for Next Gen**.
+- Required-form follow-up: **posted publicly; field-specific correction or instruction pending**.
 - Account registration email and student profile: **confirmed by the owner; the entrant joined the
   Shipaton with the qualifying academic profile**.
 - Current UX release-configuration package: **the exact local path, revision, manifest, and complete
   verification result are recorded in project status; this is not a notarized public release**.
 - Public implementation branch and CI: **project status names the audited revision and local gate;
   draft PR #12 remains the authoritative pushed-revision CI record**.
-- Submission gate: **open on the private Devpost audit, public sub-two-minute video, and final
-  logged-out URL checks**. Spoken VoiceOver evidence remains optional and was not run in this
-  silent pass.
+- Submission gate: **blocked on the required private-form attestation and open on the public
+  sub-two-minute video plus final logged-out URL checks**. Spoken VoiceOver evidence remains
+  optional and was not run in this silent pass.

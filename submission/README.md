@@ -40,6 +40,10 @@ and metadata-only stem validator are prepared. The public-video gate remains pen
 voice is recorded, the complete file is reviewed at normal speed with sound, and an owner-authorized
 YouTube/Vimeo upload passes logged-out verification.
 
+The authenticated Devpost field inventory and saved-draft readback are complete. Current readiness
+and the required store-release attestation conflict are tracked only in
+[`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md); no private account value is copied here.
+
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export
 isolation, exact RevenueCat identifiers, and pure Premium announcement/recovery/focus outcomes.
@@ -50,7 +54,8 @@ isolation, exact RevenueCat identifiers, and pure Premium announcement/recovery/
 - [Shipaton answer: macOS is eligible with no platform-only disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
 Preserve the full dated threads. These answers resolve only the Test Store and platform
-interpretations; they do not substitute for academic-email eligibility or final submission checks.
+interpretations; they do not resolve the separate required store-release attestation, public-video,
+or final-submission gates.
 
 ## Regenerate and validate
 

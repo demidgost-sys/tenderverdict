@@ -42,10 +42,14 @@ Sources rechecked on 2026-08-05:
 - [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
 - [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-The owner has joined with the qualifying student profile. Project creation was opened but stopped
-at visual reCAPTCHA before a draft or private fields existed. Do not invent its fields: after the
-owner completes that visual challenge, inspect them while signed in and do not submit without a
-separate final action.
+The owner has joined with the qualifying student profile, and the authenticated private-field
+inventory is complete. The draft overview, evidence-bounded story, repository link, tags, and three
+verified gallery images were saved and read back; Additional info remains unsaved. Its required
+store-release checkbox has no No option or visible Next Gen exception, so it cannot be checked
+truthfully for this store-exempt macOS entry. A narrow field-specific follow-up is pending in the
+[public organizer thread](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient).
+Do not treat the earlier Test Store answer as an answer to this different form-attestation issue,
+and do not accept Terms or submit without a separate final action.
 
 ## Current product proof
 
@@ -182,6 +186,14 @@ UI reports the RevenueCat expiration date as **December 31, 2026** and explicitl
 purchase was made. The exact-revision unlocked screenshot is stored at
 `submission/evidence/unlocked-judge-access-2026-08-09.png`.
 
+The final silent `217c091` Debug receipt supersedes the runtime matrix without replacing that
+genuine screenshot. It repeats missing/invalid key, offering, cancel, simulated failure, retry,
+Test Store success, immediate Restore, foreground, relaunch, natural accelerated-expiry
+locked/offering recovery, Judge refresh/Restore/foreground/relaunch, and an independent check of
+the unmodified checksummed archive. The key remained process-local, the existing December 31 grant
+was not changed, and no real payment occurred. Exact artifact metadata and the complete bounded
+matrix live in `submission/evidence/README.md`.
+
 ## Hackathon Judge Access
 
 Judge Access is a separate no-purchase evaluation route backed by RevenueCat Granted Entitlements,
@@ -243,8 +255,10 @@ Never use a fake entitlement state as evidence.
 - [x] Shipaton confirmed that macOS is eligible and carries no platform-only disadvantage.
 - [x] Devpost participation uses a TU Graz academic-domain email and the owner confirmed current
   student status, TU Graz affiliation, and July 2028 graduation on 2026-08-05.
-- [ ] Exact private Devpost fields are inspected after joining; required claims and assets agree
-  with the final repository state.
+- [x] Exact private Devpost fields are inspected after joining; the saved overview, story,
+  repository link, tags, and three gallery images were read back without exposing private values.
+- [ ] The required store-release attestation has a truthful Next Gen path through a form correction
+  or written field-specific organizer instruction.
 - [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
 - [x] The release-configuration artifact named in project status passes checksum creation,
   signature, embedded-core contract/determinism, configuration-specific native checks, and
@@ -254,11 +268,12 @@ Never use a fake entitlement state as evidence.
   [project status](PROJECT_STATUS.md), including Python, Debug/Release native, formatting, typing,
   public-tree, security, asset, and diff checks.
 - [ ] The exact final submitted revision passes its pushed PR CI checks.
-- [ ] Repeat purchase success, cancel, simulated failure, and retry on the exact final Debug
-  package. The unchanged clean `3cf20ed` baseline covers those outcomes; `cbe8b20` currently covers
-  granted-entitlement refresh, Restore, foreground, and relaunch.
-- [x] Current Judge Access grant unlocks without relaunch and survives Restore, foreground, and
-  full relaunch on the exact `cbe8b20` Debug package.
+- [x] The exact clean `217c091` Debug package repeats missing/invalid key, offering, cancel,
+  simulated failure, retry, Test Store success, immediate Restore, foreground, relaunch, natural
+  accelerated-expiry locked/offering recovery, and makes no real payment.
+- [x] Current Judge Access grant survives refresh, Restore, foreground, full relaunch, and a check
+  of the unmodified checksummed `217c091` archive bundle; the existing December 31 grant was not
+  changed.
 - [x] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
   light/dark and the regenerated portrait screenshot also pass visual review.
 - [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.

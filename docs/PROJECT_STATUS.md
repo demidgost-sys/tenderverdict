@@ -5,10 +5,13 @@
 - Audit baseline: `79186da7e83e40284cca9f34d658f6e2a0e1b335` (**superseded**)
 - Pushed remediation baseline: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
 - Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
-- Current hands-on evidence revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
+- Current hands-on evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
 - Current candidate: **clean committed product revision, fresh Release and Debug packages,
-  complete local gate, live Judge Access refresh/restore/foreground/relaunch evidence, and
-  draft-PR validation on the current branch head**
+  complete local gate, a final silent Test Store/Judge Access receipt, and draft-PR validation on
+  the pushed competition-branch head**
+- Local integration state: **the public-safe RevenueCat receipt and silent video-production handoff
+  are combined on an isolated unpushed branch; the recorded/public video and exact pushed-head CI
+  remain final gates**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Competition-branch state: **current polish is committed for the draft PR; not released and not
   submitted to Devpost**
@@ -33,7 +36,7 @@ Competition implementation and final-submission readiness are intentionally kept
 | Readiness lens | Completed | Meaning |
 |---|---:|---|
 | Local Shipaton implementation | **Complete for the declared competition scope** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, comparison drill-down, and silent settings QA are complete; VoiceOver and independent workflow validation are optional follow-ups |
-| Final submission | **9 / 12 gates (75%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, draft text, current-revision CI, and entrant verification exist; the project form, video, and final-link gates remain |
+| Final submission | **9 / 12 gates (75%)** | Public source, the working app, RevenueCat evidence, organizer clarification, assets, draft text, pushed-revision CI, and entrant verification exist; the private field inventory is complete, but a required form attestation conflicts with the store-exempt Next Gen route, and the public video/final-link gates remain |
 | Public product release | **Not ready** | The app is an ad-hoc-signed competition prototype without notarization, a trusted installer, production billing, or demonstrated external workflow fit |
 
 Only the final-submission percentage counts explicit equal-weight gates. Optional VoiceOver and
@@ -75,7 +78,7 @@ keeping the published open-source CLI honest and useful.
 | Free experience | Complete first-profile review queue with text, buyer, deadline-presence, and verdict filters; grouped verdict drivers/checks; complete filter reset; empty state; safe supplied-source links; a self-contained first-profile review brief; and one complete schema-3 export | Native query/export/brief checks, packaged headless render, source smoke, and existing accessibility inspection |
 | Premium experience | Entitlement-backed access to all one to five profile reports, a searchable comparison matrix, stable notice/profile reasoning drill-down, an all-profile review brief, and a locked-state disagreement preview that discloses no gated reasoning | Stable-identity projection/disagreement/brief checks, packaged headless render, and Test Store unlock evidence |
 | Product hierarchy | The first screen promises a clear next step for every supplier profile, shows shared notices/profile count/changed outcomes before file controls, and explains the complete Free profile versus the five-profile Portfolio value before technical Test Store status | Current packaged light/dark renders plus previous `682c040` hands-on scroll-state inspection |
-| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, access sources, the 2026 cutoff, truthful expiration copy, fail-closed builds, and accessibility outcomes; clean `cbe8b20` manual evidence covers live granted-entitlement refresh, restore, foreground, and relaunch |
+| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, access sources, the 2026 cutoff, truthful expiration copy, fail-closed builds, and accessibility outcomes; the final silent `217c091` receipt covers the complete Test Store lifecycle plus Judge refresh, Restore, foreground, relaunch, and the unmodified archive bundle |
 | Secret boundary | No key committed or bundled; only process-local Debug `test_` configuration is accepted; Release exposes no key field and refuses configuration before any SDK call | Source review, scans, and Debug/Release native checks |
 | Local continuity | File continuity is explicit opt-in and stores only two security-scoped bookmarks; Forget clears them, report data and review points are not persisted, and reopening never auto-runs analysis | Source review and native checks |
 | Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
@@ -104,21 +107,20 @@ outputs must still be selected by the exact revision directory rather than filen
 
 | Fact | Evidence |
 |---|---|
-| Evidence revision | `cbe8b2071996edc2621a16cc9d10ce1ada63766e` |
-| Artifact directory | `dist/next-gen-debug-cbe8b20/` (ignored local output; SSD was not mounted) |
-| App / archive | `TenderVerdictNextGen.app` (63 MiB) / `TenderVerdictNextGen-macos.zip` (22 MiB) |
-| Archive SHA-256 | `e1bedc2eba22ddd0ae7495062f4ddacb7a60a16839d4a48658b5481d926ca84b` |
+| Evidence revision | `217c091d21d7b997f1271abc7e263e49e6de8478` |
+| Artifact directory | Ignored external QA output; no machine-local path is published |
+| App / archive | `TenderVerdictNextGen.app` / `TenderVerdictNextGen-macos.zip` (21,793,093 bytes) |
+| Archive SHA-256 | `ee1e30696deb5f322c81d8bdfd2e6b871d5467a7bc4a53f6dac7f12ab76f0f7a` |
 | Manifest | `version=0.2.0a1`, `source_dirty=false`, `build_configuration=debug`, `test_store_enabled=true`, RevenueCat `5.83.0`, `api_key_included=false`, `notarized=false` |
 | Builder evidence | 20 Debug-native checks, embedded smoke, ad-hoc signature verification, checksum creation, and ZIP integrity passed before the manual run |
-| Current manual outcome | A fresh `CustomerInfo` refresh unlocked the existing RevenueCat grant without relaunch; Restore, foreground re-entry, and full relaunch all preserved access; no purchase was made |
-| Prior purchase evidence | Offering, cancellation, simulated failure, retry, valid Test Store purchase, and immediate restore remain evidenced by the clean `3cf20ed` baseline |
-| Silent accessibility outcome | Native roles and names were inspected on the final unlocked UI; the Tab sample reached both search fields, but VoiceOver speech was not launched |
+| Current manual outcome | Missing/invalid key, offering, cancel, simulated failure, retry, Test Store success, immediate Restore, foreground, relaunch, natural accelerated-expiry locked/offering recovery, Judge refresh/Restore/foreground/relaunch, and the unmodified archive bundle passed; no real payment occurred |
+| Judge window | Existing RevenueCat `Until` December 31, 2026 exceeds the safe October 14 boundary and was left unchanged |
+| Silent boundary | VoiceOver, TTS, microphone, sound playback, and audio files were not launched |
 
 The process-local key was supplied only to the launched process and is absent from both bundles and
-the repository. The parent `2261049` pass confirmed that accelerated Test Store expiry returns
-locked while immediately reloading the localized expected package without relaunch. The exact
-`cbe8b20` pass then confirmed the real granted entitlement and truthful local expiration copy.
-VoiceOver was never launched and system output remained silent.
+the repository. The public-safe receipt in `submission/evidence/README.md` records the exact
+outcome matrix and the observed roughly 30-minute live expiry as server-timing variance rather than
+a broader guarantee. VoiceOver was never launched and system output remained silent.
 
 ## Local implementation and optional-validation ledger
 
@@ -162,16 +164,17 @@ release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative current-branch CI record; product and hands-on evidence revision is `cbe8b20` |
+| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative pushed-head CI record at `217c091`; the isolated integration head remains unpushed |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
-| 10 | Exact private Devpost project fields are inspected after joining and signing in | `OPEN` — hackathon registration is complete, but project creation still stops before the private fields at visual reCAPTCHA; no project was created or submitted |
-| 11 | Public captioned macOS demo under two minutes is published | `OPEN_LATER` |
+| 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `BLOCKED_FORM_RULE_CONFLICT` — the authenticated field inventory and saved draft readback are complete, but the required store-release checkbox has no No/Next Gen path; a field-specific organizer correction or written instruction is pending |
+| 11 | Public captioned macOS demo under two minutes is published | `PRODUCTION_HANDOFF_READY / PUBLIC_MEDIA_OPEN` — the exact 1:49 silent animatic, captions, manifests, and owner-recording kit exist locally; no final recorded or public video is claimed |
 | 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `FINAL_GATE` |
 
-**Result: 9 of 12 submission gates ready.** The remaining gates are the private project form, the
-public video, and the final logged-out link/submission review. The video is deliberately outside the
-current product-development pass, but it remains necessary before final submission.
+**Result: 9 of 12 submission gates ready.** The remaining gates are a truthful resolution of the
+private-form conflict, the recorded/public video, and the exact pushed-head logged-out
+link/submission review. Completing a field inventory or a silent animatic does not close those
+gates.
 
 ## Reconciliation with the previous plans
 
@@ -181,7 +184,7 @@ current product-development pass, but it remains necessary before final submissi
 | Native SwiftUI shell and canonical JSON adapter | `COMPLETE` |
 | Free/Premium RevenueCat projection | `COMPLETE` |
 | Self-contained packaging and submission assets | `COMPLETE` |
-| Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — purchase outcomes remain on clean `3cf20ed`; expiry recovery is on `2261049`; granted-entitlement refresh, Restore, foreground, and relaunch are fresh on `cbe8b20` |
+| Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — the clean `217c091` silent receipt covers the complete Test Store lifecycle, natural expiry recovery, Judge refresh/Restore/foreground/relaunch, and the unmodified checksummed archive bundle |
 | Judge-facing review queue, comparison matrix, shareable brief, safe links, and visual QA | `COMPLETE` |
 | Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — product revision `cbe8b20` is clean, packaged, pushed, and covered by the current draft-PR head |
 | Advanced macOS accessibility variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard order, increased contrast, reduced transparency, and temporary large-text rendering passed; hands-on VoiceOver announcements/focus remain untested and are not a submission gate |
@@ -214,13 +217,18 @@ Verified:
   disadvantage;
 - the entrant's TU Graz academic-domain email and active-student profile are verified, and the
   entrant has joined the Shipaton in Devpost;
+- the exact `217c091` Debug package passed the complete silent Test Store lifecycle, natural
+  accelerated-expiry recovery, Judge Access refresh/Restore/foreground/relaunch, and an independent
+  check of the unmodified checksummed archive; the existing grant remains unchanged through
+  December 31, 2026;
 - no real payment was made and no usable key is stored in the repository or evidence;
 - Free is a complete single-profile workflow rather than a disabled demo;
 - existing single-profile report semantics remain unchanged.
 
 Not verified and therefore not claimable:
 
-- that the private Devpost project-submission fields or the final submitted view have been audited;
+- that the required store-release attestation has a truthful Next Gen answer or that the final
+  submitted view has been audited;
 - that a public video exists;
 - that actual post-change VoiceOver purchase/cancel/failure outcomes pass on a fresh final Debug
   package;
@@ -233,11 +241,13 @@ Not verified and therefore not claimable:
 
 ## Required submission order
 
-1. Solve the visual Devpost reCAPTCHA manually, create the private project draft, and inspect its
-   exact fields without submitting it.
-2. Finish the public demo on the exact final revision.
-3. Run the final pushed CI and logged-out repository/video/submission checks, then submit only
-   after explicit owner approval.
+1. Wait for a form correction or written field-specific organizer instruction; do not check the
+   store-release attestation or save the prefilled Additional info as if a store release existed.
+2. Record and finish the public demo from the exact final candidate, then publish only with owner
+   authorization.
+3. Push only with owner authorization, wait for exact-head CI, and verify the repository, commit,
+   video, and entry while logged out.
+4. Stop again before accepting Terms or submitting; both require explicit owner approval.
 
 ## Optional future validation
 

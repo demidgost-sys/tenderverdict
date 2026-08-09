@@ -72,14 +72,14 @@ committed.
 
 1. **Public distribution — block:** the app is arm64, ad-hoc signed, and not notarized; there is no
    trusted installer or production App Store billing configuration.
-2. **Inclusive year-end access — owner action:** RevenueCat's date-only Grant is displayed as
-   expiring December 31. If reviewers must retain access through the whole of December 31, extend
-   the dashboard grant to January 1, 2027; the local cutoff still refuses Judge Access after
-   December 31, 2026. This external access change was not made in this audit.
+2. **Judge access through judging — pass:** judging ends October 13, so the safe date-only `Until`
+   boundary is October 14. The existing December 31 grant already exceeds it and was left
+   unchanged; it must not be shortened.
 3. **Spoken accessibility evidence — optional:** run the VoiceOver sequence only when sound is
    acceptable.
-4. **Submission — open:** the private Devpost form, public sub-two-minute video, and final
-   logged-out link review remain.
+4. **Submission — blocked/open:** the private field inventory is complete, but its required
+   store-release attestation has no truthful Next Gen path. The final recorded/public video and
+   exact-head logged-out link review also remain.
 
 ## Verdicts
 

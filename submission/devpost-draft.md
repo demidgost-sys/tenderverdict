@@ -142,8 +142,10 @@ with evidence a human can defend.
 
 ## What is next
 
-Complete the private project draft after visual reCAPTCHA, keep the exact final Release and current
-Debug evidence aligned, publish the captioned sub-1:50 demo, run CI on the submitted commit, and
+The authenticated private-field inventory is complete, but the required store-release checkbox
+needs a form correction or written field-specific Next Gen instruction before it can be answered
+truthfully. Keep the exact final Release and current Debug evidence aligned, finish the owner-recorded
+captioned sub-1:50 demo, publish only with authorization, run CI on the exact pushed commit, and
 verify the repository, video, and final entry while logged out. A later accessibility pass can
 manually verify VoiceOver announcements for asynchronous purchase outcomes; independent workflow
 sessions can test product fit. Neither optional follow-up is presented as a completed result or a
