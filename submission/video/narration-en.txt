@@ -1,15 +1,15 @@
-Procurement teams often review one tender feed for several supplier profiles. TenderVerdict turns each notice into a human next step: open, watch, or skip.
+One tender feed can mean different things for different suppliers. TenderVerdict turns every notice into a clear human next step.
 
-The workflow starts with synthetic supplier profiles and normalized notice metadata. Files stay on this Mac. Before analysis, a preview shows counts, sample records, and metadata gaps.
+Everything runs locally on this Mac with synthetic demo data. Before the review starts, the app shows what was loaded and what is missing.
 
-One canonical engine evaluates the same notices and review date for every profile. It returns three verdicts: Open documents, Watch, or Reject, with visible reasons. A human decides what to do next.
+Each notice gets one of three clear results: Open documents, Watch, or Reject. The reasons stay visible, and a person always makes the final decision.
 
-Free is a complete first-profile workflow, not a disabled demo. It includes the full queue, verdict reasoning, supplied source links, a shareable review brief, and deterministic schema-three JSON export.
+The free version gives one complete supplier workflow: the full queue, visible reasons, source links, a review brief, and JSON export.
 
-Portfolio Workspace applies the same feed to up to five independent supplier profiles. RevenueCat unlocks comparison and full portfolio export, but never changes a verdict, creates a score, or makes a bid recommendation.
+RevenueCat unlocks Portfolio Workspace: comparison and full export for up to five supplier profiles. It never changes a verdict, creates a score, or makes a bid decision.
 
-In the verified Test Store baseline, the Apple SDK loaded a development-only purchase sheet. CustomerInfo then confirmed the entitlement was active. It was not an App Store payment. No real charge occurred.
+In a verified RevenueCat Test Store run, the SDK showed a test purchase screen. CustomerInfo confirmed the entitlement was active. It was not an App Store payment. No money was charged.
 
-For this evaluation build, RevenueCat Judge Access grants the entitlement without a purchase. A fresh check unlocked the screen. Restoring access, returning to the foreground, and a full relaunch all kept the workspace unlocked.
+For judges, RevenueCat Judge Access checks the same entitlement without a purchase. A fresh CustomerInfo check, Restore, returning to the app, and a full relaunch all kept access active.
 
-Synthetic data. No usable key is stored. This is not production billing. TenderVerdict is open-source macOS software under Apache two point zero.
+Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is open-source macOS software under Apache two point zero.

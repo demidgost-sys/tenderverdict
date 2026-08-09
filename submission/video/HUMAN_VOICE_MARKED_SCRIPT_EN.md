@@ -5,67 +5,63 @@ paragraphs concatenate exactly to `narration-en.txt` and `captions-en.srt`.
 
 ## 01 · Problem · 00:00–00:10
 
-Target spoken length: **about 9.6 seconds**. Calm start; a small pause between sentences. Stress
-“human next step”, then separate the three verbs.
+Target spoken length: **about 9.0 seconds**. Calm start. Pause between the problem and the product
+promise; stress “different suppliers” and “human next step”.
 
-> Procurement teams often review one tender feed for several supplier profiles. TenderVerdict
-> turns each notice into a human next step: open, watch, or skip.
+> One tender feed can mean different things for different suppliers. TenderVerdict turns every
+> notice into a clear human next step.
 
 ## 02 · Local workflow · 00:10–00:23
 
-Target spoken length: **about 11.5 seconds**. Precise and reassuring. Pause after “Mac”.
+Target spoken length: **about 10.5 seconds**. Precise and reassuring. Pause after “data”.
 
-> The workflow starts with synthetic supplier profiles and normalized notice metadata. Files stay
-> on this Mac. Before analysis, a preview shows counts, sample records, and metadata gaps.
+> Everything runs locally on this Mac with synthetic demo data. Before the review starts, the app
+> shows what was loaded and what is missing.
 
 ## 03 · Three verdicts · 00:23–00:38
 
-Target spoken length: **about 13.3 seconds**. Give Open documents, Watch, and Reject equal weight;
-do not make Reject sound like a failure alarm.
+Target spoken length: **about 12.0 seconds**. Give Open documents, Watch, and Reject equal weight;
+finish calmly on the human decision.
 
-> One canonical engine evaluates the same notices and review date for every profile. It returns
-> three verdicts: Open documents, Watch, or Reject, with visible reasons. A human decides what to do
-> next.
+> Each notice gets one of three clear results: Open documents, Watch, or Reject. The reasons stay
+> visible, and a person always makes the final decision.
 
 ## 04 · Free · 00:38–00:52
 
-Target spoken length: **about 12.1 seconds**. Confident but factual. Stress “complete” and “Free”.
+Target spoken length: **about 11.0 seconds**. Confident but factual. Stress “complete”.
 
-> Free is a complete first-profile workflow, not a disabled demo. It includes the full queue,
-> verdict reasoning, supplied source links, a shareable review brief, and deterministic
-> schema-three JSON export.
+> The free version gives one complete supplier workflow: the full queue, visible reasons, source
+> links, a review brief, and JSON export.
 
 ## 05 · Portfolio · 00:52–01:08
 
-Target spoken length: **about 13.7 seconds**. Stress “independent” and “never changes a verdict”.
+Target spoken length: **about 13.0 seconds**. Stress “Portfolio Workspace” and clearly separate
+RevenueCat access from TenderVerdict decisions.
 
-> Portfolio Workspace applies the same feed to up to five independent supplier profiles.
-> RevenueCat unlocks comparison and full portfolio export, but never changes a verdict, creates a
-> score, or makes a bid recommendation.
+> RevenueCat unlocks Portfolio Workspace: comparison and full export for up to five supplier
+> profiles. It never changes a verdict, creates a score, or makes a bid decision.
 
 ## 06 · Test Store · 01:08–01:23
 
-Target spoken length: **about 13.3 seconds**. Evidence tone. Give the last two short sentences their
-own clear beats; do not soften the payment boundary.
+Target spoken length: **about 13.2 seconds**. Evidence tone. Give the last two payment-boundary
+sentences their own clear beats.
 
-> In the verified Test Store baseline, the Apple SDK loaded a development-only purchase sheet.
-> CustomerInfo then confirmed the entitlement was active. It was not an App Store payment. No real
-> charge occurred.
+> In a verified RevenueCat Test Store run, the SDK showed a test purchase screen. CustomerInfo
+> confirmed the entitlement was active. It was not an App Store payment. No money was charged.
 
 ## 07 · Judge Access · 01:23–01:39
 
-Target spoken length: **about 14.2 seconds**. Pause after “purchase” and “screen”. Keep the recovery
-list measured.
+Target spoken length: **about 13.5 seconds**. Stress “checks” so Judge Access does not sound like a
+local Premium bypass. Keep the recovery list measured.
 
-> For this evaluation build, RevenueCat Judge Access grants the entitlement without a purchase. A
-> fresh check unlocked the screen. Restoring access, returning to the foreground, and a full
-> relaunch all kept the workspace unlocked.
+> For judges, RevenueCat Judge Access checks the same entitlement without a purchase. A fresh
+> CustomerInfo check, Restore, returning to the app, and a full relaunch all kept access active.
 
 ## 08 · Honest boundary · 01:39–01:49
 
-Target spoken length: **about 9.1 seconds**. Restrained close, not a consumer-launch announcement.
+Target spoken length: **about 9.5 seconds**. Restrained close, not a consumer-launch announcement.
 
-> Synthetic data. No usable key is stored. This is not production billing. TenderVerdict is
+> Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is
 > open-source macOS software under Apache two point zero.
 
 ## Pronunciation block
@@ -75,12 +71,13 @@ Practice this section before recording; do not include it in a take.
 | Written | Say |
 |---|---|
 | TenderVerdict | **TEN-der VER-dict** |
-| procurement | **pruh-KYOOR-ment** |
 | supplier | **suh-PLY-er** |
 | RevenueCat | **REV-uh-new Cat** |
+| Portfolio Workspace | **port-FOH-lee-oh workspace** |
 | CustomerInfo | **customer info** |
+| entitlement | **en-TY-təl-ment** |
+| Judge Access | **judge access** |
 | SDK | the letters **S-D-K** |
 | JSON | **JAY-son** |
-| schema-three | **SKEE-muh three** |
 | Apache | **uh-PATCH-ee** |
 | macOS | **Mac O-S** |

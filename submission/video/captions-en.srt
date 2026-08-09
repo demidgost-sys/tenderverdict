@@ -1,84 +1,82 @@
 1
 00:00:00,000 --> 00:00:05,000
-Procurement teams often review one tender feed
-for several supplier profiles.
+One tender feed can mean different things
+for different suppliers.
 
 2
 00:00:05,000 --> 00:00:10,000
-TenderVerdict turns each notice into a human
-next step: open, watch, or skip.
+TenderVerdict turns every notice into
+a clear human next step.
 
 3
 00:00:10,000 --> 00:00:16,000
-The workflow starts with synthetic supplier profiles
-and normalized notice metadata.
+Everything runs locally on this Mac
+with synthetic demo data.
 
 4
 00:00:16,000 --> 00:00:23,000
-Files stay on this Mac. Before analysis, a preview shows counts,
-sample records, and metadata gaps.
+Before the review starts, the app shows
+what was loaded and what is missing.
 
 5
 00:00:23,000 --> 00:00:30,000
-One canonical engine evaluates the same notices
-and review date for every profile.
+Each notice gets one of three clear results:
+Open documents, Watch, or Reject.
 
 6
 00:00:30,000 --> 00:00:38,000
-It returns three verdicts: Open documents, Watch, or Reject,
-with visible reasons. A human decides what to do next.
+The reasons stay visible, and a person
+always makes the final decision.
 
 7
 00:00:38,000 --> 00:00:44,000
-Free is a complete first-profile workflow,
-not a disabled demo.
+The free version gives one complete supplier workflow:
 
 8
 00:00:44,000 --> 00:00:52,000
-It includes the full queue, verdict reasoning, supplied source links,
-a shareable review brief, and deterministic schema-three JSON export.
+the full queue, visible reasons, source links,
+a review brief, and JSON export.
 
 9
 00:00:52,000 --> 00:00:59,000
-Portfolio Workspace applies the same feed
-to up to five independent supplier profiles.
+RevenueCat unlocks Portfolio Workspace: comparison
+and full export for up to five supplier profiles.
 
 10
 00:00:59,000 --> 00:01:08,000
-RevenueCat unlocks comparison and full portfolio export,
-but never changes a verdict, creates a score, or makes a bid recommendation.
+It never changes a verdict, creates a score,
+or makes a bid decision.
 
 11
 00:01:08,000 --> 00:01:14,000
-In the verified Test Store baseline, the Apple SDK
-loaded a development-only purchase sheet.
+In a verified RevenueCat Test Store run,
+the SDK showed a test purchase screen.
 
 12
 00:01:14,000 --> 00:01:18,500
-CustomerInfo then confirmed
-the entitlement was active.
+CustomerInfo confirmed the entitlement was active.
 
 13
 00:01:18,500 --> 00:01:23,000
 It was not an App Store payment.
-No real charge occurred.
+No money was charged.
 
 14
 00:01:23,000 --> 00:01:31,000
-For this evaluation build, RevenueCat Judge Access
-grants the entitlement without a purchase.
+For judges, RevenueCat Judge Access checks
+the same entitlement without a purchase.
 
 15
 00:01:31,000 --> 00:01:39,000
-A fresh check unlocked the screen. Restoring access, returning to the foreground,
-and a full relaunch all kept the workspace unlocked.
+A fresh CustomerInfo check, Restore, returning to the app,
+and a full relaunch all kept access active.
 
 16
-00:01:39,000 --> 00:01:44,000
-Synthetic data. No usable key is stored.
+00:01:39,000 --> 00:01:44,500
+Synthetic demo data. No usable key is stored.
 This is not production billing.
 
 17
-00:01:44,000 --> 00:01:49,000
+00:01:44,500 --> 00:01:49,000
 TenderVerdict is open-source macOS software
 under Apache two point zero.
