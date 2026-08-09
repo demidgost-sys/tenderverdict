@@ -9,7 +9,7 @@ that file.
 - Timeline: **109.000 seconds / 1:49**.
 - Script: **196 words** by the package validator.
 - Overall timeline density: **107.9 words per minute**.
-- The selected human takes run roughly **107–148 spoken words per minute**, leaving about 10.9
+- The selected human takes run roughly **102–148 spoken words per minute**, leaving about 10.4
   seconds across the timeline for sentence pauses and visual breathing room.
 - Record the whole script naturally in one continuous session. The editor cuts it into the eight
   blocks below; never time-stretch the voice.
@@ -23,7 +23,7 @@ that file.
 | 00:48–01:04 | 5 | 13.5 s | RevenueCat access must stay separate from verdict logic |
 | 01:04–01:19.7 | 6 | 15.5 s | Clearly separate Test Store from a real payment |
 | 01:19.7–01:35.7 | 7 | 15.4 s | Stress checks; measured refresh / Restore / relaunch list |
-| 01:35.7–01:49 | 8 | 12.4 s | Factual synthetic-data, key, billing, and license close |
+| 01:35.7–01:49 | 8 | 12.9 s | Factual synthetic-data, key, billing, and license close |
 
 ## Pronunciation and voice direction
 

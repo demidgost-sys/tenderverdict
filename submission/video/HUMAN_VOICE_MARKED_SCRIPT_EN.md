@@ -59,9 +59,9 @@ local Premium bypass. Keep the recovery list measured.
 
 ## 08 · Safety and license close · 01:35.7–01:49
 
-Target spoken length: **about 12.4 seconds**. Keep each boundary factual and clearly separated.
+Target spoken length: **about 12.9 seconds**. Keep each boundary factual and clearly separated.
 
-> Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is
+> Synthetic demo data. No usable key stored. This is not a production billing. TenderVerdict is
 > open-source macOS software under Apache 2.0.
 
 ## Pronunciation block

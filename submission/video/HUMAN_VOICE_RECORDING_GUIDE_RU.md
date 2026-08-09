@@ -111,12 +111,12 @@
 
 **English**
 
-> Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is
+> Synthetic demo data. No usable key stored. This is not a production billing. TenderVerdict is
 > open-source macOS software under Apache 2.0.
 
 **Как читать**
 
-> Синтэтик демоу дэйта. Ноу юзэбэл ки из сторд. Зис из нот продакшэн биллинг. Тендер Вердикт из
+> Синтэтик демоу дэйта. Ноу юзэбэл ки сторд. Зис из нот э продакшэн биллинг. Тендер Вердикт из
 > оупэн-сорс Мэк-оу-эс софтвэр андэр Эпачи ту пойнт зироу.
 
 ## Как говорить

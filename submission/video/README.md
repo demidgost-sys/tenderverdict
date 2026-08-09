@@ -34,8 +34,12 @@ the approved claims or 109-second runtime.
 
 ## Review outputs
 
-- `tenderverdict-final-review-v1.mp4` — local SSD-cache artifact outside the repository: 1920×1080,
-  30 fps, 1:49 H.264/AAC review master with burned English captions; not tracked or published.
+- `tenderverdict-final-review-v2.mp4` — recommended local SSD-cache artifact outside the
+  repository: 1920×1080, 30 fps, 1:49 H.264/AAC review master with the repaired human narration
+  and burned English captions; not tracked, hosted with link access at
+  `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, and saved in the Devpost draft.
+- `tenderverdict-final-review-v1.mp4` — superseded local review master with abrupt phrase-boundary
+  edits; its upload is private and excluded from Devpost.
 - `tenderverdict-silent-rough-cut-v1.mp4` — exact 1920×1080, 30 fps, 1:49 silent animatic;
   intentionally ignored and untracked because the public-tree policy rejects tracked files over
   1 MiB.
@@ -44,8 +48,10 @@ the approved claims or 109-second runtime.
 - `silent-rough-cut-contact-sheet.png` — ten-frame visual QA sheet.
 - `OUTPUT_QA.md` — committed public-safe runtime, ffprobe stream, caption, asset, and hash receipt.
 - `human-voice-takes/` — ignored local destination for owner-recorded raw WAV files.
-- `tenderverdict-vo-human-v1.wav` — ignored 109-second dry human voice master assembled only from
-  the owner's supplied AIFC, without time-stretch or generated speech.
+- `tenderverdict-vo-human-v2-natural.wav` — recommended ignored 109-second human voice master
+  assembled only from the owner's supplied AIFC, with source-room-tone continuity and soft phrase
+  boundaries, without time-stretch or generated speech.
+- `tenderverdict-vo-human-v1.wav` — superseded voice master retained only for comparison.
 - `FINAL_VIDEO_QA.md` — public-safe local-master metadata, provenance, caption, and remaining
   listening-gate receipt.
 
@@ -75,4 +81,5 @@ The MP4 is a local handoff artifact, not a public-tree asset. Do not add it to G
 - Do not show or store a RevenueCat key, reviewer code, account email, customer identifier,
   dashboard, terminal, notification, or private notice.
 - Use only the owner's recorded performance for narration. Do not generate or clone a voice.
-- Publication, upload, Devpost editing, and RevenueCat/account actions remain separate owner gates.
+- The hosted v2 and Devpost draft URL are complete; the owner listening pass, truthful private-form
+  resolution, and final Submit remain separate gates.

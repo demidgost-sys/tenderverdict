@@ -114,6 +114,6 @@ watch/listen once at normal speed and the private-form attestation conflict need
 ## Links
 
 - Competition source: `https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026`
-- Demo video: `https://www.youtube.com/watch?v=vJLY4uVAtUo`
+- Demo video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
 - Pushed candidate revision: `8b35acb7b29a0380b873a8cd77236db9e5096b19`
-- Demo master SHA-256: `e1922cf6d910c5ef5589b72cdafe87f5d80422afad0f1d1d81e5e8cf767e60ab`
+- Demo master SHA-256: `5862094c00c8dcb5e2e793d46d1ced44a003458dfcb1d957484135da13c6d047`

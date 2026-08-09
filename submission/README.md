@@ -16,7 +16,7 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
 | `video/` | Ready local and hosted handoff | Exact 1:49 human-narrated master, silent animatic fallback, captions, manifests, privacy/claim audit, contact sheet, and QA receipts; raw MP4/WAV remain ignored |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
-| Link-accessible video | Ready; owner listen open | `https://www.youtube.com/watch?v=vJLY4uVAtUo`, 1:49, packaged macOS app, burned English captions plus matching YouTube SRT; logged-out oEmbed and policy checks pass |
+| Link-accessible video | v2 ready; owner listen open | `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, 1:49, packaged macOS app, repaired owner narration, burned English captions plus matching YouTube SRT; logged-out oEmbed and policy checks pass; superseded v1 is private |
 | `devpost-draft.md` | Ready with exact links | Product story, judging proof, competition branch, pushed candidate SHA, video URL, and video SHA-256 are recorded |
 
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
