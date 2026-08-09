@@ -212,7 +212,12 @@ for shot in timeline.shots {
     NSBezierPath(roundedRect: chipRect, xRadius: 20, yRadius: 20).fill()
     drawText(
       chip,
-      in: NSRect(x: chipRect.minX + 16, y: chipRect.minY + 8, width: chipRect.width - 32, height: 24),
+      in: NSRect(
+        x: chipRect.minX + 16,
+        y: chipRect.minY + 8,
+        width: chipRect.width - 32,
+        height: 24
+      ),
       font: .monospacedSystemFont(ofSize: 16, weight: .semibold),
       color: NSColor.white.withAlphaComponent(0.80),
       alignment: .center
