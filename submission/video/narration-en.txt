@@ -1,0 +1,15 @@
+Procurement teams often review one tender feed for several supplier profiles. TenderVerdict turns each notice into a clear human next step: open, verify, or skip.
+
+The workflow begins with committed synthetic profiles and normalized notice metadata. Files stay on this Mac. A preview exposes counts, sample records, and metadata gaps before the deterministic analysis runs.
+
+One canonical engine evaluates the same notices and review date for every profile. It returns three explainable verdicts: Open documents, Watch, or Reject. Reasons stay visible, and a human decides what to do next.
+
+Free is a complete first-profile workflow, not a disabled demo. It includes the full queue, verdict reasoning, supplied source links, a shareable review brief, and deterministic schema-three JSON export.
+
+Portfolio Workspace applies the same feed to up to five independent supplier profiles. RevenueCat unlocks the comparison matrix and full portfolio export, but never changes a verdict, creates a score, or makes an automatic bid recommendation.
+
+In the verified Test Store baseline, the official Apple SDK loaded a development-only purchase sheet. A successful test outcome activated the supplier profiles plus entitlement through CustomerInfo. This was Test Store—not an App Store payment, and no real charge occurred.
+
+For the current evaluation build, RevenueCat Judge Access grants the same entitlement without a purchase. A current refresh unlocked the open screen; Restore access, foreground return, and full process relaunch all preserved access from current CustomerInfo.
+
+The evidence uses synthetic data, stores no usable key, and makes no production-billing claim. TenderVerdict is open-source Apache two point zero software for macOS.

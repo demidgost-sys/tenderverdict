@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "canvas": {"width": 1920, "height": 1080, "fps": 30},
+  "shots": [
+    {
+      "id": "01-problem",
+      "duration": 10.0,
+      "source": "../screenshot-1179x2556.png",
+      "crop": {"x": 0, "y": 0, "width": 1179, "height": 720},
+      "eyebrow": "PROBLEM",
+      "title": "One feed. Different supplier decisions.",
+      "body": "Open, verify, or skip — with reasons a human can inspect.",
+      "chips": ["LOCAL INPUTS", "EXPLAINABLE", "HUMAN DECISION"],
+      "evidence": "Current deterministic submission render · synthetic fixture"
+    },
+    {
+      "id": "02-local-workflow",
+      "duration": 13.0,
+      "source": "../screenshot-1179x2556.png",
+      "crop": {"x": 0, "y": 570, "width": 1179, "height": 790},
+      "eyebrow": "LOCAL WORKFLOW",
+      "title": "Inspect inputs before analysis.",
+      "body": "Committed synthetic profiles and normalized notice metadata stay on this Mac.",
+      "chips": ["3 SHARED NOTICES", "3 PROFILES", "NO UPLOAD"],
+      "evidence": "Workspace v1 JSON · normalized notices · explicit review date"
+    },
+    {
+      "id": "03-three-verdicts",
+      "duration": 15.0,
+      "source": "../screenshot-1179x2556.png",
+      "crop": {"x": 0, "y": 1290, "width": 1179, "height": 1260},
+      "eyebrow": "THREE VERDICTS",
+      "title": "Open documents. Watch. Reject.",
+      "body": "One canonical engine, the same shared notices, and reasons for every next step.",
+      "chips": ["DETERMINISTIC", "SAME REVIEW DATE", "REASONS INCLUDED"],
+      "evidence": "Current first-profile render · 1 Open / 1 Watch / 1 Reject"
+    },
+    {
+      "id": "04-free",
+      "duration": 14.0,
+      "source": "../screenshot-1179x2556.png",
+      "crop": {"x": 0, "y": 1180, "width": 1179, "height": 720},
+      "eyebrow": "FREE",
+      "title": "A complete first supplier review.",
+      "body": "Queue, reasoning, supplied source links, review brief, and schema-3 JSON export remain Free.",
+      "chips": ["NOT A DISABLED DEMO"],
+      "evidence": "Current deterministic Free surface · entitlement does not change verdicts"
+    },
+    {
+      "id": "05-portfolio",
+      "duration": 16.0,
+      "source": "../evidence/unlocked-judge-access-2026-08-09.png",
+      "crop": {"x": 20, "y": 325, "width": 980, "height": 420},
+      "eyebrow": "PORTFOLIO",
+      "title": "Same notices. Different outcomes.",
+      "body": "Compare up to five independent profiles without a score, ranking, or automatic bid decision.",
+      "chips": ["REVENUECAT ENTITLEMENT", "VERDICTS UNCHANGED"],
+      "evidence": "Current genuine cbe8b20 Judge Access capture · comparison crop"
+    },
+    {
+      "id": "06-test-store-sheet",
+      "duration": 6.0,
+      "source": "assets/test-store-purchase-sheet-baseline-2026-08-04.jpg",
+      "eyebrow": "TEST STORE BASELINE · 2026-08-04",
+      "title": "Development-only purchase sheet.",
+      "body": "Official RevenueCat Test Store path. This was not an App Store payment.",
+      "chips": ["NO REAL CHARGE"],
+      "evidence": "Dated genuine baseline · product and localized test price visible"
+    },
+    {
+      "id": "07-test-store-entitlement",
+      "duration": 9.0,
+      "source": "../evidence/unlocked-test-store-2026-08-04.png",
+      "eyebrow": "TEST STORE BASELINE · 2026-08-04",
+      "title": "supplier_profiles_plus active.",
+      "body": "The dated baseline shows RevenueCat CustomerInfo revealing all three fixture reports.",
+      "chips": ["HISTORICAL PURCHASE EVIDENCE"],
+      "evidence": "Genuine packaged Debug baseline · not exact-final purchase proof"
+    },
+    {
+      "id": "08-judge-access",
+      "duration": 8.0,
+      "source": "../evidence/unlocked-judge-access-2026-08-09.png",
+      "crop": {"x": 20, "y": 250, "width": 980, "height": 490},
+      "eyebrow": "CURRENT EVIDENCE · cbe8b20",
+      "title": "RevenueCat Judge Access. No purchase.",
+      "body": "Current refresh, Restore, foreground return, and relaunch preserved the granted entitlement.",
+      "chips": ["CURRENT CUSTOMERINFO"],
+      "evidence": "Genuine 2026-08-09 capture · no code, key, or customer identifier"
+    },
+    {
+      "id": "09-relaunch",
+      "duration": 8.0,
+      "source": "assets/entitlement-restored-on-relaunch-baseline-2026-08-04.jpg",
+      "eyebrow": "RELAUNCH BASELINE · 2026-08-04",
+      "title": "Access recovered after relaunch.",
+      "body": "Dated visual baseline; the current relaunch outcome is recorded in the 2026-08-09 technical audit.",
+      "chips": ["RESTORE VISIBLE", "NO VOICEOVER CLAIM"],
+      "evidence": "Genuine dated capture · current manual result stays audit-scoped"
+    },
+    {
+      "id": "10-boundary",
+      "duration": 10.0,
+      "source": "../icon-1024.png",
+      "eyebrow": "HONEST BOUNDARY",
+      "title": "Evaluation build, not production billing.",
+      "body": "Synthetic data. No stored usable key. Open-source Apache 2.0 software for macOS.",
+      "chips": ["NO UPLOAD", "NO PUBLIC RELEASE CLAIM"],
+      "evidence": "TenderVerdict Next Gen · local Shipaton evaluation package"
+    }
+  ]
+}

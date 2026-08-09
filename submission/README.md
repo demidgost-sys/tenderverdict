@@ -14,6 +14,7 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
 | `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
 | `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
+| `video/` | Ready local production handoff | Exact 1:49 silent animatic plan, narration, captions, manifests, privacy/claim audit, contact sheet, and QA receipt; raw MP4 stays ignored/untracked under the >1 MiB public-tree policy and is not a public video |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
 | Public video | Pending | Public YouTube/Vimeo, at or below 1:50 target and under the official two-minute limit, packaged macOS app |
 | `devpost-draft.md` | Ready with explicit placeholders | Product story and judging proof are drafted; do not publish or remove placeholders before final evidence exists |
@@ -32,6 +33,11 @@ also passes. Clean `3cf20ed` remains the purchase/cancel/failure baseline, while
 covers the current granted-entitlement refresh, Restore, foreground, relaunch, and silent
 accessibility-tree evidence. Hands-on VoiceOver announcements remain an optional accessibility
 follow-up rather than a submission gate.
+
+The video handoff in [`video/`](video/) is locally complete and remains fully silent. Its checked
+MP4 exists only as an ignored local artifact; the public-video gate remains pending until a final
+voice is separately authorized, the complete file is reviewed at normal speed with sound, and an
+owner-authorized YouTube/Vimeo upload passes logged-out verification.
 
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export

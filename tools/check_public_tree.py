@@ -20,6 +20,18 @@ SUBMISSION_SCREENSHOT_PATH = "submission/screenshot-1179x2556.png"
 JUDGE_ACCESS_EVIDENCE_PATH = "submission/evidence/unlocked-judge-access-2026-08-09.png"
 UNLOCKED_EVIDENCE_PATH = "submission/evidence/unlocked-test-store-2026-08-04.png"
 VOICEOVER_EVIDENCE_PATH = "submission/evidence/voiceover-restore-2026-08-04.png"
+VIDEO_CONTACT_SHEET_PATH = "submission/video/silent-rough-cut-contact-sheet.png"
+VIDEO_RELAUNCH_BASELINE_PATH = (
+    "submission/video/assets/entitlement-restored-on-relaunch-baseline-2026-08-04.jpg"
+)
+VIDEO_TEST_STORE_SHEET_PATH = (
+    "submission/video/assets/test-store-purchase-sheet-baseline-2026-08-04.jpg"
+)
+VIDEO_PNG_ASSET_DIMENSIONS = {VIDEO_CONTACT_SHEET_PATH: (1920, 432)}
+VIDEO_JPEG_ASSET_DIMENSIONS = {
+    VIDEO_RELAUNCH_BASELINE_PATH: (1020, 754),
+    VIDEO_TEST_STORE_SHEET_PATH: (272, 456),
+}
 EVIDENCE_SCREENSHOT_PATHS = frozenset(
     {JUDGE_ACCESS_EVIDENCE_PATH, UNLOCKED_EVIDENCE_PATH, VOICEOVER_EVIDENCE_PATH}
 )
@@ -31,6 +43,8 @@ BINARY_ASSET_PATHS = frozenset(
         SUBMISSION_ICON_PATH,
         SUBMISSION_SCREENSHOT_PATH,
         *EVIDENCE_SCREENSHOT_PATHS,
+        *VIDEO_PNG_ASSET_DIMENSIONS,
+        *VIDEO_JPEG_ASSET_DIMENSIONS,
     }
 )
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
@@ -213,6 +227,92 @@ def _validate_screenshot(path: Path) -> None:
     _validate_png_payload(payload, SCREENSHOT_PATH)
 
 
+def _validate_jpeg_payload(payload: bytes, label: str) -> tuple[int, int]:
+    if len(payload) < 4 or not payload.startswith(b"\xff\xd8") or not payload.endswith(b"\xff\xd9"):
+        raise TreeError(f"{label} does not have a bounded JPEG structure")
+
+    sof_markers = {
+        0xC0,
+        0xC1,
+        0xC2,
+        0xC3,
+        0xC5,
+        0xC6,
+        0xC7,
+        0xC9,
+        0xCA,
+        0xCB,
+        0xCD,
+        0xCE,
+        0xCF,
+    }
+    standalone_markers = {0x01, *range(0xD0, 0xD8)}
+    offset = 2
+    dimensions: tuple[int, int] | None = None
+    saw_jfif = False
+    saw_scan = False
+    while offset < len(payload) - 2:
+        if payload[offset] != 0xFF:
+            raise TreeError(f"{label} has an invalid JPEG marker boundary")
+        while offset < len(payload) and payload[offset] == 0xFF:
+            offset += 1
+        if offset >= len(payload):
+            raise TreeError(f"{label} has a truncated JPEG marker")
+        marker = payload[offset]
+        offset += 1
+        if marker == 0xD9:
+            break
+        if marker in standalone_markers:
+            continue
+        if offset + 2 > len(payload):
+            raise TreeError(f"{label} has a truncated JPEG segment")
+        length = int.from_bytes(payload[offset : offset + 2], "big")
+        if length < 2 or offset + length > len(payload):
+            raise TreeError(f"{label} has an invalid JPEG segment length")
+        segment = payload[offset + 2 : offset + length]
+        if marker == 0xE0:
+            if saw_jfif or not segment.startswith(b"JFIF\x00"):
+                raise TreeError(f"{label} has an unsupported JPEG APP0 segment")
+            saw_jfif = True
+        elif 0xE1 <= marker <= 0xEF or marker == 0xFE:
+            raise TreeError(f"{label} contains JPEG metadata marker 0x{marker:02x}")
+        elif marker in sof_markers:
+            if dimensions is not None or len(segment) < 6:
+                raise TreeError(f"{label} has an invalid JPEG frame header")
+            height = int.from_bytes(segment[1:3], "big")
+            width = int.from_bytes(segment[3:5], "big")
+            dimensions = (width, height)
+        elif marker == 0xDA:
+            saw_scan = True
+            offset += length
+            break
+        offset += length
+
+    if not saw_jfif or not saw_scan or dimensions is None:
+        raise TreeError(f"{label} is missing required JPEG structure")
+    if dimensions[0] <= 0 or dimensions[1] <= 0:
+        raise TreeError(f"{label} has invalid JPEG dimensions")
+    return dimensions
+
+
+def _validate_video_png_asset(path: Path, relative: str) -> None:
+    payload = path.read_bytes()
+    if len(payload) > MAX_SCREENSHOT_BYTES:
+        raise TreeError(f"video PNG exceeds 500 KiB: {relative} ({len(payload)} bytes)")
+    dimensions = _validate_png_payload(payload, relative)
+    if dimensions != VIDEO_PNG_ASSET_DIMENSIONS[relative]:
+        raise TreeError(f"{relative} has unexpected dimensions: {dimensions}")
+
+
+def _validate_video_jpeg_asset(path: Path, relative: str) -> None:
+    payload = path.read_bytes()
+    if len(payload) > MAX_SCREENSHOT_BYTES:
+        raise TreeError(f"video JPEG exceeds 500 KiB: {relative} ({len(payload)} bytes)")
+    dimensions = _validate_jpeg_payload(payload, relative)
+    if dimensions != VIDEO_JPEG_ASSET_DIMENSIONS[relative]:
+        raise TreeError(f"{relative} has unexpected dimensions: {dimensions}")
+
+
 def _validate_submission_icon(path: Path) -> None:
     payload = path.read_bytes()
     dimensions = _validate_png_payload(payload, SUBMISSION_ICON_PATH)
@@ -370,6 +470,10 @@ def validate_tree(root: Path, *, sdist: bool = False) -> list[str]:
             _validate_submission_screenshot(path)
         elif relative in EVIDENCE_SCREENSHOT_PATHS:
             _validate_evidence_screenshot(path, relative)
+        elif relative in VIDEO_PNG_ASSET_DIMENSIONS:
+            _validate_video_png_asset(path, relative)
+        elif relative in VIDEO_JPEG_ASSET_DIMENSIONS:
+            _validate_video_jpeg_asset(path, relative)
         elif relative == ICNS_PATH:
             _validate_icns(path)
         elif relative == ICO_PATH:

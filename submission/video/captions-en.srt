@@ -1,0 +1,84 @@
+1
+00:00:00,000 --> 00:00:05,000
+Procurement teams often review one tender feed
+for several supplier profiles.
+
+2
+00:00:05,000 --> 00:00:10,000
+TenderVerdict turns each notice into a clear human
+next step: open, verify, or skip.
+
+3
+00:00:10,000 --> 00:00:16,000
+The workflow begins with committed synthetic profiles
+and normalized notice metadata.
+
+4
+00:00:16,000 --> 00:00:23,000
+Files stay on this Mac. A preview exposes counts, sample records,
+and metadata gaps before the deterministic analysis runs.
+
+5
+00:00:23,000 --> 00:00:30,000
+One canonical engine evaluates the same notices
+and review date for every profile.
+
+6
+00:00:30,000 --> 00:00:38,000
+It returns three explainable verdicts: Open documents, Watch, or Reject.
+Reasons stay visible, and a human decides what to do next.
+
+7
+00:00:38,000 --> 00:00:44,000
+Free is a complete first-profile workflow,
+not a disabled demo.
+
+8
+00:00:44,000 --> 00:00:52,000
+It includes the full queue, verdict reasoning, supplied source links,
+a shareable review brief, and deterministic schema-three JSON export.
+
+9
+00:00:52,000 --> 00:00:59,000
+Portfolio Workspace applies the same feed
+to up to five independent supplier profiles.
+
+10
+00:00:59,000 --> 00:01:08,000
+RevenueCat unlocks the comparison matrix and full portfolio export,
+but never changes a verdict, creates a score, or makes an automatic bid recommendation.
+
+11
+00:01:08,000 --> 00:01:14,000
+In the verified Test Store baseline, the official Apple SDK
+loaded a development-only purchase sheet.
+
+12
+00:01:14,000 --> 00:01:18,500
+A successful test outcome activated the supplier profiles plus
+entitlement through CustomerInfo.
+
+13
+00:01:18,500 --> 00:01:23,000
+This was Test Store—not an App Store payment,
+and no real charge occurred.
+
+14
+00:01:23,000 --> 00:01:31,000
+For the current evaluation build, RevenueCat Judge Access
+grants the same entitlement without a purchase.
+
+15
+00:01:31,000 --> 00:01:39,000
+A current refresh unlocked the open screen; Restore access, foreground return,
+and full process relaunch all preserved access from current CustomerInfo.
+
+16
+00:01:39,000 --> 00:01:44,000
+The evidence uses synthetic data, stores no usable key,
+and makes no production-billing claim.
+
+17
+00:01:44,000 --> 00:01:49,000
+TenderVerdict is open-source Apache two point zero
+software for macOS.
