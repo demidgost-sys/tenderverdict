@@ -107,13 +107,15 @@ outcomes, and evidence a person can defend.
 ## What is next
 
 The app is an ad-hoc-signed competition evaluation build, not a notarized consumer release. The
-owner-recorded captioned demo is now hosted with link access, its URL is saved in this Devpost
-draft, and the pushed candidate passes exact-head CI. Before submission, the owner still needs to
-watch/listen once at normal speed and the private-form attestation conflict needs a truthful path.
+owner accepted the repaired captioned v2 after a normal-speed watch/listen, its link-accessible URL
+is saved in Devpost, and the pushed candidate passes exact-head CI. Every truthful Additional info
+value is saved, including store release = false, but final Submit is server-rejected by the
+contradictory required-field validation. A public follow-up and direct private manager escalation
+are pending.
 
 ## Links
 
 - Competition source: `https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026`
 - Demo video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
-- Pushed candidate revision: `8b35acb7b29a0380b873a8cd77236db9e5096b19`
+- Pushed candidate revision at the finalization attempt: `f7744d1322f90e49dc55b1938218dd4b74669a07`
 - Demo master SHA-256: `5862094c00c8dcb5e2e793d46d1ced44a003458dfcb1d957484135da13c6d047`

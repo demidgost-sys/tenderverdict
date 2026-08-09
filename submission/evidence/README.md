@@ -66,6 +66,6 @@ timing guarantee.
 
 No real payment, production purchase, or grant/dashboard mutation occurred in this receipt. A
 later final-integration pass pushed the public-safe evidence, completed exact-head CI, and created a
-link-accessible captioned YouTube demo saved in the Devpost draft. The owner listening pass, the
-truthful private-form resolution, and final Devpost submission remain separate gates. VoiceOver
-behavior is deliberately not claimed by this silent receipt.
+link-accessible captioned YouTube demo saved in Devpost. The owner accepted v2 after a normal-speed
+watch/listen. The truthful private-form resolution and final Devpost submission remain separate
+gates. VoiceOver behavior is deliberately not claimed by this silent receipt.

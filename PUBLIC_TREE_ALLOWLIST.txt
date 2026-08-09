@@ -87,6 +87,7 @@ src/tenderverdict/report.py
 src/tenderverdict/ted.py
 src/tenderverdict/vocabularies.py
 src/tenderverdict/workflow.py
+submission/DEVPOST_FINALIZATION_QA.md
 submission/README.md
 submission/devpost-draft.md
 submission/evidence/README.md

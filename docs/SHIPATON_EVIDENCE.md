@@ -1,6 +1,6 @@
 # Shipaton 2026 Next Gen evidence and implementation gate
 
-- Overall status: **GO — TEST STORE PATH ORGANIZER-CONFIRMED; VIDEO LINK SAVED; OWNER LISTEN, FORM, AND SUBMISSION GATES OPEN**
+- Overall status: **GO — TEST STORE PATH ORGANIZER-CONFIRMED; V2 OWNER-APPROVED; FORM AND SUBMISSION GATES OPEN**
 - RevenueCat-independent Portfolio Workspace: **IMPLEMENTED LOCALLY**
 - RevenueCat SDK purchase and entitlement source flow: **IMPLEMENTED AND TEST STORE-VERIFIED**
 - Repository evidence rechecked: **2026-08-09**
@@ -40,11 +40,11 @@ drill-down, competition assets, and local Test Store evidence. No usable key, cu
 or account screenshot is retained. Draft PR #12 is the authoritative pushed-revision check record;
 the exact audited revision, local-gate totals, and current local packages live in
 [project status](PROJECT_STATUS.md). A fresh final-product Debug transaction/settings pass,
-including current-revision RevenueCat Judge Access, is now recorded. The authenticated Devpost
-field inventory and saved-draft readback are complete, but a required store-release attestation has
-no truthful store-exempt Next Gen path. The 1:49 captioned YouTube demo is link-accessible, its
-English SRT is published, and its URL is saved in Devpost; the owner listening pass and final
-submission remain open.
+including current-revision RevenueCat Judge Access, is now recorded. Every truthful Additional
+info value is saved in Devpost, including store release = false, but final Submit is server-rejected
+by the contradictory required store-release validation. The 1:49 captioned YouTube v2 is
+link-accessible, its English SRT is published, its URL is saved in Devpost, and the owner accepted
+the normal-speed watch/listen. Final submission remains open.
 Post-change asynchronous VoiceOver outcomes and independent workflow sessions have not been
 performed, but they are optional future evidence rather than Next Gen submission gates.
 
@@ -61,8 +61,8 @@ performed, but they are optional future evidence rather than Next Gen submission
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_rule` + `repository_evidence` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements; the repository pins 5.83.0 and the local flow exercised those outcomes. | `CONFIRMED_TECHNICALLY` |
 | Test Store-only eligibility | `manual_evidence` | Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05: “Test Store is enough for the Next Gen category.” | `ORGANIZER_CONFIRMED` |
-| Required submission media | `official_rule` + `repository_evidence` | The icon, frameless screenshot, and current Judge Access capture are checked. The 1:49 H.264/AAC YouTube demo is link-accessible, captioned in-picture and by matching English SRT, and saved in Devpost; metadata, visual privacy, YouTube policy, and logged-out URL checks pass. The owner normal-speed watch/listen remains. | `LINK_READY_OWNER_LISTEN_OPEN` |
-| Private Devpost form | `private_account_evidence` + `manual_evidence` | The exact field inventory and saved-draft readback are complete. A required store-release checkbox offers no No/Next Gen path, so a truthful field-specific correction or written organizer instruction is required before Additional info can be saved. | `BLOCKED_FORM_RULE_CONFLICT` |
+| Required submission media | `official_rule` + `repository_evidence` | The icon, frameless screenshot, and current Judge Access capture are checked. The 1:49 H.264/AAC YouTube v2 is link-accessible, captioned in-picture and by matching English SRT, and saved in Devpost; metadata, visual privacy, YouTube policy, owner watch/listen, and logged-out URL checks pass. | `READY_OWNER_ACCEPTED` |
+| Private Devpost form | `private_account_evidence` + `manual_evidence` | Every truthful Additional info value is saved, including store release = false. Final Submit was attempted and the server returned `Please complete required fields in Additional info`; a field-specific correction or written organizer instruction is pending through public and direct private escalation. | `BLOCKED_FORM_RULE_CONFLICT` |
 
 ## Official sources checked
 
@@ -260,13 +260,11 @@ spoken purchase/cancel/failure/restore announcements must not be claimed as hand
 The platform/Test Store organizer gates are closed with positive answers. The separate required
 form-attestation issue remains open. The required remaining submission path is:
 
-1. obtain a form correction or written field-specific organizer instruction; do not falsely attest
-   to a store release;
-2. complete the owner's normal-speed watch/listen of the already hosted 1:49 captioned demo;
-3. preserve the completed exact-head CI and logged-out repository/video checks, then verify the
-   final entry and submitted view after the private form is truthfully resolved;
-4. review the applicable Terms before submitting, without claiming a real
-   payment or App Store transaction.
+1. obtain a form correction or written field-specific organizer instruction; keep store release
+   set to false and do not falsely attest to a store release;
+2. preserve the owner-approved v2, completed exact-head CI, and logged-out repository/video checks;
+3. re-read the saved private fields, retry final Submit under the recorded owner authorization,
+   and verify the final entry and submitted view while logged out.
 
 Optional evidence improvements, excluded from competition readiness, are:
 
@@ -283,7 +281,7 @@ backend, account system, telemetry, and a rewrite of the verdict engine remain o
 The initial target of no more than 25 active hours is not treated as proven: no reliable timer
 ledger was maintained while the Portfolio Workspace, native application, packaging, interactive
 Test Store setup, transaction evidence, and local submission assets were completed. The public
-video and final submission gates remain.
+video gate is complete; the final submission gate remains.
 Remaining work must be re-estimated from a verified timer state before claiming compliance with any
 owner-imposed active-hour cap.
 
@@ -315,19 +313,22 @@ Source: [public Devpost forum reply](https://revenuecat-shipaton-2026.devpost.co
   archive bundle**.
 - Genuine current Judge Access unlocked capture: **recorded locally without a key, reviewer code,
   or customer identifier**.
-- Silent video-production package: **complete locally; not a final recorded or public demo**.
-- Devpost private field inventory and saved-draft readback: **complete; required store-release
-  attestation remains blocked by the missing truthful Next Gen path**.
-- Public demo video, store submission, or Devpost project submission: **not performed in this audit**.
+- Public demo video: **owner-approved v2 is link-accessible with burned and selectable English
+  captions; superseded v1 is private and excluded from Devpost**.
+- Devpost private field inventory and saved-draft readback: **complete with store release = false;
+  final Submit was attempted and server-rejected by the contradictory required field**.
+- Devpost project submission: **not complete; the project remains Draft / 3 of 5 after the server
+  returned `Please complete required fields in Additional info`**.
 - Test Store organizer question: **answered publicly by Shipaton Manager Perttu Lähteenlahti on
   2026-08-05; Test Store is enough for Next Gen**.
-- Required-form follow-up: **posted publicly; field-specific correction or instruction pending**.
+- Required-form follow-up: **posted publicly and sent directly to a Shipaton manager; field-specific
+  correction or instruction pending**.
 - Account registration email and student profile: **confirmed by the owner; the entrant joined the
   Shipaton with the qualifying academic profile**.
 - Current UX release-configuration package: **the exact local path, revision, manifest, and complete
   verification result are recorded in project status; this is not a notarized public release**.
 - Public implementation branch and CI: **project status names the audited revision and local gate;
   draft PR #12 remains the authoritative pushed-revision CI record**.
-- Submission gate: **blocked on the required private-form attestation and open on the public
-  sub-two-minute video plus final logged-out URL checks**. Spoken VoiceOver evidence remains
-  optional and was not run in this silent pass.
+- Submission gate: **blocked only on the contradictory private-form validation and the resulting
+  unavailable submitted-view audit**. Spoken VoiceOver evidence remains optional and was not run
+  in this silent pass.

@@ -16,8 +16,9 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
 | `video/` | Ready local and hosted handoff | Exact 1:49 human-narrated master, silent animatic fallback, captions, manifests, privacy/claim audit, contact sheet, and QA receipts; raw MP4/WAV remain ignored |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
-| Link-accessible video | v2 ready; owner listen open | `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, 1:49, packaged macOS app, repaired owner narration, burned English captions plus matching YouTube SRT; logged-out oEmbed and policy checks pass; superseded v1 is private |
+| Link-accessible video | v2 ready and owner-approved | `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, 1:49, packaged macOS app, repaired owner narration, burned English captions plus matching YouTube SRT; owner watch/listen, logged-out oEmbed, and policy checks pass; superseded v1 is private |
 | `devpost-draft.md` | Ready with exact links | Product story, judging proof, competition branch, pushed candidate SHA, video URL, and video SHA-256 are recorded |
+| `DEVPOST_FINALIZATION_QA.md` | Current public-safe receipt | Truthful saved-field boundary, final Submit result, media readback, escalation, and exact next action without private values |
 
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
 continuity, review/comparison search and buyer/deadline filters, stable comparison-cell drill-down,
@@ -37,12 +38,13 @@ follow-up rather than a submission gate.
 
 The video handoff in [`video/`](video/) is locally complete. The final master uses only the owner's
 self-recorded voice, includes burned English captions, and has matching YouTube SRT captions.
-Metadata, visual privacy, YouTube policy, and logged-out link checks pass. The remaining video gate
-is the owner's one normal-speed watch/listen before final submission use.
+Metadata, visual privacy, YouTube policy, owner watch/listen, and logged-out link checks pass.
 
-The authenticated Devpost field inventory and saved-draft readback are complete. Current readiness
-and the required store-release attestation conflict are tracked only in
-[`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md); no private account value is copied here.
+Every truthful Devpost Additional info value is saved, including store release = false. Final
+Submit was attempted but the server rejected the project through the contradictory required
+store-release validation. Current readiness and the exact public-safe receipt are tracked in
+[`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md) and
+[`DEVPOST_FINALIZATION_QA.md`](DEVPOST_FINALIZATION_QA.md); no private account value is copied here.
 
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export
@@ -54,8 +56,8 @@ isolation, exact RevenueCat identifiers, and pure Portfolio announcement/recover
 - [Shipaton answer: macOS is eligible with no platform-only disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
 Preserve the full dated threads. These answers resolve only the Test Store and platform
-interpretations; they do not resolve the separate required store-release attestation, public-video,
-or final-submission gates.
+interpretations. The public-video gate is complete; the contradictory store-release validation and
+final submission remain unresolved.
 
 ## Regenerate and validate
 

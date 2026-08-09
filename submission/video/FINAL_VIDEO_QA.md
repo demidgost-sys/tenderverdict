@@ -1,6 +1,6 @@
 # Final local video QA receipt
 
-- Status: **v2 hosted with link access and saved in the Devpost draft; not finally submitted**
+- Status: **v2 owner-approved, hosted with link access, and saved in Devpost; final submission is form-blocked**
 - Hosted video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
 - Recommended upload filename: `tenderverdict-final-review-v2.mp4`
 - Local runtime: `109.000 s` / `00:01:49.000`
@@ -38,13 +38,16 @@
 - YouTube's upload check reports no violations; the matching English SRT is published alongside
   the burned captions.
 - An unauthenticated oEmbed readback returns the expected v2 title with HTTP 200.
+- Authenticated YouTube Studio readback reports the v2 source filename, `109` seconds, Unlisted
+  visibility, and published English subtitles.
 - The superseded v1 upload is private, excluded from Devpost, and returns HTTP 403 to the same
   unauthenticated oEmbed check. It remains retained only as a reversible audit artifact.
-- Authenticated Devpost Project details readback contains the v2 URL and still reports Draft / 3
-  of 5 steps done. No final Submit was performed.
+- Authenticated Devpost Project details readback contains the v2 URL. Final Submit was attempted,
+  but the server returned `Please complete required fields in Additional info`; the project still
+  reports Draft / 3 of 5 steps done.
 
-## Remaining owner gate
+## Final submission handoff
 
-- [ ] Watch and listen to v2 once at normal speed before final submission use.
-- [ ] If accepted, keep the hosted v2 and its matching `captions-en.srt`; do not restore v1 access.
+- [x] Watch and listen to v2 once at normal speed before final submission use.
+- [x] Keep the accepted hosted v2 and its matching `captions-en.srt`; do not restore v1 access.
 - [ ] Resolve the separate truthful Devpost form gate before final Submit.

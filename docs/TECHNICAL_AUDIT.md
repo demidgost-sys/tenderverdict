@@ -77,10 +77,10 @@ committed.
    unchanged; it must not be shortened.
 3. **Spoken accessibility evidence — optional:** run the VoiceOver sequence only when sound is
    acceptable.
-4. **Submission — blocked/open:** the private field inventory is complete, but its required
-   store-release attestation has no truthful Next Gen path. The 1:49 captioned YouTube demo and
-   exact-head repository/video link checks are complete; the owner listening pass and submitted
-   view remain.
+4. **Submission — blocked/open:** every truthful private field is saved, including store release =
+   false, but final Submit is server-rejected by the contradictory required validation. The
+   owner-approved 1:49 captioned YouTube v2 and exact-head repository/video link checks are
+   complete; the submitted view remains unavailable.
 
 ## Verdicts
 

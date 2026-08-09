@@ -49,7 +49,8 @@ path. No key is committed or bundled; this is not a real payment. A Shipaton Man
 confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
 eligible without a platform disadvantage. Entrant student/email eligibility is owner-confirmed and
 tracked in project status. A 1:49 captioned YouTube demo is now link-accessible and saved in the
-Devpost draft; the owner's normal-speed watch/listen and final submission remain open.
+Devpost draft; the owner accepted v2 after a normal-speed watch/listen. Final submission remains
+blocked by the contradictory required store-release validation.
 
 ## `v0.2.0-alpha.1` release contract
 

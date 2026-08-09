@@ -81,5 +81,5 @@ The MP4 is a local handoff artifact, not a public-tree asset. Do not add it to G
 - Do not show or store a RevenueCat key, reviewer code, account email, customer identifier,
   dashboard, terminal, notification, or private notice.
 - Use only the owner's recorded performance for narration. Do not generate or clone a voice.
-- The hosted v2 and Devpost draft URL are complete; the owner listening pass, truthful private-form
-  resolution, and final Submit remain separate gates.
+- The hosted v2, owner watch/listen, and Devpost URL are complete; the truthful private-form
+  resolution and final Submit remain separate gates.

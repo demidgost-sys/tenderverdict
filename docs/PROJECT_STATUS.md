@@ -7,14 +7,14 @@
 - Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
 - Current hands-on evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
 - Current candidate: **clean committed product revision, fresh Release and Debug packages,
-  complete local gate, final silent Test Store/Judge Access evidence, and a link-accessible
-  captioned 1:49 YouTube demo awaiting the owner's normal-speed watch/listen**
+  complete local gate, final silent Test Store/Judge Access evidence, and an owner-approved,
+  link-accessible captioned 1:49 YouTube demo**
 - Presentation state: **the competition branch contains the combined public-safe QA, judge-first
   README and Devpost story, refreshed gallery order, and exact metadata/visual-QA receipt for the
   human-narrated video without changing product behavior**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
-- Competition-branch state: **current polish is committed for the draft PR; not released and not
-  submitted to Devpost**
+- Competition-branch state: **current polish is committed for the draft PR; the final Devpost
+  Submit was attempted but server-rejected by the contradictory required store-release field**
 
 This is the canonical progress ledger for the competition branch. It records what was built, why
 it matters, what evidence exists, and what remains. Detailed technical contracts stay in the
@@ -36,7 +36,7 @@ Competition implementation and final-submission readiness are intentionally kept
 | Readiness lens | Completed | Meaning |
 |---|---:|---|
 | Local Shipaton implementation | **Complete for the declared competition scope** | The product, monetization path, clean package, Profile Builder, guided import, continuity, large-list review, comparison drill-down, and silent settings QA are complete; VoiceOver and independent workflow validation are optional follow-ups |
-| Final submission | **9 / 12 gates (75%)** | Public source, working app, RevenueCat evidence, organizer clarification, assets, draft text, pushed-revision CI, entrant verification, and a logged-out-checked video URL exist; the owner listen, required private-form resolution, and final submitted-view gates remain |
+| Final submission | **10 / 12 gates (83%)** | Public source, working app, RevenueCat evidence, organizer clarification, assets, draft text, pushed-revision CI, entrant verification, and an owner-approved logged-out-checked video URL exist; the private-form resolution and final submitted-view gates remain |
 | Public product release | **Not ready** | The app is an ad-hoc-signed competition prototype without notarization, a trusted installer, production billing, or demonstrated external workflow fit |
 
 Only the final-submission percentage counts explicit equal-weight gates. Optional VoiceOver and
@@ -166,14 +166,13 @@ release.
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
 | 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative record; each new competition-branch head is accepted only after its exact check suite completes |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
-| 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
-| 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `BLOCKED_FORM_RULE_CONFLICT` — the authenticated field inventory and saved draft readback are complete, but the required store-release checkbox has no No/Next Gen path; a field-specific organizer correction or written instruction is pending |
-| 11 | Public captioned macOS demo under two minutes is published | `V2_LINK_ACCESSIBLE / OWNER_LISTEN_OPEN` — `https://www.youtube.com/watch?v=HFBtMsN7Nlk` is the repaired 1:49 human-narrated master with burned and selectable English captions; metadata, visual privacy, YouTube policy, and logged-out URL checks pass; superseded v1 is private and excluded from Devpost; one owner watch/listen remains |
+| 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — the active-student profile, July 2028 graduation, and a qualifying academic-domain email were confirmed in authenticated account state without publishing the address |
+| 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `BLOCKED_FORM_RULE_CONFLICT` — every truthful Additional info value is saved, including store release = false; final Submit was attempted and the server returned `Please complete required fields in Additional info`; public follow-up and direct private manager escalation are pending |
+| 11 | Public captioned macOS demo under two minutes is published | `READY_OWNER_ACCEPTED` — `https://www.youtube.com/watch?v=HFBtMsN7Nlk` is the repaired 1:49 human-narrated v2 with burned and selectable English captions; metadata, visual privacy, YouTube policy, owner watch/listen, and logged-out URL checks pass; superseded v1 is private and excluded from Devpost |
 | 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `PARTIAL` — the pushed candidate, public repository, and video URL pass logged-out checks; the final submitted entry/view does not yet exist |
 
-**Result: 9 of 12 submission gates ready.** The remaining gates are the owner's normal-speed video
-review, a truthful resolution of the private-form conflict, and the final entry/submitted-view
-audit. A link-accessible upload does not replace the owner's listening pass.
+**Result: 10 of 12 submission gates ready.** The remaining gates are a truthful resolution of the
+private-form conflict and the final entry/submitted-view audit.
 
 ## Reconciliation with the previous plans
 
@@ -226,9 +225,8 @@ Verified:
 
 Not verified and therefore not claimable:
 
-- that the required store-release attestation has a truthful Next Gen answer or that the final
-  submitted view has been audited;
-- that the owner has completed the normal-speed watch/listen of the hosted video;
+- that Devpost has corrected the contradictory store-release validation, accepted the project, or
+  produced a final submitted view;
 - that actual post-change VoiceOver purchase/cancel/failure outcomes pass on a fresh final Debug
   package;
 - that the app is notarized, suitable for a public consumer release, or validated by external
@@ -240,13 +238,12 @@ Not verified and therefore not claimable:
 
 ## Required submission order
 
-1. Wait for a form correction or written field-specific organizer instruction; do not check the
-   store-release attestation or save the prefilled Additional info as if a store release existed.
-2. Record and finish the public demo from the exact final candidate, then publish only with owner
-   authorization.
-3. Push only with owner authorization, wait for exact-head CI, and verify the repository, commit,
-   video, and entry while logged out.
-4. Stop again before accepting Terms or submitting; both require explicit owner approval.
+1. Wait for a form correction or written field-specific organizer instruction; keep store release
+   set to false and do not attest to a release that does not exist.
+2. After a response, re-read the saved private fields and retry final Submit under the recorded
+   owner authorization.
+3. Verify the final entry, repository, v2 video, and submitted view while logged out.
+4. Preserve the product, Judge Access grant, no-real-payment boundary, and exact-head CI evidence.
 
 ## Optional future validation
 
