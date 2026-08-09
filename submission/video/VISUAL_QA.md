@@ -34,3 +34,11 @@ Reviewed on **2026-08-09** without audio playback. Artifact SHA-256:
 The still-based animatic is accepted for local handoff. The final public demo should replace the
 marked still shots with exact packaged-app footage and must undergo a new frame-by-frame privacy
 review after those replacements.
+
+## Human voice teleprompter
+
+- The offline teleprompter static fallback was rendered at 1600 px with macOS Quick Look.
+- The first cue, take number, timeline slot, target voice duration, filename, delivery note,
+  navigation controls, and silent progress bar fit without clipping.
+- Its embedded eight-cue data is machine-checked against the TSV and canonical narration.
+- The page declares and uses no network, microphone, audio, autoplay, or recording capability.

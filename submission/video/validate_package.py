@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import re
@@ -17,6 +18,9 @@ TIMELINE_PATH = PACKAGE_ROOT / "timeline.json"
 MANIFEST_PATH = PACKAGE_ROOT / "asset-manifest.json"
 NARRATION_PATH = PACKAGE_ROOT / "narration-en.txt"
 CAPTIONS_PATH = PACKAGE_ROOT / "captions-en.srt"
+HUMAN_CUES_PATH = PACKAGE_ROOT / "human-voice-cues.tsv"
+HUMAN_MARKED_SCRIPT_PATH = PACKAGE_ROOT / "HUMAN_VOICE_MARKED_SCRIPT_EN.md"
+HUMAN_TELEPROMPTER_PATH = PACKAGE_ROOT / "human-voice-teleprompter.html"
 VIDEO_PATH = PACKAGE_ROOT / "tenderverdict-silent-rough-cut-v1.mp4"
 CONTACT_SHEET_PATH = PACKAGE_ROOT / "silent-rough-cut-contact-sheet.png"
 REPORT_PATH = PACKAGE_ROOT / "OUTPUT_QA.md"
@@ -189,6 +193,101 @@ if narration != caption_text:
 word_count = len(re.findall(r"[A-Za-z0-9_]+(?:[-'][A-Za-z0-9_]+)*", narration))
 timeline_wpm = word_count / (EXPECTED_RUNTIME / 60)
 
+expected_human_fields = [
+    "take_id",
+    "in_s",
+    "out_s",
+    "slot_s",
+    "words",
+    "target_spoken_s",
+    "file_stem",
+    "delivery",
+    "script",
+]
+with HUMAN_CUES_PATH.open(encoding="utf-8", newline="") as handle:
+    cue_reader = csv.DictReader(handle, delimiter="\t", strict=True)
+    if cue_reader.fieldnames != expected_human_fields:
+        fail(f"human_cue_fields actual={cue_reader.fieldnames}")
+    human_cues = list(cue_reader)
+if len(human_cues) != 8:
+    fail(f"human_cue_count actual={len(human_cues)} expected=8")
+
+human_scripts: list[str] = []
+previous_human_out = 0.0
+max_target_wpm = 0.0
+for expected_index, human_cue in enumerate(human_cues, start=1):
+    expected_id = f"{expected_index:02d}"
+    if human_cue["take_id"] != expected_id:
+        fail(f"human_cue_id actual={human_cue['take_id']} expected={expected_id}")
+    cue_in = float(human_cue["in_s"])
+    cue_out = float(human_cue["out_s"])
+    cue_slot = float(human_cue["slot_s"])
+    target_spoken = float(human_cue["target_spoken_s"])
+    if abs(cue_in - previous_human_out) > 0.0001:
+        fail(f"human_cue_gap cue={expected_id} start={cue_in:.3f}")
+    if abs(cue_out - cue_in - cue_slot) > 0.0001:
+        fail(f"human_cue_slot cue={expected_id}")
+    if target_spoken <= 0 or target_spoken >= cue_slot:
+        fail(f"human_cue_target cue={expected_id} target={target_spoken:.3f}")
+    script = human_cue["script"]
+    actual_words = len(re.findall(r"[A-Za-z0-9_]+(?:[-'][A-Za-z0-9_]+)*", script))
+    if int(human_cue["words"]) != actual_words:
+        fail(
+            f"human_cue_words cue={expected_id} actual={actual_words} "
+            f"expected={human_cue['words']}"
+        )
+    if not re.fullmatch(rf"TV_VO_{expected_id}_[a-z0-9_]+", human_cue["file_stem"]):
+        fail(f"human_cue_filename cue={expected_id}")
+    target_wpm = actual_words / (target_spoken / 60)
+    max_target_wpm = max(max_target_wpm, target_wpm)
+    if target_wpm > 155:
+        fail(f"human_cue_pace cue={expected_id} wpm={target_wpm:.1f}")
+    human_scripts.append(script)
+    previous_human_out = cue_out
+if abs(previous_human_out - EXPECTED_RUNTIME) > 0.0001:
+    fail(f"human_cues_end actual={previous_human_out:.3f}")
+if normalize_text(" ".join(human_scripts)) != narration:
+    fail("human_cues_do_not_match_narration")
+
+marked_spoken_lines = [
+    line[2:].strip()
+    for line in HUMAN_MARKED_SCRIPT_PATH.read_text(encoding="utf-8").splitlines()
+    if line.startswith("> ")
+]
+if normalize_text(" ".join(marked_spoken_lines)) != narration:
+    fail("human_marked_script_does_not_match_narration")
+
+teleprompter_html = HUMAN_TELEPROMPTER_PATH.read_text(encoding="utf-8")
+teleprompter_match = re.search(
+    r'<script id="voice-cues" type="application/json">\s*(\[.*?\])\s*</script>',
+    teleprompter_html,
+    flags=re.DOTALL,
+)
+if not teleprompter_match:
+    fail("teleprompter_cue_data_missing")
+teleprompter_cues = json.loads(teleprompter_match.group(1))
+if len(teleprompter_cues) != len(human_cues):
+    fail(f"teleprompter_cue_count actual={len(teleprompter_cues)}")
+for human_cue, teleprompter_cue in zip(human_cues, teleprompter_cues, strict=True):
+    if teleprompter_cue.get("id") != human_cue["take_id"]:
+        fail(f"teleprompter_cue_id expected={human_cue['take_id']}")
+    if teleprompter_cue.get("script") != human_cue["script"]:
+        fail(f"teleprompter_script cue={human_cue['take_id']}")
+    if teleprompter_cue.get("filename") != f"{human_cue['file_stem']}_T01.wav":
+        fail(f"teleprompter_filename cue={human_cue['take_id']}")
+    actual_target = float(teleprompter_cue.get("targetSeconds", 0))
+    expected_target = float(human_cue["target_spoken_s"])
+    if abs(actual_target - expected_target) > 0.0001:
+        fail(f"teleprompter_target cue={human_cue['take_id']}")
+static_spoken_match = re.search(
+    r'<p id="spoken">(.*?)</p>',
+    teleprompter_html,
+    flags=re.DOTALL,
+)
+static_spoken = normalize_text(static_spoken_match.group(1)) if static_spoken_match else ""
+if static_spoken != human_cues[0]["script"]:
+    fail("teleprompter_static_fallback_mismatch")
+
 if not VIDEO_PATH.is_file():
     fail(f"missing_video path={VIDEO_PATH.name}")
 probe = ffprobe(VIDEO_PATH)
@@ -235,6 +334,10 @@ report_lines = [
     "- Audio streams: **0**",
     f"- Narration/captions: `{word_count} words`, `{len(cues)} cues`, exact text match",
     f"- Timeline delivery density: `{timeline_wpm:.1f} words/min`",
+    (
+        f"- Human voice plan: `{len(human_cues)} blocks`, exact SRT/marked-script/TSV/HTML match, "
+        f"maximum target pace `{max_target_wpm:.1f} words/min`"
+    ),
     f"- Source assets: `{len(asset_receipts)}` hash/dimension checks passed",
     f"- Video SHA-256: `{video_hash}`",
     f"- Contact sheet: `1920x432`, SHA-256 `{contact_hash}`",
@@ -275,5 +378,6 @@ LOCAL_REPORT_PATH.write_text("\n".join(local_report_lines), encoding="utf-8")
 print(
     "VIDEO_PACKAGE_OK "
     f"runtime={video_duration:.3f} words={word_count} wpm={timeline_wpm:.1f} "
-    f"audio_streams=0 assets={len(asset_receipts)} sha256={video_hash}"
+    f"audio_streams=0 assets={len(asset_receipts)} human_takes={len(human_cues)} "
+    f"max_human_wpm={max_target_wpm:.1f} sha256={video_hash}"
 )

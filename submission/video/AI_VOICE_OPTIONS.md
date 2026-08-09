@@ -3,6 +3,10 @@
 Rechecked: **2026-08-09**. No account was opened, no trial or subscription was activated, no API
 request was made, and no voice was generated or played.
 
+**Current status:** fallback research only. The owner selected their own recorded voice on
+2026-08-09, so the production plan does not require an AI provider, subscription, paid trial, voice
+clone, or synthetic-voice disclosure.
+
 ## Primary recommendation — ElevenLabs Starter
 
 - Current monthly price: **USD 6/month**, taxes excluded, with 30k credits and approximately
@@ -14,7 +18,7 @@ request was made, and no voice was generated or played.
   one-month allowance fit a one-off polished English product demo. Use a built-in licensed voice;
   do not clone a person.
 - Minimum safe purchase if authorized: one month of Starter, not Creator. Generate the approved
-  255-word script during the paid period, export a lossless WAV master, retain the invoice/license
+  approved script during the paid period, export a lossless WAV master, retain the invoice/license
   record, then cancel renewal if the owner wants a one-off plan.
 - Do **not** generate on Free and later upgrade: ElevenLabs says commercial rights attach to content
   generated during the paid subscription, not retrospectively to Free output.
@@ -42,9 +46,8 @@ Official pages rechecked: OpenAI GPT-4o mini TTS model reference; OpenAI text-to
 OpenAI Services Agreement (all accessed 2026-08-09). External hyperlinks are intentionally omitted
 from this public-tree artifact; the local handoff cites the official pages directly.
 
-## Decision rule
+## Fallback decision rule
 
-Choose **ElevenLabs Starter** when the priority is a voice-production UI and the owner approves the
-USD 6 subscription. Choose **OpenAI API** when the owner already has funded API access or wants
-usage-based billing. Neither route is authorized by this document; the separate permission must
-name the provider and authorize generation of exactly `narration-en.txt`.
+Do not use either provider for the current cut. Reopen this section only if the owner explicitly
+abandons the human recording route. A future change would require a new provider-specific
+authorization; this research does not authorize generation or spending.

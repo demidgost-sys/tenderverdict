@@ -102,6 +102,9 @@ submission/video/AUDIT.md
 submission/video/BEAT_SHEET.md
 submission/video/CALLOUTS.md
 submission/video/DIRECTOR_HANDOFF_RU.md
+submission/video/HUMAN_VOICE_MARKED_SCRIPT_EN.md
+submission/video/HUMAN_VOICE_RECORDING_GUIDE_RU.md
+submission/video/HUMAN_VOICE_TAKE_LOG.md
 submission/video/NARRATION_EN.md
 submission/video/OUTPUT_QA.md
 submission/video/PRIVACY_CROP_CHECKLIST.md
@@ -114,11 +117,14 @@ submission/video/assets/entitlement-restored-on-relaunch-baseline-2026-08-04.jpg
 submission/video/assets/test-store-purchase-sheet-baseline-2026-08-04.jpg
 submission/video/build_silent_rough_cut.sh
 submission/video/captions-en.srt
+submission/video/human-voice-cues.tsv
+submission/video/human-voice-teleprompter.html
 submission/video/narration-en.txt
 submission/video/render_cards.swift
 submission/video/sanitize_png.py
 submission/video/silent-rough-cut-contact-sheet.png
 submission/video/timeline.json
+submission/video/validate_human_voice.py
 submission/video/validate_package.py
 tests/test_cli.py
 tests/test_desktop.py

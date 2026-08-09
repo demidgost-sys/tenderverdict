@@ -17,6 +17,11 @@ without changing the narration, captions, claims, or runtime.
 | Approved on-screen wording | [Callouts](CALLOUTS.md) |
 | Canonical English words | [Narration text](narration-en.txt) |
 | Narration timing and delivery | [Narration guide](NARRATION_EN.md) |
+| Owner recording instructions | [Human voice guide](HUMAN_VOICE_RECORDING_GUIDE_RU.md) |
+| Readable eight-block script | [Human voice marked script](HUMAN_VOICE_MARKED_SCRIPT_EN.md) |
+| Offline silent teleprompter | [Human voice teleprompter](human-voice-teleprompter.html) |
+| Machine-readable recording cues | [Human voice cues](human-voice-cues.tsv) |
+| Session notes and select log | [Human voice take log](HUMAN_VOICE_TAKE_LOG.md) |
 | Russian editor handoff | [Director handoff](DIRECTOR_HANDOFF_RU.md) |
 | English captions | [SRT captions](captions-en.srt) |
 | Claim-to-source and file provenance | [Asset manifest](ASSET_MANIFEST.md) |
@@ -24,7 +29,7 @@ without changing the narration, captions, claims, or runtime.
 | Full-resolution picture review | [Visual QA](VISUAL_QA.md) |
 | Existing-material audit | [Audit](AUDIT.md) |
 | Silent assembly contract | [Rough-cut plan](SILENT_ROUGH_CUT_PLAN.md) |
-| Voice recommendation and license notes | [AI voice options](AI_VOICE_OPTIONS.md) |
+| Superseded AI fallback research | [AI voice options](AI_VOICE_OPTIONS.md) |
 
 ## Review outputs
 
@@ -35,6 +40,8 @@ without changing the narration, captions, claims, or runtime.
   path, SHA-256, size, runtime, audio-stream count, and ffprobe JSON.
 - `silent-rough-cut-contact-sheet.png` — ten-frame visual QA sheet.
 - `OUTPUT_QA.md` — committed public-safe runtime, ffprobe stream, caption, asset, and hash receipt.
+- `human-voice-takes/` — ignored local destination for owner-recorded raw WAV files.
+- `tenderverdict-vo-human-v1.wav` — ignored future 109-second dry human voice master.
 
 ## Rebuild and validate
 
@@ -45,8 +52,9 @@ submission/video/build_silent_rough_cut.sh
 python3 submission/video/validate_package.py
 ```
 
-The validator fails if the MP4 contains an audio stream, reaches 1:50, disagrees with the SRT, or
-uses an asset whose committed SHA-256 or dimensions differ from `asset-manifest.json`.
+The validator fails if the MP4 contains an audio stream, reaches 1:50, disagrees with the SRT,
+human cue sheet, or teleprompter, or uses an asset whose committed SHA-256 or dimensions differ
+from `asset-manifest.json`.
 
 The MP4 is a local handoff artifact, not a public-tree asset. Do not add it to Git or to
 `PUBLIC_TREE_ALLOWLIST.txt`.
@@ -60,6 +68,5 @@ The MP4 is a local handoff artifact, not a public-tree asset. Do not add it to G
   billing, notarization, public release, or spoken VoiceOver verification.
 - Do not show or store a RevenueCat key, reviewer code, account email, customer identifier,
   dashboard, terminal, notification, or private notice.
-- Do not generate, play, record, or add speech until the owner explicitly chooses and authorizes a
-  voice route.
+- Use only the owner's recorded performance for narration. Do not generate or clone a voice.
 - Publication, upload, Devpost editing, and RevenueCat/account actions remain separate owner gates.

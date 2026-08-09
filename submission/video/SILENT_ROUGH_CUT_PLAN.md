@@ -17,7 +17,7 @@
 | V1 | Deterministic evidence cards | Replace marked shots with packaged-app footage |
 | V2 | Callouts rendered into each card | Keep exact wording and qualifier labels |
 | C1 | `captions-en.srt` sidecar | Import as captions; do not auto-rewrite |
-| A1 | **Absent** | Add approved AI narration only after separate authorization |
+| A1 | **Absent** | Add the owner's dry human voice stem after recording and QA |
 | A2 | **Absent** | No music or SFX planned |
 
 ## Reproducibility
@@ -29,7 +29,8 @@ PNG by size and SHA-256. `validate_package.py` checks:
 1. asset hashes and dimensions;
 2. timeline total and official runtime limits;
 3. continuous SRT timing and text identity with `narration-en.txt`;
-4. MP4 resolution, frame rate, duration, and absence of audio;
-5. contact-sheet dimensions and output hashes.
+4. eight-block human cue continuity, recording pace, and teleprompter text identity;
+5. MP4 resolution, frame rate, duration, and absence of audio;
+6. contact-sheet dimensions and output hashes.
 
 The animatic does not reuse the prior narrated MP4 or its AIFF file.
