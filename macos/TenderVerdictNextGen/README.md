@@ -122,14 +122,20 @@ Outputs appear under `dist/next-gen/`. The `.app` contains:
   `normalize-workspace`, and `inspect-notices` app operations;
 - synthetic fixtures, Apache-2.0 license, notice, third-party notices, icon, and build provenance.
 
-The builder ad-hoc signs the bundle, verifies the signature, launches the app executable from `/`
-with no worktree, runs configuration-specific native checks, confirms the embedded-core smoke test,
-and writes a zip plus SHA-256 checksum.
-Full Xcode is not required for this source/package workflow; Apple Developer ID signing,
-notarization, and App Store distribution are not provided.
+By default the builder ad-hoc signs the bundle, verifies the signature, launches the app executable
+from `/` with no worktree, runs configuration-specific native checks, confirms the embedded-core
+smoke test, and writes a zip plus SHA-256 checksum. This remains the secret-free CI preview.
 
-Use `--output-dir`, `--build-root`, and `--swift-scratch-path` to route generated artifacts and
-caches. Existing output is preserved unless `--replace` is explicit.
+For direct distribution from a trusted Mac, pass `--signing-identity` and
+`--notary-keychain-profile`. That Release-only path requires an existing Developer ID Application
+identity and validated local `notarytool` profile. It enables the hardened runtime and secure
+timestamp, requires an accepted notarization result, staples and validates the ticket, and runs a
+Gatekeeper assessment before exposing output. Signing credentials remain outside the repository and
+application. This does not add App Store distribution.
+
+Use `--output-dir`, `--build-root`, `--swift-scratch-path`, and optionally
+`--notary-keychain` to route generated artifacts, caches, and a non-default Keychain. Existing
+output is preserved unless `--replace` is explicit.
 
 ## Submission asset generation
 

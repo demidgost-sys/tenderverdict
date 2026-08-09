@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a self-contained, ad-hoc-signed TenderVerdict Next Gen macOS app."""
+"""Build a self-contained TenderVerdict Next Gen macOS app."""
 
 from __future__ import annotations
 
@@ -77,7 +77,14 @@ def _write_info_plist(path: Path, bundle_version: str, project_version: str) -> 
         plistlib.dump(payload, handle, sort_keys=True)
 
 
-def _write_build_info(path: Path, version: str, configuration: str) -> None:
+def _write_build_info(
+    path: Path,
+    version: str,
+    configuration: str,
+    *,
+    signature: str,
+    notarized: bool,
+) -> None:
     revision = _capture(["git", "rev-parse", "HEAD"])
     status = _capture(["git", "status", "--porcelain"])
     lines = [
@@ -92,11 +99,135 @@ def _write_build_info(path: Path, version: str, configuration: str) -> None:
         "qualification_runtime=embedded-offline-python",
         "workspace_normalization=embedded-offline-python",
         "notice_import_preview=embedded-offline-python",
-        "signature=adhoc",
-        "notarized=false",
+        f"signature={signature}",
+        f"notarized={str(notarized).lower()}",
         "api_key_included=false",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="ascii")
+
+
+def _validate_trust_options(args: argparse.Namespace) -> tuple[str, bool]:
+    identity = (args.signing_identity or "").strip()
+    profile = (args.notary_keychain_profile or "").strip()
+    if identity == "-":
+        raise BuildError("--signing-identity must name a Developer ID Application identity")
+    if profile and not identity:
+        raise BuildError("--notary-keychain-profile requires --signing-identity")
+    if profile and args.configuration != "release":
+        raise BuildError("notarization is restricted to the Release configuration")
+    if args.notary_keychain is not None and not profile:
+        raise BuildError("--notary-keychain requires --notary-keychain-profile")
+    if args.notary_keychain is not None and not args.notary_keychain.is_file():
+        raise BuildError("the requested notary keychain does not exist")
+    return ("developer-id" if identity else "adhoc", bool(profile))
+
+
+def _signature_details(app: Path) -> str:
+    result = subprocess.run(
+        ["codesign", "-dv", "--verbose=4", str(app)],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise BuildError("codesign could not inspect the application signature")
+    return result.stdout + result.stderr
+
+
+def _sign_and_verify(app: Path, identity: str | None) -> None:
+    if identity:
+        _run(
+            [
+                "codesign",
+                "--force",
+                "--deep",
+                "--options",
+                "runtime",
+                "--timestamp",
+                "--sign",
+                identity,
+                str(app),
+            ]
+        )
+    else:
+        _run(["codesign", "--force", "--deep", "--sign", "-", str(app)])
+    _run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(app)])
+
+    details = _signature_details(app)
+    if identity:
+        if "Authority=Developer ID Application" not in details:
+            raise BuildError("the application is not signed by Developer ID Application")
+        if "TeamIdentifier=not set" in details or "Signature=adhoc" in details:
+            raise BuildError("the Developer ID signature has no trusted team identity")
+    elif "Signature=adhoc" not in details or "TeamIdentifier=not set" not in details:
+        raise BuildError("the preview application does not have the expected ad-hoc signature")
+
+
+def _archive_app(app: Path, archive: Path) -> None:
+    if archive.exists():
+        raise BuildError(f"refusing to replace unexpected archive: {archive}")
+    _run(
+        [
+            "ditto",
+            "-c",
+            "-k",
+            "--norsrc",
+            "--keepParent",
+            str(app),
+            str(archive),
+        ]
+    )
+
+
+def _notarize(
+    app: Path,
+    *,
+    profile: str,
+    keychain: Path | None,
+    build_root: Path,
+) -> None:
+    submission = build_root / f"notary-submission-{uuid.uuid4().hex}.zip"
+    try:
+        _archive_app(app, submission)
+        command = [
+            "xcrun",
+            "notarytool",
+            "submit",
+            str(submission),
+            "--keychain-profile",
+            profile,
+            "--wait",
+            "--timeout",
+            "20m",
+            "--output-format",
+            "json",
+            "--no-progress",
+        ]
+        if keychain is not None:
+            command.extend(["--keychain", str(keychain.resolve())])
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=21 * 60,
+        )
+        if result.returncode != 0:
+            raise BuildError("Apple notarization submission failed")
+        try:
+            response = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            raise BuildError("Apple notarization returned invalid JSON") from exc
+        if response.get("status") != "Accepted":
+            raise BuildError("Apple notarization did not accept the application")
+
+        _run(["xcrun", "stapler", "staple", str(app)])
+        _run(["xcrun", "stapler", "validate", str(app)])
+        _run(["spctl", "--assess", "--type", "execute", str(app)])
+    finally:
+        submission.unlink(missing_ok=True)
 
 
 def _verify_embedded_core(executable: Path) -> None:
@@ -157,6 +288,9 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
     if sys.platform != "darwin":
         raise BuildError("the Next Gen application bundle can only be built on macOS")
 
+    signature_state, notarized = _validate_trust_options(args)
+    signing_identity = (args.signing_identity or "").strip() or None
+    notary_profile = (args.notary_keychain_profile or "").strip() or None
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     project_version = metadata["project"]["version"]
     bundle_version = project_version.split("a", 1)[0]
@@ -257,30 +391,32 @@ def _build(args: argparse.Namespace) -> tuple[Path, Path, Path]:
         _copy_swift_resources(swift_bin_path, resources)
         _write_info_plist(contents / "Info.plist", bundle_version, project_version)
         (contents / "PkgInfo").write_bytes(b"APPL????")
-        _write_build_info(resources / "BUILD_INFO.txt", project_version, args.configuration)
+        _write_build_info(
+            resources / "BUILD_INFO.txt",
+            project_version,
+            args.configuration,
+            signature=signature_state,
+            notarized=notarized,
+        )
 
-        _run(["codesign", "--force", "--deep", "--sign", "-", str(app)])
-        _run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(app)])
+        _sign_and_verify(app, signing_identity)
         smoke_environment = {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "LANG": os.environ.get("LANG", "en_US.UTF-8"),
         }
         _run([str(macos / APP_NAME), "--smoke-test"], cwd=Path("/"), env=smoke_environment)
+        if notary_profile is not None:
+            _notarize(
+                app,
+                profile=notary_profile,
+                keychain=args.notary_keychain,
+                build_root=build_root,
+            )
 
         for path in existing:
             _safe_remove(path, output_dir)
         shutil.move(str(app), final_app)
-        _run(
-            [
-                "ditto",
-                "-c",
-                "-k",
-                "--norsrc",
-                "--keepParent",
-                str(final_app),
-                str(final_zip),
-            ]
-        )
+        _archive_app(final_app, final_zip)
         digest = hashlib.sha256(final_zip.read_bytes()).hexdigest()
         final_checksum.write_text(f"{digest} *{final_zip.name}\n", encoding="ascii")
         return final_app, final_zip, final_checksum
@@ -316,6 +452,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="optional SwiftPM scratch directory",
     )
     parser.add_argument(
+        "--signing-identity",
+        help="Developer ID Application identity name or SHA-1 hash; default is ad-hoc signing",
+    )
+    parser.add_argument(
+        "--notary-keychain-profile",
+        help="notarytool Keychain profile; requires Developer ID signing and Release configuration",
+    )
+    parser.add_argument(
+        "--notary-keychain",
+        type=Path,
+        help="optional explicit Keychain containing the notarytool profile",
+    )
+    parser.add_argument(
         "--replace",
         action="store_true",
         help="replace only the exact three generated outputs",
@@ -326,7 +475,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     try:
         app, archive, checksum = _build(build_parser().parse_args())
-    except (BuildError, OSError, subprocess.CalledProcessError) as exc:
+    except (BuildError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
         print(f"NEXT_GEN_BUILD_FAIL: {exc}", file=sys.stderr)
         return 1
     print(f"NEXT_GEN_BUILD_OK app={app} archive={archive} checksum={checksum}")

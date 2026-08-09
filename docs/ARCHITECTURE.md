@@ -28,7 +28,7 @@ flowchart LR
 | `tools/next_gen_core_launcher.py` | Private app bridge for `portfolio`, strict workspace normalization, and bounded notice preview | None |
 | `macos/TenderVerdictNextGen` | Profile Builder, import preview, local continuity, Free/Premium review, and RevenueCat states | RevenueCat only in an explicitly configured Debug evaluation; Release refuses Test Store configuration before the SDK |
 | `TenderVerdictCore` | PyInstaller-frozen copy of the private launcher embedded in the `.app` | None; public CLI, TED, and Tk modules are excluded |
-| `tools/build_next_gen.py` | Configuration-specific Swift build, embedded-core build, bundle assembly, ad-hoc signing, native checks, smoke test, zip, checksum | May resolve the exactly pinned Swift package; the produced app and smoke test are offline |
+| `tools/build_next_gen.py` | Configuration-specific Swift build, embedded-core build, bundle assembly, default ad-hoc signing or explicit Developer ID signing/notarization, native checks, smoke test, zip, checksum | May resolve the exactly pinned Swift package and, only when explicitly requested with local Keychain credentials, contact Apple's notary service; app smoke remains offline |
 
 ## Qualification flow
 
@@ -190,7 +190,9 @@ able to reorder or conceal evidence. Raw report bytes and deterministic exports 
   TenderVerdict. RevenueCat's SDK may cache the derived App User ID as its normal customer identity;
   neither the raw reviewer code nor the Test Store API key is written to app defaults, reports, or
   the bundle.
-- The app bundle is ad-hoc signed and not notarized. It remains an evaluation artifact.
+- The default app bundle is ad-hoc signed and not notarized. An explicit Release-only builder mode
+  can instead require Developer ID signing, accepted notarization, stapling, and Gatekeeper
+  assessment while keeping credentials outside the repository and application.
 
 ## Verification layers
 
@@ -200,7 +202,7 @@ able to reorder or conceal evidence. Raw report bytes and deterministic exports 
 | Public tree | Exact allow-list, bounded binary validation, conservative content scan |
 | Swift contract | Standalone Debug and Release result, schema, provenance, display-safety, review-point, input-preview, reason grouping, disagreement-count, stable-ID, access/accessibility-outcome, ordering, and deterministic-byte checks |
 | Source bridge | Headless synthetic smoke through the private launcher; no RevenueCat configuration |
-| Packaged bridge | Builder-enforced `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect determinism; ad-hoc signature and manifest verification |
+| Packaged bridge | Builder-enforced `.app` smoke from `/` with no worktree or system Python dependency; embedded normalize/inspect determinism; default ad-hoc verification or fail-closed Developer ID/notarization verification |
 | UX | Source implementation includes Profile Builder, import preview, filters, detail, focus, contrast, and transparency handling; refreshed screenshot/settings QA remains separate |
 | RevenueCat transaction | Packaged Debug Test Store cancel, failure, purchase, refresh, relaunch, restore, and dashboard evidence; not a real payment |
 

@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import re
+import runpy
 import subprocess
 import sys
 import tomllib
@@ -150,6 +151,10 @@ class ProjectMetadataTests(unittest.TestCase):
         self.assertIn('"inspect-notices"', next_gen_builder)
         self.assertIn("_verify_embedded_core", next_gen_builder)
         self.assertIn('"codesign", "--verify"', next_gen_builder)
+        self.assertIn('"--options",\n                "runtime"', next_gen_builder)
+        self.assertIn('"notarytool",\n            "submit"', next_gen_builder)
+        self.assertIn('["xcrun", "stapler", "staple", str(app)]', next_gen_builder)
+        self.assertIn('["spctl", "--assess", "--type", "execute", str(app)]', next_gen_builder)
         self.assertIn("api_key_included=false", next_gen_builder)
         self.assertIn('choices=("debug", "release")', next_gen_builder)
         self.assertIn('f"build_configuration={configuration}"', next_gen_builder)
@@ -167,6 +172,49 @@ class ProjectMetadataTests(unittest.TestCase):
             "swift run -c release --package-path macos/TenderVerdictNextGen",
             workflow,
         )
+
+    def test_next_gen_notarization_options_fail_closed(self) -> None:
+        tool = runpy.run_path(str(ROOT / "tools" / "build_next_gen.py"))
+        parser = tool["build_parser"]()
+        validate = tool["_validate_trust_options"]
+        build_error = tool["BuildError"]
+
+        self.assertEqual(validate(parser.parse_args([])), ("adhoc", False))
+        self.assertEqual(
+            validate(parser.parse_args(["--signing-identity", "0123456789ABCDEF"])),
+            ("developer-id", False),
+        )
+        self.assertEqual(
+            validate(
+                parser.parse_args(
+                    [
+                        "--signing-identity",
+                        "0123456789ABCDEF",
+                        "--notary-keychain-profile",
+                        "tenderverdict-notary",
+                    ]
+                )
+            ),
+            ("developer-id", True),
+        )
+
+        with self.assertRaisesRegex(build_error, "requires --signing-identity"):
+            validate(parser.parse_args(["--notary-keychain-profile", "missing-identity"]))
+        with self.assertRaisesRegex(build_error, "restricted to the Release"):
+            validate(
+                parser.parse_args(
+                    [
+                        "--configuration",
+                        "debug",
+                        "--signing-identity",
+                        "0123456789ABCDEF",
+                        "--notary-keychain-profile",
+                        "debug-is-forbidden",
+                    ]
+                )
+            )
+        with self.assertRaisesRegex(build_error, "requires --notary-keychain-profile"):
+            validate(parser.parse_args(["--notary-keychain", "/tmp/notary.keychain-db"]))
 
     def test_next_gen_review_queue_copy_and_reset_are_unambiguous(self) -> None:
         app_source = (

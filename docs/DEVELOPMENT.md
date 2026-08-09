@@ -136,9 +136,27 @@ The target requires macOS 13 or newer. The local builder emits the current host 
 than a universal binary; the audited Apple Silicon artifact is `arm64`. The default output uses the
 Swift `release` configuration, embeds no key, disables Test Store configuration before the SDK can
 reject it, is ad-hoc signed, and is not notarized. The word `release` here names a compiler
-configuration, not a public product release. The builder must verify configuration-specific native
-checks, the embedded bridge, signature, worktree-independent smoke test, ZIP, checksum, and build
-manifest before the artifact can be called a competition evaluation candidate.
+configuration, not a public product release.
+
+On a trusted Mac that already holds a Developer ID Application identity and a validated local
+`notarytool` Keychain profile, the same builder can produce the Gatekeeper-verifiable variant:
+
+```bash
+.venv-desktop-build/bin/python tools/build_next_gen.py \
+  --signing-identity "$DEVELOPER_ID_IDENTITY" \
+  --notary-keychain-profile "$NOTARY_PROFILE"
+```
+
+Notarization is fail-closed and Release-only. The builder applies the hardened runtime and secure
+timestamp, verifies the Developer ID authority, waits at most 20 minutes for an accepted Apple
+notary result, staples and validates the ticket, runs a Gatekeeper assessment, and only then exposes
+the final app, ZIP, and checksum. Credentials remain in Keychain and are never copied into source,
+the application, build metadata, or CI. The secret-free pull-request workflow intentionally keeps
+building the ad-hoc evaluation preview.
+
+Every builder mode must verify configuration-specific native checks, the embedded bridge,
+signature, worktree-independent smoke test, ZIP, checksum, and build manifest before the artifact
+can be called an evaluation candidate.
 
 `build/` and `dist/` are ignored regenerable directories and may contain older candidates. Never
 select an artifact by filename alone: inspect `Contents/Resources/BUILD_INFO.txt`, require the exact
