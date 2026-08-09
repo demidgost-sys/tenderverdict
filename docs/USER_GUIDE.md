@@ -61,9 +61,10 @@ queue. Choose the surface that matches the job:
    package immediately, so a new test purchase can start without relaunching. For evaluator access
    without a purchase, enter an assigned code under **Hackathon Judge Access**. The app derives a
    RevenueCat customer identity and still requires an active granted `supplier_profiles_plus`
-   entitlement; the code is cleared from the field, creates no purchase, and stops working after
-   December 31, 2026. If an already configured key/project is wrong, quit and reopen the Debug app
-   to replace it because the RevenueCat SDK can be configured only once per process.
+   entitlement; the code is cleared from the field and creates no purchase. The unlocked card shows
+   the effective RevenueCat expiration date in the local calendar, bounded by the December 31, 2026
+   campaign cutoff. If an already configured key/project is wrong, quit and reopen the Debug app to
+   replace it because the RevenueCat SDK can be configured only once per process.
 
 The Shipaton Manager confirmed both that a Test Store purchase is sufficient for judging and that
 a macOS entry has no judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and

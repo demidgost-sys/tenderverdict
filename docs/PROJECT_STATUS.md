@@ -1,13 +1,14 @@
 # TenderVerdict project status and Shipaton readiness
 
-- Snapshot date: **2026-08-06**
+- Snapshot date: **2026-08-09**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Audit baseline: `79186da7e83e40284cca9f34d658f6e2a0e1b335` (**superseded**)
 - Pushed remediation baseline: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
-- Current polished product revision: `34f100207e37e6b399c1ada2c65b4130c925b0df`
-- Current hands-on evidence revision: `3cf20ed0d1607b7feb943109f72c1c528df55e5b`
-- Current candidate: **clean committed product revision, fresh SSD package, complete local gate,
-  fresh Debug Test Store/settings evidence, and draft-PR validation on the current branch head**
+- Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
+- Current hands-on evidence revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
+- Current candidate: **clean committed product revision, fresh Release and Debug packages,
+  complete local gate, live Judge Access refresh/restore/foreground/relaunch evidence, and
+  draft-PR validation on the current branch head**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Competition-branch state: **current polish is committed for the draft PR; not released and not
   submitted to Devpost**
@@ -16,7 +17,8 @@ This is the canonical progress ledger for the competition branch. It records wha
 it matters, what evidence exists, and what remains. Detailed technical contracts stay in the
 [architecture](ARCHITECTURE.md), competition facts stay in the
 [evidence record](SHIPATON_EVIDENCE.md), and future ordering stays in the
-[roadmap](../ROADMAP.md).
+[roadmap](../ROADMAP.md). The current source, package, RevenueCat, security, and silent
+accessibility findings are consolidated in the [technical audit](TECHNICAL_AUDIT.md).
 
 ## Executive summary
 
@@ -73,48 +75,50 @@ keeping the published open-source CLI honest and useful.
 | Free experience | Complete first-profile review queue with text, buyer, deadline-presence, and verdict filters; grouped verdict drivers/checks; complete filter reset; empty state; safe supplied-source links; a self-contained first-profile review brief; and one complete schema-3 export | Native query/export/brief checks, packaged headless render, source smoke, and existing accessibility inspection |
 | Premium experience | Entitlement-backed access to all one to five profile reports, a searchable comparison matrix, stable notice/profile reasoning drill-down, an all-profile review brief, and a locked-state disagreement preview that discloses no gated reasoning | Stable-identity projection/disagreement/brief checks, packaged headless render, and Test Store unlock evidence |
 | Product hierarchy | The first screen promises a clear next step for every supplier profile, shows shared notices/profile count/changed outcomes before file controls, and explains the complete Free profile versus the five-profile Portfolio value before technical Test Store status | Current packaged light/dark renders plus previous `682c040` hands-on scroll-state inspection |
-| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, access sources, the 2026 cutoff, fail-closed builds, and accessibility outcomes; the latest complete packaged transaction evidence remains the dated `3cf20ed` baseline, so current-revision manual evidence is still required |
+| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, access sources, the 2026 cutoff, truthful expiration copy, fail-closed builds, and accessibility outcomes; clean `cbe8b20` manual evidence covers live granted-entitlement refresh, restore, foreground, and relaunch |
 | Secret boundary | No key committed or bundled; only process-local Debug `test_` configuration is accepted; Release exposes no key field and refuses configuration before any SDK call | Source review, scans, and Debug/Release native checks |
 | Local continuity | File continuity is explicit opt-in and stores only two security-scoped bookmarks; Forget clears them, report data and review points are not persisted, and reopening never auto-runs analysis | Source review and native checks |
-| Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Keyboard order, Increase Contrast, Reduce Transparency, and a temporary large-text render passed on `3cf20ed`; the new Judge Access field is source- and contract-checked but still needs current packaged VoiceOver evidence |
-| Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release-configuration artifact from exact clean revision `34f1002` on the SSD; details below |
+| Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
+| Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release and Debug artifacts from exact clean revision `cbe8b20`; details below |
 | Presentation | Exact icon, refreshed light/dark-reviewed portrait screenshot, current static report screenshot, genuine unlocked and VoiceOver evidence, human-facing Devpost copy, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
-| Quality | 125 Python tests including 6 private-launcher and 3 release-scanner tests; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The scoped current-source native check passes; the complete local gate, fresh packaged evidence, and pushed exact-revision CI must be repeated before this change becomes the competition candidate |
+| Quality | 125 Python tests including 6 private-launcher and 3 release-scanner tests; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The exact product revision has fresh local source/package evidence; draft PR #12 is the pushed-head CI record |
 
 ## Current clean evaluation artifact
 
 | Fact | Evidence |
 |---|---|
-| Product revision | `34f100207e37e6b399c1ada2c65b4130c925b0df` |
-| Artifact directory | `/Volumes/DemidMathSSD/MachineCaches/TenderVerdictShipaton/next-gen-artifacts-34f1002/` |
-| App / archive | `TenderVerdictNextGen.app` (53 MiB) / `TenderVerdictNextGen-macos.zip` (19 MiB) |
-| Archive SHA-256 | `6622cb65008067e9da6a0879820185e21c318a839d4fab2675d6c365c7b1c525` |
+| Product revision | `cbe8b2071996edc2621a16cc9d10ce1ada63766e` |
+| Artifact directory | `dist/next-gen-release-cbe8b20/` (ignored local output; SSD was not mounted) |
+| App / archive | `TenderVerdictNextGen.app` (53 MiB) / `TenderVerdictNextGen-macos.zip` (18 MiB) |
+| Archive SHA-256 | `77b25f7a0468603d49a3d65458540e34c9490097b5795c92c4c02034616dfa2f` |
 | Manifest | `version=0.2.0a1`, `source_dirty=false`, `build_configuration=release`, `test_store_enabled=false`, RevenueCat `5.83.0`, `api_key_included=false`, `notarized=false` |
 | Platform / trust | macOS 13+, arm64 host build, ad-hoc signature, no Team ID, not a universal or notarized app |
-| Builder evidence | 19 Release-native checks, embedded workspace/notice contracts twice with byte-identical output, signature verification, worktree-independent smoke, packaged Free/Premium HTML-brief renders, byte-matched light/dark headline renders, checksum verification, and ZIP integrity passed; filter interactions remain evidenced by the unchanged `69eed54` package |
+| Builder evidence | 20 Release-native checks, embedded workspace/notice contracts, signature verification, worktree-independent smoke, checksum creation, and ZIP integrity passed |
 
 This package is the current self-contained no-key evaluation artifact. It is not Test Store
-transaction evidence; that requires a separate Debug package and process-local key. The ignored
-repository `dist/` directory may still contain older output and must not be selected by filename.
+transaction evidence; that requires the separate Debug package and process-local key. The final
+pass kept the small outputs in ignored `dist/` because the SSD was not mounted; older ignored
+outputs must still be selected by the exact revision directory rather than filename alone.
 
-## Current clean Debug transaction artifact
+## Current clean Debug entitlement artifact
 
 | Fact | Evidence |
 |---|---|
-| Evidence revision | `3cf20ed0d1607b7feb943109f72c1c528df55e5b` |
-| Artifact directory | `/Volumes/DemidMathSSD/MachineCaches/TenderVerdictShipaton/next-gen-debug-3cf20ed/` |
-| App / archive | `TenderVerdictNextGen.app` (about 63 MiB) / `TenderVerdictNextGen-macos.zip` (about 21 MiB) |
-| Archive SHA-256 | `8439a1e2a28510c350ddf72ca5b2653f4680daebf1c0b71886b77fc84675ef30` |
+| Evidence revision | `cbe8b2071996edc2621a16cc9d10ce1ada63766e` |
+| Artifact directory | `dist/next-gen-debug-cbe8b20/` (ignored local output; SSD was not mounted) |
+| App / archive | `TenderVerdictNextGen.app` (63 MiB) / `TenderVerdictNextGen-macos.zip` (22 MiB) |
+| Archive SHA-256 | `e1bedc2eba22ddd0ae7495062f4ddacb7a60a16839d4a48658b5481d926ca84b` |
 | Manifest | `version=0.2.0a1`, `source_dirty=false`, `build_configuration=debug`, `test_store_enabled=true`, RevenueCat `5.83.0`, `api_key_included=false`, `notarized=false` |
-| Builder evidence | 19 Debug-native checks, embedded smoke, ad-hoc signature verification, checksum verification, and ZIP integrity passed before the manual run |
-| Manual Test Store outcome | Offering at localized `0,99 $`, cancellation, simulated failure, retry, valid purchase, immediate restore, and relaunch refresh all passed; no real payment was made |
-| Manual settings outcome | Full keyboard traversal, Increase Contrast, Reduce Transparency, and a temporary `.accessibility3` screenshot-renderer override passed without clipping; the override was immediately reverted |
+| Builder evidence | 20 Debug-native checks, embedded smoke, ad-hoc signature verification, checksum creation, and ZIP integrity passed before the manual run |
+| Current manual outcome | A fresh `CustomerInfo` refresh unlocked the existing RevenueCat grant without relaunch; Restore, foreground re-entry, and full relaunch all preserved access; no purchase was made |
+| Prior purchase evidence | Offering, cancellation, simulated failure, retry, valid Test Store purchase, and immediate restore remain evidenced by the clean `3cf20ed` baseline |
+| Silent accessibility outcome | Native roles and names were inspected on the final unlocked UI; the Tab sample reached both search fields, but VoiceOver speech was not launched |
 
-The process-local key was re-entered after relaunch, never stored by TenderVerdict, cleared from the
-clipboard after the pass, and is absent from the bundle and repository. Test Store subscriptions
-expire on an accelerated schedule: a later restore after expiry correctly returned the locked
-state, while an immediate restore preserved access. VoiceOver was never launched in this pass and
-system output remained muted.
+The process-local key was supplied only to the launched process and is absent from both bundles and
+the repository. The parent `2261049` pass confirmed that accelerated Test Store expiry returns
+locked while immediately reloading the localized expected package without relaunch. The exact
+`cbe8b20` pass then confirmed the real granted entitlement and truthful local expiration copy.
+VoiceOver was never launched and system output remained silent.
 
 ## Local implementation and optional-validation ledger
 
@@ -138,7 +142,7 @@ system output remained muted.
 | 16 | Free review queue, verdict filters, disclosure, human next steps, and empty state are implemented | `DONE` |
 | 17 | Premium comparison, safe source links, shareable HTML presentation, and offering recovery are implemented | `DONE` |
 | 18 | Submission assets and the public documentation package, including the original brief's literal entry-point filenames, are generated and validated | `DONE` |
-| 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — current product revision `34f1002` has the complete local/package evidence above; draft PR #12 records the branch checks |
+| 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — current product revision `cbe8b20` has the complete local/package evidence above; draft PR #12 records the branch checks |
 | 20 | VoiceOver asynchronous outcomes plus Increase Contrast, Reduce Transparency, and large-text variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard, Increase Contrast, Reduce Transparency, and temporary large-text rendering passed on the fresh Debug revision; hands-on VoiceOver speech/focus remains unverified and is not a submission gate |
 | 21 | Independent workflow sessions and evidence-backed product changes | `OPTIONAL_FUTURE_VALIDATION` — two maintainer-observed filter micro-fixes are complete; no external workflow session or user-value result is claimed or required for the current submission |
 | 22 | Native profile builder/editor for one to five complete profiles | `DONE` |
@@ -158,7 +162,7 @@ release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative current-branch CI record; product revision `34f1002` and hands-on evidence revision `3cf20ed` remain unchanged by later documentation-only commits |
+| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative current-branch CI record; product and hands-on evidence revision is `cbe8b20` |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
 | 10 | Exact private Devpost project fields are inspected after joining and signing in | `OPEN` — hackathon registration is complete, but project creation still stops before the private fields at visual reCAPTCHA; no project was created or submitted |
@@ -177,9 +181,9 @@ current product-development pass, but it remains necessary before final submissi
 | Native SwiftUI shell and canonical JSON adapter | `COMPLETE` |
 | Free/Premium RevenueCat projection | `COMPLETE` |
 | Self-contained packaging and submission assets | `COMPLETE` |
-| Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — fresh on packaged Debug revision `3cf20ed`; dashboard readback remains the dated baseline |
+| Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — purchase outcomes remain on clean `3cf20ed`; expiry recovery is on `2261049`; granted-entitlement refresh, Restore, foreground, and relaunch are fresh on `cbe8b20` |
 | Judge-facing review queue, comparison matrix, shareable brief, safe links, and visual QA | `COMPLETE` |
-| Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — product revision `34f1002` is clean, packaged, pushed, and covered by the current green draft-PR head |
+| Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — product revision `cbe8b20` is clean, packaged, pushed, and covered by the current draft-PR head |
 | Advanced macOS accessibility variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard order, increased contrast, reduced transparency, and temporary large-text rendering passed; hands-on VoiceOver announcements/focus remain untested and are not a submission gate |
 | Native Profile Builder | `COMPLETE` — creates, renames, reorders, validates, and saves one to five full profiles |
 | Import wizard | `COMPLETE_BOUNDED` — normalized preview, canonical fields, and missing-field guidance exist; arbitrary user-defined column mapping is intentionally excluded |
@@ -192,16 +196,16 @@ current product-development pass, but it remains necessary before final submissi
 
 Verified:
 
-- current evidence revision `3cf20ed` passes 125 Python tests, 19 native checks in both Debug
+- current product revision `cbe8b20` passes 125 Python tests, 20 native checks in both Debug
   and Release, Ruff, Mypy, Swift format, public-tree, security, source-smoke, asset, distribution,
   and diff gates locally; the linked draft PR is the authoritative live CI record;
-- its clean SSD package records `source_dirty=false`, disables Test Store in Release, passes the
+- its clean Release package records `source_dirty=false`, disables Test Store in Release, passes the
   embedded-core/signature/checksum/ZIP/worktree-independent smoke gates, and is arm64/ad-hoc signed;
-- that current package rendered both Free and Premium HTML briefs outside the worktree, produced
-  one versus three ordered profile sections, rendered current light/dark native screenshots, and
-  passed the one-result and no-match filter interactions in its accessibility tree;
-- the clean `3cf20ed` Debug package passed offering, cancel, simulated failure, retry, valid
-  purchase, immediate restore, and relaunch refresh in the real entitlement-backed UI;
+- the unchanged Free/Premium brief, light/dark rendering, and filter interactions retain their
+  earlier package evidence and remain covered by the current native/source contracts;
+- the clean `cbe8b20` Debug package passed granted-entitlement refresh without relaunch, Restore,
+  foreground re-entry, full relaunch, and genuine unlocked capture; the earlier clean `3cf20ed`
+  package remains the purchase/cancel/failure/retry baseline;
 - keyboard navigation, Increase Contrast, Reduce Transparency, and a temporary large-text render
   were checked hands-on without retaining a source modification;
 - Shipaton Manager Perttu Lähteenlahti confirmed on 2026-08-05 that Test Store is enough for the

@@ -327,7 +327,10 @@ its configuration-specific, integrity, and smoke checks; exact provenance is tra
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
 A fresh clean Debug artifact from evidence revision `3cf20ed` completed the local RevenueCat Test
 Store offering, cancel, simulated failure, retry, purchase, immediate restore, and relaunch refresh
-pass; that is test evidence, not a real payment. The current icon and portrait screenshot were
+pass; that is test evidence, not a real payment. Exact current revision `cbe8b20` additionally
+passed RevenueCat Judge Access refresh without relaunch, Restore, foreground re-entry, and full
+relaunch, and records a genuine unlocked screenshot without a code or key. The current icon and
+portrait screenshot were
 regenerated and structure-checked; the portrait was also visually reviewed in light and dark
 appearance. Keyboard order, large-text rendering, Increase Contrast, and Reduce Transparency were
 checked silently. Hands-on asynchronous VoiceOver speech/focus is an optional accessibility

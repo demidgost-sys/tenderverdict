@@ -13,6 +13,7 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `screenshot-1179x2556.png` | Ready current candidate | Exactly 1179×2556, regenerated from the current native UX, sanitized, and visually reviewed in light and dark appearance; repeat after later visual changes |
 | `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
 | `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
+| `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
 | Public video | Pending | Public YouTube/Vimeo, at or below 1:50 target and under the official two-minute limit, packaged macOS app |
 | `devpost-draft.md` | Ready with explicit placeholders | Product story and judging proof are drafted; do not publish or remove placeholders before final evidence exists |
@@ -20,16 +21,17 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
 continuity, review/comparison search and buyer/deadline filters, stable comparison-cell drill-down,
 and terminal RevenueCat accessibility announcements/focus recovery. The current portrait capture
-shows that complete locked pre-transaction surface. The dated unlocked and VoiceOver evidence
-captures still predate the newest UX and remain baseline evidence only.
+shows that complete locked pre-transaction surface. The dated Test Store and VoiceOver captures
+remain baseline evidence; the Judge Access capture is current product-revision evidence.
 
 The clean release-configuration package named in project status passed
 configuration-specific native checks, embedded-core determinism and contracts, signature,
 checksum, ZIP integrity, and worktree-independent smoke. Its `.app`, zip, exact SHA-256, and
 manifest live in [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md). The portrait/icon asset gate
-also passes. A clean `3cf20ed` Debug artifact now covers the current Test Store runtime plus
-keyboard, contrast, transparency, and bounded large-text evidence. Hands-on VoiceOver
-announcements remain an optional accessibility follow-up rather than a submission gate.
+also passes. Clean `3cf20ed` remains the purchase/cancel/failure baseline, while clean `cbe8b20`
+covers the current granted-entitlement refresh, Restore, foreground, relaunch, and silent
+accessibility-tree evidence. Hands-on VoiceOver announcements remain an optional accessibility
+follow-up rather than a submission gate.
 
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export

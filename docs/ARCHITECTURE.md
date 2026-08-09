@@ -123,7 +123,9 @@ and consistency checks.
   derives a dedicated RevenueCat App User ID, and calls the SDK `logIn` path. The code itself never
   toggles Premium: an active `supplier_profiles_plus` entitlement remains mandatory. A promotional
   grant on a known judge identity is additionally bounded in-app to December 31, 2026, even if the
-  dashboard grant were accidentally configured for longer.
+  dashboard grant were accidentally configured for longer. The unlocked UI formats the effective
+  `CustomerInfo` expiration in the user's calendar and describes it as an expiration boundary, not
+  an inclusive paid-subscription promise.
 - Missing Debug configuration makes no RevenueCat request. Non-`test_` keys are rejected before
   SDK configuration. A key pasted into the Debug app is held only for that process and is not
   persisted by TenderVerdict. Release builds expose no key field and refuse Test Store

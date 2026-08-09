@@ -3,7 +3,8 @@
 This runbook turns the repository into a competition submission without upgrading unverified facts
 into claims. The controlling evidence record is [SHIPATON_EVIDENCE.md](SHIPATON_EVIDENCE.md), and
 current implementation and submission counts are tracked in
-[PROJECT_STATUS.md](PROJECT_STATUS.md).
+[PROJECT_STATUS.md](PROJECT_STATUS.md). The current code, package, RevenueCat, security, and silent
+accessibility review is recorded in [TECHNICAL_AUDIT.md](TECHNICAL_AUDIT.md).
 
 ## Official submission gates
 
@@ -92,12 +93,12 @@ It builds the release Swift executable, freezes a portfolio-only Python core, co
 licenses, embeds Swift package resources, ad-hoc signs the app, runs the app smoke test from `/`
 without a worktree, archives it, and writes a checksum. The bundle is not notarized.
 
-The fresh 2026-08-05 Release build from the current source passed embedded workspace normalization
-and notice inspection twice with byte-identical output, contract decoding, ad-hoc signature
-verification, and a worktree-independent app smoke test. The `.app`, zip, and SHA-256 companion
-were created on regenerable SSD build/output paths. A separate clean Debug artifact from
-`3cf20ed0d1607b7feb943109f72c1c528df55e5b` was then built on the SSD for transaction evidence;
-Release intentionally continues to reject Test Store transactions.
+The fresh Release and Debug builds from exact clean product revision
+`cbe8b2071996edc2621a16cc9d10ce1ada63766e` passed 20 configuration-specific native checks,
+embedded smoke, ad-hoc signature verification, checksum creation, and worktree-independent app
+smoke. Release intentionally rejects Test Store configuration. The SSD was not mounted during this
+pass, so the small ignored outputs remain under `dist/next-gen-release-cbe8b20/` and
+`dist/next-gen-debug-cbe8b20/`; they were not copied, moved, or committed.
 
 After any native source or asset change, regenerate all three outputs rather than presenting the
 older bundle as the current candidate. If build scratch must live on a separate volume, use the
@@ -174,6 +175,13 @@ override that was reverted immediately. It did not re-open the dashboard and did
 Manual VoiceOver verification of asynchronous success, cancellation, and failure remains
 unverified and is an optional accessibility follow-up, not a submission gate.
 
+The exact clean `cbe8b20` Debug package then verified the no-purchase Judge Access path. A
+forced-current refresh changed the already-open locked screen to the Premium comparison without
+relaunch; Restore, background/foreground re-entry, and full process relaunch preserved access. The
+UI reports the RevenueCat expiration date as **December 31, 2026** and explicitly states that no
+purchase was made. The exact-revision unlocked screenshot is stored at
+`submission/evidence/unlocked-judge-access-2026-08-09.png`.
+
 ## Hackathon Judge Access
 
 Judge Access is a separate no-purchase evaluation route backed by RevenueCat Granted Entitlements,
@@ -184,8 +192,12 @@ For each assigned reviewer slot:
 
 1. Launch the fresh Debug evaluation app with the process-local Test Store key and activate its
    assigned Judge Access code once, creating the dedicated RevenueCat App User ID.
-2. Find that customer in RevenueCat and grant `supplier_profiles_plus` until
-   **2026-12-31 23:59:59 UTC**. Granted Entitlements create no purchase and do not affect billing.
+2. Find that customer in RevenueCat and grant `supplier_profiles_plus` for the required review
+   window. RevenueCat's date-only **Until date** is an expiration boundary, not an inclusive
+   end-of-day promise. If access must remain available through all of December 31, select January
+   1, 2027 in the dashboard; the app still rejects known Judge Access identities after its local
+   **2026-12-31 23:59:59 UTC** cutoff. Granted Entitlements create no purchase and do not affect
+   billing.
 3. Activate the same code again and verify the app identifies the RevenueCat promotional grant,
    states that no purchase was made, and exposes the Premium workspace.
 4. Refresh, background/foreground, and relaunch with key re-entry; verify access remains governed by
@@ -206,6 +218,8 @@ The repository contains:
   1179×2556, regenerated, sanitized, and visually reviewed in light and dark appearance;
 - `submission/evidence/unlocked-test-store-2026-08-04.png` — genuine 1020×754 supplemental unlocked
   baseline, not a replacement for the required portrait screenshot or fresh-build evidence;
+- `submission/evidence/unlocked-judge-access-2026-08-09.png` — genuine 1020×754 current-revision
+  Judge Access capture after refresh, Restore, foreground, and relaunch, with no code or key;
 - `submission/evidence/voiceover-restore-2026-08-04.png` — baseline assistive-technology evidence;
 - [a timed demo script](DEMO_SCRIPT.md);
 - [a Devpost draft](../submission/devpost-draft.md).
@@ -240,8 +254,11 @@ Never use a fake entitlement state as evidence.
   [project status](PROJECT_STATUS.md), including Python, Debug/Release native, formatting, typing,
   public-tree, security, asset, and diff checks.
 - [ ] The exact final submitted revision passes its pushed PR CI checks.
-- [x] Test Store success, cancel, failure, retry, relaunch, and immediate restore are refreshed on
-  the final product Debug package.
+- [ ] Repeat purchase success, cancel, simulated failure, and retry on the exact final Debug
+  package. The unchanged clean `3cf20ed` baseline covers those outcomes; `cbe8b20` currently covers
+  granted-entitlement refresh, Restore, foreground, and relaunch.
+- [x] Current Judge Access grant unlocks without relaunch and survives Restore, foreground, and
+  full relaunch on the exact `cbe8b20` Debug package.
 - [x] Current large-text, Increase Contrast, and Reduce Transparency views are manually checked;
   light/dark and the regenerated portrait screenshot also pass visual review.
 - [ ] Public YouTube or Vimeo demo is under two minutes and shows the packaged app on macOS.

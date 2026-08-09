@@ -198,10 +198,17 @@ simulated failure, retry, purchase, entitlement activation, immediate restore, a
 It is not a real payment. The earlier baseline remains the latest VoiceOver Restore and RevenueCat
 dashboard readback evidence.
 
+Exact current product revision `cbe8b20` adds the clean Judge Access evidence: a fresh
+`CustomerInfo` read unlocked the RevenueCat grant without relaunch, and Restore, foreground
+re-entry, and full process relaunch preserved it. The UI derives the visible expiration from the
+active entitlement, bounds it to the local campaign cutoff, and states that no purchase was made.
+
 Keyboard order, Increase Contrast, Reduce Transparency, and a temporary `.accessibility3`
-screenshot-renderer pass were checked on that package without retaining a source change. Terminal
-VoiceOver announcements/focus across purchase outcomes remain an optional accessibility follow-up;
-they are not a Next Gen submission gate. The private Devpost form and final public submission are
-still required. See
+screenshot-renderer pass remain evidenced by the clean `3cf20ed` package. A silent accessibility
+tree and keyboard sample on `cbe8b20` confirmed useful native names for the visible controls and
+comparison cells, but it is not presented as a spoken VoiceOver pass. Terminal VoiceOver
+announcements/focus across purchase outcomes remain an optional accessibility follow-up; they are
+not a Next Gen submission gate. The private Devpost form and final public submission are still
+required. See
 [the evidence record](../../docs/SHIPATON_EVIDENCE.md) and
 [hackathon runbook](../../docs/HACKATHON_RUNBOOK.md).
