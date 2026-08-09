@@ -7,9 +7,9 @@ that file.
 ## Timing
 
 - Timeline: **109.000 seconds / 1:49**.
-- Script: **200 words** by the package validator.
-- Overall timeline density: **110.1 words per minute**.
-- The marked human takes target roughly **115–145 spoken words per minute**, leaving about 17.3
+- Script: **201 words** by the package validator.
+- Overall timeline density: **110.6 words per minute**.
+- The marked human takes target roughly **115–152 spoken words per minute**, leaving about 17.3
   seconds across the timeline for sentence pauses and visual breathing room.
 - Record the whole script naturally in one continuous session. The editor cuts it into the eight
   blocks below; never time-stretch the voice.
@@ -23,7 +23,7 @@ that file.
 | 00:52–01:08 | 5 | 13.0 s | RevenueCat access must stay separate from verdict logic |
 | 01:08–01:23 | 6 | 13.2 s | Clearly separate Test Store from a real payment |
 | 01:23–01:39 | 7 | 13.5 s | Stress checks; measured refresh / Restore / relaunch list |
-| 01:39–01:49 | 8 | 9.5 s | Restrained close, not a release announcement |
+| 01:39–01:49 | 8 | 9.5 s | Value-led close; stress every supplier profile |
 
 ## Pronunciation and voice direction
 
@@ -35,7 +35,6 @@ that file.
 - “TenderVerdict”: **TEN-der VER-dict**.
 - “RevenueCat”: normal English brand pronunciation; do not over-enunciate it.
 - “CustomerInfo”: **customer info**.
-- “macOS”: **Mac O-S**.
 - No impersonation, cloned voice, whisper, trailer voice, exaggerated emotion, music, or synthetic
   sound effects.
 - Because this route uses the owner's real recorded performance, no AI-voice disclosure is needed.

@@ -102,11 +102,11 @@
       "id": "10-boundary",
       "duration": 10.0,
       "source": "../icon-1024.png",
-      "eyebrow": "HONEST BOUNDARY",
-      "title": "Evaluation build, not production billing.",
-      "body": "Synthetic data. No stored usable key. Open-source Apache 2.0 software for macOS.",
-      "chips": ["NO UPLOAD", "NO PUBLIC RELEASE CLAIM"],
-      "evidence": "TenderVerdict Next Gen · local Shipaton evaluation package"
+      "eyebrow": "TENDERVERDICT",
+      "title": "One tender feed. A clear next step for every supplier profile.",
+      "body": "Local, explainable, and human-owned.",
+      "chips": ["SYNTHETIC DATA", "TEST STORE", "NO REAL CHARGE"],
+      "evidence": "Shipaton evaluation · no stored usable key · no production billing"
     }
   ]
 }

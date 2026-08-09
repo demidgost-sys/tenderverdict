@@ -14,7 +14,7 @@ animatic uses hard cuts so its duration remains deterministic.
 | 7 | 01:14–01:23 | 9 s | `submission/evidence/unlocked-test-store-2026-08-04.png` | Entitlement active and all three fixture profiles visible | Keep as clearly dated baseline unless an exact-final purchase take exists |
 | 8 | 01:23–01:31 | 8 s | Current `unlocked-judge-access-2026-08-09.png` | RevenueCat Judge Access, expiration, “No purchase was made”, Restore | Current genuine evidence; do not crop out the no-purchase sentence |
 | 9 | 01:31–01:39 | 8 s | Dated relaunch baseline | Unlocked state after relaunch baseline | If replacing, capture quit/relaunch only after hiding all keys/codes and do not use VoiceOver |
-| 10 | 01:39–01:49 | 10 s | `submission/icon-1024.png` | Evaluation-build boundary, Apache 2.0, local/synthetic, no production billing | Keep deterministic end card; add final public repo URL only after logged-out verification |
+| 10 | 01:39–01:49 | 10 s | `submission/icon-1024.png` | One-feed value statement, local/human-owned positioning, Test Store and no-real-charge boundary | Keep deterministic end card; add final public repo URL only after logged-out verification |
 
 ## Capture settings for replacement footage
 

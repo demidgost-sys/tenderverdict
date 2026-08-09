@@ -9,9 +9,9 @@
 - Current candidate: **clean committed product revision, fresh Release and Debug packages,
   complete local gate, a final silent Test Store/Judge Access receipt, and draft-PR validation on
   the pushed competition-branch head**
-- Local integration state: **the public-safe RevenueCat receipt and silent video-production handoff
-  are combined on an isolated unpushed branch; the recorded/public video and exact pushed-head CI
-  remain final gates**
+- Presentation state: **the competition branch contains the combined public-safe QA and silent
+  video handoff; a focused local pass now aligns the README front door, Devpost story, gallery
+  order, and value-led video close without changing product behavior**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Competition-branch state: **current polish is committed for the draft PR; not released and not
   submitted to Devpost**
@@ -83,7 +83,7 @@ keeping the published open-source CLI honest and useful.
 | Local continuity | File continuity is explicit opt-in and stores only two security-scoped bookmarks; Forget clears them, report data and review points are not persisted, and reopening never auto-runs analysis | Source review and native checks |
 | Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
 | Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release and Debug artifacts from exact clean revision `cbe8b20`; details below |
-| Presentation | Exact icon, refreshed light/dark-reviewed portrait screenshot, current static report screenshot, genuine unlocked and VoiceOver evidence, human-facing Devpost copy, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
+| Presentation | Judge-first README entry, exact icon, refreshed light/dark-reviewed portrait screenshot, current unlocked comparison evidence, concise human-facing Devpost copy, value-led silent-video close, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `README.md`, `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
 | Quality | 125 Python tests including 6 private-launcher and 3 release-scanner tests; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The exact product revision has fresh local source/package evidence; draft PR #12 is the pushed-head CI record |
 
 ## Current clean evaluation artifact

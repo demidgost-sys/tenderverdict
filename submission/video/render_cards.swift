@@ -202,12 +202,12 @@ for shot in timeline.shots {
   var chipX: CGFloat = 80
   var chipY: CGFloat = 304
   for chip in shot.chips {
-    let chipWidth = min(590, max(150, CGFloat(chip.count) * 13.0 + 42))
+    let chipWidth = min(590, max(150, CGFloat(chip.count) * 14.0 + 44))
     if chipX + chipWidth > 700 {
       chipX = 80
       chipY -= 54
     }
-    let chipRect = NSRect(x: chipX, y: chipY, width: chipWidth, height: 40)
+    let chipRect = NSRect(x: chipX, y: chipY, width: chipWidth, height: 42)
     NSColor.white.withAlphaComponent(0.085).setFill()
     NSBezierPath(roundedRect: chipRect, xRadius: 20, yRadius: 20).fill()
     drawText(
@@ -216,10 +216,10 @@ for shot in timeline.shots {
         x: chipRect.minX + 16,
         y: chipRect.minY + 8,
         width: chipRect.width - 32,
-        height: 24
+        height: 26
       ),
-      font: .monospacedSystemFont(ofSize: 16, weight: .semibold),
-      color: NSColor.white.withAlphaComponent(0.80),
+      font: .monospacedSystemFont(ofSize: 18, weight: .semibold),
+      color: NSColor.white.withAlphaComponent(0.88),
       alignment: .center
     )
     chipX += chipWidth + 12
@@ -251,8 +251,8 @@ for shot in timeline.shots {
   drawText(
     shot.evidence,
     in: NSRect(x: 80, y: 58, width: 1760, height: 32),
-    font: .systemFont(ofSize: 18, weight: .medium),
-    color: NSColor.white.withAlphaComponent(0.48)
+    font: .systemFont(ofSize: 20, weight: .medium),
+    color: NSColor.white.withAlphaComponent(0.66)
   )
 
   NSGraphicsContext.restoreGraphicsState()

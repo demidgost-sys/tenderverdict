@@ -12,7 +12,7 @@ one second under the working 1:50 ceiling.
 | 00:52–01:08 | Portfolio value | Current comparison matrix across the same shared notices | Up to five independent profiles; no combined score, ranking, or changed verdict |
 | 01:08–01:23 | RevenueCat Test Store | Dated development-only purchase sheet, then dated entitlement-unlocked baseline | Official SDK/Test Store baseline; no App Store payment and no real charge |
 | 01:23–01:39 | Judge Access, Restore, relaunch | Current no-purchase Judge Access capture plus dated relaunch baseline | Current `cbe8b20` refresh/Restore/foreground/relaunch evidence; grant is not a purchase |
-| 01:39–01:49 | Honest close | Product icon and explicit evaluation-build boundary | Synthetic data, no stored usable key, no production-billing or public-release claim |
+| 01:39–01:49 | Value close | Product icon and the one-feed promise | Local and human-owned; synthetic Test Store evaluation with no real charge |
 
 ## Claim-to-evidence map
 

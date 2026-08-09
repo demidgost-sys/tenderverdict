@@ -21,9 +21,10 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
 continuity, review/comparison search and buyer/deadline filters, stable comparison-cell drill-down,
-and terminal RevenueCat accessibility announcements/focus recovery. The current portrait capture
-shows that complete locked pre-transaction surface. The dated Test Store and VoiceOver captures
-remain baseline evidence; the Judge Access capture is current product-revision evidence.
+and terminal RevenueCat accessibility announcements/focus recovery. The portrait capture shows the
+complete Free and locked Portfolio surface; the current Judge Access capture leads the
+cross-profile story with a genuine unlocked comparison. The dated Test Store and VoiceOver
+captures remain baseline evidence.
 
 The clean release-configuration package named in project status passed
 configuration-specific native checks, embedded-core determinism and contracts, signature,
@@ -46,7 +47,7 @@ and the required store-release attestation conflict are tracked only in
 
 The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
 is recorded only in project status. The suite includes display safety, schema-3 Free export
-isolation, exact RevenueCat identifiers, and pure Premium announcement/recovery/focus outcomes.
+isolation, exact RevenueCat identifiers, and pure Portfolio announcement/recovery/focus outcomes.
 
 ## Organizer proof
 
@@ -74,7 +75,9 @@ The sanitizer removes ancillary PNG metadata chunks without changing `IHDR`, `ID
 image data. The public-tree gate verifies exact dimensions and PNG structure; it cannot replace a
 human visual check of clipping, hierarchy, focus, contrast, or truthful entitlement state.
 
-For the final entry, use the exact current portrait screenshot and, if the form permits multiple
-images, supplement it with a genuine unlocked Test Store capture from the final Debug package. Do
-not use a hidden launch flag, edited entitlement, mock purchase, or composited fake as transaction
-evidence.
+For the final entry, keep the exact 1179×2556 portrait for any required portrait slot. Where the
+gallery permits a landscape lead or multiple images, lead with
+`evidence/unlocked-judge-access-2026-08-09.png` so the cross-profile value is visible immediately,
+then use the portrait for the complete Free-to-Portfolio workflow. Label Judge Access as a granted
+entitlement, not a purchase. Do not use a hidden launch flag, edited entitlement, mock purchase, or
+composited fake as transaction evidence.

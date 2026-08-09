@@ -14,7 +14,7 @@ captions.
 | 7 | TEST STORE BASELINE · 2026-08-04 | `supplier_profiles_plus` active. | The dated baseline shows RevenueCat `CustomerInfo` revealing all three fixture reports. · `HISTORICAL PURCHASE EVIDENCE` |
 | 8 | CURRENT EVIDENCE · cbe8b20 | RevenueCat Judge Access. No purchase. | Current refresh, Restore, foreground return, and relaunch preserved the granted entitlement. · `CURRENT CUSTOMERINFO` |
 | 9 | RELAUNCH BASELINE · 2026-08-04 | Access recovered after relaunch. | Dated visual baseline; current relaunch outcome is recorded in the 2026-08-09 technical audit. · `RESTORE VISIBLE` `NO VOICEOVER CLAIM` |
-| 10 | HONEST BOUNDARY | Evaluation build, not production billing. | Synthetic data. No stored usable key. Open-source Apache 2.0 software for macOS. · `NO UPLOAD` `NO PUBLIC RELEASE CLAIM` |
+| 10 | TENDERVERDICT | One tender feed. A clear next step for every supplier profile. | Local, explainable, and human-owned. · `SYNTHETIC DATA` `TEST STORE` `NO REAL CHARGE` |
 
 ## Forbidden wording
 

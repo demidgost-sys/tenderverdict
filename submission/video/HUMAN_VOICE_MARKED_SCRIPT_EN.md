@@ -57,12 +57,13 @@ local Premium bypass. Keep the recovery list measured.
 > For judges, RevenueCat Judge Access checks the same entitlement without a purchase. A fresh
 > CustomerInfo check, Restore, returning to the app, and a full relaunch all kept access active.
 
-## 08 · Honest boundary · 01:39–01:49
+## 08 · Value close · 01:39–01:49
 
-Target spoken length: **about 9.5 seconds**. Restrained close, not a consumer-launch announcement.
+Target spoken length: **about 9.5 seconds**. Return to the product value; stress “every supplier
+profile”. Keep the evaluation boundary factual.
 
-> Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is
-> open-source macOS software under Apache two point zero.
+> TenderVerdict keeps one tender feed clear across every supplier profile: local, explainable, and
+> human-owned. This Shipaton build uses synthetic data and RevenueCat Test Store.
 
 ## Pronunciation block
 
@@ -79,5 +80,3 @@ Practice this section before recording; do not include it in a take.
 | Judge Access | **judge access** |
 | SDK | the letters **S-D-K** |
 | JSON | **JAY-son** |
-| Apache | **uh-PATCH-ee** |
-| macOS | **Mac O-S** |

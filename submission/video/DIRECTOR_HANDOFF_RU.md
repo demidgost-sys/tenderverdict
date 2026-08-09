@@ -16,7 +16,8 @@ callouts, английский narration, синхронные captions, crop/pr
 5. **Portfolio:** одинаковые notices сравниваются по независимым профилям без score/ranking.
 6. **RevenueCat:** сначала отдельно показан датированный Test Store baseline, затем current Judge
    Access без покупки.
-7. **Честная граница:** no real charge, no stored key, no production billing/public release claim.
+7. **Ценностный финал:** one feed / every supplier profile, затем короткая граница Test Store и no
+   real charge.
 
 ## Как заменить stills на финальные screen captures
 

@@ -4,41 +4,61 @@
 
 <h1 align="center">TenderVerdict</h1>
 
-<p align="center"><strong>See what to open, verify, or skip — locally and explainably.</strong></p>
+<p align="center"><strong>One tender feed. A clear next step for every supplier profile.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status for main"></a>
+  <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=hackathon%2Frevenuecat-next-gen-2026&amp;event=push" alt="CI status for the Shipaton competition branch"></a>
   &nbsp;·&nbsp; <a href="https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.2.0-alpha.1">v0.2.0-alpha.1</a>
   &nbsp;·&nbsp; Python 3.11+
   &nbsp;·&nbsp; <a href="LICENSE">Apache-2.0</a>
 </p>
 
 <p align="center">
+  <a href="#shipaton-next-gen">Shipaton entry</a> ·
+  <a href="HACKATHON.md">Competition overview</a> ·
+  <a href="submission/README.md">Demo and evidence</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#desktop-developer-alpha">Desktop preview</a> ·
-  <a href="#example-output">Example output</a> ·
-  <a href="#portfolio-workspace-json">Portfolio Workspace</a> ·
   <a href="#next-gen-macos-app">Next Gen macOS</a> ·
-  <a href="#verdicts">Verdicts</a> ·
   <a href="docs/README.md">Docs</a> ·
   <a href="docs/PROJECT_STATUS.md">Status</a> ·
-  <a href="ROADMAP.md">Roadmap</a> ·
-  <a href="LIMITATIONS.md">Limitations</a> ·
-  <a href="CONTRIBUTING.md">Contributing</a>
+  <a href="LIMITATIONS.md">Limitations</a>
 </p>
 
-TenderVerdict is experimental open-source software for supplier-side pre-qualification of
-public-procurement **notice metadata**. The published developer alpha contains a CLI, Python
-library, and an unsigned local desktop preview. You supply a company profile and structured notices;
+## Shipaton Next Gen
+
+TenderVerdict is for small supplier teams that screen the same public-tender feed for several legal
+entities, countries, or service lines. It evaluates each notice independently for one to five
+supplier profiles, then explains what to **open, verify, or skip** before the team spends hours in
+the documents.
+
+| Free | Portfolio, unlocked by RevenueCat |
+|---|---|
+| One complete supplier review | Up to five complete supplier reviews |
+| Every reason, unknown, source link, and human next step | A cross-profile comparison with exact reasoning drill-down |
+| Shareable review brief and deterministic JSON | Full portfolio brief and deterministic portfolio JSON |
+
+<p align="center">
+  <img src="submission/evidence/unlocked-judge-access-2026-08-09.png" width="900" alt="TenderVerdict Next Gen showing the same three synthetic notices compared across three supplier profiles after RevenueCat Judge Access refresh.">
+</p>
+
+RevenueCat controls access to the Portfolio presentation; it never changes a qualification result.
+The product-native verdicts are `open_documents`, `watch`, and `reject`, presented in the pitch as
+**open, verify, and skip**. TenderVerdict does not read full procurement documents, rank suppliers,
+or decide whether to bid.
+
+**Judges:** start with the [competition overview](HACKATHON.md), then review the
+[demo and public-safe evidence](submission/README.md) and the
+[current verification status](docs/PROJECT_STATUS.md). The source for the entry lives on the
+[`hackathon/revenuecat-next-gen-2026` branch](https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026).
+
+## Published developer alpha
+
+The published `v0.2.0-alpha.1` remains experimental open-source software for supplier-side
+pre-qualification of public-procurement **notice metadata**. It contains a CLI, Python library, and
+an unsigned local desktop preview. You supply a company profile and structured notices;
 TenderVerdict applies narrow, deterministic rules and produces a review queue with reasons,
 unresolved fields, and a human next step.
-
-The Portfolio Workspace idea is equally narrow: **one tender feed, with a clear next step for every
-supplier profile**. The current competition source evaluates the same notices independently for up
-to five profiles and explains what to open, verify, or skip without creating a score, ranking, or
-automatic bid recommendation.
-
-It does not read full procurement documents or decide whether you should bid.
 
 | Property | What it means |
 |---|---|
@@ -245,8 +265,8 @@ the `supplier_profiles_plus` entitlement as active.
 
 Its core loop is designed to be understood in one glance: **one feed, different supplier
 decisions**. A Portfolio Signal shows how many outcomes change between profiles; Free keeps one
-complete review with reasons, a shareable brief, and JSON, while Premium reveals every profile, the
-comparison, and the complete portfolio brief and JSON export.
+complete review with reasons, a shareable brief, and JSON, while Portfolio reveals every profile,
+the comparison, and the complete portfolio brief and JSON export.
 
 <p align="center">
   <img src="submission/screenshot-1179x2556.png" width="420" alt="TenderVerdict Next Gen macOS showing a Portfolio Signal, local inputs, a complete free supplier review, and the RevenueCat-backed Portfolio Workspace.">
@@ -266,13 +286,13 @@ Watch, and one Reject. The app visibly distinguishes bundled demo, current selec
 retained previous reports; Free atomically exports a deterministic, ASCII-safe schema-3 report for
 the first profile, while an active entitlement additionally enables the exact complete portfolio
 JSON export. The same Export menu creates a deterministic self-contained HTML review brief: Free
-includes only the complete first profile, and Premium includes every profile in source order. A
+includes only the complete first profile, and Portfolio includes every profile in source order. A
 previous valid report remains exportable after failure, but its action is explicitly labelled as
 previous.
 
 The Free review queue supports verdict, text, buyer, and deadline-presence filters with bounded
 progressive disclosure, full reset, and separate verdict-driver, confirmation, and passed-check
-groups. Premium applies text, buyer, and deadline-presence filters to the cross-profile matrix;
+groups. Portfolio applies text, buyer, and deadline-presence filters to the cross-profile matrix;
 selecting a cell resolves the result by stable profile and notice identities and opens its evidence,
 human next step, and safe supplied-source link. The locked preview exposes only a disagreement count,
 not gated report details. Profiles are never scored or ranked.
@@ -300,7 +320,7 @@ TENDERVERDICT_WORKTREE="$PWD" \
 The native checks require no API key and the smoke test makes no RevenueCat request. They cover
 strict workspace and import-preview decoding, full report preservation, ordered shared-notice
 validation, strict review-point grammar, reason grouping, disagreement counts, large review
-filtering with stable-ID lookup, the Free/Premium projection, Test Store configuration and terminal
+filtering with stable-ID lookup, the Free/Portfolio projection, Test Store configuration and terminal
 accessibility outcomes, deterministic JSON and HTML-brief bytes, gated brief content and escaping,
 and the real private core bridge. The offline Python suite also exercises strict normalization,
 CSV/JSON preview,

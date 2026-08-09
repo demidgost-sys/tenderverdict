@@ -1,7 +1,7 @@
 # Silent animatic visual QA — PASS
 
 Reviewed on **2026-08-09** without audio playback. Artifact SHA-256:
-`1d3117032827ca06b37a930683d581d983bc467087e28b36fecb0dca28a5c15b`.
+`9be79aa90f071bd878aeb74e672c25e3fdbfa5537e18a509a8601caee2c43e4a`.
 
 ## Inspection performed
 
@@ -9,10 +9,12 @@ Reviewed on **2026-08-09** without audio playback. Artifact SHA-256:
   resolution and contains exactly one preview for each of the ten timeline shots.
 - The contact sheet was rechecked after the final lossless JPEG metadata removal and PNG ancillary
   chunk stripping; composition and evidence wording are unchanged.
-- Full 1920×1080 frames were extracted from the local ignored MP4 at 00:17, 00:30, 01:11,
-  01:27, and 01:44 using `ffmpeg -frames:v 1 -an`.
-- The five full-resolution frames covered the highest-risk content: local inputs, three verdicts,
-  Test Store sheet, current Judge Access/no-purchase copy, and the honest-boundary end card.
+- Five frames were sampled from the 1920×1080 local ignored MP4 at 00:17, 00:30, 01:11, 01:27,
+  and 01:44 with audio mapping disabled, then reviewed together at a matched scale.
+- Those frames covered the highest-risk content: local inputs, three verdicts, Test Store sheet,
+  current Judge Access/no-purchase copy, and the value-led end card.
+- The previous and current 1920×1080 end frames were placed side by side at the same scale. The new
+  title, body, three boundary chips, icon, and evidence footer remain inside their intended regions.
 
 ## Result
 
@@ -27,8 +29,9 @@ Reviewed on **2026-08-09** without audio playback. Artifact SHA-256:
 - [x] Baseline/current labels are prominent and not hidden by image crops.
 - [x] No key, reviewer code, customer identifier, account UI, notification, terminal, full local
   path, or private notice is visible.
-- [x] The end card explicitly says evaluation build, no production billing, synthetic data, no
-  stored usable key, and no public-release claim.
+- [x] The end card closes on the one-feed/every-profile value, then states local and human-owned
+  positioning plus synthetic data, Test Store, no real charge, no stored usable key, and no
+  production billing.
 - [x] No audio was generated or played during visual QA.
 
 The still-based animatic is accepted for local handoff. The final public demo should replace the

@@ -73,10 +73,10 @@ and a full relaunch all kept access active.
 
 16
 00:01:39,000 --> 00:01:44,500
-Synthetic demo data. No usable key is stored.
-This is not production billing.
+TenderVerdict keeps one tender feed clear across every supplier
+profile: local, explainable, and human-owned.
 
 17
 00:01:44,500 --> 00:01:49,000
-TenderVerdict is open-source macOS software
-under Apache two point zero.
+This Shipaton build uses synthetic data
+and RevenueCat Test Store.

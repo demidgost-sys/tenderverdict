@@ -19,7 +19,7 @@ not delete raw takes during or after the session.
 | 05 Portfolio |  |  |  |  |  |
 | 06 Test Store |  |  |  |  |  |
 | 07 Judge Access |  |  |  |  |  |
-| 08 Honest boundary |  |  |  |  |  |
+| 08 Value close |  |  |  |  |  |
 
 ## Assembly receipt
 
