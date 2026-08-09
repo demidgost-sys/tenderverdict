@@ -94,9 +94,10 @@ and consistency checks.
   first profile report, including its complete review queue and a deterministic ASCII-safe schema-3
   export. Its HTML review brief is a deterministic presentation of that same first report.
 - Premium presentation requires RevenueCat `CustomerInfo` to report the
-  `supplier_profiles_plus` entitlement as active, then adds a notice-by-profile comparison and all
-  profile summaries plus the exact complete portfolio JSON export and an all-profile HTML review
-  brief, without ranking or scoring.
+  `supplier_profiles_plus` entitlement as active, whether it came from the Test Store transaction
+  path or an explicitly granted RevenueCat promotional entitlement. Only then does it add a
+  notice-by-profile comparison and all profile summaries plus the exact complete portfolio JSON
+  export and an all-profile HTML review brief, without ranking or scoring.
 - Free review uses verdict, text, buyer, and deadline-presence filters with progressive disclosure.
   Premium applies text, buyer, and deadline filters to the shared notice identities. Matrix cells
   resolve a profile/result pair by stable IDs, never by the current filtered offset, before opening
@@ -113,8 +114,16 @@ and consistency checks.
   64 MiB and written atomically by the app, so a rendering or write failure cannot replace an
   existing brief.
 - A configured Debug app accepts only offering `supplier_profiles_plus`, package `$rc_monthly`, and
-  product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, and
-  refreshes access on launch. An unexpected dashboard shape stays locked.
+  product `supplier_profiles_plus_monthly`; it handles cancellation, restores purchases, forces a
+  current `CustomerInfo` read on explicit refresh and foreground re-entry, and refreshes access on
+  launch. If restore returns an inactive entitlement, the app reloads that exact offering before
+  presenting the locked state, so purchase remains recoverable without relaunch. An unexpected
+  dashboard shape stays locked.
+- Hackathon Judge Access validates one of a bounded set of reviewer codes through a one-way digest,
+  derives a dedicated RevenueCat App User ID, and calls the SDK `logIn` path. The code itself never
+  toggles Premium: an active `supplier_profiles_plus` entitlement remains mandatory. A promotional
+  grant on a known judge identity is additionally bounded in-app to December 31, 2026, even if the
+  dashboard grant were accidentally configured for longer.
 - Missing Debug configuration makes no RevenueCat request. Non-`test_` keys are rejected before
   SDK configuration. A key pasted into the Debug app is held only for that process and is not
   persisted by TenderVerdict. Release builds expose no key field and refuse Test Store
@@ -175,6 +184,10 @@ able to reorder or conceal evidence. Raw report bytes and deterministic exports 
   explicitly supplies a Test Store key to a Debug evaluation build. Its normal SDK customer state
   is distinct from TenderVerdict's session-only API-key field and offline input path. Release
   evaluation builds cannot enter or configure that key.
+- A submitted Judge Access code is cleared from the SwiftUI field and is not persisted by
+  TenderVerdict. RevenueCat's SDK may cache the derived App User ID as its normal customer identity;
+  neither the raw reviewer code nor the Test Store API key is written to app defaults, reports, or
+  the bundle.
 - The app bundle is ad-hoc signed and not notarized. It remains an evaluation artifact.
 
 ## Verification layers

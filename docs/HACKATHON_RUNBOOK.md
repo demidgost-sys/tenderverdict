@@ -147,9 +147,12 @@ Record one continuous hands-on sequence on the freshly packaged Debug app:
 4. Cancel outcome: access stays locked.
 5. Failure outcome: clear retry state appears.
 6. Success outcome: `CustomerInfo` activates `supplier_profiles_plus` and all reports appear.
-7. Relaunch or refresh: active access returns.
-8. Restore: access returns through `restorePurchases()`.
-9. RevenueCat dashboard: the same anonymous customer and Test Store event are visible.
+7. Relaunch, foreground re-entry, or refresh: current active access returns.
+8. Immediate restore: access returns through `restorePurchases()`.
+9. Expiry recovery: after the accelerated subscription becomes inactive, choose **Restore access**
+   and verify the app returns to locked with the localized exact monthly package and an enabled
+   purchase action without relaunching.
+10. RevenueCat dashboard: the same customer and Test Store event are visible.
 
 Capture dates, app revision, SDK version, entitlement identifier, and outcome. Do not claim a real
 payment or App Store transaction.
@@ -170,6 +173,29 @@ keyboard navigation, Increase Contrast, Reduce Transparency, and a temporary lar
 override that was reverted immediately. It did not re-open the dashboard and did not run VoiceOver.
 Manual VoiceOver verification of asynchronous success, cancellation, and failure remains
 unverified and is an optional accessibility follow-up, not a submission gate.
+
+## Hackathon Judge Access
+
+Judge Access is a separate no-purchase evaluation route backed by RevenueCat Granted Entitlements,
+not an Apple offer code and not a local Premium override. Keep the raw code list outside Git and do
+not include it in public screenshots or repository text.
+
+For each assigned reviewer slot:
+
+1. Launch the fresh Debug evaluation app with the process-local Test Store key and activate its
+   assigned Judge Access code once, creating the dedicated RevenueCat App User ID.
+2. Find that customer in RevenueCat and grant `supplier_profiles_plus` until
+   **2026-12-31 23:59:59 UTC**. Granted Entitlements create no purchase and do not affect billing.
+3. Activate the same code again and verify the app identifies the RevenueCat promotional grant,
+   states that no purchase was made, and exposes the Premium workspace.
+4. Refresh, background/foreground, and relaunch with key re-entry; verify access remains governed by
+   current `CustomerInfo`.
+5. Exercise an invalid code and confirm the field receives recovery focus without changing the
+   RevenueCat identity or unlocking Premium.
+
+The app also rejects known Judge Access identities after December 31, 2026. Dashboard expiry and
+the local cutoff must agree; neither one should be described as a paid subscription or real store
+transaction.
 
 ## Submission assets
 

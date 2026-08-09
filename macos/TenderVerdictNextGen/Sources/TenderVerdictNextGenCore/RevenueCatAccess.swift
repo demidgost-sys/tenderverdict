@@ -1,4 +1,5 @@
 import Combine
+import CryptoKit
 import Foundation
 @preconcurrency import RevenueCat
 
@@ -144,6 +145,7 @@ public enum PremiumAccessState: Equatable, Sendable {
 }
 
 public enum PremiumAccessRecoveryAction: Hashable, Sendable {
+  case activateJudgeAccess
   case connectTestStore
   case purchase
   case refreshOffering
@@ -152,6 +154,7 @@ public enum PremiumAccessRecoveryAction: Hashable, Sendable {
 }
 
 public enum PremiumAccessFocusTarget: Hashable, Sendable {
+  case judgeAccessCode
   case testStoreAPIKey
   case purchase
   case refreshOffering
@@ -179,6 +182,123 @@ public struct PremiumAccessAccessibilityOutcome: Equatable, Sendable {
   }
 }
 
+public enum PremiumAccessSource: Equatable, Sendable {
+  case testStore
+  case judgeAccess(expiresAt: Date?)
+  case otherRevenueCat
+}
+
+public enum JudgeAccessCodeValidation: Equatable, Sendable {
+  case accepted(appUserID: String)
+  case expired
+  case invalid
+}
+
+public enum RevenueCatJudgeAccess {
+  public static let expiresAt = Date(timeIntervalSince1970: 1_798_761_599)
+  public static let expiryLabel = "December 31, 2026"
+
+  private static let acceptedCodeDigests: Set<String> = [
+    "0d6240bc8f3b8cd77a6457b5ce0330726077c60213e7c1373906051504108a26",
+    "4e118a47833348f05045f3cf9146faf4ba095874cb1a922db81f99ae8384b3db",
+    "6d64362bdfe7bafdde7f2c98b179ef320bc25d57ad5bb7f18eeb0c2d5bc69e2e",
+    "ca472cf3cacdd4da8f2732e379c2843f5693b1aa763fd37889a68a9ca828128c",
+    "fe56bfb274e8efe55aa5b7dd29830545e13e66a6a96900874d7e0bc1ee59b4e4",
+  ]
+
+  public static func validate(
+    _ rawCode: String,
+    now: Date = Date()
+  ) -> JudgeAccessCodeValidation {
+    guard now <= expiresAt else {
+      return .expired
+    }
+    let code = rawCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    guard (20...96).contains(code.utf8.count),
+      code.unicodeScalars.allSatisfy({ scalar in
+        scalar.isASCII
+          && (CharacterSet.alphanumerics.contains(scalar) || scalar.value == 45)
+      })
+    else {
+      return .invalid
+    }
+    let digest = digestHex(code)
+    guard acceptedCodeDigests.contains(digest) else {
+      return .invalid
+    }
+    return .accepted(appUserID: appUserID(forDigest: digest))
+  }
+
+  public static func isKnownAppUserID(_ appUserID: String) -> Bool {
+    guard appUserID.hasPrefix("tvj_") else {
+      return false
+    }
+    return acceptedCodeDigests.contains(String(appUserID.dropFirst(4)))
+  }
+
+  public static func appUserID(forDigest digest: String) -> String {
+    "tvj_\(digest)"
+  }
+
+  public static func digestHex(_ value: String) -> String {
+    SHA256.hash(data: Data(value.utf8))
+      .map { String(format: "%02x", $0) }
+      .joined()
+  }
+}
+
+public enum JudgeAccessActivationState: Equatable, Sendable {
+  case idle
+  case checking
+  case invalidCode
+  case expired
+  case entitlementMissing
+  case failed
+  case active(expiresAt: Date?)
+
+  public var terminalAccessibilityOutcome: PremiumAccessAccessibilityOutcome? {
+    switch self {
+    case .idle, .checking:
+      return nil
+    case .invalidCode:
+      return PremiumAccessAccessibilityOutcome(
+        announcement: "Judge access code not recognized. Check the code and try again.",
+        recoveryActions: [.activateJudgeAccess],
+        focusTarget: .judgeAccessCode
+      )
+    case .expired:
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "Hackathon Judge Access ended on \(RevenueCatJudgeAccess.expiryLabel).",
+        recoveryActions: [],
+        focusTarget: .judgeAccessCode
+      )
+    case .entitlementMissing:
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "Judge access code recognized, but RevenueCat has no active granted entitlement. "
+          + "Check the assigned code or refresh access.",
+        recoveryActions: [.activateJudgeAccess, .refreshOffering],
+        focusTarget: .judgeAccessCode
+      )
+    case .failed:
+      return PremiumAccessAccessibilityOutcome(
+        announcement: "Judge access could not be checked. Check the connection and try again.",
+        recoveryActions: [.activateJudgeAccess],
+        focusTarget: .judgeAccessCode
+      )
+    case .active:
+      return PremiumAccessAccessibilityOutcome(
+        announcement:
+          "RevenueCat Judge Access is active through \(RevenueCatJudgeAccess.expiryLabel). "
+          + "No purchase was made.",
+        recoveryActions: [.restore],
+        focusTarget: .restore
+      )
+    }
+  }
+}
+
 @MainActor
 public final class RevenueCatAccessController: ObservableObject {
   public nonisolated static let entitlementIdentifier = "supplier_profiles_plus"
@@ -187,6 +307,8 @@ public final class RevenueCatAccessController: ObservableObject {
   public nonisolated static let productIdentifier = "supplier_profiles_plus_monthly"
 
   @Published public private(set) var state: PremiumAccessState
+  @Published public private(set) var accessSource: PremiumAccessSource? = nil
+  @Published public private(set) var judgeAccessState: JudgeAccessActivationState = .idle
 
   private var apiKey: String?
   private var currentPackage: Package?
@@ -214,6 +336,10 @@ public final class RevenueCatAccessController: ObservableObject {
     didConfigure && !state.isBusy
   }
 
+  public var canActivateJudgeAccess: Bool {
+    didConfigure && !state.isBusy && judgeAccessState != .checking
+  }
+
   public nonisolated static func isExpectedPackage(
     offeringIdentifier: String,
     packageIdentifier: String,
@@ -222,6 +348,32 @@ public final class RevenueCatAccessController: ObservableObject {
     offeringIdentifier == Self.offeringIdentifier
       && packageIdentifier == Self.packageIdentifier
       && productIdentifier == Self.productIdentifier
+  }
+
+  public nonisolated static func resolvedAccessSource(
+    entitlementIsActive: Bool,
+    store: Store,
+    expirationDate: Date?,
+    appUserID: String,
+    now: Date = Date()
+  ) -> PremiumAccessSource? {
+    guard entitlementIsActive else {
+      return nil
+    }
+    if store == .promotional {
+      guard RevenueCatJudgeAccess.isKnownAppUserID(appUserID) else {
+        return .otherRevenueCat
+      }
+      if now > RevenueCatJudgeAccess.expiresAt {
+        return nil
+      }
+      let boundedExpiration = expirationDate.map { min($0, RevenueCatJudgeAccess.expiresAt) }
+      return .judgeAccess(expiresAt: boundedExpiration)
+    }
+    if store == .testStore {
+      return .testStore
+    }
+    return .otherRevenueCat
   }
 
   public func configure(testStoreAPIKey: String) async {
@@ -277,6 +429,13 @@ public final class RevenueCatAccessController: ObservableObject {
     await refreshConfiguredAccess()
   }
 
+  public func refreshIfConfigured() async {
+    guard didConfigure, !state.isBusy else {
+      return
+    }
+    await refreshConfiguredAccess()
+  }
+
   public func purchaseCurrentPackage() async {
     guard let currentPackage, didConfigure else {
       state = .failed
@@ -288,12 +447,14 @@ public final class RevenueCatAccessController: ObservableObject {
       let result = try await Purchases.shared.purchase(package: currentPackage)
       if result.userCancelled {
         state = .cancelled(price: price)
-      } else if Self.hasPremiumAccess(result.customerInfo) {
-        state = .unlocked
+      } else if applyActiveAccess(result.customerInfo) {
+        return
       } else {
+        accessSource = nil
         state = .failed
       }
     } catch {
+      accessSource = nil
       state = .failed
     }
   }
@@ -306,41 +467,105 @@ public final class RevenueCatAccessController: ObservableObject {
     state = .loading
     do {
       let customerInfo = try await Purchases.shared.restorePurchases()
-      state =
-        Self.hasPremiumAccess(customerInfo)
-        ? .unlocked
-        : .locked(price: currentPackage?.localizedPriceString)
+      if applyActiveAccess(customerInfo) {
+        return
+      }
+      try await loadExpectedPackageAndLock()
     } catch {
+      accessSource = nil
       state = .failed
+    }
+  }
+
+  public func activateJudgeAccess(code: String, now: Date = Date()) async {
+    guard didConfigure else {
+      judgeAccessState = .failed
+      return
+    }
+    switch RevenueCatJudgeAccess.validate(code, now: now) {
+    case .invalid:
+      judgeAccessState = .invalidCode
+      return
+    case .expired:
+      judgeAccessState = .expired
+      return
+    case .accepted(let appUserID):
+      judgeAccessState = .checking
+      state = .loading
+      do {
+        let result = try await Purchases.shared.logIn(appUserID)
+        if applyActiveAccess(result.customerInfo, now: now) {
+          return
+        }
+        try await loadExpectedPackageAndLock(now: now)
+      } catch {
+        accessSource = nil
+        judgeAccessState = .failed
+        state = .failed
+      }
     }
   }
 
   private func refreshConfiguredAccess() async {
     state = .loading
     do {
-      let customerInfo = try await Purchases.shared.customerInfo()
-      if Self.hasPremiumAccess(customerInfo) {
-        currentPackage = nil
-        state = .unlocked
+      let customerInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
+      if applyActiveAccess(customerInfo) {
         return
       }
-      let offerings = try await Purchases.shared.offerings()
-      currentPackage = offerings.current.flatMap { offering in
-        offering.availablePackages.first { package in
-          Self.isExpectedPackage(
-            offeringIdentifier: offering.identifier,
-            packageIdentifier: package.identifier,
-            productIdentifier: package.storeProduct.productIdentifier
-          )
-        }
-      }
-      state = .locked(price: currentPackage?.localizedPriceString)
+      try await loadExpectedPackageAndLock()
     } catch {
+      accessSource = nil
       state = .failed
     }
   }
 
-  private static func hasPremiumAccess(_ customerInfo: CustomerInfo) -> Bool {
-    customerInfo.entitlements[entitlementIdentifier]?.isActive == true
+  private func loadExpectedPackageAndLock(now: Date = Date()) async throws {
+    let offerings = try await Purchases.shared.offerings()
+    currentPackage = offerings.current.flatMap { offering in
+      offering.availablePackages.first { package in
+        Self.isExpectedPackage(
+          offeringIdentifier: offering.identifier,
+          packageIdentifier: package.identifier,
+          productIdentifier: package.storeProduct.productIdentifier
+        )
+      }
+    }
+    accessSource = nil
+    state = .locked(price: currentPackage?.localizedPriceString)
+    if RevenueCatJudgeAccess.isKnownAppUserID(Purchases.shared.appUserID) {
+      judgeAccessState =
+        now > RevenueCatJudgeAccess.expiresAt ? .expired : .entitlementMissing
+    } else if judgeAccessState == .checking {
+      judgeAccessState = .entitlementMissing
+    }
+  }
+
+  @discardableResult
+  private func applyActiveAccess(
+    _ customerInfo: CustomerInfo,
+    now: Date = Date()
+  ) -> Bool {
+    guard let entitlement = customerInfo.entitlements[Self.entitlementIdentifier],
+      let source = Self.resolvedAccessSource(
+        entitlementIsActive: entitlement.isActive,
+        store: entitlement.store,
+        expirationDate: entitlement.expirationDate,
+        appUserID: Purchases.shared.appUserID,
+        now: now
+      )
+    else {
+      return false
+    }
+    accessSource = source
+    state = .unlocked
+    if case .judgeAccess(let expiresAt) = source,
+      RevenueCatJudgeAccess.isKnownAppUserID(Purchases.shared.appUserID)
+    {
+      judgeAccessState = .active(expiresAt: expiresAt)
+    } else {
+      judgeAccessState = .idle
+    }
+    return true
   }
 }

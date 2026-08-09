@@ -55,9 +55,15 @@ queue. Choose the surface that matches the job:
    the cross-profile comparison, all profile summaries, and full portfolio export appear only while
    `supplier_profiles_plus` is active. Before purchase, the locked preview can disclose how many
    shared notices produce different verdicts without exposing the gated reports. **Refresh
-   offering** retries a recoverable network or
-   dashboard issue. If an already configured key/project is wrong, quit and reopen the Debug app to
-   replace it because the RevenueCat SDK can be configured only once per process.
+   offering** retrieves current entitlement state and retries a recoverable network or dashboard
+   issue. Returning to the foreground also refreshes configured access. If an expired Test Store
+   subscription is restored, the app returns to the locked state and reloads the exact monthly
+   package immediately, so a new test purchase can start without relaunching. For evaluator access
+   without a purchase, enter an assigned code under **Hackathon Judge Access**. The app derives a
+   RevenueCat customer identity and still requires an active granted `supplier_profiles_plus`
+   entitlement; the code is cleared from the field, creates no purchase, and stops working after
+   December 31, 2026. If an already configured key/project is wrong, quit and reopen the Debug app
+   to replace it because the RevenueCat SDK can be configured only once per process.
 
 The Shipaton Manager confirmed both that a Test Store purchase is sufficient for judging and that
 a macOS entry has no judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and

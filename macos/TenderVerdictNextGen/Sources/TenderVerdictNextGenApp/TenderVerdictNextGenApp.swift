@@ -269,6 +269,13 @@ final class AppModel: ObservableObject {
     loadSynthetic()
   }
 
+  func refreshPremiumAccessAfterActivation() {
+    guard started else {
+      return
+    }
+    Task { await revenueCat.refreshIfConfigured() }
+  }
+
   func chooseWorkspace() {
     let panel = NSOpenPanel()
     panel.title = "Choose a TenderVerdict workspace"
@@ -625,6 +632,7 @@ struct ContentView: View {
   var startsAutomatically = true
   var scrollable = true
   @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+  @Environment(\.scenePhase) private var scenePhase
 
   var body: some View {
     Group {
@@ -639,6 +647,11 @@ struct ContentView: View {
     .task {
       if startsAutomatically {
         model.start()
+      }
+    }
+    .onChange(of: scenePhase) { phase in
+      if startsAutomatically, phase == .active {
+        model.refreshPremiumAccessAfterActivation()
       }
     }
     .sheet(isPresented: $model.isProfileBuilderPresented) {
@@ -1088,7 +1101,9 @@ struct PremiumWorkspaceSection: View {
   let report: PortfolioWorkspaceReport?
   @ObservedObject var controller: RevenueCatAccessController
   @State private var apiKeyEntry = ""
+  @State private var judgeCodeEntry = ""
   @State private var pendingUserAction = false
+  @State private var pendingJudgeAction = false
   @FocusState private var premiumFocus: PremiumAccessFocusTarget?
 
   var body: some View {
@@ -1101,11 +1116,22 @@ struct PremiumWorkspaceSection: View {
       premiumContent
     }
     .onChange(of: controller.state) { state in
+      if pendingJudgeAction {
+        return
+      }
       guard let outcome = state.terminalAccessibilityOutcome else { return }
       PremiumAccessibilityAnnouncer.post(outcome)
       if pendingUserAction {
         premiumFocus = outcome.focusTarget
         pendingUserAction = false
+      }
+    }
+    .onChange(of: controller.judgeAccessState) { state in
+      guard let outcome = state.terminalAccessibilityOutcome else { return }
+      PremiumAccessibilityAnnouncer.post(outcome)
+      if pendingJudgeAction {
+        premiumFocus = outcome.focusTarget
+        pendingJudgeAction = false
       }
     }
   }
@@ -1234,6 +1260,8 @@ struct PremiumWorkspaceSection: View {
           HStack(spacing: 10) { lockedActions }
           VStack(alignment: .leading, spacing: 10) { lockedActions }
         }
+        Divider()
+        judgeAccessControls
       }
     }
   }
@@ -1290,6 +1318,89 @@ struct PremiumWorkspaceSection: View {
     }
   }
 
+  private var judgeAccessControls: some View {
+    VStack(alignment: .leading, spacing: 10) {
+      Label("Hackathon Judge Access", systemImage: "key.fill")
+        .font(.subheadline.weight(.semibold))
+      Text(
+        "Use an assigned reviewer code for a RevenueCat granted entitlement through "
+          + "\(RevenueCatJudgeAccess.expiryLabel). This creates no purchase and stores no raw code."
+      )
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      Text("Judge access code")
+        .font(.caption.weight(.semibold))
+      ViewThatFits(in: .horizontal) {
+        HStack(spacing: 10) { judgeAccessEntry }
+        VStack(alignment: .leading, spacing: 10) { judgeAccessEntry }
+      }
+      judgeAccessStatus
+    }
+  }
+
+  @ViewBuilder
+  private var judgeAccessEntry: some View {
+    SecureField("TVJ-2026-…", text: $judgeCodeEntry)
+      .textFieldStyle(.roundedBorder)
+      .accessibilityLabel("Hackathon judge access code")
+      .focused($premiumFocus, equals: .judgeAccessCode)
+    Button {
+      let code = judgeCodeEntry
+      judgeCodeEntry = ""
+      pendingJudgeAction = true
+      Task { await controller.activateJudgeAccess(code: code) }
+    } label: {
+      Label("Activate judge access", systemImage: "key.fill")
+    }
+    .buttonStyle(.bordered)
+    .disabled(!controller.canActivateJudgeAccess)
+  }
+
+  @ViewBuilder
+  private var judgeAccessStatus: some View {
+    switch controller.judgeAccessState {
+    case .idle:
+      EmptyView()
+    case .checking:
+      HStack(spacing: 8) {
+        ProgressView()
+          .controlSize(.small)
+        Text("Checking the RevenueCat granted entitlement…")
+      }
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      .accessibilityElement(children: .combine)
+    case .invalidCode:
+      Label(
+        "Code not recognized. Check the assigned code and try again.",
+        systemImage: "key.slash"
+      )
+      .foregroundStyle(.red)
+      .accessibilityLabel("Error: Judge access code not recognized. Check the code and try again.")
+    case .expired:
+      Label(
+        "Judge Access ended on \(RevenueCatJudgeAccess.expiryLabel).",
+        systemImage: "calendar.badge.exclamationmark"
+      )
+      .foregroundStyle(.secondary)
+    case .entitlementMissing:
+      Label(
+        "Code recognized, but its RevenueCat granted entitlement is not active. "
+          + "Check the assigned code or refresh access.",
+        systemImage: "person.badge.clock"
+      )
+      .foregroundStyle(.orange)
+    case .failed:
+      Label(
+        "Judge access could not be checked. Check the connection and try again.",
+        systemImage: "wifi.exclamationmark"
+      )
+      .foregroundStyle(.red)
+    case .active:
+      EmptyView()
+    }
+  }
+
   @ViewBuilder
   private var failedActions: some View {
     Button("Retry") {
@@ -1313,9 +1424,7 @@ struct PremiumWorkspaceSection: View {
       VStack(alignment: .leading, spacing: 12) {
         NoticeCard(
           title: "Portfolio comparison ready",
-          detail:
-            "RevenueCat confirmed access. Every profile, changed outcome, and the full "
-            + "portfolio export are now available.",
+          detail: unlockedAccessDetail,
           systemImage: "checkmark.seal.fill",
           tint: .green
         )
@@ -1341,6 +1450,20 @@ struct PremiumWorkspaceSection: View {
       }
     } else {
       LoadingCard(label: "Load a local portfolio to use Premium access.")
+    }
+  }
+
+  private var unlockedAccessDetail: String {
+    switch controller.accessSource {
+    case .judgeAccess:
+      return
+        "RevenueCat Judge Access is active through \(RevenueCatJudgeAccess.expiryLabel). "
+        + "No purchase was made. Every profile, changed outcome, and the full portfolio export "
+        + "are available."
+    case .testStore, .otherRevenueCat, .none:
+      return
+        "RevenueCat confirmed access. Every profile, changed outcome, and the full "
+        + "portfolio export are now available."
     }
   }
 

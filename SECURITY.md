@@ -37,8 +37,16 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
 - A configured Debug launch can contact RevenueCat only after the evaluator supplies local
   configuration and activates the corresponding UI control. Purchase is fail-closed to offering
   `supplier_profiles_plus`, package `$rc_monthly`, and product
-  `supplier_profiles_plus_monthly`; restore uses RevenueCat's customer state. Do not put a key in
-  source, reports, logs, issues, or build artifacts.
+  `supplier_profiles_plus_monthly`; restore uses fresh RevenueCat customer state and reloads only
+  that exact package after expiry. Do not put a key in source, reports, logs, issues, or build
+  artifacts.
+- Hackathon Judge Access accepts only pre-generated high-entropy codes whose digests are allowlisted
+  in the client, derives a RevenueCat App User ID, and still requires the active
+  `supplier_profiles_plus` entitlement returned by `CustomerInfo`. The raw codes stay in a private
+  owner handoff outside the repository and are cleared from the input field; RevenueCat may retain
+  the derived customer identity as normal SDK state. The client-side allowlist is an evaluation
+  convenience in an open-source app, not production authentication, DRM, or a confidential access
+  boundary. Known judge grants are rejected after December 31, 2026.
 - The native shell passes only a minimal environment to its Python child process; RevenueCat
   configuration and unrelated parent-process variables are not forwarded.
 - The open-source Python CLI and local input files remain directly accessible. The SwiftUI

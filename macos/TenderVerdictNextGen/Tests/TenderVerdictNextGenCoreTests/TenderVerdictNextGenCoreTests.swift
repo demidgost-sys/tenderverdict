@@ -31,10 +31,11 @@ enum TenderVerdictNextGenChecks {
     try checkNoticeImportPreviewContract()
     try checkReviewQueryAndStableResultLookup()
     try checkLargeReviewQueryPreservesStableIdentities()
+    try checkJudgeAccessAndExpiryTransitions()
     try checkPremiumAccessibilityOutcomes()
     try await checkTestStoreConfigurationFailsClosed()
     try checkProcessAdapterPreservesDeterministicBytes()
-    print("NEXT_GEN_CHECKS_OK checks=19")
+    print("NEXT_GEN_CHECKS_OK checks=20")
   }
 
   private static func checkPortfolioContractPreservesFreeAndPremiumSurfaces() throws {
@@ -637,8 +638,74 @@ enum TenderVerdictNextGenChecks {
     #endif
   }
 
+  private static func checkJudgeAccessAndExpiryTransitions() throws {
+    let cutoff = RevenueCatJudgeAccess.expiresAt
+    let beforeCutoff = cutoff.addingTimeInterval(-1)
+    let afterCutoff = cutoff.addingTimeInterval(1)
+    let knownDigest = "4e118a47833348f05045f3cf9146faf4ba095874cb1a922db81f99ae8384b3db"
+    let judgeAppUserID = RevenueCatJudgeAccess.appUserID(forDigest: knownDigest)
+
+    try require(
+      RevenueCatJudgeAccess.validate("not-a-judge-code", now: beforeCutoff) == .invalid,
+      "unknown Judge Access code was accepted"
+    )
+    try require(
+      RevenueCatJudgeAccess.validate("any-code-after-cutoff", now: afterCutoff) == .expired,
+      "Judge Access remained redeemable after its documented cutoff"
+    )
+    try require(
+      RevenueCatJudgeAccess.isKnownAppUserID(judgeAppUserID),
+      "configured Judge Access customer was not recognized"
+    )
+    try require(
+      !RevenueCatJudgeAccess.isKnownAppUserID("tvj_public_fixture"),
+      "unknown Judge Access customer was accepted"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .testStore,
+        expirationDate: cutoff,
+        appUserID: "$RCAnonymousID:public-fixture",
+        now: beforeCutoff
+      ) == .testStore,
+      "active Test Store entitlement did not unlock Premium"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .promotional,
+        expirationDate: cutoff.addingTimeInterval(3_600),
+        appUserID: judgeAppUserID,
+        now: beforeCutoff
+      ) == .judgeAccess(expiresAt: cutoff),
+      "RevenueCat granted entitlement was not bounded to the Judge Access cutoff"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .promotional,
+        expirationDate: cutoff.addingTimeInterval(3_600),
+        appUserID: judgeAppUserID,
+        now: afterCutoff
+      ) == nil,
+      "Judge Access remained unlocked after the local campaign cutoff"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: false,
+        store: .testStore,
+        expirationDate: cutoff,
+        appUserID: "$RCAnonymousID:public-fixture",
+        now: beforeCutoff
+      ) == nil,
+      "inactive entitlement unlocked Premium"
+    )
+  }
+
   private static func checkPremiumAccessibilityOutcomes() throws {
     let offeringMarker = "TEST-OFFERING"
+    let knownDigestMarker = "4e118a47833348f0"
     let cases: [(PremiumAccessState, PremiumAccessRecoveryAction, PremiumAccessFocusTarget)] = [
       (.configurationMissing, .connectTestStore, .testStoreAPIKey),
       (.configurationRejected, .connectTestStore, .testStoreAPIKey),
@@ -678,6 +745,29 @@ enum TenderVerdictNextGenChecks {
           && !outcome.announcement.contains("appl_")
           && !outcome.announcement.contains(offeringMarker),
         "accessibility announcement exposed configuration or package data"
+      )
+    }
+
+    let judgeCases:
+      [(JudgeAccessActivationState, PremiumAccessRecoveryAction?, PremiumAccessFocusTarget)] = [
+        (.invalidCode, .activateJudgeAccess, .judgeAccessCode),
+        (.expired, nil, .judgeAccessCode),
+        (.entitlementMissing, .activateJudgeAccess, .judgeAccessCode),
+        (.failed, .activateJudgeAccess, .judgeAccessCode),
+        (.active(expiresAt: RevenueCatJudgeAccess.expiresAt), .restore, .restore),
+      ]
+    for (state, primaryAction, focusTarget) in judgeCases {
+      guard let outcome = state.terminalAccessibilityOutcome else {
+        throw CheckFailure.failed("terminal Judge Access state omitted accessibility outcome")
+      }
+      try require(
+        outcome.primaryRecoveryAction == primaryAction,
+        "Judge Access recovery action changed"
+      )
+      try require(outcome.focusTarget == focusTarget, "Judge Access recovery focus changed")
+      try require(
+        !outcome.announcement.contains(knownDigestMarker),
+        "Judge Access announcement exposed a customer identifier"
       )
     }
   }
