@@ -38,7 +38,7 @@ all of the following without a purchase:
 
 The genuine current-revision screenshot is
 `submission/evidence/unlocked-judge-access-2026-08-09.png` (1020×754, SHA-256
-`ef051e9430352ce30d7c510aa49519de99d285856d96fa7ec89a15d833ae9c6f`). It contains neither the
+`7432611a953749f5c19ebc5a02e1092da564e43e574600308bc4cf26eb94c3c9`). It contains neither the
 raw reviewer code nor the Test Store key.
 
 ## Build and security evidence

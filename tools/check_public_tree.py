@@ -17,9 +17,12 @@ ICNS_PATH = "packaging/tenderverdict-icon.icns"
 ICO_PATH = "packaging/tenderverdict-icon.ico"
 SUBMISSION_ICON_PATH = "submission/icon-1024.png"
 SUBMISSION_SCREENSHOT_PATH = "submission/screenshot-1179x2556.png"
+JUDGE_ACCESS_EVIDENCE_PATH = "submission/evidence/unlocked-judge-access-2026-08-09.png"
 UNLOCKED_EVIDENCE_PATH = "submission/evidence/unlocked-test-store-2026-08-04.png"
 VOICEOVER_EVIDENCE_PATH = "submission/evidence/voiceover-restore-2026-08-04.png"
-EVIDENCE_SCREENSHOT_PATHS = frozenset({UNLOCKED_EVIDENCE_PATH, VOICEOVER_EVIDENCE_PATH})
+EVIDENCE_SCREENSHOT_PATHS = frozenset(
+    {JUDGE_ACCESS_EVIDENCE_PATH, UNLOCKED_EVIDENCE_PATH, VOICEOVER_EVIDENCE_PATH}
+)
 BINARY_ASSET_PATHS = frozenset(
     {
         SCREENSHOT_PATH,
