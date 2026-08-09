@@ -9,7 +9,6 @@ import json
 import subprocess
 from pathlib import Path
 
-
 EXPECTED_DURATION = 109.0
 EXPECTED_CODEC = "pcm_s24le"
 EXPECTED_SAMPLE_RATE = "48000"
@@ -77,9 +76,7 @@ def main() -> int:
     if stream.get("codec_name") != EXPECTED_CODEC:
         fail(f"codec expected={EXPECTED_CODEC} actual={stream.get('codec_name')}")
     if stream.get("sample_rate") != EXPECTED_SAMPLE_RATE:
-        fail(
-            f"sample_rate expected={EXPECTED_SAMPLE_RATE} actual={stream.get('sample_rate')}"
-        )
+        fail(f"sample_rate expected={EXPECTED_SAMPLE_RATE} actual={stream.get('sample_rate')}")
     if stream.get("channels") != EXPECTED_CHANNELS:
         fail(f"channels expected={EXPECTED_CHANNELS} actual={stream.get('channels')}")
     if stream.get("bits_per_raw_sample") not in {"24", None}:

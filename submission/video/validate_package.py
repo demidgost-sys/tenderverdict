@@ -9,9 +9,8 @@ import json
 import re
 import struct
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TIMELINE_PATH = PACKAGE_ROOT / "timeline.json"
@@ -162,10 +161,7 @@ for asset in manifest.get("assets", []):
         fail(f"asset_hash path={relative_path} actual={actual_hash}")
     actual_format, width, height = raster_format_and_dimensions(asset_path)
     if actual_format != asset["format"]:
-        fail(
-            f"asset_format path={relative_path} actual={actual_format} "
-            f"expected={asset['format']}"
-        )
+        fail(f"asset_format path={relative_path} actual={actual_format} expected={asset['format']}")
     if width != asset["width"] or height != asset["height"]:
         fail(
             f"asset_dimensions path={relative_path} actual={width}x{height} "
@@ -233,8 +229,7 @@ for expected_index, human_cue in enumerate(human_cues, start=1):
     actual_words = len(re.findall(r"[A-Za-z0-9_]+(?:[-'][A-Za-z0-9_]+)*", script))
     if int(human_cue["words"]) != actual_words:
         fail(
-            f"human_cue_words cue={expected_id} actual={actual_words} "
-            f"expected={human_cue['words']}"
+            f"human_cue_words cue={expected_id} actual={actual_words} expected={human_cue['words']}"
         )
     if not re.fullmatch(rf"TV_VO_{expected_id}_[a-z0-9_]+", human_cue["file_stem"]):
         fail(f"human_cue_filename cue={expected_id}")
@@ -300,9 +295,7 @@ if audio_streams:
     fail(f"audio_stream_count actual={len(audio_streams)}")
 video_stream = video_streams[0]
 if video_stream.get("width") != 1920 or video_stream.get("height") != 1080:
-    fail(
-        f"video_dimensions actual={video_stream.get('width')}x{video_stream.get('height')}"
-    )
+    fail(f"video_dimensions actual={video_stream.get('width')}x{video_stream.get('height')}")
 if video_stream.get("avg_frame_rate") != "30/1":
     fail(f"video_fps actual={video_stream.get('avg_frame_rate')}")
 video_duration = float(probe["format"]["duration"])
@@ -320,7 +313,7 @@ if (contact_width, contact_height) != (1920, 432):
 video_hash = sha256(VIDEO_PATH)
 contact_hash = sha256(CONTACT_SHEET_PATH)
 video_size = VIDEO_PATH.stat().st_size
-checked_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+checked_at = datetime.now(UTC).replace(microsecond=0).isoformat()
 ffprobe_receipt = json.dumps(probe, indent=2, sort_keys=True)
 report_lines = [
     "# Silent rough-cut QA receipt",
@@ -343,14 +336,21 @@ report_lines = [
     f"- Contact sheet: `1920x432`, SHA-256 `{contact_hash}`",
     "- Publication/upload/account actions: **not performed**",
     "",
-    "The MP4 is a silent evidence animatic built from still captures. It is not continuous final app footage.",
+    (
+        "The MP4 is a silent evidence animatic built from still captures. "
+        "It is not continuous final app footage."
+    ),
     "",
     "## ffprobe receipt",
     "",
     "Command:",
     "",
     "```bash",
-    "ffprobe -v error -show_entries format=duration,size:stream=index,codec_type,codec_name,width,height,avg_frame_rate -of json tenderverdict-silent-rough-cut-v1.mp4",
+    (
+        "ffprobe -v error -show_entries format=duration,size:"
+        "stream=index,codec_type,codec_name,width,height,avg_frame_rate "
+        "-of json tenderverdict-silent-rough-cut-v1.mp4"
+    ),
     "```",
     "",
     "```json",
