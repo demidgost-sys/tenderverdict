@@ -3,67 +3,66 @@
 Read only the quoted English paragraphs. Timing and direction lines are not spoken. The eight
 paragraphs concatenate exactly to `narration-en.txt` and `captions-en.srt`.
 
-## 01 · Problem · 00:00–00:10
+## 01 · Problem · 00:00–00:09.5
 
-Target spoken length: **about 9.0 seconds**. Calm start. Pause between the problem and the product
+Target spoken length: **about 8.1 seconds**. Calm start. Pause between the problem and the product
 promise; stress “different suppliers” and “human next step”.
 
 > One tender feed can mean different things for different suppliers. TenderVerdict turns every
 > notice into a clear human next step.
 
-## 02 · Local workflow · 00:10–00:23
+## 02 · Local workflow · 00:09.5–00:22
 
-Target spoken length: **about 10.5 seconds**. Precise and reassuring. Pause after “data”.
+Target spoken length: **about 10.9 seconds**. Precise and reassuring. Pause after “data”.
 
 > Everything runs locally on this Mac with synthetic demo data. Before the review starts, the app
 > shows what was loaded and what is missing.
 
-## 03 · Three verdicts · 00:23–00:38
+## 03 · Three verdicts · 00:22–00:36
 
-Target spoken length: **about 12.0 seconds**. Give Open documents, Watch, and Reject equal weight;
+Target spoken length: **about 12.3 seconds**. Give Open documents, Watch, and Reject equal weight;
 finish calmly on the human decision.
 
 > Each notice gets one of three clear results: Open documents, Watch, or Reject. The reasons stay
 > visible, and a person always makes the final decision.
 
-## 04 · Free · 00:38–00:52
+## 04 · Free · 00:36–00:48
 
-Target spoken length: **about 11.0 seconds**. Confident but factual. Stress “complete”.
+Target spoken length: **about 10.0 seconds**. Confident but factual. Stress “complete”.
 
 > The free version gives one complete supplier workflow: the full queue, visible reasons, source
 > links, a review brief, and JSON export.
 
-## 05 · Portfolio · 00:52–01:08
+## 05 · Portfolio · 00:48–01:04
 
-Target spoken length: **about 13.0 seconds**. Stress “Portfolio Workspace” and clearly separate
+Target spoken length: **about 13.5 seconds**. Stress “Portfolio Workspace” and clearly separate
 RevenueCat access from TenderVerdict decisions.
 
 > RevenueCat unlocks Portfolio Workspace: comparison and full export for up to five supplier
-> profiles. It never changes a verdict, creates a score, or makes a bid decision.
+> profiles. It never creates a score or makes a bid decision.
 
-## 06 · Test Store · 01:08–01:23
+## 06 · Test Store · 01:04–01:19.7
 
-Target spoken length: **about 13.2 seconds**. Evidence tone. Give the last two payment-boundary
+Target spoken length: **about 15.5 seconds**. Evidence tone. Give the last two payment-boundary
 sentences their own clear beats.
 
 > In a verified RevenueCat Test Store run, the SDK showed a test purchase screen. CustomerInfo
 > confirmed the entitlement was active. It was not an App Store payment. No money was charged.
 
-## 07 · Judge Access · 01:23–01:39
+## 07 · Judge Access · 01:19.7–01:35.7
 
-Target spoken length: **about 13.5 seconds**. Stress “checks” so Judge Access does not sound like a
+Target spoken length: **about 15.4 seconds**. Stress “checks” so Judge Access does not sound like a
 local Premium bypass. Keep the recovery list measured.
 
 > For judges, RevenueCat Judge Access checks the same entitlement without a purchase. A fresh
 > CustomerInfo check, Restore, returning to the app, and a full relaunch all kept access active.
 
-## 08 · Value close · 01:39–01:49
+## 08 · Safety and license close · 01:35.7–01:49
 
-Target spoken length: **about 9.5 seconds**. Return to the product value; stress “every supplier
-profile”. Keep the evaluation boundary factual.
+Target spoken length: **about 12.4 seconds**. Keep each boundary factual and clearly separated.
 
-> TenderVerdict keeps one tender feed clear across every supplier profile: local, explainable, and
-> human-owned. This Shipaton build uses synthetic data and RevenueCat Test Store.
+> Synthetic demo data. No usable key is stored. This is not production billing. TenderVerdict is
+> open-source macOS software under Apache 2.0.
 
 ## Pronunciation block
 
@@ -80,3 +79,4 @@ Practice this section before recording; do not include it in a take.
 | Judge Access | **judge access** |
 | SDK | the letters **S-D-K** |
 | JSON | **JAY-son** |
+| Apache 2.0 | **uh-PATCH-ee two point zero** |

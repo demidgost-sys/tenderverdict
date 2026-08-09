@@ -7,23 +7,23 @@ that file.
 ## Timing
 
 - Timeline: **109.000 seconds / 1:49**.
-- Script: **201 words** by the package validator.
-- Overall timeline density: **110.6 words per minute**.
-- The marked human takes target roughly **115–152 spoken words per minute**, leaving about 17.3
+- Script: **196 words** by the package validator.
+- Overall timeline density: **107.9 words per minute**.
+- The selected human takes run roughly **107–148 spoken words per minute**, leaving about 10.9
   seconds across the timeline for sentence pauses and visual breathing room.
 - Record the whole script naturally in one continuous session. The editor cuts it into the eight
   blocks below; never time-stretch the voice.
 
 | Time | Block | Target spoken length | Delivery note |
 |---|---:|---:|---|
-| 00:00–00:10 | 1 | 9.0 s | Calm problem statement; stress different suppliers |
-| 00:10–00:23 | 2 | 10.5 s | Precise; pause after synthetic demo data |
-| 00:23–00:38 | 3 | 12.0 s | Give Open / Watch / Reject equal weight |
-| 00:38–00:52 | 4 | 11.0 s | Confident but not promotional; stress complete |
-| 00:52–01:08 | 5 | 13.0 s | RevenueCat access must stay separate from verdict logic |
-| 01:08–01:23 | 6 | 13.2 s | Clearly separate Test Store from a real payment |
-| 01:23–01:39 | 7 | 13.5 s | Stress checks; measured refresh / Restore / relaunch list |
-| 01:39–01:49 | 8 | 9.5 s | Value-led close; stress every supplier profile |
+| 00:00–00:09.5 | 1 | 8.1 s | Calm problem statement; stress different suppliers |
+| 00:09.5–00:22 | 2 | 10.9 s | Precise; pause after synthetic demo data |
+| 00:22–00:36 | 3 | 12.3 s | Give Open / Watch / Reject equal weight |
+| 00:36–00:48 | 4 | 10.0 s | Confident but not promotional; stress complete |
+| 00:48–01:04 | 5 | 13.5 s | RevenueCat access must stay separate from verdict logic |
+| 01:04–01:19.7 | 6 | 15.5 s | Clearly separate Test Store from a real payment |
+| 01:19.7–01:35.7 | 7 | 15.4 s | Stress checks; measured refresh / Restore / relaunch list |
+| 01:35.7–01:49 | 8 | 12.4 s | Factual synthetic-data, key, billing, and license close |
 
 ## Pronunciation and voice direction
 
@@ -35,6 +35,7 @@ that file.
 - “TenderVerdict”: **TEN-der VER-dict**.
 - “RevenueCat”: normal English brand pronunciation; do not over-enunciate it.
 - “CustomerInfo”: **customer info**.
+- “Apache 2.0”: **uh-PATCH-ee two point zero**.
 - No impersonation, cloned voice, whisper, trailer voice, exaggerated emotion, music, or synthetic
   sound effects.
 - Because this route uses the owner's real recorded performance, no AI-voice disclosure is needed.

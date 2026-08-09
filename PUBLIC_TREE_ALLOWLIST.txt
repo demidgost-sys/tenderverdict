@@ -102,6 +102,7 @@ submission/video/AUDIT.md
 submission/video/BEAT_SHEET.md
 submission/video/CALLOUTS.md
 submission/video/DIRECTOR_HANDOFF_RU.md
+submission/video/FINAL_VIDEO_QA.md
 submission/video/HUMAN_VOICE_MARKED_SCRIPT_EN.md
 submission/video/HUMAN_VOICE_RECORDING_GUIDE_RU.md
 submission/video/HUMAN_VOICE_TAKE_LOG.md

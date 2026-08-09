@@ -5,14 +5,14 @@ one second under the working 1:50 ceiling.
 
 | Time | Beat | Screen proof | Claim boundary |
 |---|---|---|---|
-| 00:00–00:10 | Problem | Current hero and Portfolio Signal: one feed, three profiles, changed outcomes | Human metadata triage, not award prediction or a bid decision |
-| 00:10–00:23 | Local source and workflow | Committed synthetic workspace/notices, local inputs, analyzed count, explicit review date | Local files; no upload, hosted backend, or secret persistence claim |
-| 00:23–00:38 | Three verdicts | Current first-profile queue with Open documents, Watch, and Reject | Same canonical rules and review date; reasons stay inspectable |
-| 00:38–00:52 | Free value | Complete first profile, reasoning, supplied sources, brief, schema-3 JSON export | Free is functional, not a disabled demo |
-| 00:52–01:08 | Portfolio value | Current comparison matrix across the same shared notices | Up to five independent profiles; no combined score, ranking, or changed verdict |
-| 01:08–01:23 | RevenueCat Test Store | Dated development-only purchase sheet, then dated entitlement-unlocked baseline | Official SDK/Test Store baseline; no App Store payment and no real charge |
-| 01:23–01:39 | Judge Access, Restore, relaunch | Current no-purchase Judge Access capture plus dated relaunch baseline | Current `cbe8b20` refresh/Restore/foreground/relaunch evidence; grant is not a purchase |
-| 01:39–01:49 | Value close | Product icon and the one-feed promise | Local and human-owned; synthetic Test Store evaluation with no real charge |
+| 00:00–00:09.5 | Problem | Current hero and Portfolio Signal: one feed, three profiles, changed outcomes | Human metadata triage, not award prediction or a bid decision |
+| 00:09.5–00:22 | Local source and workflow | Committed synthetic workspace/notices, local inputs, analyzed count, explicit review date | Local files; no upload, hosted backend, or secret persistence claim |
+| 00:22–00:36 | Three verdicts | Current first-profile queue with Open documents, Watch, and Reject | Same canonical rules and review date; reasons stay inspectable |
+| 00:36–00:48 | Free value | Complete first profile, reasoning, supplied sources, brief, schema-3 JSON export | Free is functional, not a disabled demo |
+| 00:48–01:04 | Portfolio value | Current comparison matrix across the same shared notices | Up to five independent profiles; no combined score, ranking, or automatic bid decision |
+| 01:04–01:19.7 | RevenueCat Test Store | Dated development-only purchase sheet, then dated entitlement-unlocked baseline | Official SDK/Test Store baseline; no App Store payment and no real charge |
+| 01:19.7–01:35.7 | Judge Access, Restore, relaunch | Current no-purchase Judge Access capture plus dated relaunch baseline | Current refresh/Restore/foreground/relaunch evidence; grant is not a purchase |
+| 01:35.7–01:49 | Safety and license close | Product icon with explicit synthetic-data, secret, billing, and license boundaries | No usable key, no production billing, Apache 2.0 |
 
 ## Claim-to-evidence map
 

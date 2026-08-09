@@ -4,7 +4,7 @@
   "shots": [
     {
       "id": "01-problem",
-      "duration": 10.0,
+      "duration": 9.5,
       "source": "../screenshot-1179x2556.png",
       "crop": {"x": 0, "y": 0, "width": 1179, "height": 720},
       "eyebrow": "PROBLEM",
@@ -15,7 +15,7 @@
     },
     {
       "id": "02-local-workflow",
-      "duration": 13.0,
+      "duration": 12.5,
       "source": "../screenshot-1179x2556.png",
       "crop": {"x": 0, "y": 570, "width": 1179, "height": 790},
       "eyebrow": "LOCAL WORKFLOW",
@@ -26,7 +26,7 @@
     },
     {
       "id": "03-three-verdicts",
-      "duration": 15.0,
+      "duration": 14.0,
       "source": "../screenshot-1179x2556.png",
       "crop": {"x": 0, "y": 1290, "width": 1179, "height": 1260},
       "eyebrow": "THREE VERDICTS",
@@ -37,7 +37,7 @@
     },
     {
       "id": "04-free",
-      "duration": 14.0,
+      "duration": 12.0,
       "source": "../screenshot-1179x2556.png",
       "crop": {"x": 0, "y": 1180, "width": 1179, "height": 720},
       "eyebrow": "FREE",
@@ -59,7 +59,7 @@
     },
     {
       "id": "06-test-store-sheet",
-      "duration": 6.0,
+      "duration": 7.2,
       "source": "assets/test-store-purchase-sheet-baseline-2026-08-04.jpg",
       "eyebrow": "TEST STORE BASELINE · 2026-08-04",
       "title": "Development-only purchase sheet.",
@@ -69,7 +69,7 @@
     },
     {
       "id": "07-test-store-entitlement",
-      "duration": 9.0,
+      "duration": 8.5,
       "source": "../evidence/unlocked-test-store-2026-08-04.png",
       "eyebrow": "TEST STORE BASELINE · 2026-08-04",
       "title": "supplier_profiles_plus active.",
@@ -79,7 +79,7 @@
     },
     {
       "id": "08-judge-access",
-      "duration": 8.0,
+      "duration": 7.4,
       "source": "../evidence/unlocked-judge-access-2026-08-09.png",
       "crop": {"x": 20, "y": 250, "width": 980, "height": 490},
       "eyebrow": "CURRENT EVIDENCE · cbe8b20",
@@ -90,7 +90,7 @@
     },
     {
       "id": "09-relaunch",
-      "duration": 8.0,
+      "duration": 8.6,
       "source": "assets/entitlement-restored-on-relaunch-baseline-2026-08-04.jpg",
       "eyebrow": "RELAUNCH BASELINE · 2026-08-04",
       "title": "Access recovered after relaunch.",
@@ -100,13 +100,13 @@
     },
     {
       "id": "10-boundary",
-      "duration": 10.0,
+      "duration": 13.3,
       "source": "../icon-1024.png",
       "eyebrow": "TENDERVERDICT",
-      "title": "One tender feed. A clear next step for every supplier profile.",
-      "body": "Local, explainable, and human-owned.",
-      "chips": ["SYNTHETIC DATA", "TEST STORE", "NO REAL CHARGE"],
-      "evidence": "Shipaton evaluation · no stored usable key · no production billing"
+      "title": "Open-source macOS software.",
+      "body": "Synthetic demo data. No usable key is stored. This is not production billing.",
+      "chips": ["APACHE 2.0", "NO STORED KEY", "NO PRODUCTION BILLING"],
+      "evidence": "Shipaton evaluation boundary · public Apache 2.0 repository"
     }
   ]
 }

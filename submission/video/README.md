@@ -1,12 +1,13 @@
 # TenderVerdict Shipaton video package
 
 This directory is the local, production-ready handoff for the English Shipaton demo. The current
-review artifact is a **silent 1:49 animatic** assembled from genuine, sanitized application captures.
-It contains no audio stream and is not uploaded or submitted.
+local review master is a **1:49 video with the owner's human narration and burned English captions**.
+It uses live Release-app footage for the product walkthrough and genuine sanitized evidence cards
+for the RevenueCat section. It is not uploaded or submitted.
 
-The animatic proves the story and timing. It does not pretend that still images are continuous app
-footage. The final editor may replace the marked shots with current packaged-app screen recordings
-without changing the narration, captions, claims, or runtime.
+The reproducible silent animatic remains the timing and evidence fallback. The final local review
+master replaces the first 48 seconds with a current packaged-app window recording without changing
+the approved claims or 109-second runtime.
 
 ## Start here
 
@@ -33,6 +34,8 @@ without changing the narration, captions, claims, or runtime.
 
 ## Review outputs
 
+- `tenderverdict-final-review-v1.mp4` — local SSD-cache artifact outside the repository: 1920×1080,
+  30 fps, 1:49 H.264/AAC review master with burned English captions; not tracked or published.
 - `tenderverdict-silent-rough-cut-v1.mp4` — exact 1920×1080, 30 fps, 1:49 silent animatic;
   intentionally ignored and untracked because the public-tree policy rejects tracked files over
   1 MiB.
@@ -41,7 +44,10 @@ without changing the narration, captions, claims, or runtime.
 - `silent-rough-cut-contact-sheet.png` — ten-frame visual QA sheet.
 - `OUTPUT_QA.md` — committed public-safe runtime, ffprobe stream, caption, asset, and hash receipt.
 - `human-voice-takes/` — ignored local destination for owner-recorded raw WAV files.
-- `tenderverdict-vo-human-v1.wav` — ignored future 109-second dry human voice master.
+- `tenderverdict-vo-human-v1.wav` — ignored 109-second dry human voice master assembled only from
+  the owner's supplied AIFC, without time-stretch or generated speech.
+- `FINAL_VIDEO_QA.md` — public-safe local-master metadata, provenance, caption, and remaining
+  listening-gate receipt.
 
 ## Rebuild and validate
 

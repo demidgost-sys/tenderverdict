@@ -1,82 +1,86 @@
 1
-00:00:00,000 --> 00:00:05,000
+00:00:00,000 --> 00:00:05,220
 One tender feed can mean different things
 for different suppliers.
 
 2
-00:00:05,000 --> 00:00:10,000
+00:00:05,220 --> 00:00:09,500
 TenderVerdict turns every notice into
 a clear human next step.
 
 3
-00:00:10,000 --> 00:00:16,000
+00:00:09,500 --> 00:00:15,300
 Everything runs locally on this Mac
 with synthetic demo data.
 
 4
-00:00:16,000 --> 00:00:23,000
+00:00:15,300 --> 00:00:22,000
 Before the review starts, the app shows
 what was loaded and what is missing.
 
 5
-00:00:23,000 --> 00:00:30,000
+00:00:22,000 --> 00:00:30,200
 Each notice gets one of three clear results:
 Open documents, Watch, or Reject.
 
 6
-00:00:30,000 --> 00:00:38,000
+00:00:30,200 --> 00:00:36,000
 The reasons stay visible, and a person
 always makes the final decision.
 
 7
-00:00:38,000 --> 00:00:44,000
+00:00:36,000 --> 00:00:40,900
 The free version gives one complete supplier workflow:
 
 8
-00:00:44,000 --> 00:00:52,000
+00:00:40,900 --> 00:00:48,000
 the full queue, visible reasons, source links,
 a review brief, and JSON export.
 
 9
-00:00:52,000 --> 00:00:59,000
+00:00:48,000 --> 00:00:58,800
 RevenueCat unlocks Portfolio Workspace: comparison
 and full export for up to five supplier profiles.
 
 10
-00:00:59,000 --> 00:01:08,000
-It never changes a verdict, creates a score,
+00:00:58,800 --> 00:01:04,000
+It never creates a score
 or makes a bid decision.
 
 11
-00:01:08,000 --> 00:01:14,000
+00:01:04,000 --> 00:01:11,300
 In a verified RevenueCat Test Store run,
 the SDK showed a test purchase screen.
 
 12
-00:01:14,000 --> 00:01:18,500
+00:01:11,300 --> 00:01:15,880
 CustomerInfo confirmed the entitlement was active.
 
 13
-00:01:18,500 --> 00:01:23,000
+00:01:15,880 --> 00:01:19,700
 It was not an App Store payment.
 No money was charged.
 
 14
-00:01:23,000 --> 00:01:31,000
+00:01:19,700 --> 00:01:26,780
 For judges, RevenueCat Judge Access checks
 the same entitlement without a purchase.
 
 15
-00:01:31,000 --> 00:01:39,000
+00:01:26,780 --> 00:01:35,700
 A fresh CustomerInfo check, Restore, returning to the app,
 and a full relaunch all kept access active.
 
 16
-00:01:39,000 --> 00:01:44,500
-TenderVerdict keeps one tender feed clear across every supplier
-profile: local, explainable, and human-owned.
+00:01:35,700 --> 00:01:40,480
+Synthetic demo data.
+No usable key is stored.
 
 17
-00:01:44,500 --> 00:01:49,000
-This Shipaton build uses synthetic data
-and RevenueCat Test Store.
+00:01:40,480 --> 00:01:42,740
+This is not production billing.
+
+18
+00:01:42,740 --> 00:01:49,000
+TenderVerdict is open-source macOS software
+under Apache 2.0.

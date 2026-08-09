@@ -7,11 +7,11 @@
 - Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
 - Current hands-on evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
 - Current candidate: **clean committed product revision, fresh Release and Debug packages,
-  complete local gate, a final silent Test Store/Judge Access receipt, and draft-PR validation on
-  the pushed competition-branch head**
-- Presentation state: **the competition branch contains the combined public-safe QA and silent
-  video handoff; a focused local pass now aligns the README front door, Devpost story, gallery
-  order, and value-led video close without changing product behavior**
+  complete local gate, final silent Test Store/Judge Access evidence, and a captioned 1:49 local
+  review master awaiting the owner's normal-speed watch/listen before publication**
+- Presentation state: **the competition branch contains the combined public-safe QA, judge-first
+  README and Devpost story, refreshed gallery order, and exact metadata/visual-QA receipt for the
+  human-narrated video without changing product behavior**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Competition-branch state: **current polish is committed for the draft PR; not released and not
   submitted to Devpost**
@@ -84,7 +84,7 @@ keeping the published open-source CLI honest and useful.
 | Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
 | Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release and Debug artifacts from exact clean revision `cbe8b20`; details below |
 | Presentation | Judge-first README entry, exact icon, refreshed light/dark-reviewed portrait screenshot, current unlocked comparison evidence, concise human-facing Devpost copy, value-led silent-video close, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `README.md`, `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
-| Quality | 125 Python tests including 6 private-launcher and 3 release-scanner tests; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The exact product revision has fresh local source/package evidence; draft PR #12 is the pushed-head CI record |
+| Quality | 126 Python tests including 6 private-launcher, 3 release-scanner, and fail-closed notarization-option coverage; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The integrated presentation head has fresh local source/package evidence; draft PR #12 remains the authoritative pushed-head CI record |
 
 ## Current clean evaluation artifact
 
@@ -164,17 +164,16 @@ release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_DRAFT` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative pushed-head CI record at `217c091`; the isolated integration head remains unpushed |
+| 7 | Current pushed implementation revision passes all required CI checks | `READY` — draft PR #12 is the authoritative record; each new competition-branch head is accepted only after its exact check suite completes |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — current-student status, TU Graz affiliation, July 2028 graduation, and the academic-domain email were confirmed in Devpost |
 | 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `BLOCKED_FORM_RULE_CONFLICT` — the authenticated field inventory and saved draft readback are complete, but the required store-release checkbox has no No/Next Gen path; a field-specific organizer correction or written instruction is pending |
-| 11 | Public captioned macOS demo under two minutes is published | `PRODUCTION_HANDOFF_READY / PUBLIC_MEDIA_OPEN` — the exact 1:49 silent animatic, captions, manifests, and owner-recording kit exist locally; no final recorded or public video is claimed |
+| 11 | Public captioned macOS demo under two minutes is published | `LOCAL_REVIEW_MASTER_READY / OWNER_LISTEN_AND_PUBLICATION_OPEN` — the exact 1:49 human-narrated master has burned English captions plus metadata and visual QA; one owner watch/listen and the public upload remain |
 | 12 | Final commit, repository URL, video URL, and submitted view are checked while logged out | `FINAL_GATE` |
 
 **Result: 9 of 12 submission gates ready.** The remaining gates are a truthful resolution of the
-private-form conflict, the recorded/public video, and the exact pushed-head logged-out
-link/submission review. Completing a field inventory or a silent animatic does not close those
-gates.
+private-form conflict, publication of the reviewed local video, and the exact pushed-head
+logged-out link/submission review. A local review master does not close the public-link gate.
 
 ## Reconciliation with the previous plans
 
