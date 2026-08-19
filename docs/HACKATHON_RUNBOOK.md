@@ -42,14 +42,11 @@ Sources rechecked on 2026-08-05:
 - [Test Store eligibility answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
 - [macOS submission answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-The owner has joined with the qualifying student profile, and the authenticated private-field
-inventory is complete. The draft overview, evidence-bounded story, repository link, tags, and three
-verified gallery images were saved and read back; Additional info remains unsaved. Its required
-store-release checkbox has no No option or visible Next Gen exception, so it cannot be checked
-truthfully for this store-exempt macOS entry. A narrow field-specific follow-up is pending in the
-[public organizer thread](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient).
-Do not treat the earlier Test Store answer as an answer to this different form-attestation issue,
-and do not accept Terms or submit without a separate final action.
+The owner joined with the qualifying student profile and completed the authenticated private-field
+inventory. The organizer fixed the contradictory store-release validation; store release remained
+false, final Submit succeeded on 2026-08-19, and authenticated plus logged-out readbacks passed.
+The public-safe receipt is in
+[`submission/DEVPOST_FINALIZATION_QA.md`](../submission/DEVPOST_FINALIZATION_QA.md).
 
 ## Current product proof
 
@@ -278,13 +275,13 @@ Never use a fake entitlement state as evidence.
   light/dark and the regenerated portrait screenshot also pass visual review.
 - [x] The link-accessible YouTube demo is 1:49, shows the packaged macOS app, includes burned and
   selectable English captions, and passes logged-out URL plus YouTube policy checks.
-- [ ] The owner completes one normal-speed watch/listen of the hosted demo.
+- [x] The owner completed one normal-speed watch/listen of the hosted demo and accepted v2.
 - [x] Icon is exactly 1024×1024.
 - [x] At least one current screenshot is exactly 1179×2556 and has no device frame.
 - [x] Devpost draft contains no key, private data, unsupported payment claim, or fabricated result.
 - [x] The current pushed SHA, public repository, and video URL are recorded and checked without
   authenticated browser state.
-- [ ] The final submitted entry and submitted view are checked while logged out.
+- [x] The final submitted entry and submitted view were checked while logged out.
 
 ## Optional evidence follow-ups
 

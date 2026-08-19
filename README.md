@@ -7,7 +7,7 @@
 <p align="center"><strong>One tender feed. A clear next step for every supplier profile.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=hackathon%2Frevenuecat-next-gen-2026&amp;event=push" alt="CI status for the Shipaton competition branch"></a>
+  <a href="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml"><img src="https://github.com/demidgost-sys/tenderverdict/actions/workflows/ci.yml/badge.svg?branch=hackathon%2Frevenuecat-next-gen-2026" alt="CI status for the Shipaton competition branch"></a>
   &nbsp;·&nbsp; <a href="https://github.com/demidgost-sys/tenderverdict/releases/tag/v0.2.0-alpha.1">v0.2.0-alpha.1</a>
   &nbsp;·&nbsp; Python 3.11+
   &nbsp;·&nbsp; <a href="LICENSE">Apache-2.0</a>
@@ -39,8 +39,12 @@ the documents.
 | Shareable review brief and deterministic JSON | Full portfolio brief and deterministic portfolio JSON |
 
 <p align="center">
-  <img src="submission/evidence/unlocked-judge-access-2026-08-09.png" width="900" alt="TenderVerdict Next Gen showing the same three synthetic notices compared across three supplier profiles after RevenueCat Judge Access refresh.">
+  <img src="submission/gallery-hero-1020x754.png" width="900" alt="TenderVerdict Next Gen showing one synthetic tender feed, three supplier profiles, and two notices whose outcomes change by profile.">
 </p>
+
+The gallery hero is a direct, pre-transaction capture from the current packaged native app. The
+current genuine Judge Access comparison remains available in the
+[public-safe evidence](submission/evidence/README.md).
 
 RevenueCat controls access to the Portfolio presentation; it never changes a qualification result.
 The product-native verdicts are `open_documents`, `watch`, and `reject`, presented in the pitch as

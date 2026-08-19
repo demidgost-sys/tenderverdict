@@ -1,7 +1,7 @@
-# TenderVerdict Next Gen — Devpost draft
+# TenderVerdict Next Gen — canonical Devpost story
 
-> Draft only. Do not publish or submit until the final package, media, eligibility, and logged-out
-> URL checks in `docs/HACKATHON_RUNBOOK.md` pass.
+> The project was submitted on 2026-08-19. After any post-submit edit, verify that the authenticated
+> entry still says `Submitted` and that the public page renders while logged out.
 
 ## Tagline
 
@@ -104,18 +104,16 @@ workflow makes the Portfolio value easier to understand, and visible reasoning m
 new score. The strongest product sentence is also the product loop: one feed, different supplier
 outcomes, and evidence a person can defend.
 
-## What is next
+## What's next for TenderVerdict Next Gen
 
-The app is an ad-hoc-signed competition evaluation build, not a notarized consumer release. The
-owner accepted the repaired captioned v2 after a normal-speed watch/listen, its link-accessible URL
-is saved in Devpost, and the pushed candidate passes exact-head CI. Every truthful Additional info
-value is saved, including store release = false, but final Submit is server-rejected by the
-contradictory required-field validation. A public follow-up and direct private manager escalation
-are pending.
+Next, I want to validate the workflow with small supplier teams, improve trusted distribution and
+notarization, and move from Test Store evidence to production billing only after real demand is
+proven. The current app remains an ad-hoc-signed competition evaluation build, not a notarized
+consumer release or production-payment claim.
 
 ## Links
 
 - Competition source: `https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026`
 - Demo video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
-- Pushed candidate revision at the finalization attempt: `f7744d1322f90e49dc55b1938218dd4b74669a07`
+- Submitted competition head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
 - Demo master SHA-256: `5862094c00c8dcb5e2e793d46d1ced44a003458dfcb1d957484135da13c6d047`

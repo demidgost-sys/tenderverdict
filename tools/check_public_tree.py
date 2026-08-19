@@ -17,6 +17,7 @@ ICNS_PATH = "packaging/tenderverdict-icon.icns"
 ICO_PATH = "packaging/tenderverdict-icon.ico"
 SUBMISSION_ICON_PATH = "submission/icon-1024.png"
 SUBMISSION_SCREENSHOT_PATH = "submission/screenshot-1179x2556.png"
+SUBMISSION_GALLERY_HERO_PATH = "submission/gallery-hero-1020x754.png"
 JUDGE_ACCESS_EVIDENCE_PATH = "submission/evidence/unlocked-judge-access-2026-08-09.png"
 UNLOCKED_EVIDENCE_PATH = "submission/evidence/unlocked-test-store-2026-08-04.png"
 VOICEOVER_EVIDENCE_PATH = "submission/evidence/voiceover-restore-2026-08-04.png"
@@ -42,6 +43,7 @@ BINARY_ASSET_PATHS = frozenset(
         ICO_PATH,
         SUBMISSION_ICON_PATH,
         SUBMISSION_SCREENSHOT_PATH,
+        SUBMISSION_GALLERY_HERO_PATH,
         *EVIDENCE_SCREENSHOT_PATHS,
         *VIDEO_PNG_ASSET_DIMENSIONS,
         *VIDEO_JPEG_ASSET_DIMENSIONS,
@@ -327,6 +329,15 @@ def _validate_submission_screenshot(path: Path) -> None:
         raise TreeError(f"{SUBMISSION_SCREENSHOT_PATH} must be exactly 1179x2556, got {dimensions}")
 
 
+def _validate_submission_gallery_hero(path: Path) -> None:
+    payload = path.read_bytes()
+    dimensions = _validate_png_payload(payload, SUBMISSION_GALLERY_HERO_PATH)
+    if dimensions != (1020, 754):
+        raise TreeError(
+            f"{SUBMISSION_GALLERY_HERO_PATH} must be exactly 1020x754, got {dimensions}"
+        )
+
+
 def _validate_evidence_screenshot(path: Path, relative: str) -> None:
     payload = path.read_bytes()
     dimensions = _validate_png_payload(payload, relative)
@@ -468,6 +479,8 @@ def validate_tree(root: Path, *, sdist: bool = False) -> list[str]:
             _validate_submission_icon(path)
         elif relative == SUBMISSION_SCREENSHOT_PATH:
             _validate_submission_screenshot(path)
+        elif relative == SUBMISSION_GALLERY_HERO_PATH:
+            _validate_submission_gallery_hero(path)
         elif relative in EVIDENCE_SCREENSHOT_PATHS:
             _validate_evidence_screenshot(path, relative)
         elif relative in VIDEO_PNG_ASSET_DIMENSIONS:

@@ -3,7 +3,8 @@
 This directory is the local, production-ready handoff for the English Shipaton demo. The current
 local review master is a **1:49 video with the owner's human narration and burned English captions**.
 It uses live Release-app footage for the product walkthrough and genuine sanitized evidence cards
-for the RevenueCat section. It is not uploaded or submitted.
+for the RevenueCat section. The repaired v2 was published at the canonical YouTube URL and used in
+the submitted Devpost entry; raw local MP4 and WAV files remain ignored.
 
 The reproducible silent animatic remains the timing and evidence fallback. The final local review
 master replaces the first 48 seconds with a current packaged-app window recording without changing

@@ -10,6 +10,7 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | Asset | Current status | Contract |
 |---|---|---|
 | `icon-1024.png` | Ready | Exactly 1024×1024, extracted byte-for-byte from the reviewed ICNS 1024 px chunk |
+| `gallery-hero-1020x754.png` | Ready current candidate | Exactly 1020×754, direct current-package native capture for the first gallery image after the video; synthetic data and no purchase state |
 | `screenshot-1179x2556.png` | Ready current candidate | Exactly 1179×2556, regenerated from the current native UX, sanitized, and visually reviewed in light and dark appearance; repeat after later visual changes |
 | `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
 | `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
@@ -40,9 +41,10 @@ The video handoff in [`video/`](video/) is locally complete. The final master us
 self-recorded voice, includes burned English captions, and has matching YouTube SRT captions.
 Metadata, visual privacy, YouTube policy, owner watch/listen, and logged-out link checks pass.
 
-Every truthful Devpost Additional info value is saved, including store release = false. Final
-Submit was attempted but the server rejected the project through the contradictory required
-store-release validation. Current readiness and the exact public-safe receipt are tracked in
+Every truthful Devpost Additional info value was saved, including store release = false. After the
+organizer fixed the contradictory required-field validation, final Submit succeeded and both the
+authenticated `Submitted` view and logged-out public page were verified. Current readiness and the
+exact public-safe receipt are tracked in
 [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md) and
 [`DEVPOST_FINALIZATION_QA.md`](DEVPOST_FINALIZATION_QA.md); no private account value is copied here.
 
@@ -55,13 +57,14 @@ isolation, exact RevenueCat identifiers, and pure Portfolio announcement/recover
 - [Shipaton Manager answer: Test Store-only purchase is acceptable](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
 - [Shipaton answer: macOS is eligible with no platform-only disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
 
-Preserve the full dated threads. These answers resolve only the Test Store and platform
-interpretations. The public-video gate is complete; the contradictory store-release validation and
-final submission remain unresolved.
+Preserve the full dated threads. These answers resolve the Test Store and platform interpretations;
+the separate field-specific organizer response and final submission outcome are recorded in the
+[evidence ledger](../docs/SHIPATON_EVIDENCE.md).
 
 ## Regenerate and validate
 
-Build the final revision first, then regenerate the portrait candidate:
+Build the final revision first, then regenerate the portrait candidate. Capture the gallery hero
+directly from the current packaged Release app at the top of the guided synthetic example:
 
 ```bash
 TENDERVERDICT_WORKTREE="$PWD" \
@@ -76,9 +79,7 @@ The sanitizer removes ancillary PNG metadata chunks without changing `IHDR`, `ID
 image data. The public-tree gate verifies exact dimensions and PNG structure; it cannot replace a
 human visual check of clipping, hierarchy, focus, contrast, or truthful entitlement state.
 
-For the final entry, keep the exact 1179×2556 portrait for any required portrait slot. Where the
-gallery permits a landscape lead or multiple images, lead with
-`evidence/unlocked-judge-access-2026-08-09.png` so the cross-profile value is visible immediately,
-then use the portrait for the complete Free-to-Portfolio workflow. Label Judge Access as a granted
-entitlement, not a purchase. Do not use a hidden launch flag, edited entitlement, mock purchase, or
-composited fake as transaction evidence.
+For the final entry, place the deterministic 3:2 gallery hero immediately after the video, then the
+genuine `evidence/unlocked-judge-access-2026-08-09.png` comparison and the exact 1179×2556 portrait.
+Label Judge Access as a granted entitlement, not a purchase. Do not use a hidden launch flag,
+edited entitlement, mock purchase, or composited fake as transaction evidence.

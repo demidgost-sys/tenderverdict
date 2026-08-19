@@ -77,10 +77,10 @@ committed.
    unchanged; it must not be shortened.
 3. **Spoken accessibility evidence — optional:** run the VoiceOver sequence only when sound is
    acceptable.
-4. **Submission — blocked/open:** every truthful private field is saved, including store release =
-   false, but final Submit is server-rejected by the contradictory required validation. The
-   owner-approved 1:49 captioned YouTube v2 and exact-head repository/video link checks are
-   complete; the submitted view remains unavailable.
+4. **Submission — pass:** every truthful private field was saved, including store release = false.
+   After the organizer corrected the contradictory validation, final Submit succeeded; the
+   authenticated `Submitted` view, public project page, owner-approved 1:49 captioned YouTube v2,
+   and repository/video links were verified.
 
 ## Verdicts
 
