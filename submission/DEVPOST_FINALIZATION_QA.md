@@ -1,11 +1,12 @@
 # Devpost finalization QA receipt
 
-- Checked: **2026-08-09**
-- Status: **BLOCKED_FORM_RULE_CONFLICT — not submitted**
+- Checked: **2026-08-19**
+- Status: **SUBMITTED — authenticated and logged-out readbacks passed**
 - Project: **TenderVerdict Next Gen**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
-- Head at final Submit attempt: `f7744d1322f90e49dc55b1938218dd4b74669a07`
-- Previous exact-head CI: **18 / 18 required checks passed**
+- Submission candidate head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
+- Exact-head GitHub Actions: **CI success; Desktop preview success**
+- Public project: https://devpost.com/software/tenderverdict-next-gen
 
 This receipt records only public-safe outcomes. It contains no key, reviewer code, customer
 identifier, account email, RevenueCat project identifier, or absolute local path.
@@ -20,7 +21,12 @@ identifier, account email, RevenueCat project identifier, or absolute local path
   watch/listen and accepted this repaired version.
 - Superseded v1 is Private, excluded from Devpost, and returns unauthenticated oEmbed HTTP 403.
 
-## Truthful Additional info save
+## Organizer correction and truthful Additional info save
+
+Shipaton Manager Perttu Lähteenlahti replied in the
+[field-specific public discussion](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44872-next-gen-submission-blocked-by-required-store-release-checkbox)
+that the form had been fixed. A fresh authenticated readback confirmed that the store-release
+checkbox was unchecked, enabled, and no longer required.
 
 Authenticated readback confirmed that the following values were saved:
 
@@ -35,28 +41,27 @@ Authenticated readback confirmed that the following values were saved:
 - judge note identifies the official SDK, Test Store-only flow, granted-entitlement Judge Access,
   and the no-real-payment boundary.
 
+Saving the corrected Additional info page advanced the draft from 3 / 5 to 4 / 5 steps and removed
+the prior required-field error without changing the store-release value.
+
 ## Finalization outcome
 
-The applicable Official Rules and Devpost terms were reviewed under explicit owner authorization.
-The terms checkbox was accepted and final Submit was clicked. The server returned:
+The saved private fields were re-read without copying their values into evidence. Under fresh,
+field-specific owner authorization:
 
-> Please complete required fields in Additional info
+1. the corrected Additional info page was saved with store release still false;
+2. the Official Rules and Devpost Terms checkbox was accepted;
+3. `Submit project` was clicked exactly once.
 
-The project remained Draft / 3 of 5 and therefore was **not submitted**. The only unresolved
-Additional info condition was the required store-release attestation. The
-[Official Rules](https://revenuecat-shipaton-2026.devpost.com/rules) and
-[Next Gen page](https://www.shipaton.com/next-gen) say that a Next Gen entrant does not need a
-store release. No false attestation or client/server validation bypass was used.
+Devpost returned `Project submitted!` and navigated to the public project URL. A second
+authenticated readback showed **SUBMITTED** and no **DRAFT** state. A separate logged-out browser
+opened the same URL and rendered the project title and tagline successfully.
 
-## Escalation and next action
+## Preserved boundaries
 
-- The existing public organizer discussion contains the field-specific follow-up; no answer was
-  present at this check.
-- A direct private message describing the server rejection and requesting a truthful route was
-  sent to a Shipaton manager; Devpost confirmed delivery.
-- After a form correction or written instruction, re-read every saved field, keep store release
-  false unless the facts change, retry final Submit under the recorded owner authorization, and
-  verify the submitted view while logged out.
-
-No real payment, store release, notarization, RevenueCat dashboard change, Judge Access grant
-change, or successful Devpost submission is claimed by this receipt.
+- No real payment or store release occurred.
+- RevenueCat product, offering, billing, SDK key, and Judge Access grant were not changed.
+- The Test Store evidence remains test activity, not a real purchase.
+- The app remains an ad-hoc-signed, non-notarized competition evaluation build.
+- No private field value, account email, reviewer code, customer identifier, or key is published by
+  this receipt.

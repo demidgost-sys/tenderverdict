@@ -69,6 +69,7 @@ OFFICIAL_URL_HOSTS = {
     "api.ted.europa.eu",
     "data.europa.eu",
     "developer.apple.com",
+    "devpost.com",
     "docs.ted.europa.eu",
     "git-lfs.github.com",
     "github.com",

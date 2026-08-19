@@ -11,6 +11,23 @@ from security_scan import _scan_text  # noqa: E402
 
 
 class SecurityScanTests(unittest.TestCase):
+    def test_submitted_devpost_project_host_is_approved_without_weakening_other_hosts(self) -> None:
+        devpost_errors: list[str] = []
+        _scan_text(
+            "submission.md",
+            "https://devpost.com/software/tenderverdict-next-gen",
+            devpost_errors,
+        )
+        self.assertEqual(devpost_errors, [])
+
+        other_errors: list[str] = []
+        unapproved_url = "https:" + "//untrusted-devpost.com/software/example"
+        _scan_text("submission.md", unapproved_url, other_errors)
+        self.assertEqual(
+            other_errors,
+            ["submission.md: unapproved external URL host: untrusted-devpost.com"],
+        )
+
     def test_final_demo_youtube_host_is_approved_without_weakening_other_hosts(self) -> None:
         youtube_errors: list[str] = []
         _scan_text(
