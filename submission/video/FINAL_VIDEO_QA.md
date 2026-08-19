@@ -1,6 +1,6 @@
 # Final local video QA receipt
 
-- Status: **v2 owner-approved, hosted with link access, and saved in Devpost; final submission is form-blocked**
+- Status: **v2 owner-approved, hosted with link access, and used in the submitted Devpost entry**
 - Hosted video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
 - Recommended upload filename: `tenderverdict-final-review-v2.mp4`
 - Local runtime: `109.000 s` / `00:01:49.000`
@@ -42,12 +42,13 @@
   visibility, and published English subtitles.
 - The superseded v1 upload is private, excluded from Devpost, and returns HTTP 403 to the same
   unauthenticated oEmbed check. It remains retained only as a reversible audit artifact.
-- Authenticated Devpost Project details readback contains the v2 URL. Final Submit was attempted,
-  but the server returned `Please complete required fields in Additional info`; the project still
-  reports Draft / 3 of 5 steps done.
+- Authenticated Devpost Project details readback contains the v2 URL. After the organizer corrected
+  the contradictory required-field validation, store release remained false, final Submit
+  succeeded, and authenticated plus logged-out project readbacks passed.
 
 ## Final submission handoff
 
 - [x] Watch and listen to v2 once at normal speed before final submission use.
 - [x] Keep the accepted hosted v2 and its matching `captions-en.srt`; do not restore v1 access.
-- [ ] Resolve the separate truthful Devpost form gate before final Submit.
+- [x] Keep v2 in the submitted entry; the truthful private form and final Submit are verified in
+  [`../DEVPOST_FINALIZATION_QA.md`](../DEVPOST_FINALIZATION_QA.md).

@@ -4,12 +4,16 @@
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
 - Audit baseline: `79186da7e83e40284cca9f34d658f6e2a0e1b335` (**superseded**)
 - Pushed remediation baseline: `24b760a671efc9c2c2d54dc6cf4607ed730a293f`
-- Current polished product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
-- Current hands-on evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
-- Submitted competition head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
-- Current candidate: **clean committed product revision, fresh Release and Debug packages,
-  complete local gate, final silent Test Store/Judge Access evidence, and an owner-approved,
-  link-accessible captioned 1:49 YouTube demo, now submitted to Devpost**
+- Current source product revision: `68180b817b99db265d7585be51aa699dd4e99597`
+- Latest hands-on Release product revision: `cbe8b2071996edc2621a16cc9d10ce1ada63766e`
+- Current hands-on entitlement evidence revision: `217c091d21d7b997f1271abc7e263e49e6de8478`
+- Initial successful Submit head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
+- Presentation/docs revision and live competition head: resolve
+  `hackathon/revenuecat-next-gen-2026` through GitHub/PR #12; a tracked document cannot identify
+  its own containing commit without becoming stale
+- Current candidate: **clean committed source with explicit UTC entitlement expiry, scheduled local
+  relock, cross-runtime Unicode profile identity parity, the existing public-safe hands-on evidence,
+  and an owner-approved captioned 1:49 YouTube demo in the submitted Devpost entry**
 - Presentation state: **the competition branch contains the combined public-safe QA, judge-first
   README, canonical Devpost story, refreshed public gallery order, and exact metadata/visual-QA receipt for
   the human-narrated video without changing product behavior**
@@ -81,15 +85,15 @@ keeping the published open-source CLI honest and useful.
 | Free experience | Complete first-profile review queue with text, buyer, deadline-presence, and verdict filters; grouped verdict drivers/checks; complete filter reset; empty state; safe supplied-source links; a self-contained first-profile review brief; and one complete schema-3 export | Native query/export/brief checks, packaged headless render, source smoke, and existing accessibility inspection |
 | Premium experience | Entitlement-backed access to all one to five profile reports, a searchable comparison matrix, stable notice/profile reasoning drill-down, an all-profile review brief, and a locked-state disagreement preview that discloses no gated reasoning | Stable-identity projection/disagreement/brief checks, packaged headless render, and Test Store unlock evidence |
 | Product hierarchy | The first screen promises a clear next step for every supplier profile, shows shared notices/profile count/changed outcomes before file controls, and explains the complete Free profile versus the five-profile Portfolio value before technical Test Store status | Current packaged light/dark renders plus previous `682c040` hands-on scroll-state inspection |
-| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, access sources, the 2026 cutoff, truthful expiration copy, fail-closed builds, and accessibility outcomes; the final silent `217c091` receipt covers the complete Test Store lifecycle plus Judge refresh, Restore, foreground, relaunch, and the unmodified archive bundle |
+| RevenueCat | Official Apple SDK `5.83.0`; Debug requires offering `supplier_profiles_plus`, package `$rc_monthly`, and product `supplier_profiles_plus_monthly`; cancellation, failure, retry, purchase, forced-current entitlement refresh, foreground refresh, restore-after-expiry offering recovery, and RevenueCat-backed Judge Access are implemented | Twenty native contract checks cover identifiers, active-entitlement expiration, the exclusive `2027-01-01T00:00:00Z` Judge cutoff, scheduled cancellation/replacement/immediate relock, truthful UTC copy, fail-closed builds, and accessibility outcomes; the final silent `217c091` receipt remains the hands-on Test Store/Judge lifecycle evidence |
 | Secret boundary | No key committed or bundled; only process-local Debug `test_` configuration is accepted; Release exposes no key field and refuses configuration before any SDK call | Source review, scans, and Debug/Release native checks |
 | Local continuity | File continuity is explicit opt-in and stores only two security-scoped bookmarks; Forget clears them, report data and review points are not persisted, and reopening never auto-runs analysis | Source review and native checks |
 | Accessibility | Terminal RevenueCat and Judge Access states map to announcements and recovery focus; input controls and bidi-formatting characters render visibly; layout/color treatments respond to increased contrast and reduced transparency | Exact `cbe8b20` silent AX inspection found named native roles for the visible controls and comparison cells; spoken VoiceOver outcomes remain intentionally unverified |
 | Packaging | Reproducible embedded-runtime `.app`, configuration-specific checks, ad-hoc signature, worktree-independent smoke and HTML-brief render, zip, SHA-256, and manifest | Fresh Release and Debug artifacts from exact clean revision `cbe8b20`; details below |
 | Presentation | Judge-first README entry, exact icon, refreshed light/dark-reviewed portrait screenshot, current unlocked comparison evidence, concise human-facing Devpost copy, value-led silent-video close, literal brief entry points, runbook, demo script, architecture, user guide, scorecard, and UX audit | `README.md`, `HACKATHON.md`, `submission/`, `demo/`, and `docs/` |
-| Quality | 127 Python tests including 6 private-launcher, 4 release-scanner, fail-closed notarization-option coverage, and a bounded YouTube-host regression; 20 native contract checks in both Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL | The integrated presentation head has fresh local source/package evidence; draft PR #12 remains the authoritative pushed-head CI record |
+| Quality | Source revision `68180b8` passes 128 Python tests plus 20 native contract checks in Debug and Release; Ruff, Mypy, Swift format, public-tree validation, security scan, source smoke, package/distribution checks, platform builds, and CodeQL remain required | PR #12 and the live competition branch are the authoritative exact-head CI record; local native reproduction awaits a matching Apple compiler/SDK toolchain |
 
-## Current clean evaluation artifact
+## Latest hands-on clean evaluation artifact
 
 | Fact | Evidence |
 |---|---|
@@ -101,12 +105,13 @@ keeping the published open-source CLI honest and useful.
 | Platform / trust | macOS 13+, arm64 host build, ad-hoc signature, no Team ID, not a universal or notarized app |
 | Builder evidence | 20 Release-native checks, embedded workspace/notice contracts, signature verification, worktree-independent smoke, checksum creation, and ZIP integrity passed |
 
-This package is the current self-contained no-key evaluation artifact. It is not Test Store
+This package is the latest hands-on self-contained no-key evaluation artifact. It predates the
+source-only expiry/Unicode remediation and is not Test Store
 transaction evidence; that requires the separate Debug package and process-local key. The final
 pass kept the small outputs in ignored `dist/` because the SSD was not mounted; older ignored
 outputs must still be selected by the exact revision directory rather than filename alone.
 
-## Current clean Debug entitlement artifact
+## Latest hands-on clean Debug entitlement artifact
 
 | Fact | Evidence |
 |---|---|
@@ -117,7 +122,7 @@ outputs must still be selected by the exact revision directory rather than filen
 | Manifest | `version=0.2.0a1`, `source_dirty=false`, `build_configuration=debug`, `test_store_enabled=true`, RevenueCat `5.83.0`, `api_key_included=false`, `notarized=false` |
 | Builder evidence | 20 Debug-native checks, embedded smoke, ad-hoc signature verification, checksum creation, and ZIP integrity passed before the manual run |
 | Current manual outcome | Missing/invalid key, offering, cancel, simulated failure, retry, Test Store success, immediate Restore, foreground, relaunch, natural accelerated-expiry locked/offering recovery, Judge refresh/Restore/foreground/relaunch, and the unmodified archive bundle passed; no real payment occurred |
-| Judge window | Existing RevenueCat `Until` December 31, 2026 exceeds the safe October 14 boundary and was left unchanged |
+| Judge window | Existing RevenueCat `Until` December 31, 2026 exceeds the safe October 14 judging boundary and was left unchanged; current source also enforces the exclusive UTC cutoff `2027-01-01T00:00:00Z` and local relock at the earlier effective expiration |
 | Silent boundary | VoiceOver, TTS, microphone, sound playback, and audio files were not launched |
 
 The process-local key was supplied only to the launched process and is absent from both bundles and
@@ -130,7 +135,7 @@ a broader guarantee. VoiceOver was never launched and system output remained sil
 | # | Milestone | State |
 |---:|---|---|
 | 1 | Immutable workspace and run models reuse the canonical profile/report types | `DONE` |
-| 2 | Workspace accepts one to five normalized, uniquely named profiles and rejects invalid input as a unit | `DONE` |
+| 2 | Workspace accepts one to five profiles whose names remain unique after NFKC/case normalization and rejects invalid input as a unit in both Python and Swift | `DONE` |
 | 3 | Notices are loaded once with shared order, review point, metadata, and provenance | `DONE` |
 | 4 | `portfolio` provides deterministic stdout and atomic file output without changing existing commands | `DONE` |
 | 5 | Boundary, ordering, empty-input, serialization, failure-retention, and network-isolation tests exist | `DONE` |
@@ -147,7 +152,7 @@ a broader guarantee. VoiceOver was never launched and system output remained sil
 | 16 | Free review queue, verdict filters, disclosure, human next steps, and empty state are implemented | `DONE` |
 | 17 | Premium comparison, safe source links, shareable HTML presentation, and offering recovery are implemented | `DONE` |
 | 18 | Submission assets and the public documentation package, including the original brief's literal entry-point filenames, are generated and validated | `DONE` |
-| 19 | The complete local/repository gate set passed on one clean pushed implementation commit | `DONE` — current product revision `cbe8b20` has the complete local/package evidence above; draft PR #12 records the branch checks |
+| 19 | The complete repository gate set passes on the clean pushed implementation commit | `DONE` — source product revision `68180b8` has the updated Python/native contracts; PR #12 owns exact-head CI, while the matching local Swift rerun remains blocked only by the host compiler/SDK mismatch |
 | 20 | VoiceOver asynchronous outcomes plus Increase Contrast, Reduce Transparency, and large-text variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard, Increase Contrast, Reduce Transparency, and temporary large-text rendering passed on the fresh Debug revision; hands-on VoiceOver speech/focus remains unverified and is not a submission gate |
 | 21 | Independent workflow sessions and evidence-backed product changes | `OPTIONAL_FUTURE_VALIDATION` — two maintainer-observed filter micro-fixes are complete; no external workflow session or user-value result is claimed or required for the current submission |
 | 22 | Native profile builder/editor for one to five complete profiles | `DONE` |
@@ -167,7 +172,7 @@ release.
 | 4 | 1024×1024 icon is generated and structure-checked | `READY` |
 | 5 | 1179×2556 frameless portrait screenshot is generated and structure-checked | `READY` |
 | 6 | Devpost copy exists without a key, private identifier, or unsupported payment claim | `READY_SUBMITTED` |
-| 7 | Current pushed implementation revision passes all required CI checks | `READY` — submission candidate `e96695b` passed both CI and Desktop preview workflows |
+| 7 | Current pushed implementation revision passes all required CI checks | `READY` — resolve the live competition SHA and required checks through PR #12; the initial successful Submit head was `e96695b` |
 | 8 | Organizer confirms Test Store-only eligibility | `READY` — Shipaton Manager Perttu Lähteenlahti answered on 2026-08-05 that Test Store is enough for Next Gen |
 | 9 | Active-student status and qualifying academic email are verified in the entrant account | `READY` — the active-student profile, July 2028 graduation, and a qualifying academic-domain email were confirmed in authenticated account state without publishing the address |
 | 10 | Exact private Devpost project fields are inspected and every required attestation has a truthful path | `READY` — Shipaton Manager Perttu Lähteenlahti confirmed the form fix; the live store-release checkbox was unchecked and optional, and Additional info saved without a false attestation |
@@ -188,7 +193,7 @@ completion.
 | Self-contained packaging and submission assets | `COMPLETE` |
 | Test Store transaction, refresh, relaunch, and restore evidence | `COMPLETE_CURRENT_RUNTIME` — the clean `217c091` silent receipt covers the complete Test Store lifecycle, natural expiry recovery, Judge refresh/Restore/foreground/relaunch, and the unmodified checksummed archive bundle |
 | Judge-facing review queue, comparison matrix, shareable brief, safe links, and visual QA | `COMPLETE` |
-| Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — product revision `cbe8b20` is clean, packaged, pushed, and covered by the current draft-PR head |
+| Clean implementation commit and full PR CI | `COMPLETE_CURRENT` — source product revision `68180b8` is the exact logic-remediation commit; the live competition head and required checks are resolved through PR #12 |
 | Advanced macOS accessibility variants | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` — keyboard order, increased contrast, reduced transparency, and temporary large-text rendering passed; hands-on VoiceOver announcements/focus remain untested and are not a submission gate |
 | Native Profile Builder | `COMPLETE` — creates, renames, reorders, validates, and saves one to five full profiles |
 | Import wizard | `COMPLETE_BOUNDED` — normalized preview, canonical fields, and missing-field guidance exist; arbitrary user-defined column mapping is intentionally excluded |
@@ -201,9 +206,10 @@ completion.
 
 Verified:
 
-- current product revision `cbe8b20` passes 125 Python tests, 20 native checks in both Debug
-  and Release, Ruff, Mypy, Swift format, public-tree, security, source-smoke, asset, distribution,
-  and diff gates locally; the linked draft PR is the authoritative live CI record;
+- source product revision `68180b8` passes 128 Python tests and 20 native checks in both Debug and
+  Release, including UTC expiry scheduling and Unicode identity parity; Ruff, Mypy, Swift format,
+  public-tree, security, source-smoke, asset, distribution, and diff gates remain covered by the
+  authoritative live PR CI record;
 - its clean Release package records `source_dirty=false`, disables Test Store in Release, passes the
   embedded-core/signature/checksum/ZIP/worktree-independent smoke gates, and is arm64/ad-hoc signed;
 - the unchanged Free/Premium brief, light/dark rendering, and filter interactions retain their
@@ -225,6 +231,9 @@ Verified:
   accelerated-expiry recovery, Judge Access refresh/Restore/foreground/relaunch, and an independent
   check of the unmodified checksummed archive; the existing grant remains unchanged through
   December 31, 2026;
+- current source treats `2027-01-01T00:00:00Z` as the exclusive Judge campaign cutoff, presents the
+  inclusive UTC date, and relocks at the earlier active-entitlement expiration without changing the
+  RevenueCat grant or dashboard;
 - no real payment was made and no usable key is stored in the repository or evidence;
 - Free is a complete single-profile workflow rather than a disabled demo;
 - existing single-profile report semantics remain unchanged.

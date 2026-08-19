@@ -72,8 +72,13 @@ identifiers and may change interfaces during the alpha period.
 - Documented the conditional Shipaton Next Gen boundary: the portfolio, native app, packaging, and
   local submission assets and Test Store transaction evidence are implemented. Shipaton Managers
   have now confirmed that Test Store is sufficient for Next Gen and that macOS is eligible without
-  a platform disadvantage; public video, student-account verification, private-form inspection,
-  final accessibility evidence, and submission remain gated.
+  a platform disadvantage. The public video, student-account verification, truthful private form,
+  final Submit, and logged-out public readback are complete; spoken VoiceOver and external workflow
+  validation remain optional future evidence.
+- Aligned Python and Swift profile identity through trim, Unicode NFKC compatibility normalization,
+  and case folding so compatibility-equivalent names fail closed in both runtimes.
+- Made Judge Access use the exclusive UTC cutoff `2027-01-01T00:00:00Z`, present the inclusive date
+  through December 31, 2026 UTC, and relock locally at the earlier active-entitlement expiration.
 - Made RevenueCat Test Store configuration Debug-only and fail-closed in Release before any SDK
   call; exact offering, package, and product identifiers must match before purchase.
 - Corrected the Free export boundary to emit only the first complete schema-3 report while Premium

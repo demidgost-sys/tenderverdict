@@ -33,7 +33,9 @@ flowchart LR
 ## Qualification flow
 
 1. The workspace parser rejects unknown fields, unsupported schema versions, zero or more than five
-   profiles, duplicate normalized names, and any invalid nested profile.
+   profiles, duplicate names after trim, Unicode NFKC compatibility normalization, and
+   locale-independent case folding, and any invalid nested profile. Swift applies the same identity
+   contract before accepting a workspace or portfolio report.
 2. Notices are read and validated once. The same ordered objects and one explicit review point are
    passed to every profile.
 3. Existing qualification rules create an independent `QualificationRun` for each profile.
@@ -51,9 +53,10 @@ profile.
 
 Workspace selection and the Profile Builder both converge on
 `normalize-workspace --workspace PATH`. The Python parser enforces the 256 KiB limit, strict
-envelope and nested profile schemas, one-to-five bound, case-insensitive unique names, authority
-tables, normalization, and deterministic ASCII-safe JSON. The builder writes those returned bytes
-atomically; Swift's local model is an additional fail-closed decoder, not a second authority.
+envelope and nested profile schemas, one-to-five bound, names unique after NFKC compatibility and
+case normalization, authority tables, normalization, and deterministic ASCII-safe JSON. The
+builder writes those returned bytes atomically; Swift's local model is an additional fail-closed
+decoder, not a second authority.
 
 Notice selection converges on `inspect-notices --notices PATH --limit 5`. The canonical CSV/JSON
 parser validates the complete file once and returns an exact schema-1 preview with:
@@ -122,10 +125,12 @@ and consistency checks.
 - Hackathon Judge Access validates one of a bounded set of reviewer codes through a one-way digest,
   derives a dedicated RevenueCat App User ID, and calls the SDK `logIn` path. The code itself never
   toggles Premium: an active `supplier_profiles_plus` entitlement remains mandatory. A promotional
-  grant on a known judge identity is additionally bounded in-app to December 31, 2026, even if the
-  dashboard grant were accidentally configured for longer. The unlocked UI formats the effective
-  `CustomerInfo` expiration in the user's calendar and describes it as an expiration boundary, not
-  an inclusive paid-subscription promise.
+  grant on a known judge identity is additionally bounded by the exclusive UTC instant
+  `2027-01-01T00:00:00Z`, even if the dashboard grant were accidentally configured for longer. The
+  UI describes access as available through December 31, 2026 UTC. Every successful `CustomerInfo`
+  replaces an in-process expiry schedule; at the earlier of the entitlement expiration and campaign
+  cutoff, the controller relocks locally before fresh active customer state may unlock it again.
+  Foreground and relaunch refreshes cover a Mac that slept across that instant.
 - Missing Debug configuration makes no RevenueCat request. Non-`test_` keys are rejected before
   SDK configuration. A key pasted into the Debug app is held only for that process and is not
   persisted by TenderVerdict. Release builds expose no key field and refuse Test Store

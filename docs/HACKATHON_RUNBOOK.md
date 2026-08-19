@@ -179,8 +179,10 @@ unverified and is an optional accessibility follow-up, not a submission gate.
 The exact clean `cbe8b20` Debug package then verified the no-purchase Judge Access path. A
 forced-current refresh changed the already-open locked screen to the Premium comparison without
 relaunch; Restore, background/foreground re-entry, and full process relaunch preserved access. The
-UI reports the RevenueCat expiration date as **December 31, 2026** and explicitly states that no
-purchase was made. The exact-revision unlocked screenshot is stored at
+UI reported the then-current December 31 boundary and explicitly stated that no purchase was made.
+The current source renders the bounded access as available through **December 31, 2026 UTC** and
+relocks locally at the earlier effective expiration. The dated exact-revision unlocked screenshot
+is stored at
 `submission/evidence/unlocked-judge-access-2026-08-09.png`.
 
 The final silent `217c091` Debug receipt supersedes the runtime matrix without replacing that
@@ -204,9 +206,9 @@ For each assigned reviewer slot:
 2. Find that customer in RevenueCat and grant `supplier_profiles_plus` for the required review
    window. RevenueCat's date-only **Until date** is an expiration boundary, not an inclusive
    end-of-day promise. If access must remain available through all of December 31, select January
-   1, 2027 in the dashboard; the app still rejects known Judge Access identities after its local
-   **2026-12-31 23:59:59 UTC** cutoff. Granted Entitlements create no purchase and do not affect
-   billing.
+   1, 2027 in the dashboard; the app uses the same exclusive
+   **2027-01-01 00:00:00 UTC** campaign cutoff. Granted Entitlements create no purchase and do not
+   affect billing.
 3. Activate the same code again and verify the app identifies the RevenueCat promotional grant,
    states that no purchase was made, and exposes the Premium workspace.
 4. Refresh, background/foreground, and relaunch with key re-entry; verify access remains governed by
@@ -214,9 +216,10 @@ For each assigned reviewer slot:
 5. Exercise an invalid code and confirm the field receives recovery focus without changing the
    RevenueCat identity or unlocking Premium.
 
-The app also rejects known Judge Access identities after December 31, 2026. Dashboard expiry and
-the local cutoff must agree; neither one should be described as a paid subscription or real store
-transaction.
+The app rejects known Judge Access identities at and after `2027-01-01T00:00:00Z`. It also schedules
+an in-process relock at the earlier of the active entitlement expiration and that campaign cutoff;
+foreground and relaunch refreshes cover suspended processes. Neither boundary should be described
+as a paid subscription or real store transaction.
 
 ## Submission assets
 
@@ -256,7 +259,7 @@ Never use a fake entitlement state as evidence.
   repository link, tags, and three gallery images were read back without exposing private values.
 - [x] The organizer corrected the required store-release validation; the live checkbox remained
   unchecked and optional, and Devpost accepted the truthful Next Gen submission.
-- [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
+- [x] Public competition branch contains source, instructions, assets, and Apache-2.0 license.
 - [x] The release-configuration artifact named in project status passes checksum creation,
   signature, embedded-core contract/determinism, configuration-specific native checks, and
   worktree-independent smoke checks.
@@ -278,7 +281,8 @@ Never use a fake entitlement state as evidence.
 - [x] The owner completed one normal-speed watch/listen of the hosted demo and accepted v2.
 - [x] Icon is exactly 1024×1024.
 - [x] At least one current screenshot is exactly 1179×2556 and has no device frame.
-- [x] Devpost draft contains no key, private data, unsupported payment claim, or fabricated result.
+- [x] Canonical Devpost story contains no key, private data, unsupported payment claim, or
+  fabricated result.
 - [x] The current pushed SHA, public repository, and video URL are recorded and checked without
   authenticated browser state.
 - [x] The final submitted entry and submitted view were checked while logged out.

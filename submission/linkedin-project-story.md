@@ -35,8 +35,8 @@ boundaries, reviewed the intermediate versions, tested the application and decid
 willing to claim publicly. Codex handled most of the implementation, tests, UI work and release
 checks.
 
-The current macOS build uses local files, uploads no tender data and has no telemetry. It passes
-125 Python tests and 19 Debug plus 19 Release native checks.
+The current macOS build uses local files, uploads no tender data and has no telemetry. Its full
+Python, native Debug/Release, security, package, and platform checks are public in the repository.
 
 The number alone is not the point. These checks protect narrower promises: deterministic results,
 fail-closed errors, identical qualification before and after purchase, and no stored RevenueCat

@@ -1,8 +1,8 @@
 # Shipaton 2026 competition scorecard
 
-- Rechecked: 2026-08-05
+- Rechecked: 2026-08-19
 - Scope: Next Gen Award, macOS submission path
-- Decision rule: verified evidence is separated from inference and open owner gates
+- Decision rule: verified evidence is separated from inference and optional future validation
 
 This scorecard converts the public judging criteria and recurring winner patterns into product
 decisions. It does not predict a result, claim private judge preferences, or replace the controlling
@@ -26,12 +26,11 @@ The Next Gen criteria are paraphrased below from the
 | Problem and experience | A clear, useful, interesting, original answer to a real problem | One notice feed is evaluated differently for several supplier profiles; verdicts remain explainable and human-owned | `STRONG_CONCEPT` |
 | Working application | Meaningful progress toward a functioning app, with core behavior visible in the repository and demo | Offline Python core, self-contained macOS app, real local files, deterministic export, and native review UI run locally | `VERIFIED_LOCALLY` |
 | RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised, and the Shipaton Manager confirmed Test Store is enough for Next Gen | `VERIFIED_TEST_STORE`, `ORGANIZER_CONFIRMED` |
-| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, and public documentation | `STRONG_WITH_OPEN_SUBMISSION_GATES` |
+| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, public documentation, and a verified submitted entry | `STRONG_SUBMITTED_ENTRY` |
 
-The remaining required work is not feature volume, Test Store eligibility, package
-reproducibility, VoiceOver, or independent-user evidence. It is the private Devpost draft, public
-demo, exact-final-revision CI, and logged-out submission review. External workflow validation and a
-fresh VoiceOver pass could strengthen future product evidence but are not Next Gen requirements.
+The Devpost entry, public demo, truthful store-release field, exact competition branch, and
+logged-out project readback are complete. External workflow validation and a fresh VoiceOver pass
+could strengthen future product evidence but are not Next Gen requirements.
 
 ## Category decision
 
@@ -47,9 +46,9 @@ each category are unknown.
 | Grand Prize / #BuildInPublic | 2 / 10 | `NOT_CURRENT_TARGETS` | They depend on live release, traction, growth, revenue, or a public build narrative that the Next Gen path intentionally does not require. |
 
 The [Next Gen page](https://www.shipaton.com/next-gen) says student projects remain in the broader
-prize mix, but the private Devpost form has not been inspected. Submit **Next Gen** as the clear
-primary choice. Treat any additional category selection as a later form/organizer confirmation,
-not as permission to weaken the store-exempt Next Gen submission or invent missing metrics.
+prize mix. The inspected private form and organizer correction supported a truthful **Next Gen**
+submission with store release left false. No additional category claim should weaken that boundary
+or invent missing metrics.
 
 ## What recent winners demonstrate
 
@@ -110,7 +109,7 @@ puts proof of the working experience ahead of an exhaustive feature tour.
     profile with reasons, a review brief, and JSON; Portfolio is up to five profiles, comparison,
     a complete portfolio brief, and full portfolio JSON. The purchase control now names the value
     being unlocked.
-17. The native app, README, demo script, and Devpost draft now lead with one user-facing promise:
+17. The native app, README, demo script, and canonical Devpost story lead with one user-facing promise:
     one tender feed and a clear next step for every supplier profile. The product vocabulary stays
     concrete: open, verify, or skip, with human-owned next steps.
 18. The Export menu now provides a self-contained HTML human-review brief as well as JSON. It
@@ -133,13 +132,13 @@ puts proof of the working experience ahead of an exhaustive feature tour.
 | P3 | Saved local export presets | `DEFERRED` | Current atomic Save panel is adequate; a preset does not close a judging or trust gap | Reconsider only if opt-in sessions repeatedly identify export destination friction |
 
 Do not add cross-profile ranking, bid automation, confidential-document ingestion, hosted accounts,
-analytics, or production billing merely to look larger. None is required to close the remaining
-submission gates, and each would widen the trust and delivery surface.
+analytics, or production billing merely to look larger. None is required for the submitted Next
+Gen entry, and each would widen the trust and delivery surface.
 
-## Release and submission gates
+## Release and submitted-entry status
 
-The project is not ready for an external release or final Devpost submission until all of these are
-true:
+The competition entry is submitted and publicly readable. Before and after the successful Submit,
+the following gates were verified:
 
 - the complete Python, Swift, package, public-tree, and security checks pass on the final candidate;
 - a fresh self-contained app passes launch, local-file run, Profile Builder save, import preview,
@@ -147,22 +146,22 @@ true:
   recovery checks;
 - the final layout remains usable with Increase Contrast, Reduce Transparency, and large text;
 - the student and academic-email requirement is confirmed in the entrant account;
-- exact private Devpost fields are inspected after the owner signs in and joins the hackathon;
+- exact private Devpost fields are inspected, including store release left false;
 - public repository and final submission URLs are intentionally checked while logged out.
 
-The unauthenticated Devpost project page currently stops at registration, so this repository does
-not pretend that private form fields have been verified. Publicly documented description, source,
-video, icon, screenshot, platform, and eligibility requirements are already tracked in the
-[runbook](HACKATHON_RUNBOOK.md).
+The public project page renders without authentication and links the captioned v2 video plus the
+competition source branch. The private values themselves remain outside the repository; their
+truthful saved state and successful Submit readback are recorded in the
+[runbook](HACKATHON_RUNBOOK.md) and public-safe finalization receipt.
 
 The exact audited revision, current suite totals, pushed CI result, and SSD artifact provenance live
 in [project status](PROJECT_STATUS.md). The fresh final-product Debug transaction and silent settings
 pass are current. VoiceOver and independent-user outcomes remain optional and must not be claimed
 as verified unless a later dated pass establishes them.
 
-## Owner inputs — later, not required for this implementation pass
+## Post-submission preservation
 
-When the local product and QA pass is complete, the owner will need to provide or confirm:
-
-1. manual completion of the visual Devpost reCAPTCHA so the private project fields can be audited;
-2. final approval of the exact commit and public claims before any release or submission action.
+Keep the public repository, v2 video, Devpost project, and Judge Access available through judging.
+Any competition-branch update must retain truthful Test Store/no-purchase copy, pass exact-head CI,
+and be checked through the logged-out public links. A consumer release remains separately blocked
+on signing/notarization, production billing readiness, and external workflow validation.

@@ -32,7 +32,7 @@ by the original competition brief. They route to `DEMO_SCRIPT.md` and
 | Official competition rule or organizer clarification | `SHIPATON_EVIDENCE.md` | Cite the same primary source and avoid broader inference |
 | Reproducible engineering commands | `DEVELOPMENT.md` | Keep only the smallest surface-specific quick start |
 | Manual UX and accessibility outcome | `UX_AUDIT.md` | Preserve the evidence label and date |
-| Submission wording and asset inventory | `submission/` | Never treat a draft or generated asset as a submitted entry |
+| Submission wording, asset inventory, and finalization receipt | `submission/` | Distinguish draft/assets from the explicit authenticated and logged-out submission receipt |
 | Future ordering | `ROADMAP.md` | Do not count planned work as complete |
 
 The implementation and executable checks outrank prose when they disagree. A mismatch is a defect:

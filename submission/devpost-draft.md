@@ -115,5 +115,6 @@ a consumer release, and no real payment was made.
 
 - Competition source: `https://github.com/demidgost-sys/tenderverdict/tree/hackathon/revenuecat-next-gen-2026`
 - Demo video: `https://www.youtube.com/watch?v=HFBtMsN7Nlk`
-- Submitted competition head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
+- Initial successful Submit head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
+- Live competition head: resolve `hackathon/revenuecat-next-gen-2026` through GitHub/PR #12
 - Demo master SHA-256: `5862094c00c8dcb5e2e793d46d1ced44a003458dfcb1d957484135da13c6d047`

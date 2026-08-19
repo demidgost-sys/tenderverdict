@@ -93,7 +93,7 @@ telemetry, or automatic update channel. A configured RevenueCat Debug flow still
 normal identifiers and network behavior. See [`ROADMAP.md`](ROADMAP.md) for the evidence gates and
 evaluation thresholds.
 
-Current completion and final-submission gate counts are maintained in
+Current verification and submitted-entry status are maintained in
 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). They are evidence checklists, not a winning
 probability or a public-release claim.
 
@@ -365,7 +365,8 @@ that a macOS app is accepted without a judging disadvantage:
 [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
 [macOS answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
 See the [`Next Gen source README`](macos/TenderVerdictNextGen/README.md) and
-[`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the remaining gates. The complete
+[`Shipaton evidence record`](docs/SHIPATON_EVIDENCE.md) for the closed submission status and
+evidence boundaries. The complete
 documentation map is in [`docs/README.md`](docs/README.md), and the judging-to-product map is in the
 [`competition scorecard`](docs/COMPETITION_SCORECARD.md).
 

@@ -18,7 +18,7 @@ evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
 | `video/` | Ready local and hosted handoff | Exact 1:49 human-narrated master, silent animatic fallback, captions, manifests, privacy/claim audit, contact sheet, and QA receipts; raw MP4/WAV remain ignored |
 | `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
 | Link-accessible video | v2 ready and owner-approved | `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, 1:49, packaged macOS app, repaired owner narration, burned English captions plus matching YouTube SRT; owner watch/listen, logged-out oEmbed, and policy checks pass; superseded v1 is private |
-| `devpost-draft.md` | Ready with exact links | Product story, judging proof, competition branch, pushed candidate SHA, video URL, and video SHA-256 are recorded |
+| `devpost-draft.md` | Submitted canonical story | Product story, judging proof, live competition branch, initial successful Submit head, video URL, and video SHA-256 are recorded |
 | `DEVPOST_FINALIZATION_QA.md` | Current public-safe receipt | Truthful saved-field boundary, final Submit result, media readback, escalation, and exact next action without private values |
 
 The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark

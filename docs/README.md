@@ -26,7 +26,7 @@ Shipaton Next Gen work.
 | Engineering | [Developer guide](DEVELOPMENT.md), [agent guide](../AGENTS.md), [contributing](../CONTRIBUTING.md) | Repository map, gates, and change workflow |
 | Current evidence | [Project status](PROJECT_STATUS.md), [technical audit](TECHNICAL_AUDIT.md), [UX audit](UX_AUDIT.md) | Current totals, revision evidence, manual/automated split, and open gates |
 | Competition | [Overview](../HACKATHON.md), [Shipaton evidence](SHIPATON_EVIDENCE.md), [scorecard](COMPETITION_SCORECARD.md), [runbook](HACKATHON_RUNBOOK.md), [demo script](DEMO_SCRIPT.md) | Stable pitch, rules, strategy, reproducible submission steps, and claims |
-| Submission package | [Asset inventory](../submission/README.md), [evidence inventory](../submission/evidence/README.md), [Devpost draft](../submission/devpost-draft.md) | Files and draft copy, not proof of submission |
+| Submission package | [Asset inventory](../submission/README.md), [evidence inventory](../submission/evidence/README.md), [Devpost story](../submission/devpost-draft.md), [finalization receipt](../submission/DEVPOST_FINALIZATION_QA.md) | Assets and canonical copy are separate from the public-safe authenticated/logged-out submission receipt |
 | History and future | [Changelog](../CHANGELOG.md), [roadmap](../ROADMAP.md) | Shipped changes and evidence-gated next work |
 
 Read [documentation governance](DOCUMENTATION.md) for source-of-truth ownership, evidence labels,
@@ -66,5 +66,5 @@ The current native source supports this bounded journey:
 The [UX audit](UX_AUDIT.md) separates source inspection, automated checks, dated hands-on evidence,
 the completed silent final-product Debug/settings pass, and optional future VoiceOver evidence.
 Written organizer answers confirm the narrow Test Store-only path and macOS eligibility; the
-[evidence record](SHIPATON_EVIDENCE.md) owns those primary sources and the remaining
-personal/submission gates.
+[evidence record](SHIPATON_EVIDENCE.md) owns those primary sources and the completed
+personal/submission readbacks.

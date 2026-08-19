@@ -48,9 +48,10 @@ failure, retry, purchase, entitlement unlock, relaunch refresh, restore, and Voi
 path. No key is committed or bundled; this is not a real payment. A Shipaton Manager has now
 confirmed that Test Store is sufficient for Next Gen, and another Manager confirmed that macOS is
 eligible without a platform disadvantage. Entrant student/email eligibility is owner-confirmed and
-tracked in project status. A 1:49 captioned YouTube demo is now link-accessible and saved in the
-Devpost draft; the owner accepted v2 after a normal-speed watch/listen. Final submission remains
-blocked by the contradictory required store-release validation.
+tracked in project status. A 1:49 captioned YouTube demo is link-accessible and saved in the
+submitted Devpost entry; the owner accepted v2 after a normal-speed watch/listen. The organizer
+corrected the contradictory store-release validation, store release remained false, and both the
+authenticated Submitted view and logged-out public page passed.
 
 ## `v0.2.0-alpha.1` release contract
 
@@ -112,12 +113,13 @@ implemented. The organizer gate is closed: a
 and a separate
 [Manager response confirms macOS eligibility without disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission).
 
-The remaining order is:
+The post-submission order is:
 
-1. inspect the exact private Devpost fields after the owner completes visual reCAPTCHA;
-2. prepare the public demo on the exact final candidate;
-3. after owner approval, complete the final pushed-CI, evidence, and
-   logged-out-link audit.
+1. keep the public repository, v2 video, Devpost project, and Judge Access available through
+   judging;
+2. require exact-head CI and logged-out link checks after any competition-branch update;
+3. keep production billing, signing/notarization, and external-user validation as explicit future
+   work rather than implying that the competition build is a consumer release.
 
 Optional follow-ups, excluded from Next Gen readiness, are a hands-on VoiceOver announcement/focus
 pass, independent opt-in workflow validation, and a refreshed RevenueCat dashboard capture.

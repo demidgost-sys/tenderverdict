@@ -46,9 +46,10 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
   owner handoff outside the repository and are cleared from the input field; RevenueCat may retain
   the derived customer identity as normal SDK state. The client-side allowlist is an evaluation
   convenience in an open-source app, not production authentication, DRM, or a confidential access
-  boundary. Known judge grants are rejected after December 31, 2026.
-  The visible expiration is derived from the active RevenueCat entitlement and bounded by that
-  local cutoff; it is not a locally fabricated subscription duration.
+  boundary. Known judge grants are rejected at and after the exclusive UTC cutoff
+  `2027-01-01T00:00:00Z`. The controller schedules local relock at the earlier of the active
+  RevenueCat entitlement expiration and that campaign cutoff. The visible inclusive UTC date is
+  derived from the same boundary; it is not a locally fabricated subscription duration.
 - The native shell passes only a minimal environment to its Python child process; RevenueCat
   configuration and unrelated parent-process variables are not forwarded.
 - The open-source Python CLI and local input files remain directly accessible. The SwiftUI

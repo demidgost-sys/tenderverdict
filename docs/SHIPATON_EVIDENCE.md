@@ -59,7 +59,7 @@ performed, but they are optional future evidence rather than Next Gen submission
 | Repository chronology | `repository_evidence` | The first commit was authored August 2, 2026 at 22:25 CEST, after either published opening description. The public developer alpha followed on August 4. | `CONFIRMED` |
 | Next Gen store exception | `official_rule` | Active students may submit a public open-source repository and video without a paid Apple or Google developer account or store release. | `CONFIRMED` |
 | Student and academic email | `private_account_evidence` | The entrant's current-student profile, TU Graz affiliation, July 2028 graduation, and academic-domain account value were verified in authenticated Devpost state. No address is published here. | `VERIFIED_IN_ACCOUNT` |
-| Public functional repository | `official_rule` + `repository_evidence` | The public draft branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Project status names the exact audited revision and gate result; draft PR #12 is the authoritative pushed-revision check record. | `PUBLIC_DRAFT_READY` |
+| Public functional repository | `official_rule` + `repository_evidence` | The public competition branch contains the Python product, Apache-2.0 license, fixtures, SwiftUI source, exact SDK pin, self-contained app builder, run instructions, and packaged smoke/UX/Test Store evidence. Project status names the exact audited revision and gate result; PR #12 is the authoritative pushed-revision check record. | `PUBLIC_SUBMITTED_SOURCE` |
 | Supported platform | `official_rule` + `manual_evidence` | macOS is explicitly allowed by the rules and FAQ. Shipaton Manager Jaewoong Eum also confirmed that macOS is eligible and has no judging disadvantage. | `CONFIRMED` |
 | RevenueCat is substantive | `official_rule` + `manual_evidence` | The official SDK loaded the current offering, executed cancel/failure/success, activated `supplier_profiles_plus`, restored access, and reported the sandbox subscription in RevenueCat. This is a Test Store transaction, not a real payment. | `VERIFIED_TEST_STORE` |
 | Test Store technical capability | `official_rule` + `repository_evidence` | Apple SDK 5.43.0 or newer can use a Test Store key for offerings, simulated outcomes, `CustomerInfo`, and entitlements; the repository pins 5.83.0 and the local flow exercised those outcomes. | `CONFIRMED_TECHNICALLY` |
@@ -97,8 +97,9 @@ performed, but they are optional future evidence rather than Next Gen submission
 The local Python foundation is additive and does not modify the three verdict rules or existing
 single-profile outputs:
 
-- `PortfolioWorkspace` v1 accepts one to five normalized profiles with case-insensitively unique
-  names and rejects unknown fields or any invalid nested profile;
+- `PortfolioWorkspace` v1 accepts one to five normalized profiles with names unique after trim,
+  Unicode NFKC compatibility normalization, and case folding, and rejects unknown fields or any
+  invalid nested profile;
 - one bounded notice file is parsed once and evaluated independently against every profile at the
   same explicit review point;
 - the `portfolio` CLI emits schema-1 deterministic JSON containing one complete canonical schema-3
@@ -232,13 +233,15 @@ refresh paths on 2026-08-05. A later restore after accelerated Test Store expiry
 locked. The current pass did not repeat dashboard readback, so that evidence remains dated
 2026-08-04 rather than being upgraded to final-current proof.
 
-The exact clean `cbe8b20` Debug package provides the current no-purchase Judge Access evidence. A
+The exact clean `cbe8b20` Debug package provides the dated no-purchase Judge Access evidence. A
 forced-current `CustomerInfo` refresh unlocked the existing RevenueCat grant without relaunch;
 Restore, background/foreground re-entry, and a full process relaunch all preserved access. The UI
-reports that Judge Access expires December 31, 2026 and explicitly states that no purchase was
-made. The genuine 1020×754 screenshot is stored in `submission/evidence/` without a raw code,
-customer identifier, or key. This supplements rather than rewrites the earlier Test Store purchase
-evidence.
+reported the then-current December 31 boundary and explicitly stated that no purchase was made.
+The current source expresses the same campaign boundary as the exclusive UTC instant
+`2027-01-01T00:00:00Z`, displays inclusive copy through December 31, 2026 UTC, and schedules a local
+relock at the earlier effective expiration. The genuine 1020×754 screenshot remains stored in
+`submission/evidence/` without a raw code, customer identifier, or key. It is dated runtime evidence,
+not a claim that the screenshot was regenerated after the source-only cutoff clarification.
 
 The final silent `217c091` receipt then repeated the complete Test Store lifecycle on one clean
 Debug package, observed natural accelerated expiry and immediate locked/offering recovery, repeated

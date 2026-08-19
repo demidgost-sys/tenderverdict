@@ -33,7 +33,7 @@ reviewer code, RevenueCat customer identifier, email address, account URL, or pr
 | Submission deadline | September 30, 2026 at 23:45 PDT, from the [Shipaton Official Rules](https://revenuecat-shipaton-2026.devpost.com/rules) |
 | Judging window | October 1, 2026 at 00:00 PDT through October 13, 2026 at 12:00 PDT; the same Rules require free, unrestricted testing until judging ends |
 | Safe RevenueCat `Until` boundary | October 14, 2026, using the next calendar day so access cannot expire during the final judging day |
-| Existing Judge grant | `Until` December 31, 2026, confirmed through forced-current RevenueCat `CustomerInfo` and truthful in-app expiry copy; this already exceeds the safe boundary and was left unchanged |
+| Existing Judge grant | `Until` December 31, 2026, confirmed through forced-current RevenueCat `CustomerInfo`; this already exceeds the safe October 14 judging boundary and was left unchanged. Current source additionally enforces the exclusive UTC campaign cutoff `2027-01-01T00:00:00Z` and schedules local relock at the earlier effective expiration |
 
 ### Outcome matrix
 
@@ -52,7 +52,7 @@ reviewer code, RevenueCat customer identifier, email address, account URL, or pr
 | Foreground refresh | `PASS_PREMIUM` | Background/foreground re-entry preserved active access |
 | Full relaunch | `PASS_PREMIUM` | Re-entering the process-local Test Store key recovered the same entitlement without another simulated purchase |
 | Accelerated expiry | `PASS_LOCKED_RECOVERED_OFFERING` | A forced refresh shortly after the documented 25-minute total still reported active access; a refresh shortly after 30 minutes returned locked and immediately reloaded the expected offering |
-| Judge activation/refresh | `PASS_PREMIUM` | The existing grant produced `RevenueCat Judge Access expires December 31, 2026` and `No purchase was made` |
+| Judge activation/refresh | `PASS_PREMIUM` | The existing grant produced the then-current December 31 boundary copy and `No purchase was made`; current source presents the bounded date as available through December 31, 2026 UTC |
 | Judge Restore | `PASS_PREMIUM` | Restore preserved granted access and the same expiry/no-purchase copy |
 | Judge foreground | `PASS_PREMIUM` | Background/foreground re-entry preserved granted access |
 | Judge full relaunch | `PASS_PREMIUM` | A new process plus forced-current refresh recovered the existing grant and truthful expiry/no-purchase copy |
@@ -66,6 +66,7 @@ timing guarantee.
 
 No real payment, production purchase, or grant/dashboard mutation occurred in this receipt. A
 later final-integration pass pushed the public-safe evidence, completed exact-head CI, and created a
-link-accessible captioned YouTube demo saved in Devpost. The owner accepted v2 after a normal-speed
-watch/listen. The truthful private-form resolution and final Devpost submission remain separate
-gates. VoiceOver behavior is deliberately not claimed by this silent receipt.
+link-accessible captioned YouTube demo used in the submitted Devpost entry. The owner accepted v2
+after a normal-speed watch/listen. The truthful private-form resolution, final Submit, authenticated
+Submitted view, and logged-out page readback are complete. VoiceOver behavior is deliberately not
+claimed by this silent receipt.

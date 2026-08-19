@@ -62,9 +62,11 @@ queue. Choose the surface that matches the job:
    without a purchase, enter an assigned code under **Hackathon Judge Access**. The app derives a
    RevenueCat customer identity and still requires an active granted `supplier_profiles_plus`
    entitlement; the code is cleared from the field and creates no purchase. The unlocked card shows
-   the effective RevenueCat expiration date in the local calendar, bounded by the December 31, 2026
-   campaign cutoff. If an already configured key/project is wrong, quit and reopen the Debug app to
-   replace it because the RevenueCat SDK can be configured only once per process.
+   the effective expiration as an inclusive UTC date, bounded by the exclusive
+   `2027-01-01T00:00:00Z` campaign cutoff. The controller relocks at the earlier effective
+   expiration; foreground and relaunch refreshes recover only from fresh active customer state. If
+   an already configured key/project is wrong, quit and reopen the Debug app to replace it because
+   the RevenueCat SDK can be configured only once per process.
 
 The Shipaton Manager confirmed both that a Test Store purchase is sufficient for judging and that
 a macOS entry has no judging disadvantage: [Test Store answer](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient) and
@@ -91,7 +93,8 @@ competition integration boundary, not encryption or DRM.
 ```
 
 - Use one to five profiles.
-- Names are trimmed and must be unique without regard to case.
+- Names are trimmed and must remain unique after Unicode NFKC compatibility normalization and
+  locale-independent case folding.
 - Unknown fields, invalid codes, unsupported versions, or one invalid profile reject the complete
   workspace.
 - The workspace file is bounded to 256 KiB.

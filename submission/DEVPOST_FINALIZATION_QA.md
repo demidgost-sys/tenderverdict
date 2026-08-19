@@ -4,8 +4,10 @@
 - Status: **SUBMITTED — authenticated and logged-out readbacks passed**
 - Project: **TenderVerdict Next Gen**
 - Competition branch: `hackathon/revenuecat-next-gen-2026`
-- Submission candidate head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
-- Exact-head GitHub Actions: **CI success; Desktop preview success**
+- Initial successful Submit head: `e96695b81c3ae1afd86f9d51f1ffee8d0533da5b`
+- Live source: `hackathon/revenuecat-next-gen-2026`; resolve its current head through GitHub/PR #12
+- Initial-submit GitHub Actions: **CI success; Desktop preview success**; resolve current source
+  checks through PR #12
 - Public project: https://devpost.com/software/tenderverdict-next-gen
 
 This receipt records only public-safe outcomes. It contains no key, reviewer code, customer
