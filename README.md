@@ -42,8 +42,8 @@ the documents.
   <img src="submission/gallery-hero-1020x754.png" width="900" alt="TenderVerdict Next Gen showing one synthetic tender feed, three supplier profiles, and two notices whose outcomes change by profile.">
 </p>
 
-The gallery hero is a direct, pre-transaction capture from the current packaged native app. The
-current genuine Judge Access comparison remains available in the
+The gallery hero is a direct capture from the current packaged Release app using synthetic data;
+no purchase state is shown. The current genuine Judge Access comparison remains available in the
 [public-safe evidence](submission/evidence/README.md).
 
 RevenueCat controls access to the Portfolio presentation; it never changes a qualification result.

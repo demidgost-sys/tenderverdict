@@ -254,8 +254,8 @@ Never use a fake entitlement state as evidence.
   student status, TU Graz affiliation, and July 2028 graduation on 2026-08-05.
 - [x] Exact private Devpost fields are inspected after joining; the saved overview, story,
   repository link, tags, and three gallery images were read back without exposing private values.
-- [ ] The required store-release attestation has a truthful Next Gen path through a form correction
-  or written field-specific organizer instruction.
+- [x] The organizer corrected the required store-release validation; the live checkbox remained
+  unchecked and optional, and Devpost accepted the truthful Next Gen submission.
 - [x] Public draft branch contains source, instructions, assets, and Apache-2.0 license.
 - [x] The release-configuration artifact named in project status passes checksum creation,
   signature, embedded-core contract/determinism, configuration-specific native checks, and

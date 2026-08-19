@@ -106,10 +106,10 @@ outcomes, and evidence a person can defend.
 
 ## What's next for TenderVerdict Next Gen
 
-Next, I want to validate the workflow with small supplier teams, improve trusted distribution and
-notarization, and move from Test Store evidence to production billing only after real demand is
-proven. The current app remains an ad-hoc-signed competition evaluation build, not a notarized
-consumer release or production-payment claim.
+Next, I want to validate the workflow with small supplier teams and add a signed, notarized
+distribution path. I will move from Test Store evidence to production billing only after real
+demand is proven. The current app remains an ad-hoc-signed competition evaluation build; it is not
+a consumer release, and no real payment was made.
 
 ## Links
 
