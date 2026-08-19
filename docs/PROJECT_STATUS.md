@@ -11,11 +11,13 @@
   complete local gate, final silent Test Store/Judge Access evidence, and an owner-approved,
   link-accessible captioned 1:49 YouTube demo, now submitted to Devpost**
 - Presentation state: **the competition branch contains the combined public-safe QA, judge-first
-  README, canonical Devpost story, prepared gallery order, and exact metadata/visual-QA receipt for
+  README, canonical Devpost story, refreshed public gallery order, and exact metadata/visual-QA receipt for
   the human-narrated video without changing product behavior**
 - Review surface: [draft pull request #12](https://github.com/demidgost-sys/tenderverdict/pull/12)
 - Competition-branch state: **the organizer corrected the required-field conflict; store release
-  remained false, Devpost accepted the entry, and authenticated plus logged-out readbacks passed**
+  remained false, Devpost accepted the entry, and authenticated plus logged-out readbacks passed;
+  the public page now uses the deduplicated story, current next-step copy, direct competition-branch
+  repository link, and deterministic gallery hero immediately after the video**
 
 This is the canonical progress ledger for the competition branch. It records what was built, why
 it matters, what evidence exists, and what remains. Detailed technical contracts stay in the

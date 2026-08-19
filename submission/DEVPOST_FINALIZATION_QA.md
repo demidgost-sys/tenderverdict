@@ -57,6 +57,24 @@ Devpost returned `Project submitted!` and navigated to the public project URL. A
 authenticated readback showed **SUBMITTED** and no **DRAFT** state. A separate logged-out browser
 opened the same URL and rendered the project title and tagline successfully.
 
+## Public presentation polish
+
+With separate, field-specific owner approval after submission, the public Project details page was
+saved once with these presentation-only changes:
+
+- the accidental duplicate heading preamble was removed, leaving one canonical story sequence;
+- the final next-step paragraph now distinguishes validation and notarized distribution from the
+  current competition evaluation build and repeats that no real payment was made;
+- the public repository link points directly to `hackathon/revenuecat-next-gen-2026`;
+- the deterministic 1020×754 native-app hero is the first image after the unchanged demo video;
+- the remaining icon, Judge Access, and workspace images retain their intended order.
+
+The save returned to the authenticated submission flow with **SUBMITTED** and **5 / 5 steps done**
+still visible. A fresh logged-out readback confirmed the project title, tagline, single story heading
+sequence, current next-step paragraph, exact competition-branch link, unchanged video, and gallery
+order. This polish changed no private submission field, eligibility answer, billing state, product,
+offering, key, or RevenueCat grant.
+
 ## Preserved boundaries
 
 - No real payment or store release occurred.
