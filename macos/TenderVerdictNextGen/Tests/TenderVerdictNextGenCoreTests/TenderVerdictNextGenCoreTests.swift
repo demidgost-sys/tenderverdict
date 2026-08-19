@@ -12,6 +12,23 @@ enum CheckFailure: Error, LocalizedError {
   }
 }
 
+private final class ExpiryTestClock: @unchecked Sendable {
+  let now: Date
+
+  init(now: Date) {
+    self.now = now
+  }
+}
+
+@MainActor
+private final class ExpiryProbe {
+  private(set) var expirations = 0
+
+  func record() {
+    expirations += 1
+  }
+}
+
 @main
 enum TenderVerdictNextGenChecks {
   static func main() async throws {
@@ -31,7 +48,7 @@ enum TenderVerdictNextGenChecks {
     try checkNoticeImportPreviewContract()
     try checkReviewQueryAndStableResultLookup()
     try checkLargeReviewQueryPreservesStableIdentities()
-    try checkJudgeAccessAndExpiryTransitions()
+    try await checkJudgeAccessAndExpiryTransitions()
     try checkPremiumAccessibilityOutcomes()
     try await checkTestStoreConfigurationFailsClosed()
     try checkProcessAdapterPreservesDeterministicBytes()
@@ -416,6 +433,34 @@ enum TenderVerdictNextGenChecks {
       _ = try PortfolioWorkspaceDocument.decode(duplicate)
     }
 
+    let normalizedDuplicatePairs = [
+      ("A", "Ａ"),
+      ("Café", "Cafe\u{301}"),
+      ("Straße", "STRASSE"),
+    ]
+    for (firstName, secondName) in normalizedDuplicatePairs {
+      let normalizedDuplicate = try JSONSerialization.data(
+        withJSONObject: [
+          "schema_version": 1,
+          "profiles": [
+            profilePayload.merging(["name": firstName]) { _, replacement in replacement },
+            profilePayload.merging(["name": secondName]) { _, replacement in replacement },
+          ],
+        ]
+      )
+      try requireThrows("normalized duplicate workspace profile names were accepted") {
+        _ = try PortfolioWorkspaceDocument.decode(normalizedDuplicate)
+      }
+      try requireContractError(
+        .duplicateProfileName,
+        data: try makeReportData(
+          profileCount: 2,
+          firstProfileName: firstName,
+          secondProfileName: secondName
+        )
+      )
+    }
+
     let unnormalizedProfile = try JSONSerialization.data(
       withJSONObject: [
         "schema_version": 1,
@@ -638,39 +683,36 @@ enum TenderVerdictNextGenChecks {
     #endif
   }
 
+  @MainActor
   private static func checkJudgeAccessAndExpiryTransitions() throws {
-    let cutoff = RevenueCatJudgeAccess.expiresAt
+    let cutoff = RevenueCatJudgeAccess.cutoffExclusiveUTC
     let beforeCutoff = cutoff.addingTimeInterval(-1)
     let afterCutoff = cutoff.addingTimeInterval(1)
     let dayBeforeCutoff = cutoff.addingTimeInterval(-86_400)
-    guard let utc = TimeZone(secondsFromGMT: 0) else {
-      throw CheckFailure.failed("UTC time zone was unavailable")
-    }
     let knownDigest = "4e118a47833348f05045f3cf9146faf4ba095874cb1a922db81f99ae8384b3db"
     let judgeAppUserID = RevenueCatJudgeAccess.appUserID(forDigest: knownDigest)
 
     try require(
-      RevenueCatJudgeAccess.expirationLabel(for: dayBeforeCutoff, timeZone: utc)
-        == "December 30, 2026",
+      RevenueCatJudgeAccess.expirationLabel(for: dayBeforeCutoff) == "December 30, 2026 UTC",
       "Judge Access copy ignored an earlier RevenueCat grant expiry"
     )
     try require(
-      RevenueCatJudgeAccess.expirationLabel(
-        for: cutoff.addingTimeInterval(3_600),
-        timeZone: utc
-      )
-        == RevenueCatJudgeAccess.expiryLabel,
-      "Judge Access copy exceeded the local campaign cutoff"
+      RevenueCatJudgeAccess.expirationLabel(for: cutoff.addingTimeInterval(3_600))
+        == "December 31, 2026 UTC",
+      "Judge Access copy exceeded the UTC campaign cutoff"
     )
     try require(
-      RevenueCatJudgeAccess.expirationLabel(for: nil, timeZone: utc)
-        == RevenueCatJudgeAccess.expiryLabel,
+      RevenueCatJudgeAccess.expirationLabel(for: nil) == "December 31, 2026 UTC",
       "Judge Access copy lost the documented fallback cutoff"
     )
 
     try require(
       RevenueCatJudgeAccess.validate("not-a-judge-code", now: beforeCutoff) == .invalid,
       "unknown Judge Access code was accepted"
+    )
+    try require(
+      RevenueCatJudgeAccess.validate("any-code-at-cutoff", now: cutoff) == .expired,
+      "Judge Access remained redeemable at its exclusive cutoff"
     )
     try require(
       RevenueCatJudgeAccess.validate("any-code-after-cutoff", now: afterCutoff) == .expired,
@@ -708,6 +750,26 @@ enum TenderVerdictNextGenChecks {
       RevenueCatAccessController.resolvedAccessSource(
         entitlementIsActive: true,
         store: .promotional,
+        expirationDate: nil,
+        appUserID: judgeAppUserID,
+        now: beforeCutoff
+      ) == .judgeAccess(expiresAt: cutoff),
+      "Judge Access without a RevenueCat expiration lost the campaign cutoff"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .promotional,
+        expirationDate: dayBeforeCutoff,
+        appUserID: judgeAppUserID,
+        now: dayBeforeCutoff.addingTimeInterval(-1)
+      ) == .judgeAccess(expiresAt: dayBeforeCutoff),
+      "an earlier RevenueCat grant expiration was not preserved"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .promotional,
         expirationDate: cutoff.addingTimeInterval(3_600),
         appUserID: judgeAppUserID,
         now: afterCutoff
@@ -723,6 +785,44 @@ enum TenderVerdictNextGenChecks {
         now: beforeCutoff
       ) == nil,
       "inactive entitlement unlocked Premium"
+    )
+    try require(
+      RevenueCatAccessController.resolvedAccessSource(
+        entitlementIsActive: true,
+        store: .testStore,
+        expirationDate: beforeCutoff,
+        appUserID: "$RCAnonymousID:public-fixture",
+        now: beforeCutoff
+      ) == nil,
+      "an entitlement unlocked Premium at its exclusive expiration boundary"
+    )
+
+    let clock = ExpiryTestClock(now: beforeCutoff)
+    let probe = ExpiryProbe()
+    let scheduler = PremiumAccessExpiryScheduler(
+      now: { clock.now },
+      sleepUntil: { _ in await Task.yield() }
+    )
+    scheduler.schedule(at: cutoff) { probe.record() }
+    try require(
+      scheduler.scheduledExpiration == cutoff && probe.expirations == 0,
+      "a future access expiration was not scheduled"
+    )
+    let replacement = beforeCutoff.addingTimeInterval(0.5)
+    scheduler.schedule(at: replacement) { probe.record() }
+    try require(
+      scheduler.scheduledExpiration == replacement && probe.expirations == 0,
+      "a refreshed access expiration did not replace the prior schedule"
+    )
+    scheduler.cancel()
+    try require(
+      scheduler.scheduledExpiration == nil && probe.expirations == 0,
+      "cancelling active access left an expiration scheduled"
+    )
+    scheduler.schedule(at: beforeCutoff) { probe.record() }
+    try require(
+      scheduler.scheduledExpiration == nil && probe.expirations == 1,
+      "an already expired access boundary did not relock immediately"
     )
   }
 
@@ -774,10 +874,12 @@ enum TenderVerdictNextGenChecks {
     let judgeCases:
       [(JudgeAccessActivationState, PremiumAccessRecoveryAction?, PremiumAccessFocusTarget)] = [
         (.invalidCode, .activateJudgeAccess, .judgeAccessCode),
-        (.expired, nil, .judgeAccessCode),
+        (
+          .expired(expiresAt: RevenueCatJudgeAccess.cutoffExclusiveUTC), nil, .judgeAccessCode
+        ),
         (.entitlementMissing, .activateJudgeAccess, .judgeAccessCode),
         (.failed, .activateJudgeAccess, .judgeAccessCode),
-        (.active(expiresAt: RevenueCatJudgeAccess.expiresAt), .restore, .restore),
+        (.active(expiresAt: RevenueCatJudgeAccess.cutoffExclusiveUTC), .restore, .restore),
       ]
     for (state, primaryAction, focusTarget) in judgeCases {
       guard let outcome = state.terminalAccessibilityOutcome else {
@@ -1012,6 +1114,7 @@ private func makeReportData(
   mismatchSecondSummary: Bool = false,
   noticeCount: Int = 3,
   firstProfileName: String? = nil,
+  secondProfileName: String? = nil,
   firstSourceURL: String? = nil
 ) throws -> Data {
   let sharedNoticeDigest = String(repeating: "a", count: 64)
@@ -1048,7 +1151,10 @@ private func makeReportData(
       ],
       "profile": [
         "schema_version": 1,
-        "name": index == 1 ? firstProfileName ?? "Profile 1" : "Profile \(index)",
+        "name":
+          index == 1
+          ? firstProfileName ?? "Profile 1"
+          : index == 2 ? secondProfileName ?? "Profile 2" : "Profile \(index)",
         "cpv_codes": ["72260000"],
         "countries": ["AUT"],
         "minimum_days_to_deadline": 14,

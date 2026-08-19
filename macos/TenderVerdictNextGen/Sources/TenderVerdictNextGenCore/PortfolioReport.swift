@@ -44,7 +44,7 @@ public enum PortfolioContractError: Error, Equatable, LocalizedError {
     case .inconsistentNoticeSet:
       return "Portfolio profiles were not evaluated against one shared notice set."
     case .duplicateProfileName:
-      return "Portfolio profile names must be unique."
+      return "Portfolio profile names must be unique after case and width normalization."
     case .invalidProvenance:
       return "Portfolio provenance digests are invalid or inconsistent."
     }

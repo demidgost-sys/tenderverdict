@@ -195,24 +195,23 @@ public enum JudgeAccessCodeValidation: Equatable, Sendable {
 }
 
 public enum RevenueCatJudgeAccess {
-  public static let expiresAt = Date(timeIntervalSince1970: 1_798_761_599)
-  public static let expiryLabel = "December 31, 2026"
+  public static let cutoffExclusiveUTC = Date(timeIntervalSince1970: 1_798_761_600)
+  public static let availabilityLabel = "through December 31, 2026 UTC"
 
-  public static func expirationLabel(
-    for expirationDate: Date?,
-    timeZone: TimeZone = .current
-  ) -> String {
-    guard let expirationDate else {
-      return expiryLabel
-    }
-    let effectiveExpiration = min(expirationDate, expiresAt)
+  public static func effectiveExpiration(for expirationDate: Date?) -> Date {
+    min(expirationDate ?? cutoffExclusiveUTC, cutoffExclusiveUTC)
+  }
+
+  public static func expirationLabel(for expirationDate: Date?) -> String {
+    let effectiveExpiration = effectiveExpiration(for: expirationDate)
+    let lastIncludedInstant = effectiveExpiration.addingTimeInterval(-1)
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .gregorian)
     formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.timeZone = timeZone
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
     formatter.dateStyle = .long
     formatter.timeStyle = .none
-    return formatter.string(from: effectiveExpiration)
+    return "\(formatter.string(from: lastIncludedInstant)) UTC"
   }
 
   private static let acceptedCodeDigests: Set<String> = [
@@ -227,7 +226,7 @@ public enum RevenueCatJudgeAccess {
     _ rawCode: String,
     now: Date = Date()
   ) -> JudgeAccessCodeValidation {
-    guard now <= expiresAt else {
+    guard now < cutoffExclusiveUTC else {
       return .expired
     }
     let code = rawCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
@@ -268,7 +267,7 @@ public enum JudgeAccessActivationState: Equatable, Sendable {
   case idle
   case checking
   case invalidCode
-  case expired
+  case expired(expiresAt: Date)
   case entitlementMissing
   case failed
   case active(expiresAt: Date?)
@@ -283,10 +282,11 @@ public enum JudgeAccessActivationState: Equatable, Sendable {
         recoveryActions: [.activateJudgeAccess],
         focusTarget: .judgeAccessCode
       )
-    case .expired:
+    case .expired(let expiresAt):
       return PremiumAccessAccessibilityOutcome(
         announcement:
-          "Hackathon Judge Access ended on \(RevenueCatJudgeAccess.expiryLabel).",
+          "Hackathon Judge Access expired after "
+          + "\(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)).",
         recoveryActions: [],
         focusTarget: .judgeAccessCode
       )
@@ -307,13 +307,67 @@ public enum JudgeAccessActivationState: Equatable, Sendable {
     case .active(let expiresAt):
       return PremiumAccessAccessibilityOutcome(
         announcement:
-          "RevenueCat Judge Access expires "
+          "RevenueCat Judge Access is available through "
           + "\(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)). "
           + "No purchase was made.",
         recoveryActions: [.restore],
         focusTarget: .restore
       )
     }
+  }
+}
+
+@MainActor
+package final class PremiumAccessExpiryScheduler {
+  package typealias SleepUntil = @Sendable (Date) async -> Void
+
+  package private(set) var scheduledExpiration: Date?
+
+  private let nowProvider: @Sendable () -> Date
+  private let sleepUntil: SleepUntil
+  private var task: Task<Void, Never>?
+
+  package init(
+    now: @escaping @Sendable () -> Date = { Date() },
+    sleepUntil: @escaping SleepUntil = { expiration in
+      let interval = max(0, expiration.timeIntervalSinceNow)
+      guard interval > 0 else { return }
+      let nanoseconds = UInt64(min(interval * 1_000_000_000, Double(UInt64.max)))
+      try? await Task<Never, Never>.sleep(nanoseconds: nanoseconds)
+    }
+  ) {
+    nowProvider = now
+    self.sleepUntil = sleepUntil
+  }
+
+  package func schedule(
+    at expiration: Date?,
+    onExpire: @escaping @MainActor @Sendable () -> Void
+  ) {
+    cancel()
+    guard let expiration else { return }
+    scheduledExpiration = expiration
+    guard nowProvider() < expiration else {
+      scheduledExpiration = nil
+      onExpire()
+      return
+    }
+
+    let nowProvider = self.nowProvider
+    let sleepUntil = self.sleepUntil
+    task = Task { [weak self] in
+      await sleepUntil(expiration)
+      guard !Task.isCancelled, nowProvider() >= expiration, let self else { return }
+      self.task = nil
+      self.scheduledExpiration = nil
+      onExpire()
+    }
+  }
+
+  package func cancel() {
+    task?.cancel()
+    task = nil
+    scheduledExpiration = nil
   }
 }
 
@@ -331,6 +385,7 @@ public final class RevenueCatAccessController: ObservableObject {
   private var apiKey: String?
   private var currentPackage: Package?
   private var didConfigure = false
+  private let expiryScheduler = PremiumAccessExpiryScheduler()
 
   public init(environment: [String: String] = ProcessInfo.processInfo.environment) {
     apiKey = RevenueCatTestStoreConfiguration.apiKey(in: environment)
@@ -378,14 +433,20 @@ public final class RevenueCatAccessController: ObservableObject {
     guard entitlementIsActive else {
       return nil
     }
+    if let expirationDate, now >= expirationDate {
+      return nil
+    }
     if store == .promotional {
       guard RevenueCatJudgeAccess.isKnownAppUserID(appUserID) else {
         return .otherRevenueCat
       }
-      if now > RevenueCatJudgeAccess.expiresAt {
+      guard now < RevenueCatJudgeAccess.cutoffExclusiveUTC else {
         return nil
       }
-      let boundedExpiration = expirationDate.map { min($0, RevenueCatJudgeAccess.expiresAt) }
+      let boundedExpiration = RevenueCatJudgeAccess.effectiveExpiration(for: expirationDate)
+      guard now < boundedExpiration else {
+        return nil
+      }
       return .judgeAccess(expiresAt: boundedExpiration)
     }
     if store == .testStore {
@@ -397,6 +458,7 @@ public final class RevenueCatAccessController: ObservableObject {
   public func configure(testStoreAPIKey: String) async {
     guard RevenueCatTestStoreConfiguration.isAvailableInCurrentBuild else {
       apiKey = nil
+      clearActiveAccess()
       state = .testStoreUnavailableInRelease
       return
     }
@@ -409,6 +471,7 @@ public final class RevenueCatAccessController: ObservableObject {
     ]
     guard let validatedKey = RevenueCatTestStoreConfiguration.apiKey(in: environment) else {
       apiKey = nil
+      clearActiveAccess()
       state = .configurationRejected
       return
     }
@@ -420,6 +483,7 @@ public final class RevenueCatAccessController: ObservableObject {
   public func start() async {
     guard RevenueCatTestStoreConfiguration.isAvailableInCurrentBuild else {
       apiKey = nil
+      clearActiveAccess()
       state = .testStoreUnavailableInRelease
       return
     }
@@ -429,6 +493,7 @@ public final class RevenueCatAccessController: ObservableObject {
     state = .loading
     if !didConfigure {
       guard !Purchases.isConfigured else {
+        clearActiveAccess()
         state = .failed
         return
       }
@@ -464,15 +529,16 @@ public final class RevenueCatAccessController: ObservableObject {
     do {
       let result = try await Purchases.shared.purchase(package: currentPackage)
       if result.userCancelled {
+        clearActiveAccess()
         state = .cancelled(price: price)
       } else if applyActiveAccess(result.customerInfo) {
         return
       } else {
-        accessSource = nil
+        clearActiveAccess()
         state = .failed
       }
     } catch {
-      accessSource = nil
+      clearActiveAccess()
       state = .failed
     }
   }
@@ -490,7 +556,7 @@ public final class RevenueCatAccessController: ObservableObject {
       }
       try await loadExpectedPackageAndLock()
     } catch {
-      accessSource = nil
+      clearActiveAccess()
       state = .failed
     }
   }
@@ -505,7 +571,7 @@ public final class RevenueCatAccessController: ObservableObject {
       judgeAccessState = .invalidCode
       return
     case .expired:
-      judgeAccessState = .expired
+      judgeAccessState = .expired(expiresAt: RevenueCatJudgeAccess.cutoffExclusiveUTC)
       return
     case .accepted(let appUserID):
       judgeAccessState = .checking
@@ -517,7 +583,7 @@ public final class RevenueCatAccessController: ObservableObject {
         }
         try await loadExpectedPackageAndLock(now: now)
       } catch {
-        accessSource = nil
+        clearActiveAccess()
         judgeAccessState = .failed
         state = .failed
       }
@@ -533,7 +599,7 @@ public final class RevenueCatAccessController: ObservableObject {
       }
       try await loadExpectedPackageAndLock()
     } catch {
-      accessSource = nil
+      clearActiveAccess()
       state = .failed
     }
   }
@@ -549,11 +615,12 @@ public final class RevenueCatAccessController: ObservableObject {
         )
       }
     }
-    accessSource = nil
+    clearActiveAccess()
     state = .locked(price: currentPackage?.localizedPriceString)
     if RevenueCatJudgeAccess.isKnownAppUserID(Purchases.shared.appUserID) {
       judgeAccessState =
-        now > RevenueCatJudgeAccess.expiresAt ? .expired : .entitlementMissing
+        now >= RevenueCatJudgeAccess.cutoffExclusiveUTC
+        ? .expired(expiresAt: RevenueCatJudgeAccess.cutoffExclusiveUTC) : .entitlementMissing
     } else if judgeAccessState == .checking {
       judgeAccessState = .entitlementMissing
     }
@@ -577,13 +644,37 @@ public final class RevenueCatAccessController: ObservableObject {
     }
     accessSource = source
     state = .unlocked
+    let effectiveExpiration: Date?
     if case .judgeAccess(let expiresAt) = source,
       RevenueCatJudgeAccess.isKnownAppUserID(Purchases.shared.appUserID)
     {
+      effectiveExpiration = RevenueCatJudgeAccess.effectiveExpiration(for: expiresAt)
       judgeAccessState = .active(expiresAt: expiresAt)
+    } else {
+      effectiveExpiration = entitlement.expirationDate
+      judgeAccessState = .idle
+    }
+    expiryScheduler.schedule(at: effectiveExpiration) { [weak self] in
+      self?.expireActiveAccess(source: source, expiresAt: effectiveExpiration)
+    }
+    return true
+  }
+
+  private func clearActiveAccess() {
+    expiryScheduler.cancel()
+    accessSource = nil
+  }
+
+  private func expireActiveAccess(source: PremiumAccessSource, expiresAt: Date?) {
+    guard state.isUnlocked, accessSource == source else { return }
+    clearActiveAccess()
+    state = .locked(price: currentPackage?.localizedPriceString)
+    if case .judgeAccess = source {
+      judgeAccessState = .expired(
+        expiresAt: expiresAt ?? RevenueCatJudgeAccess.cutoffExclusiveUTC
+      )
     } else {
       judgeAccessState = .idle
     }
-    return true
   }
 }

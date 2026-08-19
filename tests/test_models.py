@@ -94,17 +94,30 @@ class PortfolioWorkspaceValidationTests(unittest.TestCase):
                     }
                 )
 
-    def test_workspace_rejects_duplicate_names_case_insensitively(self) -> None:
-        with self.assertRaisesRegex(SchemaValidationError, "unique case-insensitively"):
-            portfolio_workspace_from_dict(
-                {
-                    "schema_version": 1,
-                    "profiles": [
-                        _workspace_profile(" Example Austria Services "),
-                        _workspace_profile("example austria services"),
-                    ],
-                }
-            )
+    def test_workspace_rejects_duplicate_names_after_identity_normalization(self) -> None:
+        duplicate_pairs = (
+            (" Example Austria Services ", "example austria services"),
+            ("A", "Ａ"),
+            ("Café", "Cafe\N{COMBINING ACUTE ACCENT}"),
+            ("Straße", "STRASSE"),
+        )
+
+        for first, second in duplicate_pairs:
+            with (
+                self.subTest(first=first, second=second),
+                self.assertRaisesRegex(
+                    SchemaValidationError, "unique after case and width normalization"
+                ),
+            ):
+                portfolio_workspace_from_dict(
+                    {
+                        "schema_version": 1,
+                        "profiles": [
+                            _workspace_profile(first),
+                            _workspace_profile(second),
+                        ],
+                    }
+                )
 
     def test_workspace_rejects_bad_schema_shape_and_nested_profile(self) -> None:
         invalid_variants = (

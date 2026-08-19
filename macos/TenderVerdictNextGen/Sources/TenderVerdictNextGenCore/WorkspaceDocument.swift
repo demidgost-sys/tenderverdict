@@ -15,7 +15,7 @@ public enum WorkspaceDocumentError: Error, Equatable, LocalizedError {
     case .invalidProfile:
       return "A workspace profile does not match the schema-1 contract."
     case .duplicateProfileName:
-      return "Workspace profile names must be unique."
+      return "Workspace profile names must be unique after case and width normalization."
     }
   }
 }
@@ -138,8 +138,9 @@ func normalizedSearchText(_ value: String) -> String {
 }
 
 func normalizedIdentityText(_ value: String) -> String {
-  value.trimmingCharacters(in: .whitespacesAndNewlines).folding(
-    options: [.caseInsensitive, .widthInsensitive],
-    locale: Locale(identifier: "en_US_POSIX")
-  )
+  value.trimmingCharacters(in: .whitespacesAndNewlines)
+    .precomposedStringWithCompatibilityMapping.folding(
+      options: [.caseInsensitive],
+      locale: Locale(identifier: "en_US_POSIX")
+    )
 }

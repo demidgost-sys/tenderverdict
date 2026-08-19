@@ -1323,8 +1323,8 @@ struct PremiumWorkspaceSection: View {
       Label("Hackathon Judge Access", systemImage: "key.fill")
         .font(.subheadline.weight(.semibold))
       Text(
-        "Use an assigned reviewer code for a RevenueCat granted entitlement through "
-          + "\(RevenueCatJudgeAccess.expiryLabel). This creates no purchase and stores no raw code."
+        "Use an assigned reviewer code for a RevenueCat granted entitlement "
+          + "\(RevenueCatJudgeAccess.availabilityLabel). This creates no purchase and stores no raw code."
       )
       .font(.caption)
       .foregroundStyle(.secondary)
@@ -1377,9 +1377,9 @@ struct PremiumWorkspaceSection: View {
       )
       .foregroundStyle(.red)
       .accessibilityLabel("Error: Judge access code not recognized. Check the code and try again.")
-    case .expired:
+    case .expired(let expiresAt):
       Label(
-        "Judge Access ended on \(RevenueCatJudgeAccess.expiryLabel).",
+        "Judge Access expired after \(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)).",
         systemImage: "calendar.badge.exclamationmark"
       )
       .foregroundStyle(.secondary)
@@ -1457,7 +1457,7 @@ struct PremiumWorkspaceSection: View {
     switch controller.accessSource {
     case .judgeAccess(let expiresAt):
       return
-        "RevenueCat Judge Access expires "
+        "RevenueCat Judge Access is available through "
         + "\(RevenueCatJudgeAccess.expirationLabel(for: expiresAt)). "
         + "No purchase was made. Every profile, changed outcome, and the full portfolio export "
         + "are available."

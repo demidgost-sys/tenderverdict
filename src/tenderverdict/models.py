@@ -6,6 +6,7 @@ import csv
 import io
 import json
 import re
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -321,11 +322,11 @@ def portfolio_workspace_from_dict(data: Mapping[str, Any]) -> PortfolioWorkspace
                 message = f"workspace.profiles[{index}]: {message}"
             raise SchemaValidationError(message) from exc
 
-        normalized_name = profile.name.casefold()
+        normalized_name = _normalized_profile_identity(profile.name)
         previous_index = seen_names.get(normalized_name)
         if previous_index is not None:
             raise SchemaValidationError(
-                "workspace profile names must be unique case-insensitively: "
+                "workspace profile names must be unique after case and width normalization: "
                 f"profiles[{index}].name duplicates profiles[{previous_index}].name"
             )
         seen_names[normalized_name] = index
@@ -798,6 +799,12 @@ def _required_nonempty_string(
             f"{label}.{key} must be at most {maximum_characters} characters"
         )
     return stripped
+
+
+def _normalized_profile_identity(value: str) -> str:
+    """Return the cross-runtime identity used to reject ambiguous profile names."""
+
+    return unicodedata.normalize("NFKC", value.strip()).casefold()
 
 
 def _optional_string(value: object, label: str, maximum_characters: int) -> str | None:
