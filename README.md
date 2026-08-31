@@ -267,6 +267,14 @@ trifft keine Vergabe- oder Teilnahmeentscheidung und ersetzt nicht die Prüfung 
 Ausschreibungsunterlagen. Die veröffentlichte Alpha-Version ist ein CLI; `main` enthält zusätzlich
 eine noch unveröffentlichte Desktop-Vorschau ohne unterstützten Ein-Klick-Installer.
 
+## Authorship and tools
+
+Demid Valiullin defined the product boundary, acceptance criteria, and public release claims. He reviewed and manually verified the AI-assisted implementation and decided what shipped.
+
+Codex substantially assisted with implementation, tests, UI work, documentation, and release checks. The result should therefore be read as an AI-assisted project with human product ownership and release responsibility, not as a claim that every line was written manually by one person.
+
+Verification is documented in the repository test and release commands. The competition branch records 128 Python tests and 20 native contract checks. The project remains an experimental prototype and developer alpha, not an App Store or production release.
+
 ## License and attribution
 
 The code is licensed under the [`Apache License 2.0`](LICENSE). Procurement records, TED names,
