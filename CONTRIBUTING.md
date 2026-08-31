@@ -26,7 +26,8 @@ boundaries:
 - no runtime dependency unless the issue establishes a clear need;
 - offline tests and reproducible synthetic examples.
 
-Run the local checks before proposing a patch:
+Run the complete source gate in the [developer guide](docs/DEVELOPMENT.md) before proposing a patch.
+That page owns the exact cross-language command matrix. The minimum Python/distribution subset is:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: --no-deps \
@@ -41,6 +42,24 @@ ruff format --check .
 mypy
 python -m build --no-isolation
 ```
+
+On macOS, changes under `macos/TenderVerdictNextGen`, `submission`, or the embedded runtime also
+require both Debug and Release native contracts plus the applicable source/package/manual gates:
+
+```bash
+swift build --package-path macos/TenderVerdictNextGen
+swift run --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift run -c release --package-path macos/TenderVerdictNextGen TenderVerdictNextGenChecks
+swift format lint --recursive --strict macos/TenderVerdictNextGen
+TENDERVERDICT_WORKTREE="$PWD" \
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen --smoke-test
+python3 tools/prepare_submission_assets.py
+```
+
+The self-contained app builder and manual evidence sequence are documented in the
+[Next Gen README](macos/TenderVerdictNextGen/README.md) and
+[UX audit](docs/UX_AUDIT.md).
 
 `requirements-package-build.txt` is the reviewed, hash-locked package-build environment. Desktop
 bundles use the separate `requirements-desktop-build.txt` lock. The vocabulary snapshots under

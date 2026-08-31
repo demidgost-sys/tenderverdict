@@ -36,7 +36,7 @@ def demo_notices() -> list[dict[str, Any]]:
             "title": "Software support services",
             "buyer": "Example Regional Authority",
             "cpv_codes": ["72261000"],
-            "countries": ["DEU"],
+            "countries": ["AUT", "DEU"],
             "deadline": "2026-09-20",
             "publication_date": "2026-07-30",
             "source_url": "https://procurement.example/notices/SYN-WATCH-001",

@@ -44,9 +44,11 @@ class OfflinePipelineTests(unittest.TestCase):
         html = render_run(run, "html")
         self.assertEqual(html, (ROOT / "demo" / "index.html").read_text(encoding="utf-8"))
         lowered = html.lower()
-        for forbidden in ("<script", "<form", "<iframe", " src=", " href=", "@import"):
+        for forbidden in ("<script", "<form", "<iframe", " src=", "@import"):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, lowered)
+        self.assertEqual(lowered.count('<a class="source-link" href="https://'), 3)
+        self.assertNotIn('href="javascript:', lowered)
         self.assertEqual(lowered.count("<h1"), 1)
         self.assertIn('<meta name="viewport"', lowered)
 

@@ -1,7 +1,8 @@
-# Third-party notices for desktop developer artifacts
+# Third-party notices for developer artifacts
 
-The source package itself remains licensed under Apache-2.0. A frozen desktop artifact also
-contains components supplied by its platform Python and build toolchain.
+TenderVerdict source remains licensed under Apache-2.0. Frozen Python desktop artifacts and the
+unreleased SwiftUI target also use components supplied by their platform toolchains and declared
+dependencies.
 
 ## CPython and the Python standard library
 
@@ -17,6 +18,28 @@ Python distribution. Tcl/Tk is distributed under its upstream permissive license
 
 Developer artifacts are assembled with PyInstaller. PyInstaller is distributed under
 GPL-2.0-or-later with a special exception that permits the distribution of bundled applications.
+
+## RevenueCat Purchases Apple SDK
+
+The unreleased Next Gen Swift package declares RevenueCat `purchases-ios` `5.83.0`. The dependency
+is distributed under the MIT License:
+
+Copyright (c) 2024 RevenueCat, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## EU vocabulary snapshots
 

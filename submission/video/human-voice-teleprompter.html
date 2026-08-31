@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TenderVerdict human voice teleprompter</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #080a12;
+      color: #f7f8ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 82% 20%, rgba(95, 91, 210, 0.25), transparent 32rem),
+        #080a12;
+    }
+    main {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 1.5rem;
+      padding: clamp(1.25rem, 4vw, 4rem);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: #aeb4c8;
+      font-size: clamp(0.8rem, 1.4vw, 1rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .status { color: #9ea1ff; font-weight: 700; }
+    article {
+      width: min(76rem, 100%);
+      align-self: center;
+      justify-self: center;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .pill {
+      border: 1px solid #31364b;
+      border-radius: 999px;
+      padding: 0.45rem 0.75rem;
+      color: #cdd1e1;
+      background: rgba(18, 22, 35, 0.8);
+    }
+    h1 {
+      margin: 0 0 1.25rem;
+      font-size: clamp(1.15rem, 2vw, 1.75rem);
+      color: #b8bcff;
+    }
+    #spoken {
+      margin: 0;
+      max-width: 30ch;
+      font-size: clamp(2rem, 5.5vw, 5rem);
+      font-weight: 650;
+      line-height: 1.14;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
+    #direction {
+      margin: 1.5rem 0 0;
+      max-width: 70ch;
+      color: #aeb4c8;
+      font-size: clamp(1rem, 1.7vw, 1.25rem);
+      line-height: 1.5;
+    }
+    .timer {
+      grid-column: 1 / -1;
+      width: 100%;
+      height: 0.45rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #222738;
+    }
+    #progress {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #7774ff, #d6a942);
+    }
+    footer {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 0.75rem 1.25rem;
+      color: #aeb4c8;
+      font-size: clamp(0.8rem, 1.4vw, 1rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    button {
+      appearance: none;
+      border: 1px solid #3a4059;
+      border-radius: 0.7rem;
+      padding: 0.65rem 0.9rem;
+      background: #141827;
+      color: #f7f8ff;
+      font: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:focus-visible { outline: 3px solid #9693ff; outline-offset: 3px; }
+    .controls { display: flex; gap: 0.6rem; }
+    @media (max-width: 680px) {
+      header { align-items: flex-start; flex-direction: column; }
+      footer { grid-template-columns: 1fr; }
+      .timer { grid-column: 1; }
+      .controls { flex-wrap: wrap; }
+      #spoken { max-width: none; }
+    }
+    @media print {
+      body { background: white; color: black; }
+      main { display: block; min-height: auto; padding: 1cm; }
+      header, footer, .timer, .controls { display: none; }
+      article { break-after: page; }
+      #spoken { max-width: none; font-size: 26pt; }
+      #direction { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span>TenderVerdict · owner-recorded voice</span>
+      <span class="status">Silent visual timer · no mic · no audio</span>
+    </header>
+
+    <article aria-live="polite">
+      <div class="meta">
+        <span class="pill" id="counter">Take 01 / 8</span>
+        <span class="pill" id="timecode">00:00–00:10</span>
+        <span class="pill" id="target">Target voice 9.0 s</span>
+        <span class="pill" id="filename">TV_VO_01_problem_T01.wav</span>
+      </div>
+      <h1 id="title">Problem</h1>
+      <p id="spoken">One tender feed can mean different things for different suppliers.
+        TenderVerdict turns every notice into a clear human next step.</p>
+      <p id="direction">Calm opening. Stress different suppliers and human next step.</p>
+    </article>
+
+    <footer>
+      <div class="controls">
+        <button id="previous" type="button">← Previous</button>
+        <button id="start" type="button">Start / reset silent timer</button>
+        <button id="next" type="button">Next →</button>
+      </div>
+      <span>Keys: ← → navigate · Space starts timer · R resets</span>
+      <div class="timer" aria-label="Silent cue progress"><div id="progress"></div></div>
+    </footer>
+  </main>
+
+  <script id="voice-cues" type="application/json">
+[
+  {
+    "id": "01",
+    "title": "Problem",
+    "timecode": "00:00–00:09.5",
+    "targetSeconds": 8.1,
+    "filename": "TV_VO_01_problem_T01.wav",
+    "direction": "Calm opening. Stress different suppliers and human next step.",
+    "script": "One tender feed can mean different things for different suppliers. TenderVerdict turns every notice into a clear human next step."
+  },
+  {
+    "id": "02",
+    "title": "Local workflow",
+    "timecode": "00:09.5–00:22",
+    "targetSeconds": 10.9,
+    "filename": "TV_VO_02_local_workflow_T01.wav",
+    "direction": "Precise and reassuring. Pause after synthetic demo data.",
+    "script": "Everything runs locally on this Mac with synthetic demo data. Before the review starts, the app shows what was loaded and what is missing."
+  },
+  {
+    "id": "03",
+    "title": "Three verdicts",
+    "timecode": "00:22–00:36",
+    "targetSeconds": 12.3,
+    "filename": "TV_VO_03_three_verdicts_T01.wav",
+    "direction": "Give all three results equal weight; finish calmly on the human decision.",
+    "script": "Each notice gets one of three clear results: Open documents, Watch, or Reject. The reasons stay visible, and a person always makes the final decision."
+  },
+  {
+    "id": "04",
+    "title": "Free",
+    "timecode": "00:36–00:48",
+    "targetSeconds": 10.0,
+    "filename": "TV_VO_04_free_T01.wav",
+    "direction": "Confident but factual. Stress complete.",
+    "script": "The free version gives one complete supplier workflow: the full queue, visible reasons, source links, a review brief, and JSON export."
+  },
+  {
+    "id": "05",
+    "title": "Portfolio",
+    "timecode": "00:48–01:04",
+    "targetSeconds": 13.5,
+    "filename": "TV_VO_05_portfolio_T01.wav",
+    "direction": "Stress Portfolio Workspace; keep access separate from decisions.",
+    "script": "RevenueCat unlocks Portfolio Workspace: comparison and full export for up to five supplier profiles. It never creates a score or makes a bid decision."
+  },
+  {
+    "id": "06",
+    "title": "Test Store",
+    "timecode": "01:04–01:19.7",
+    "targetSeconds": 15.5,
+    "filename": "TV_VO_06_test_store_T01.wav",
+    "direction": "Evidence tone. Give the payment boundary two clear closing beats.",
+    "script": "In a verified RevenueCat Test Store run, the SDK showed a test purchase screen. CustomerInfo confirmed the entitlement was active. It was not an App Store payment. No money was charged."
+  },
+  {
+    "id": "07",
+    "title": "Judge Access",
+    "timecode": "01:19.7–01:35.7",
+    "targetSeconds": 15.4,
+    "filename": "TV_VO_07_judge_access_T01.wav",
+    "direction": "Stress checks; keep the recovery list measured.",
+    "script": "For judges, RevenueCat Judge Access checks the same entitlement without a purchase. A fresh CustomerInfo check, Restore, returning to the app, and a full relaunch all kept access active."
+  },
+  {
+    "id": "08",
+    "title": "Safety and license close",
+    "timecode": "01:35.7–01:49",
+    "targetSeconds": 12.9,
+    "filename": "TV_VO_08_boundary_T01.wav",
+    "direction": "Keep the synthetic-data, key, billing, and license boundaries factual.",
+    "script": "Synthetic demo data. No usable key stored. This is not a production billing. TenderVerdict is open-source macOS software under Apache 2.0."
+  }
+]
+  </script>
+  <script>
+    "use strict";
+    const cues = JSON.parse(document.getElementById("voice-cues").textContent);
+    const elements = {
+      counter: document.getElementById("counter"),
+      timecode: document.getElementById("timecode"),
+      target: document.getElementById("target"),
+      filename: document.getElementById("filename"),
+      title: document.getElementById("title"),
+      spoken: document.getElementById("spoken"),
+      direction: document.getElementById("direction"),
+      progress: document.getElementById("progress")
+    };
+    let index = 0;
+    let timerFrame = null;
+
+    function stopTimer() {
+      if (timerFrame !== null) cancelAnimationFrame(timerFrame);
+      timerFrame = null;
+      elements.progress.style.width = "0";
+    }
+
+    function render() {
+      stopTimer();
+      const cue = cues[index];
+      elements.counter.textContent = "Take " + cue.id + " / " + cues.length;
+      elements.timecode.textContent = cue.timecode;
+      elements.target.textContent = "Target voice " + cue.targetSeconds.toFixed(1) + " s";
+      elements.filename.textContent = cue.filename;
+      elements.title.textContent = cue.title;
+      elements.spoken.textContent = cue.script;
+      elements.direction.textContent = cue.direction;
+      document.title = cue.id + " · " + cue.title + " · TenderVerdict VO";
+    }
+
+    function navigate(delta) {
+      index = Math.max(0, Math.min(cues.length - 1, index + delta));
+      render();
+    }
+
+    function startTimer() {
+      stopTimer();
+      const duration = cues[index].targetSeconds * 1000;
+      const started = performance.now();
+      function tick(now) {
+        const fraction = Math.min(1, (now - started) / duration);
+        elements.progress.style.width = (fraction * 100).toFixed(2) + "%";
+        if (fraction < 1) timerFrame = requestAnimationFrame(tick);
+        else timerFrame = null;
+      }
+      timerFrame = requestAnimationFrame(tick);
+    }
+
+    document.getElementById("previous").addEventListener("click", () => navigate(-1));
+    document.getElementById("next").addEventListener("click", () => navigate(1));
+    document.getElementById("start").addEventListener("click", startTimer);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") navigate(-1);
+      if (event.key === "ArrowRight") navigate(1);
+      if (event.key === " " || event.code === "Space") {
+        event.preventDefault();
+        startTimer();
+      }
+      if (event.key.toLowerCase() === "r") stopTimer();
+    });
+    render();
+  </script>
+</body>
+</html>

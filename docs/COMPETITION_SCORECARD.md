@@ -1,0 +1,167 @@
+# Shipaton 2026 competition scorecard
+
+- Rechecked: 2026-08-19
+- Scope: Next Gen Award, macOS submission path
+- Decision rule: verified evidence is separated from inference and optional future validation
+
+This scorecard converts the public judging criteria and recurring winner patterns into product
+decisions. It does not predict a result, claim private judge preferences, or replace the controlling
+[evidence record](SHIPATON_EVIDENCE.md).
+
+The measurable progress ledger and exact current totals are maintained separately in
+[PROJECT_STATUS.md](PROJECT_STATUS.md). This scorecard explains quality and strategic fit; the
+ledger prevents those judgments from being confused with verified completion.
+
+## Public judges and judging contract
+
+The public Devpost page currently lists Charlie Chapman and David Barnard as judges. The Official
+Rules allow the panel to change, so TenderVerdict should be optimized for the published criteria,
+not for speculative personal taste.
+
+The Next Gen criteria are paraphrased below from the
+[Official Rules](https://revenuecat-shipaton-2026.devpost.com/rules):
+
+| Criterion | What the product must make obvious | Current evidence | State |
+|---|---|---|---|
+| Problem and experience | A clear, useful, interesting, original answer to a real problem | One notice feed is evaluated differently for several supplier profiles; verdicts remain explainable and human-owned | `STRONG_CONCEPT` |
+| Working application | Meaningful progress toward a functioning app, with core behavior visible in the repository and demo | Offline Python core, self-contained macOS app, real local files, deterministic export, and native review UI run locally | `VERIFIED_LOCALLY` |
+| RevenueCat and monetization | RevenueCat should control a thoughtful subscription, purchase, ads, or monetization experience | `supplier_profiles_plus` gates the multi-profile comparison while the complete single-profile workflow stays free; Test Store purchase, refresh, relaunch, and restore were exercised, and the Shipaton Manager confirmed Test Store is enough for Next Gen | `VERIFIED_TEST_STORE`, `ORGANIZER_CONFIRMED` |
+| Product and technical care | Intentional product decisions, build quality, and a well-presented result | One qualification engine, strict private bridge contracts, offline privacy, opt-in bookmark-only continuity, provenance, failure recovery, accessible terminal-state handling, packaging, public documentation, and a verified submitted entry | `STRONG_SUBMITTED_ENTRY` |
+
+The Devpost entry, public demo, truthful store-release field, exact competition branch, and
+logged-out project readback are complete. External workflow validation and a fresh VoiceOver pass
+could strengthen future product evidence but are not Next Gen requirements.
+
+## Category decision
+
+These are fit scores, not winning probabilities. The number and quality of final submissions in
+each category are unknown.
+
+| Category | Fit | Recommendation | Evidence-based reason |
+|---|---:|---|---|
+| **Next Gen Award** | **9 / 10** | **PRIMARY** | It directly rewards a clear useful idea, meaningful working progress, thoughtful RevenueCat use, technical choices, product thinking, and presentation. TenderVerdict has concrete evidence for every criterion and an organizer-confirmed Test Store path. |
+| RevenueCat Design Award | 6 / 10 | `SECONDARY_STORY` | The app is coherent, native, accessible, and visually restrained, but this category explicitly rewards delight, animation, and unusually strong visual craft. Do not distort a serious procurement tool merely to add spectacle. |
+| HAMM Award | 4 / 10 | `DO_NOT_OPTIMIZE_FOR_NOW` | The Free/Premium packaging is thoughtful, but the current rules ask for paywall and monetization strategy plus conversion or revenue results. A Test Store transaction proves integration, not real monetization performance. |
+| RevenueCat Peace Prize | 4 / 10 | `NOT_WITHOUT_USER_EVIDENCE` | Better procurement access for small suppliers could have social value, but the project has not yet proved community impact or reach. Do not retrofit an impact claim. |
+| Grand Prize / #BuildInPublic | 2 / 10 | `NOT_CURRENT_TARGETS` | They depend on live release, traction, growth, revenue, or a public build narrative that the Next Gen path intentionally does not require. |
+
+The [Next Gen page](https://www.shipaton.com/next-gen) says student projects remain in the broader
+prize mix. The inspected private form and organizer correction supported a truthful **Next Gen**
+submission with store release left false. No additional category claim should weaken that boundary
+or invent missing metrics.
+
+## What recent winners demonstrate
+
+The following is an inference from RevenueCat's official
+[2025 winners](https://www.revenuecat.com/blog/company/shipaton-2025-winners) and
+[2024 winners](https://www.revenuecat.com/blog/company/2024-ship-a-ton-winners/) announcements, not
+an additional judging rule:
+
+1. A narrow, immediately understandable core loop beats a broad feature inventory.
+2. Native polish matters when it supports the task: fast onboarding, clear interaction, haptics or
+   animation where appropriate, privacy, offline behavior, and accessibility.
+3. Monetization is strongest when Premium expands a real repeated job rather than removing a
+   basic safety or trust feature.
+4. Personal or observed problem evidence, user feedback, and signs of real use strengthen the
+   story more than speculative market claims.
+5. Technical ambition helps when the user can feel the result and the repository makes the work
+   inspectable.
+
+RevenueCat's own [Shipaton product guidance](https://www.revenuecat.com/blog/engineering/how-to-win-shipaton-part-1-coming-up-with-an-idea)
+similarly recommends a minimum lovable product around a real problem and early feedback. Its
+[pitch guidance](https://www.revenuecat.com/blog/engineering/how-to-win-shipaton-part-4-pitching-your-app)
+puts proof of the working experience ahead of an exhaustive feature tour.
+
+## Product decisions from the scorecard
+
+### Implemented in the current pass
+
+1. The Free surface now contains a real review queue, not only aggregate totals. Each notice shows
+   title, buyer, deadline, verdict, and the human next step.
+2. Verdict filters and progressive disclosure keep reasons and unknowns available without turning
+   the first screen into a wall of text.
+3. Valid supplied HTTPS sources open through an explicit safe link in both the native app and the
+   self-contained HTML report.
+4. Premium now contains a notice-by-profile comparison matrix. It shows independent verdicts and
+   explicitly avoids score, ranking, or an automatic recommendation.
+5. The Swift decoder validates complete result arrays, result counts, verdict totals, unique notice
+   identities, and the shared ordered notice set before anything is presented.
+6. A visible offering refresh action improves recovery without weakening the entitlement boundary.
+7. The native Profile Builder creates, renames, reorders, validates, and saves one to five complete
+   profiles; canonical Python normalization still decides what is accepted.
+8. CSV and JSON imports now show a deterministic bounded preview, canonical fields, metadata
+   warnings, and missing-field counts before analysis.
+9. Repeated work can opt in to security-scoped workspace/notices bookmarks, with explicit Forget,
+   no saved report, key, tender content, or review point, and no automatic analysis.
+10. Review and comparison use text, buyer, deadline-presence, and verdict filters backed by pure
+    queries; filtered results retain stable identity.
+11. Selecting a comparison cell opens the exact matching profile/notice reasons, unknowns, next
+    step, and safe source without relying on a filtered array offset.
+12. RevenueCat terminal states map to VoiceOver announcements and recovery focus, while contrast and
+    transparency treatments adapt to system accessibility settings.
+13. Demo/current/previous report state is explicit, retained exports are honestly labelled, and the
+    first synthetic Free profile demonstrates all three verdicts instead of looking incomplete.
+14. Native explanation disclosure prioritizes verdict drivers, while a locked disagreement count
+    communicates Premium value without exposing the gated reports or inventing a score.
+15. The opening hierarchy now leads with a Portfolio Signal: one feed, the number of supplier
+    profiles, the shared notice count, and the bounded count of outcomes that change by profile.
+16. Free/Premium packaging is stated before the technical Test Store status: Free is one complete
+    profile with reasons, a review brief, and JSON; Portfolio is up to five profiles, comparison,
+    a complete portfolio brief, and full portfolio JSON. The purchase control now names the value
+    being unlocked.
+17. The native app, README, demo script, and canonical Devpost story lead with one user-facing promise:
+    one tender feed and a clear next step for every supplier profile. The product vocabulary stays
+    concrete: open, verify, or skip, with human-owned next steps.
+18. The Export menu now provides a self-contained HTML human-review brief as well as JSON. It
+    preserves source order and the entitlement boundary, activates only verified HTTPS links, and
+    adds no cross-profile score, ranking, or recommendation.
+
+### Product status and optional follow-on evidence
+
+| Priority | Improvement | Current state | Why it matters | Acceptance evidence |
+|---|---|---|---|---|
+| Optional | Complete VoiceOver evidence pass | `OPTIONAL_ACCESSIBILITY_FOLLOW_UP` | Converts deterministic terminal-state handling into additional hands-on assistive-technology evidence | Keyboard, purchase/cancel/failure/retry/refresh/restore, Increase Contrast, Reduce Transparency, and large-text checks passed; spoken VoiceOver outcomes remain unverified |
+| Optional | Independent workflow validation | `OPTIONAL_FUTURE_VALIDATION` | Could test whether verdict wording and comparison reduce review work outside the synthetic scenario | Opt-in sessions and evidence-backed changes using public, synthetic, or de-identified data; no current user-value claim |
+| P1 | Native profile builder and editor | `IMPLEMENTED` | Removes hand-authored workspace JSON while preserving the strict canonical contract | Source checks and fresh Release embedded codec/normalizer determinism are green; interactive packaged UI pass remains |
+| P1 | Local workspace continuity | `IMPLEMENTED_OPT_IN` | Makes repeated supplier review feel like a product without creating an account | Only two security-scoped bookmarks persist; Forget clears them; no content/report/key/review point or auto-run |
+| P2 | Notice search and buyer/deadline filters | `IMPLEMENTED` | Keeps realistic files navigable without changing qualification semantics | Pure review-query checks and stable identities are green; final large-file hands-on pass remains |
+| P2 | Profile-focused drill-down | `IMPLEMENTED` | Lets a user move from comparison to evidence without losing context | A matrix cell opens the exact stable profile/notice reasons, unknowns, next step, and safe source |
+| P2 | Guided notice import | `IMPLEMENTED_BOUNDED` | Reveals source quality before a run without adding a fragile mapping language | Deterministic CSV/JSON preview, canonical fields, warnings, and missing-field counts |
+| P2 | Shareable human review brief | `IMPLEMENTED_BOUNDED` | Turns the accepted report into a concise colleague-facing handoff without changing qualification semantics | Deterministic self-contained HTML, Free/Premium projection, escaping, safe-link, no-ranking, and visual checks pass; external workflow usefulness still needs validation |
+| P3 | Local review notes and decision history | `POST_HACKATHON` | Could turn triage into a repeated team workflow, but it adds persistence, migration, and privacy scope | Design only after real users define what must be recorded and retained |
+| P3 | Saved local export presets | `DEFERRED` | Current atomic Save panel is adequate; a preset does not close a judging or trust gap | Reconsider only if opt-in sessions repeatedly identify export destination friction |
+
+Do not add cross-profile ranking, bid automation, confidential-document ingestion, hosted accounts,
+analytics, or production billing merely to look larger. None is required for the submitted Next
+Gen entry, and each would widen the trust and delivery surface.
+
+## Release and submitted-entry status
+
+The competition entry is submitted and publicly readable. Before and after the successful Submit,
+the following gates were verified:
+
+- the complete Python, Swift, package, public-tree, and security checks pass on the final candidate;
+- a fresh self-contained app passes launch, local-file run, Profile Builder save, import preview,
+  filtered review, comparison drill-down, source link, export, failure retention, and entitlement
+  recovery checks;
+- the final layout remains usable with Increase Contrast, Reduce Transparency, and large text;
+- the student and academic-email requirement is confirmed in the entrant account;
+- exact private Devpost fields are inspected, including store release left false;
+- public repository and final submission URLs are intentionally checked while logged out.
+
+The public project page renders without authentication and links the captioned v2 video plus the
+competition source branch. The private values themselves remain outside the repository; their
+truthful saved state and successful Submit readback are recorded in the
+[runbook](HACKATHON_RUNBOOK.md) and public-safe finalization receipt.
+
+The exact audited revision, current suite totals, pushed CI result, and SSD artifact provenance live
+in [project status](PROJECT_STATUS.md). The fresh final-product Debug transaction and silent settings
+pass are current. VoiceOver and independent-user outcomes remain optional and must not be claimed
+as verified unless a later dated pass establishes them.
+
+## Post-submission preservation
+
+Keep the public repository, v2 video, Devpost project, and Judge Access available through judging.
+Any competition-branch update must retain truthful Test Store/no-purchase copy, pass exact-head CI,
+and be checked through the logged-out public links. A consumer release remains separately blocked
+on signing/notarization, production billing readiness, and external workflow validation.

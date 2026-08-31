@@ -9,7 +9,7 @@
 - **Generator:** TenderVerdict 0.2.0a1
 - **Source kind:** synthetic\_demo
 - **Profile SHA-256:** `0a50cb80e9d2f9f61f6d7f9e5f24e5abaaf185ea985507c11cf922d0a2403d6a`
-- **Notices SHA-256:** `2bc23dc112526168591bc7922b477b2cb1dd73b00d1fc941db89cbd209f59a5d`
+- **Notices SHA-256:** `459dce067cffffdff323d71b873ebecb506c3d1d7814aa39166db3f31960f36d`
 
 ## Summary
 
@@ -56,7 +56,7 @@
 - Buyer metadata is supplied\.
 - Submission deadline leaves 49 days, meeting the 14\-day minimum\.
 - Four\-digit CPV class match only: profile 72260000, notice 72261000\.
-- Country match: DEU\.
+- Country match: AUT\.
 - A syntactically valid HTTPS source URL is supplied\.
 
 ### Unknowns
@@ -87,7 +87,7 @@
 
 - None from the supplied metadata.
 
-**Human next step:** Stop review unless the notice metadata is corrected\.
+**Human next step:** Do not proceed for this profile\. If the source metadata changes, correct the input and run again\.
 
 ---
 

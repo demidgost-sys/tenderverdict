@@ -24,11 +24,40 @@ Ordinary correctness errors, source-data corrections, and feature requests can u
 
 ## Security boundaries
 
-- `demo` and `qualify` operate on local files and require no network access.
+- `demo`, `qualify`, and `portfolio` operate on local files and require no network access.
 - `fetch-ted` is the only command that intentionally contacts an external service.
 - The desktop preview does not call `fetch-ted`; it accepts local normalized notice metadata.
+- Portfolio Workspace parses one bounded workspace and one bounded notice file before atomically
+  emitting JSON; one invalid nested profile fails the whole run.
 - The tool does not require credentials and should not be given secrets.
+- The unreleased Next Gen shell contains a pinned official RevenueCat SDK integration, but no API
+  key. In Debug only, it accepts a process-local Test Store-shaped key and stays locked without
+  one. Release builds compile-gate that path: they expose no key field and refuse configuration
+  before any RevenueCat SDK call.
+- A configured Debug launch can contact RevenueCat only after the evaluator supplies local
+  configuration and activates the corresponding UI control. Purchase is fail-closed to offering
+  `supplier_profiles_plus`, package `$rc_monthly`, and product
+  `supplier_profiles_plus_monthly`; restore uses fresh RevenueCat customer state and reloads only
+  that exact package after expiry. Do not put a key in source, reports, logs, issues, or build
+  artifacts.
+- Hackathon Judge Access accepts only pre-generated high-entropy codes whose digests are allowlisted
+  in the client, derives a RevenueCat App User ID, and still requires the active
+  `supplier_profiles_plus` entitlement returned by `CustomerInfo`. The raw codes stay in a private
+  owner handoff outside the repository and are cleared from the input field; RevenueCat may retain
+  the derived customer identity as normal SDK state. The client-side allowlist is an evaluation
+  convenience in an open-source app, not production authentication, DRM, or a confidential access
+  boundary. Known judge grants are rejected at and after the exclusive UTC cutoff
+  `2027-01-01T00:00:00Z`. The controller schedules local relock at the earlier of the active
+  RevenueCat entitlement expiration and that campaign cutoff. The visible inclusive UTC date is
+  derived from the same boundary; it is not a locally fabricated subscription duration.
+- The native shell passes only a minimal environment to its Python child process; RevenueCat
+  configuration and unrelated parent-process variables are not forwarded.
+- The open-source Python CLI and local input files remain directly accessible. The SwiftUI
+  entitlement state is a product presentation boundary, not an anti-tamper or confidentiality
+  control.
 - Output can contain content copied from input metadata. Treat generated files as untrusted data.
+  Python/Tk/HTML and SwiftUI presentation make control and bidirectional-formatting characters
+  visible; deterministic JSON exports preserve the underlying evidence contract.
 - A verdict is not a security, legal, eligibility, or procurement decision.
 
 The repository CI performs offline tests, public-tree and distribution validation, a conservative

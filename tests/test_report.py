@@ -87,11 +87,24 @@ class ReportTests(unittest.TestCase):
         self.assertIn('<meta name="viewport"', output)
         self.assertIn("overflow-wrap: anywhere", output)
         self.assertIn("@media (max-width: 32rem)", output)
+        self.assertIn("prefers-color-scheme: dark", output)
+        self.assertIn("@media print", output)
+        self.assertIn("Decision queue", output)
+        self.assertIn("What to open, verify, or skip.", output)
+        self.assertIn("Verdict drivers", output)
+        self.assertIn("Needs confirmation", output)
+        self.assertIn("Open documents", output)
+        self.assertNotIn(" — ", output)
         self.assertNotIn("<script", output.casefold())
         self.assertNotIn("<form", output.casefold())
         self.assertNotIn("<input", output.casefold())
         self.assertNotIn("src=", output.casefold())
         self.assertIn("Report provenance", output)
+        self.assertIn(
+            '<a class="source-link" href="https://procurement.example/notices/SYN-OPEN-001" ',
+            output,
+        )
+        self.assertIn('rel="noopener noreferrer"', output)
 
     def test_user_content_is_escaped_in_both_formats(self) -> None:
         malicious_notice = replace(
@@ -117,6 +130,7 @@ class ReportTests(unittest.TestCase):
         self.assertNotIn("<img", html.casefold())
         self.assertIn("&lt;script&gt;", html)
         self.assertIn("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;", html)
+        self.assertNotIn('href="javascript:', html.casefold())
         self.assertEqual(result[0].verdict, Verdict.REJECT)
 
     def test_terminal_and_bidi_controls_are_rendered_visibly(self) -> None:

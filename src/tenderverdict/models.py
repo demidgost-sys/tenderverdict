@@ -6,6 +6,7 @@ import csv
 import io
 import json
 import re
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -28,8 +29,10 @@ _RFC3339_UTC_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-
 _MISSING = object()
 
 MAX_PROFILE_FILE_BYTES = 256 * 1024
+MAX_WORKSPACE_FILE_BYTES = 256 * 1024
 MAX_NOTICES_FILE_BYTES = 10 * 1024 * 1024
 MAX_NOTICE_COUNT = 1_000
+MAX_PORTFOLIO_PROFILES = 5
 MAX_PROFILE_NAME_CHARACTERS = 200
 MAX_PUBLICATION_NUMBER_CHARACTERS = 200
 MAX_LOT_ID_CHARACTERS = 24
@@ -98,6 +101,20 @@ class Profile:
             "cpv_codes": list(self.cpv_codes),
             "countries": list(self.countries),
             "minimum_days_to_deadline": self.minimum_days_to_deadline,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class PortfolioWorkspace:
+    """A bounded, ordered collection of independently evaluated profiles."""
+
+    schema_version: int
+    profiles: tuple[Profile, ...]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": self.schema_version,
+            "profiles": [profile.to_dict() for profile in self.profiles],
         }
 
 
@@ -272,6 +289,52 @@ def profile_from_dict(data: Mapping[str, Any]) -> Profile:
     )
 
 
+def portfolio_workspace_from_dict(data: Mapping[str, Any]) -> PortfolioWorkspace:
+    """Validate a versioned workspace containing one to five named profiles."""
+
+    obj = _require_mapping(data, "workspace")
+    _reject_unknown_keys(obj, {"schema_version", "profiles"}, "workspace")
+
+    schema_version = _required(obj, "schema_version", "workspace")
+    if isinstance(schema_version, bool) or not isinstance(schema_version, int):
+        raise SchemaValidationError("workspace.schema_version must be an integer")
+    if schema_version != 1:
+        raise SchemaValidationError("workspace.schema_version must be 1")
+
+    profile_data = _required(obj, "profiles", "workspace")
+    if not isinstance(profile_data, list):
+        raise SchemaValidationError("workspace.profiles must be an array")
+    if not profile_data:
+        raise SchemaValidationError("workspace.profiles must contain at least 1 profile")
+    if len(profile_data) > MAX_PORTFOLIO_PROFILES:
+        raise SchemaValidationError(
+            f"workspace.profiles must contain at most {MAX_PORTFOLIO_PROFILES} profiles"
+        )
+
+    profiles: list[Profile] = []
+    seen_names: dict[str, int] = {}
+    for index, value in enumerate(profile_data):
+        try:
+            profile = profile_from_dict(_require_mapping(value, f"workspace.profiles[{index}]"))
+        except SchemaValidationError as exc:
+            message = str(exc)
+            if not message.startswith(f"workspace.profiles[{index}]"):
+                message = f"workspace.profiles[{index}]: {message}"
+            raise SchemaValidationError(message) from exc
+
+        normalized_name = _normalized_profile_identity(profile.name)
+        previous_index = seen_names.get(normalized_name)
+        if previous_index is not None:
+            raise SchemaValidationError(
+                "workspace profile names must be unique after case and width normalization: "
+                f"profiles[{index}].name duplicates profiles[{previous_index}].name"
+            )
+        seen_names[normalized_name] = index
+        profiles.append(profile)
+
+    return PortfolioWorkspace(schema_version=schema_version, profiles=tuple(profiles))
+
+
 def notice_from_dict(data: Mapping[str, Any], index: int | None = None) -> Notice:
     """Validate one normalized notice mapping.
 
@@ -437,6 +500,19 @@ def profile_from_json_bytes(payload: bytes, source: str | Path = "profile") -> P
     if not isinstance(data, Mapping):
         raise SchemaValidationError("profile must be a JSON object")
     return profile_from_dict(data)
+
+
+def portfolio_workspace_from_json_bytes(
+    payload: bytes,
+    source: str | Path = "workspace",
+) -> PortfolioWorkspace:
+    """Decode and validate one bounded UTF-8 portfolio workspace."""
+
+    _ensure_payload_size(payload, MAX_WORKSPACE_FILE_BYTES, "workspace")
+    data = _decode_json_bytes(payload, source)
+    if not isinstance(data, Mapping):
+        raise SchemaValidationError("workspace must be a JSON object")
+    return portfolio_workspace_from_dict(data)
 
 
 def notices_from_json_bytes(
@@ -723,6 +799,12 @@ def _required_nonempty_string(
             f"{label}.{key} must be at most {maximum_characters} characters"
         )
     return stripped
+
+
+def _normalized_profile_identity(value: str) -> str:
+    """Return the cross-runtime identity used to reject ambiguous profile names."""
+
+    return unicodedata.normalize("NFKC", value.strip()).casefold()
 
 
 def _optional_string(value: object, label: str, maximum_characters: int) -> str | None:

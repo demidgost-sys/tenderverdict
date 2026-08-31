@@ -13,6 +13,9 @@ a conclusion about whether an organisation can or should participate in a procur
 - `open_documents` means only that the configured deterministic metadata checks passed.
 - `watch` means that a person must resolve missing or ambiguous metadata.
 - `reject` records a configured metadata stop factor; it is not a legal disqualification.
+- Portfolio Workspace repeats the same metadata checks independently for each profile. It does not
+  compare, rank, score, or recommend profiles, and its top-level notice count is the size of the
+  shared input rather than a sum of repeated profile evaluations.
 
 ## Input and source risk
 
@@ -23,10 +26,11 @@ not establish that a code is appropriate for the actual scope. A source URL is c
 absolute HTTPS syntax; it establishes traceability, not correctness or live availability. Deadlines
 can be amended or subject to procedural rules not represented in the input.
 
-The model supports either a calendar date or a timezone-aware RFC 3339 deadline. Calendar dates
-retain the conservative v0.1 rule. An exact timestamp is compared precisely only when the review
-point is also a timezone-aware instant; a date-only boundary becomes `watch`. No deadline rule in
-TenderVerdict interprets extensions, time-zone law, portal availability, or procedural exceptions.
+The model supports either a calendar date or a whole-second timezone-aware RFC 3339 deadline;
+fractional seconds are not accepted. Calendar dates retain the conservative v0.1 rule. An exact
+timestamp is compared precisely only when the review point is also a timezone-aware instant; a
+date-only boundary becomes `watch`. No deadline rule in TenderVerdict interprets extensions,
+time-zone law, portal availability, or procedural exceptions.
 
 TED Search API output is notice-level. Multi-lot fetches are expanded only after a bounded official
 eForms XML document preserves each lot's identifier and fields, and Search/XML identifiers agree.
@@ -47,9 +51,21 @@ answer.
   treated as an empty market.
 - A successful zero-row snapshot is distinct from a failure and produces an explicit zero-notice
   report.
+- A portfolio workspace is limited to five profiles and 256 KiB. Its JSON output is a machine
+  contract; combined Markdown and HTML are not implemented. The only multi-profile presentation is
+  an unreleased macOS SwiftUI competition app, not the published Tk desktop.
+- The Next Gen source links the official RevenueCat SDK and implements offering, Test Store
+  purchase, restore, and entitlement-driven presentation states. The self-contained app and local
+  choose/run/review/export flow are verified, and a separate Debug artifact completed a Test Store
+  transaction, entitlement refresh, relaunch, and restore pass. There is no committed key, real
+  payment, account system, or production billing. The organizer's narrow Test Store-only answer is
+  recorded in the [Shipaton evidence](docs/SHIPATON_EVIDENCE.md); it does not turn a test transaction
+  into a real payment or the open-source portfolio CLI into a payment-enforcement boundary.
 - The unsigned desktop preview has no trusted installer or update channel. The Windows x64 alpha
   has native automated startup and synthetic-flow evidence but no hands-on usability run.
-  Automated platform smoke tests do not replace hands-on Windows, VoiceOver, or NVDA validation.
+  Automated platform smoke tests do not replace hands-on Windows or NVDA validation. The macOS
+  VoiceOver restore path passed once; asynchronous purchase announcements and display-setting
+  variants still need dedicated verification.
 
 The software is provided under the warranty disclaimer in the Apache License 2.0. Nothing in this
 repository is legal advice or a professional procurement opinion.

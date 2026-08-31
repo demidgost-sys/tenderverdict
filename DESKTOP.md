@@ -6,6 +6,13 @@ local interface over the same deterministic qualification workflow used by the C
 The preview is intended for evaluation. It is not a signed consumer release or a replacement for
 procurement, eligibility, or legal review.
 
+The Tk desktop remains a single-profile surface. The unreleased Portfolio Workspace contract is
+available through the local `portfolio` CLI and an additional competition-only SwiftUI app under
+`macos/TenderVerdictNextGen`. That app is not part of `v0.2.0-alpha.1` or its archives. Current
+source can build a separate self-contained, ad-hoc-signed Next Gen `.app`, but neither that package
+nor its local UX evidence proves a Test Store transaction or qualifying submission. See the
+[Next Gen README](macos/TenderVerdictNextGen/README.md).
+
 ## Release status
 
 The source UI and unsigned native archives are published in the `v0.2.0-alpha.1` prerelease. Each
@@ -22,7 +29,8 @@ control to run an unsigned artifact.
 1. Enter a supplier name, CPV codes, countries, and a minimum lead time.
 2. Choose a local normalized notices CSV or JSON file, save an editable CSV example, or use the
    bundled synthetic demo.
-3. Enter an explicit review date or RFC 3339 instant with a UTC offset.
+3. Enter an explicit review date or the supported whole-second RFC 3339 form with a UTC offset;
+   fractional seconds are not accepted.
 4. Filter by verdict, sort the queue by a column heading, inspect reasons and unknowns, and copy a
    selected result as plain text when useful.
 5. Export a complete HTML, Markdown, or JSON report to a location you choose.

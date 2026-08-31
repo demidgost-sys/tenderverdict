@@ -1,0 +1,86 @@
+# Shipaton submission assets
+
+This directory contains public, synthetic-only entry materials. It must never contain a RevenueCat
+key, account screenshot, private identifier, confidential notice, or unsupported transaction claim.
+Overall readiness is recorded in [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md); the final
+evidence sequence is in the [`Shipaton runbook`](../docs/HACKATHON_RUNBOOK.md).
+
+## Asset status
+
+| Asset | Current status | Contract |
+|---|---|---|
+| `icon-1024.png` | Ready | Exactly 1024×1024, extracted byte-for-byte from the reviewed ICNS 1024 px chunk |
+| `gallery-hero-1020x754.png` | Ready current candidate | Exactly 1020×754, direct capture from the current packaged native app for the first gallery image after the video; synthetic data and no purchase state |
+| `screenshot-1179x2556.png` | Ready current candidate | Exactly 1179×2556, regenerated from the current native UX, sanitized, and visually reviewed in light and dark appearance; repeat after later visual changes |
+| `evidence/unlocked-test-store-2026-08-04.png` | Valid baseline evidence | Genuine 1020×754 packaged Debug app after Test Store unlock; no key or customer identifier; not final-current-revision proof |
+| `evidence/voiceover-restore-2026-08-04.png` | Valid baseline evidence | VoiceOver enabled with native Restore focus; manual async success/cancel/failure announcements are unverified optional follow-up evidence |
+| `evidence/unlocked-judge-access-2026-08-09.png` | Ready current evidence | Genuine 1020×754 exact `cbe8b20` Judge Access screen after refresh, Restore, foreground, and relaunch; no purchase, key, reviewer code, or customer identifier |
+| `video/` | Ready local and hosted handoff | Exact 1:49 human-narrated master, silent animatic fallback, captions, manifests, privacy/claim audit, contact sheet, and QA receipts; raw MP4/WAV remain ignored |
+| `linkedin-project-story.md` | Published by owner; readback not independently audited | Human first-person Shipaton project story with no recruitment or user-validation claim |
+| Link-accessible video | v2 ready and owner-approved | `https://www.youtube.com/watch?v=HFBtMsN7Nlk`, 1:49, packaged macOS app, repaired owner narration, burned English captions plus matching YouTube SRT; owner watch/listen, logged-out oEmbed, and policy checks pass; superseded v1 is private |
+| `devpost-draft.md` | Submitted canonical story | Product story, judging proof, live competition branch, initial successful Submit head, video URL, and video SHA-256 are recorded |
+| `DEVPOST_FINALIZATION_QA.md` | Current public-safe receipt | Truthful saved-field boundary, final Submit result, media readback, escalation, and exact next action without private values |
+
+The source now includes Profile Builder, notice import preview, opt-in security-scoped bookmark
+continuity, review/comparison search and buyer/deadline filters, stable comparison-cell drill-down,
+and terminal RevenueCat accessibility announcements/focus recovery. The portrait capture shows the
+complete Free and locked Portfolio surface; the current Judge Access capture leads the
+cross-profile story with a genuine unlocked comparison. The dated Test Store and VoiceOver
+captures remain baseline evidence.
+
+The clean release-configuration package named in project status passed
+configuration-specific native checks, embedded-core determinism and contracts, signature,
+checksum, ZIP integrity, and worktree-independent smoke. Its `.app`, zip, exact SHA-256, and
+manifest live in [`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md). The portrait/icon asset gate
+also passes. Clean `3cf20ed` remains the purchase/cancel/failure baseline, while clean `cbe8b20`
+covers the current granted-entitlement refresh, Restore, foreground, relaunch, and silent
+accessibility-tree evidence. Hands-on VoiceOver announcements remain an optional accessibility
+follow-up rather than a submission gate.
+
+The video handoff in [`video/`](video/) is locally complete. The final master uses only the owner's
+self-recorded voice, includes burned English captions, and has matching YouTube SRT captions.
+Metadata, visual privacy, YouTube policy, owner watch/listen, and logged-out link checks pass.
+
+Every truthful Devpost Additional info value was saved, including store release = false. After the
+organizer fixed the contradictory required-field validation, final Submit succeeded and both the
+authenticated `Submitted` view and logged-out public page were verified. Current readiness and the
+exact public-safe receipt are tracked in
+[`docs/PROJECT_STATUS.md`](../docs/PROJECT_STATUS.md) and
+[`DEVPOST_FINALIZATION_QA.md`](DEVPOST_FINALIZATION_QA.md); no private account value is copied here.
+
+The final candidate must emit `NEXT_GEN_CHECKS_OK` in Debug and Release; the current expected total
+is recorded only in project status. The suite includes display safety, schema-3 Free export
+isolation, exact RevenueCat identifiers, and pure Portfolio announcement/recovery/focus outcomes.
+
+## Organizer proof
+
+- [Shipaton Manager answer: Test Store-only purchase is acceptable](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44695-next-gen-eligibility-is-a-test-store-only-purchase-sufficient)
+- [Shipaton answer: macOS is eligible with no platform-only disadvantage](https://revenuecat-shipaton-2026.devpost.com/forum_topics/44615-macos-app-submission)
+
+Preserve the full dated threads. These answers resolve the Test Store and platform interpretations;
+the separate field-specific organizer response and final submission outcome are recorded in the
+[evidence ledger](../docs/SHIPATON_EVIDENCE.md).
+
+## Regenerate and validate
+
+Build the final revision first, then regenerate the portrait candidate. Capture the gallery hero
+directly from the current packaged Release app at the top of the guided synthetic example:
+
+```bash
+TENDERVERDICT_WORKTREE="$PWD" \
+  swift run --package-path macos/TenderVerdictNextGen \
+  TenderVerdictNextGen --render-submission-screenshot \
+  "$PWD/submission/screenshot-1179x2556.png"
+python3 tools/prepare_submission_assets.py
+python3 tools/check_public_tree.py
+```
+
+The sanitizer removes ancillary PNG metadata chunks without changing `IHDR`, `IDAT`, or `IEND`
+image data. The public-tree gate verifies exact dimensions and PNG structure; it cannot replace a
+human visual check of clipping, hierarchy, focus, contrast, or truthful entitlement state.
+
+For the final entry, place the deterministic 1020×754 gallery hero immediately after the video,
+then the genuine `evidence/unlocked-judge-access-2026-08-09.png` comparison and the exact
+1179×2556 portrait.
+Label Judge Access as a granted entitlement, not a purchase. Do not use a hidden launch flag,
+edited entitlement, mock purchase, or composited fake as transaction evidence.

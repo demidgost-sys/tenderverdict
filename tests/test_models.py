@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from datetime import UTC, date, datetime
@@ -7,6 +8,8 @@ from pathlib import Path
 
 from tenderverdict.models import (
     MAX_NOTICE_COUNT,
+    MAX_PORTFOLIO_PROFILES,
+    MAX_WORKSPACE_FILE_BYTES,
     SchemaValidationError,
     load_notices,
     load_profile,
@@ -17,6 +20,8 @@ from tenderverdict.models import (
     parse_iso_date,
     parse_review_point,
     parse_rfc3339_datetime,
+    portfolio_workspace_from_dict,
+    portfolio_workspace_from_json_bytes,
     profile_from_dict,
     render_notices_csv,
 )
@@ -28,6 +33,10 @@ VALID_PROFILE = {
     "countries": ["AUT", "DEU"],
     "minimum_days_to_deadline": 14,
 }
+
+
+def _workspace_profile(name: str) -> dict[str, object]:
+    return {**VALID_PROFILE, "name": name}
 
 
 class ProfileValidationTests(unittest.TestCase):
@@ -55,6 +64,92 @@ class ProfileValidationTests(unittest.TestCase):
         for value in invalid_variants:
             with self.subTest(value=value), self.assertRaises(SchemaValidationError):
                 profile_from_dict(value)
+
+
+class PortfolioWorkspaceValidationTests(unittest.TestCase):
+    def test_workspace_accepts_one_and_five_profiles_in_input_order(self) -> None:
+        for count in (1, MAX_PORTFOLIO_PROFILES):
+            with self.subTest(count=count):
+                names = [f"Example Profile {index}" for index in range(count)]
+                workspace = portfolio_workspace_from_dict(
+                    {
+                        "schema_version": 1,
+                        "profiles": [_workspace_profile(name) for name in names],
+                    }
+                )
+
+                self.assertEqual([profile.name for profile in workspace.profiles], names)
+                self.assertEqual(workspace.to_dict()["schema_version"], 1)
+
+    def test_workspace_rejects_zero_or_more_than_five_profiles(self) -> None:
+        invalid_counts = (0, MAX_PORTFOLIO_PROFILES + 1)
+        for count in invalid_counts:
+            with self.subTest(count=count), self.assertRaises(SchemaValidationError):
+                portfolio_workspace_from_dict(
+                    {
+                        "schema_version": 1,
+                        "profiles": [
+                            _workspace_profile(f"Example Profile {index}") for index in range(count)
+                        ],
+                    }
+                )
+
+    def test_workspace_rejects_duplicate_names_after_identity_normalization(self) -> None:
+        duplicate_pairs = (
+            (" Example Austria Services ", "example austria services"),
+            ("A", "Ａ"),
+            ("Café", "Cafe\N{COMBINING ACUTE ACCENT}"),
+            ("Straße", "STRASSE"),
+        )
+
+        for first, second in duplicate_pairs:
+            with (
+                self.subTest(first=first, second=second),
+                self.assertRaisesRegex(
+                    SchemaValidationError, "unique after case and width normalization"
+                ),
+            ):
+                portfolio_workspace_from_dict(
+                    {
+                        "schema_version": 1,
+                        "profiles": [
+                            _workspace_profile(first),
+                            _workspace_profile(second),
+                        ],
+                    }
+                )
+
+    def test_workspace_rejects_bad_schema_shape_and_nested_profile(self) -> None:
+        invalid_variants = (
+            {"schema_version": 2, "profiles": [_workspace_profile("Example One")]},
+            {
+                "schema_version": 1,
+                "profiles": [_workspace_profile("Example One")],
+                "unexpected": True,
+            },
+            {"schema_version": 1, "profiles": "not-an-array"},
+            {
+                "schema_version": 1,
+                "profiles": [{**_workspace_profile("Example One"), "countries": ["ZZZ"]}],
+            },
+        )
+
+        for value in invalid_variants:
+            with self.subTest(value=value), self.assertRaises(SchemaValidationError):
+                portfolio_workspace_from_dict(value)
+
+    def test_workspace_json_is_bounded_and_must_be_an_object(self) -> None:
+        valid = {
+            "schema_version": 1,
+            "profiles": [_workspace_profile("Example One")],
+        }
+        workspace = portfolio_workspace_from_json_bytes(json.dumps(valid).encode())
+        self.assertEqual(workspace.profiles[0].name, "Example One")
+
+        with self.assertRaisesRegex(SchemaValidationError, "JSON object"):
+            portfolio_workspace_from_json_bytes(b"[]")
+        with self.assertRaisesRegex(SchemaValidationError, "256 KiB"):
+            portfolio_workspace_from_json_bytes(b" " * (MAX_WORKSPACE_FILE_BYTES + 1))
 
 
 class NoticeValidationTests(unittest.TestCase):

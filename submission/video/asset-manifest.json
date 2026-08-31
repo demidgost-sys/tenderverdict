@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "path": "../screenshot-1179x2556.png",
+      "format": "png",
+      "sha256": "6ce7bf1080aa2cc345c6f4cf138450e53dd54f274c355c9d7ef43ce60762e7a0",
+      "width": 1179,
+      "height": 2556,
+      "evidence_class": "current deterministic submission render",
+      "allowed_claims": ["problem", "local workflow", "three verdicts", "Free first profile"]
+    },
+    {
+      "path": "../../demo/screenshot.png",
+      "format": "png",
+      "sha256": "585fd257b1f303b4f4ba1625c2101c023bbb33d8ba4edcb59cca39a06390db12",
+      "width": 1098,
+      "height": 889,
+      "evidence_class": "current deterministic static report render",
+      "allowed_claims": ["three verdicts", "supplied source link", "report provenance"]
+    },
+    {
+      "path": "../evidence/unlocked-judge-access-2026-08-09.png",
+      "format": "png",
+      "sha256": "7432611a953749f5c19ebc5a02e1092da564e43e574600308bc4cf26eb94c3c9",
+      "width": 1020,
+      "height": 754,
+      "evidence_class": "current genuine cbe8b20 Judge Access capture",
+      "allowed_claims": ["Portfolio comparison", "RevenueCat granted entitlement", "Restore visible", "no purchase"]
+    },
+    {
+      "path": "../evidence/unlocked-test-store-2026-08-04.png",
+      "format": "png",
+      "sha256": "4a6909e1f3eae7ecf0aa64e526e838f6f56be5717aa0f4e1d53cb6b2828e693d",
+      "width": 1020,
+      "height": 754,
+      "evidence_class": "dated genuine Test Store unlocked baseline",
+      "allowed_claims": ["historical Test Store entitlement", "three fixture profiles", "Restore visible"]
+    },
+    {
+      "path": "../icon-1024.png",
+      "format": "png",
+      "sha256": "46ce775c84ae82b6942c55887e37c8928135b815c584179ba3ac659c9f546480",
+      "width": 1024,
+      "height": 1024,
+      "evidence_class": "current reviewed submission icon",
+      "allowed_claims": ["TenderVerdict identity"]
+    },
+    {
+      "path": "assets/test-store-purchase-sheet-baseline-2026-08-04.jpg",
+      "format": "jpeg",
+      "sha256": "93ea07ce974a26a533783704162bc32218786cab9fcd31444ebacf557c3c1364",
+      "decoded_pixel_sha256": "833dc77a5a808eb22837e9e13ae87b7b78441de5fa82560f9063eb6a2c2f5c4e",
+      "width": 272,
+      "height": 456,
+      "evidence_class": "dated genuine Test Store purchase-sheet baseline; lossless metadata removal with decoded pixels unchanged",
+      "allowed_claims": ["development-only Test Store sheet", "localized test price", "no real charge"]
+    },
+    {
+      "path": "assets/entitlement-restored-on-relaunch-baseline-2026-08-04.jpg",
+      "format": "jpeg",
+      "sha256": "fe39b49a226095a241e5c7ce01fbdc5a58eb2035f9912bd95e21a1f6cb546fc0",
+      "decoded_pixel_sha256": "e27714388f01052dd0bb0238e1c287c8ad34b450a332d58a5d820410a3e3444c",
+      "width": 1020,
+      "height": 754,
+      "evidence_class": "dated genuine relaunch baseline; lossless metadata removal with decoded pixels unchanged",
+      "allowed_claims": ["historical entitlement recovered after relaunch", "Restore visible"]
+    }
+  ]
+}
